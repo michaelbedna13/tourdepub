@@ -11,7 +11,13 @@ let prekresli = () => {};
 let cekaZapis = false;
 let chyba = "";
 
-export const stavSyncu = () => ({ rezim, pocet: zvenku.length, chyba });
+export const stavSyncu = () => ({
+  rezim,
+  pocet: zvenku.length,
+  chyba,
+  // bez signálu to není špatné nastavení, jen se nemá kam připojit
+  offline: typeof navigator !== "undefined" && navigator.onLine === false,
+});
 export const ostatniTymy = () => zvenku;
 
 export async function spustSync(naZmenuPohledu) {
@@ -21,7 +27,7 @@ export async function spustSync(naZmenuPohledu) {
   rezim = "pripojuji";
   prekresli();
   try {
-    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.45.4");
+    const { createClient } = await nactiKlienta();
     klient = createClient(SUPABASE_URL, SUPABASE_KEY);
     // První čtení musí projít, jinak bychom se tvářili připojeně a nic by se nesdílelo.
     // Typicky tu spadne chybějící tabulka nebo špatný klíč – to se musí poznat.
@@ -40,10 +46,29 @@ export async function spustSync(naZmenuPohledu) {
     // bez signálu zápis spadne; jak se síť vrátí, dopošle se
     addEventListener("online", posliOpatrne);
   } catch (e) {
-    chyba = e?.message || String(e);
+    chyba = popisChyby(e);
     rezim = "chyba"; // nevadí, hra funguje dál lokálně
   }
   prekresli();
+}
+
+// Verze musí umět nový formát klíče (sb_publishable_…). Starší klient ho nepozná
+// a připojení selže. Drž ji stejnou, jakou má untrois.
+const VERZE_KLIENTA = "2.117.2";
+const CDN = [
+  `https://esm.sh/@supabase/supabase-js@${VERZE_KLIENTA}`,
+  `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@${VERZE_KLIENTA}/+esm`,
+];
+
+/** Stáhne klienta. Když první CDN nejede, zkusí druhé — na jedné adrese
+ *  by celé živé pořadí viselo zbytečně. */
+async function nactiKlienta() {
+  let posledni;
+  for (const adresa of CDN) {
+    try { return await import(/* @vite-ignore */ adresa); }
+    catch (e) { posledni = e; }
+  }
+  throw new Error("Nepodařilo se stáhnout klienta Supabase: " + popisChyby(posledni));
 }
 
 /** Zapisovat při každém ťuknutí by bylo zbytečně často, tak se to slučuje. */
@@ -85,8 +110,28 @@ async function nacti() {
     prekresli();
     return true;
   } catch (e) {
-    chyba = e?.message || String(e);
+    chyba = popisChyby(e);
     prekresli();
     return false; // ponecháme poslední známé pořadí
   }
+}
+
+/** Supabase vrací kód i radu, a ty rozhodnou, co je špatně. Samotné „Failed to
+ *  fetch" nestačí na nic. */
+function popisChyby(e) {
+  if (!e) return "neznámá chyba";
+  const kusy = [];
+  if (e.code) kusy.push(e.code);
+  if (e.message) kusy.push(e.message);
+  if (e.hint) kusy.push("Rada: " + e.hint);
+  if (e.details) kusy.push(e.details);
+  return kusy.length ? kusy.join(" · ") : String(e);
+}
+
+/** Zkusit se připojit znovu, aniž by se načítala celá stránka. */
+export async function zkusZnovu() {
+  klient = null;
+  rezim = "ukazka";
+  chyba = "";
+  await spustSync(prekresli);
 }

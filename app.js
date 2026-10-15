@@ -12,7 +12,7 @@ import {
   pridejNovyUkol, upravUkol, smazUkol, ukolPodleId, BARVY,
 } from "./stav.js";
 import { ikona, carky, obtiznost, sklonuj, sklonujUkol, bezpecne, vazat } from "./ui.js";
-import { spustSync, stavSyncu, ostatniTymy } from "./sync.js";
+import { spustSync, stavSyncu, ostatniTymy, zkusZnovu } from "./sync.js";
 
 /** Postaví kostru stránky, když chybí.
  *
@@ -92,10 +92,16 @@ function pruhSyncu(podrobne = false) {
   if (s.rezim === "ukazka")
     return `<div class="rezim">${ikona("zamek", 16)}
       <span>Zapisuje se jen do tohohle telefonu. Jak zapnout živé pořadí, je v README.</span></div>`;
-  if (s.rezim === "chyba")
+  if (s.rezim === "chyba") {
+    if (s.offline)
+      return `<div class="rezim">${ikona("zamek", 16)}
+        <span>Jsi offline. Zapisuje se do telefonu a pošle se to, až bude signál.</span></div>`;
     return `<div class="rezim chybny">${ikona("zamek", 16)}
-      <span>Živé pořadí se nepřipojilo, hra běží dál jen z telefonu.${
-        podrobne && s.chyba ? `<br><span class="drobne">${bezpecne(s.chyba)}</span>` : ""}</span></div>`;
+      <span>Živé pořadí se nepřipojilo, hra běží dál jen z telefonu.
+        ${s.chyba ? `<br><span class="drobne">${bezpecne(s.chyba)}</span>` : ""}
+        <br><button class="tl maly" data-akce="sync-znovu"
+          style="margin-top:9px">Zkusit znovu</button></span></div>`;
+  }
   if (s.rezim === "zivo" && podrobne)
     return `<div class="rezim zivy">${ikona("check", 16)}
       <span>Živé pořadí běží${s.pocet ? `, vidíš ${s.pocet} ${
@@ -652,6 +658,7 @@ function obsluha(e) {
     case "hospoda-plus": posunHospodu(1); window.scrollTo(0, 0); break;
     case "hospoda-min": posunHospodu(-1); window.scrollTo(0, 0); break;
     case "zavri": zavri(); break;
+    case "sync-znovu": zkusZnovu(); break;
 
     case "uloz-tym": {
       const nazev = hodnota("pole-nazev").trim().slice(0, 40);
