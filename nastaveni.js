@@ -13,3 +13,9 @@ export const TABULKA = "tourdepub_tymy";
 
 // Název hry. Když byste chtěli hrát víckrát, změň ho a ročníky se nebudou míchat.
 export const HRA = "brno-2026";
+
+// Kód, kterým se odemknou úpravy úkolů a hospod. Kdo ho nezadá, může jenom hrát.
+// POZOR: je to zámek proti omylu a zvědavosti, ne bezpečnost. Web je veřejný
+// a statický, takže kdo se podívá do zdrojáku, kód si přečte. Na partu kamarádů
+// to stačí; kdyby mělo jít o víc, musela by přibýt opravdová práva v databázi.
+export const ADMIN_KOD = "sladek";

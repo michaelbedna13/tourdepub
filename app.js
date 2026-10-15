@@ -1,22 +1,42 @@
 // Obrazovky a ovládání. Jedna stránka, mezi pohledy se přepíná spodní lištou.
-// Při hře se ťuká jednou rukou v hospodě, tak jsou terče velké a nic není schované.
+// Lišta a okno stojí mimo překreslovanou část, jinak by při každém zápisu probliklo.
+// Při hře se ťuká jednou rukou v hospodě, tak jsou terče velké a hlavní akce jasná.
 import { KATEGORIE, ZAKLAD, OBTIZNOST } from "./data.js";
+import { ADMIN_KOD } from "./nastaveni.js";
+import { LOGO } from "./logo.js";
 import {
-  stav, uloz, naZmenu, tym, body, rozpad, strop, dostupnost, kolikrat, jdePridat,
+  stav, naZmenu, tym, body, rozpad, strop, dostupnost, kolikrat, jdePridat,
   prepniZaklad, pridejUkol, uberUkol, nastavHospodu, posunHospodu, hospodaTed, indexHospody,
   pridejTym, upravTym, smazTym, prepniTym, vynulujTym,
   pridejHospodu, upravHospodu, smazHospodu, posunHospoduVPoradi,
   pridejNovyUkol, upravUkol, smazUkol, ukolPodleId, BARVY,
 } from "./stav.js";
-import { ikona, carky, obtiznost, nazevObtiznosti, sklonuj, sklonujUkol, bezpecne } from "./ui.js";
+import { ikona, carky, obtiznost, sklonuj, sklonujUkol, bezpecne, vazat } from "./ui.js";
 import { spustSync, stavSyncu, ostatniTymy } from "./sync.js";
 
-const el = document.getElementById("app");
+const elObrazovka = document.getElementById("obrazovka");
+const elLista = document.getElementById("lista");
+const elOkno = document.getElementById("okno");
+
 let pohled = "hra";
-let okno = null;       // { druh, id, ... } – otevřené okno
-let konceptBarvy = null;
-let konceptPiva = null;
-let konceptKat = null;
+let kategorieFiltr = "vse";
+let okno = null;
+let konceptBarvy = null, konceptPiva = null;
+
+/* ---------- režim správce ---------- */
+// Zámek proti omylu, ne bezpečnost: web je statický a veřejný, kód si jde přečíst
+// ze zdrojáku. Na partu kamarádů to stačí – brání tomu, aby někdo omylem přepsal
+// úkoly uprostřed hry.
+const KLIC_SPRAVCE = "tourdepub-spravce";
+let jeSpravce = false;
+try { jeSpravce = localStorage.getItem(KLIC_SPRAVCE) === ADMIN_KOD; } catch {}
+function nastavSpravce(zapnuto) {
+  jeSpravce = zapnuto;
+  try {
+    if (zapnuto) localStorage.setItem(KLIC_SPRAVCE, ADMIN_KOD);
+    else localStorage.removeItem(KLIC_SPRAVCE);
+  } catch {}
+}
 
 /* ---------- drobnosti ---------- */
 
@@ -32,7 +52,7 @@ function odmena(text) {
 function hlava() {
   const t = tym();
   return `<div class="hlava">
-    <div class="logo">Tour de Pub</div>
+    <span class="logo">${LOGO}</span>
     <button class="prepinac-tymu" data-okno="tymy-rychle" aria-label="Přepnout tým">
       <span class="tecka" style="background:${bezpecne(t?.barva || BARVY[0])}"></span>
       <b>${bezpecne(t?.nazev || "Bez týmu")}</b>
@@ -42,7 +62,7 @@ function hlava() {
 }
 
 /** Pruh o tom, jestli se skóre sdílí. Rozlišuje tři stavy, protože „tváříme se
- *  připojeně, ale nic se neposílá“ je ten nejhorší, co může nastat. */
+ *  připojeně, ale nic se neposílá" je ten nejhorší, co může nastat. */
 function pruhSyncu(podrobne = false) {
   const s = stavSyncu();
   if (s.rezim === "ukazka")
@@ -51,11 +71,23 @@ function pruhSyncu(podrobne = false) {
   if (s.rezim === "chyba")
     return `<div class="rezim chybny">${ikona("zamek", 16)}
       <span>Živé pořadí se nepřipojilo, hra běží dál jen z telefonu.${
-        podrobne && s.chyba ? ` <br><span class="drobne">${bezpecne(s.chyba)}</span>` : ""}</span></div>`;
+        podrobne && s.chyba ? `<br><span class="drobne">${bezpecne(s.chyba)}</span>` : ""}</span></div>`;
   if (s.rezim === "zivo" && podrobne)
     return `<div class="rezim zivy">${ikona("check", 16)}
-      <span>Živé pořadí běží${s.pocet ? `, vidíš ${s.pocet} ${s.pocet === 1 ? "partu" : s.pocet < 5 ? "party" : "part"} z jinejch telefonů` : " – zatím nikdo jinej nepřipojenej"}.</span></div>`;
+      <span>Živé pořadí běží${s.pocet ? `, vidíš ${s.pocet} ${
+        s.pocet === 1 ? "partu" : s.pocet < 5 ? "party" : "part"} z jinejch telefonů` : " – zatím nikdo jinej nepřipojenej"}.</span></div>`;
   return "";
+}
+
+/** Všechny týmy (místní i ze serveru) seřazené podle čárek. */
+function poradiTymu() {
+  const mistni = stav.tymy.map((t) => ({
+    id: t.id, nazev: t.nazev || "Bez názvu", barva: t.barva, body: body(t),
+    rozpad: rozpad(t), hospoda: indexHospody(t) + 1, mistni: true,
+  }));
+  const zvenku = ostatniTymy().filter((z) => !mistni.some((m) => m.id === z.id));
+  return [...mistni, ...zvenku]
+    .sort((a, b) => b.body - a.body || (b.rozpad?.makacky || 0) - (a.rozpad?.makacky || 0));
 }
 
 /* ---------- obrazovka: Hra ---------- */
@@ -72,50 +104,69 @@ function hra() {
   const zbyva = stav.ukoly.filter((u) => jdePridat(u, t)).length;
 
   const trasa = stav.hospody.map((x, j) => {
-    const stavD = x.id === t.hospoda ? " ted" : t.prichod[x.id] ? " splneno" : "";
-    return `<div class="trasa-bod${stavD}" title="${j + 1}. ${bezpecne(x.nazev)}"></div>`;
+    const s = x.id === t.hospoda ? " ted" : t.prichod[x.id] ? " splneno" : "";
+    return `<div class="trasa-bod${s}" title="${j + 1}. ${bezpecne(x.nazev)}"></div>`;
   }).join("");
+
+  const poradi = poradiTymu();
+  const nejvic = poradi[0]?.body || 0;
 
   return `
     ${hlava()}
     ${pruhSyncu()}
 
     <div class="staci">
-      <div class="staci-poradi cislo">${i + 1}</div>
-      <div style="min-width:0">
+      <button class="ikonove" data-akce="hospoda-min" ${i <= 0 ? "disabled" : ""}
+        aria-label="Předchozí špeluňka">${ikona("i-zpet", 17)}</button>
+      <div class="staci-text">
         <h1>${bezpecne(h?.nazev || "Žádná špeluňka")}</h1>
-        <div class="staci-kolik cislo">${i + 1} z ${stav.hospody.length}</div>
+        <div class="staci-kolik cislo">ŠTACE ${i + 1} Z ${stav.hospody.length}</div>
       </div>
+      <button class="ikonove" data-akce="hospoda-plus" ${i >= stav.hospody.length - 1 ? "disabled" : ""}
+        aria-label="Další špeluňka">${ikona("i-zpet", 17, "otocit")}</button>
     </div>
     <div class="trasa">${trasa}</div>
 
-    <div class="tl-rada" style="margin-bottom:10px">
-      <button class="tl" data-akce="hospoda-min" ${i <= 0 ? "disabled" : ""}>
-        ${ikona("i-zpet", 18)} Zpátky</button>
-      <button class="tl" data-akce="hospoda-plus" ${i >= stav.hospody.length - 1 ? "disabled" : ""}>
-        Další ${ikona("i-zpet", 18, "otocit")}</button>
+    <div class="akce-bloku">
+      <button class="tl ${jePrichod ? "hotovo" : "hlavni"}" data-akce="prichod">
+        ${ikona(jePrichod ? "check" : "mista", 20)} ${jePrichod ? "Jsme tady" : "Jsme v špeluňce"}
+      </button>
+      <button class="tl ${jeSkopek ? "hotovo" : "hlavni"}" data-akce="skopek">
+        ${ikona(jeSkopek ? "check" : "piva", 20)} ${jeSkopek ? "Škopky jsme lupnuli" : "Škopky jsme lupnuli"}
+      </button>
     </div>
-    <button class="tl ${jePrichod ? "hotovo" : "hlavni"}" data-akce="prichod" style="margin-bottom:9px">
-      ${ikona(jePrichod ? "check" : "mista", 21)} ${jePrichod ? "Jsme tady" : "Jsme v špeluňce"}
-    </button>
-    <button class="tl ${jeSkopek ? "hotovo" : "hlavni"}" data-akce="skopek">
-      ${ikona(jeSkopek ? "check" : "piva", 21)} ${jeSkopek ? "Škopek padl" : "Lupnul škopek"}
-    </button>
-    <p class="poznamka">${ZAKLAD[1].popis}</p>
 
     <div class="sekce">
-      <div class="vrstva skore">
-        <div class="skore-cislo cislo">${celkem}</div>
-        <div class="skore-vedle">
-          ${carky(celkem, 24)}
-          <div class="skore-popis cislo">${r.dochazka} za špeluňky · ${r.skopky} za škopky · ${r.ukoly} za srandy</div>
+      <div class="vrstva">
+        <div class="skore-velke">
+          <div class="skore-cislo cislo">${celkem}</div>
+          <div class="skore-vedle">
+            ${carky(celkem, 22)}
+            <div class="skore-popis cislo">${r.dochazka} za špeluňky · ${r.skopky} za škopky · ${r.ukoly} za srandy</div>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="sekce">
+      <div class="sekce-hlava"><h2>JAK NA TOM JSOU</h2>
+        <span class="pocet">${poradi.length} ${poradi.length === 1 ? "tým" : poradi.length < 5 ? "týmy" : "týmů"}</span></div>
+      <div class="vrstva radky">
+        ${poradi.map((p) => {
+          const rozdil = p.body - nejvic;
+          return `<div class="pruh-tymu${p.id === stav.tymId ? " ja" : ""}">
+            <span class="tecka" style="background:${bezpecne(p.barva)}"></span>
+            <span class="jmeno">${bezpecne(p.nazev)}</span>
+            <span class="odstup cislo">${rozdil === 0 ? "vede" : rozdil}</span>
+            <span class="cifra cislo">${p.body}</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <div class="sekce">
       <button class="tl" data-pohled="ukoly">
-        ${ikona("hvezda", 19)} ${zbyva ? `Zbývá ${zbyva} ${sklonujUkol(zbyva)}` : "Projít úkoly"}
+        ${ikona("hvezda", 18)} ${zbyva ? `Zbývá ${zbyva} ${sklonujUkol(zbyva)}` : "Projít úkoly"}
       </button>
     </div>
   `;
@@ -126,18 +177,15 @@ function hra() {
 function ukoly() {
   const t = tym();
   const r = rozpad();
-  const sekce = KATEGORIE.map((k) => {
-    const v = stav.ukoly.filter((u) => u.kat === k.id);
-    if (!v.length) return "";
-    return `
-      <div class="sekce">
-        <div class="sekce-hlava">
-          <h2>${k.nazev}</h2>
-          <span class="pocet cislo">${v.filter((u) => kolikrat(u.id, t) > 0).length}/${v.length}</span>
-        </div>
-        <div class="vrstva radky">${v.map(radekUkolu).join("")}</div>
-      </div>`;
-  }).join("");
+  const vybrane = kategorieFiltr === "vse"
+    ? stav.ukoly
+    : stav.ukoly.filter((u) => u.kat === kategorieFiltr);
+
+  const zalozka = (id, nazev, seznam) => {
+    const hotovo = seznam.filter((u) => kolikrat(u.id, t) > 0).length;
+    return `<button data-kategorie="${id}" role="tab" aria-selected="${kategorieFiltr === id}">
+      ${bezpecne(nazev)} <span class="pocet cislo">${hotovo}/${seznam.length}</span></button>`;
+  };
 
   return `
     ${hlava()}
@@ -145,10 +193,16 @@ function ukoly() {
       <h1>Úkoly</h1>
       <p class="cislo">Splněno ${r.splneno} z ${stav.ukoly.length} · ${r.ukoly} ${sklonuj(r.ukoly)} za srandy</p>
     </div>
-    ${sekce}
-    <div class="sekce">
-      <button class="tl" data-okno="ukol-novy">${ikona("plus", 18)} Přidat úkol</button>
+    <div class="prepinac" role="tablist">
+      ${zalozka("vse", "Všechno", stav.ukoly)}
+      ${KATEGORIE.map((k) => zalozka(k.id, k.nazev, stav.ukoly.filter((u) => u.kat === k.id))).join("")}
     </div>
+    ${vybrane.length
+      ? `<div class="vrstva radky">${vybrane.map(radekUkolu).join("")}</div>`
+      : `<div class="prazdno">${ikona("hvezda", 40)}<p>V týhle kategorii zatím nic není.</p></div>`}
+    ${jeSpravce ? `<div class="sekce">
+      <button class="tl" data-okno="ukol-novy">${ikona("plus", 18)} Přidat úkol</button>
+    </div>` : ""}
   `;
 }
 
@@ -185,8 +239,8 @@ function radekUkolu(u) {
     ${u.pozn ? `<p class="ukol-pozn">${bezpecne(u.pozn)}</p>` : ""}
     <div class="ukol-stav">
       <div class="ukol-chipy">${obtiznost(u.piva)}${odznaky}</div>
-      <button class="ikonove" data-okno="ukol-uprava" data-id="${u.id}"
-        aria-label="Upravit ${bezpecne(u.nazev)}">${ikona("i-tuzka", 16)}</button>
+      ${jeSpravce ? `<button class="ikonove holy" data-okno="ukol-uprava" data-id="${u.id}"
+        aria-label="Upravit ${bezpecne(u.nazev)}">${ikona("i-tuzka", 16)}</button>` : ""}
     </div>
   </div>`;
 }
@@ -194,35 +248,26 @@ function radekUkolu(u) {
 /* ---------- obrazovka: Týmy ---------- */
 
 function tymy() {
-  const mujId = stav.tymId;
-  const zvenku = ostatniTymy();
-  const mistni = stav.tymy.map((t) => ({
-    id: t.id, nazev: t.nazev || "Bez názvu", barva: t.barva, body: body(t), rozpad: rozpad(t),
-    hospoda: indexHospody(t) + 1, mistni: true,
-  }));
-  // tým, co máme i my i server, bereme z telefonu – ten je zdroj pravdy
-  const vse = [...mistni, ...zvenku.filter((z) => !mistni.some((m) => m.id === z.id))]
-    .sort((a, b) => b.body - a.body || b.rozpad.makacky - a.rozpad.makacky);
-
-  const radky = vse.map((p, i) => `
-    <div class="radek${i === 0 && p.body > 0 ? " vede" : ""}${p.id === mujId ? " ja" : ""}">
+  const poradi = poradiTymu();
+  const s = strop();
+  const radky = poradi.map((p, i) => `
+    <div class="radek${i === 0 && p.body > 0 ? " vede" : ""}${p.id === stav.tymId ? " ja" : ""}">
       <div class="poradi-cislo cislo">${i + 1}</div>
       ${p.mistni ? `<button class="radek-telo" data-prepni-tym="${p.id}" style="text-align:left">`
                  : `<div class="radek-telo">`}
         <div class="radek-nazev">
           <span class="tecka" style="background:${bezpecne(p.barva)}"></span>
           ${bezpecne(p.nazev)}
-          ${p.id === mujId ? `<span class="odznak duraz">zapisuju</span>` : ""}
+          ${p.id === stav.tymId ? `<span class="odznak duraz">zapisuju</span>` : ""}
         </div>
-        <div class="radek-pod cislo">${p.rozpad.splneno} ${sklonujUkol(p.rozpad.splneno)} · ${
-          p.rozpad.makacky} ${p.rozpad.makacky === 1 ? "makačka" : "makaček"} · štace ${p.hospoda}</div>
+        <div class="radek-pod cislo">${p.rozpad?.splneno || 0} ${sklonujUkol(p.rozpad?.splneno || 0)} · ${
+          p.rozpad?.makacky || 0} ${(p.rozpad?.makacky || 0) === 1 ? "makačka" : "makaček"} · štace ${p.hospoda}</div>
       ${p.mistni ? "</button>" : "</div>"}
       <div class="radek-body cislo">${p.body}</div>
-      ${p.mistni ? `<button class="ikonove" data-okno="tym-uprava" data-id="${p.id}"
+      ${p.mistni ? `<button class="ikonove holy" data-okno="tym-uprava" data-id="${p.id}"
         aria-label="Upravit ${bezpecne(p.nazev)}">${ikona("i-tuzka", 16)}</button>` : ""}
     </div>`).join("");
 
-  const s = strop();
   return `
     ${hlava()}
     <div class="nadpis">
@@ -236,10 +281,10 @@ function tymy() {
     </div>
     <div class="sekce">
       <div class="vrstva prodyseny">
-        <h3 style="margin-bottom:9px">Kolik se dá urvat</h3>
+        <h3 style="margin-bottom:10px">Kolik se dá urvat</h3>
         <p class="skore-popis cislo">${s.hospody} za špeluňky · ${s.hospody} za škopky · ${s.ukoly} za srandy</p>
-        <p style="margin-top:9px;font-size:14.5px;color:var(--text-2)">Dohromady nejvíc
-          <b class="cislo" style="color:var(--akcent);font-weight:600">${s.celkem}</b> ${sklonuj(s.celkem)}</p>
+        <p style="margin-top:10px;font-size:15px;color:var(--text-2)" class="psane">Dohromady nejvíc
+          <b class="cislo" style="font-family:var(--nadpisy);color:var(--text)">${s.celkem}</b> ${sklonuj(s.celkem)}</p>
       </div>
     </div>
   `;
@@ -257,26 +302,27 @@ function hospody() {
         ${h.id === t?.hospoda ? `<div class="radek-pod">Tady jste teď</div>`
           : t?.prichod[h.id] ? `<div class="radek-pod">Máte odsud čárku</div>` : ""}
       </button>
-      <div class="radek-vpravo">
-        <button class="ikonove" data-posun="${h.id}" data-smer="-1" ${i === 0 ? "disabled" : ""}
+      ${jeSpravce ? `<div class="radek-vpravo">
+        <button class="ikonove holy" data-posun="${h.id}" data-smer="-1" ${i === 0 ? "disabled" : ""}
           aria-label="Posunout ${bezpecne(h.nazev)} nahoru">${ikona("i-nahoru", 15)}</button>
-        <button class="ikonove" data-posun="${h.id}" data-smer="1" ${i === stav.hospody.length - 1 ? "disabled" : ""}
+        <button class="ikonove holy" data-posun="${h.id}" data-smer="1" ${i === stav.hospody.length - 1 ? "disabled" : ""}
           aria-label="Posunout ${bezpecne(h.nazev)} dolů">${ikona("i-dolu", 15)}</button>
-        <button class="ikonove" data-okno="hospoda-uprava" data-id="${h.id}"
+        <button class="ikonove holy" data-okno="hospoda-uprava" data-id="${h.id}"
           aria-label="Upravit ${bezpecne(h.nazev)}">${ikona("i-tuzka", 16)}</button>
-      </div>
+      </div>` : ""}
     </div>`).join("");
 
   return `
     ${hlava()}
     <div class="nadpis">
       <h1>Hospody</h1>
-      <p>Pořadí určuje trasu. Šipkami se přehazuje, ťuknutím na název se přesuneš.</p>
+      <p>${jeSpravce ? "Pořadí určuje trasu. Šipkami se přehazuje."
+                     : "Ťukni na hospodu, ať se tam tým přesune."}</p>
     </div>
     <div class="vrstva radky">${radky}</div>
-    <div class="sekce">
+    ${jeSpravce ? `<div class="sekce">
       <button class="tl" data-okno="hospoda-nova">${ikona("plus", 18)} Přidat hospodu</button>
-    </div>
+    </div>` : ""}
   `;
 }
 
@@ -287,7 +333,7 @@ function pravidla() {
   return `
     ${hlava()}
     <div class="pravidla">
-      <h1 style="margin-bottom:14px">Pravidla</h1>
+      <h1 style="margin-bottom:16px;font-size:27px">Pravidla</h1>
       <p>Bacha, to není jenom takový to klasický večerní nasávání v Štatlu. Tady se jede
       betelná řežba přes brněnský špeluňky, kde čárky nemáš jenom za vyžahnutý pruty,
       ale hlavně za to, že máš koule, dobrej kšaft a v palici to nemáš vypatlaný.</p>
@@ -295,14 +341,14 @@ function pravidla() {
       <b>Vlezné do kotla:</b> Kilo na palici.<br>
       <b>Celej bank:</b> První parta bere všecko — všechny love só jejich.</p>
 
-      <h2>Jak se to valí</h2>
+      <h2>JAK SE TO VALÍ</h2>
       <ol>
         <li><b>Časovej cajk:</b> Valí se to od <b>šesti večer do dvou do rána</b>. Co se zvrtne potom, už se do čárek nepočítá.</li>
         <li><b>Partyje:</b> Jede se ve dvou až třech partách.</li>
         <li><b>Žádný courání:</b> Na každou štaci je zhruba 45 minut. Jak se nějaká parta bude fest loudat a ty druhý na ně budou muset čumět, tak v té špeluňce nebudou mít za ty srandy ani čárku.</li>
       </ol>
 
-      <h2>Bodování</h2>
+      <h2>BODOVÁNÍ</h2>
       <ol>
         <li>Čárka za každou špeluňku, do který vlezete. <b class="cislo">(max. ${s.hospody})</b></li>
         <li>Čárka, když v tý štaci lupne aspoň půlka partyje jeden škopek. <b class="cislo">(max. ${s.hospody})</b></li>
@@ -315,8 +361,17 @@ function pravidla() {
     </div>
 
     <div class="sekce">
-      <div class="sekce-hlava"><h2>Vaše hra</h2></div>
+      <div class="sekce-hlava"><h2>NASTAVENÍ</h2></div>
       <div class="vrstva radky">
+        <button class="radek" data-okno="${jeSpravce ? "spravce-konec" : "spravce"}">
+          <div class="radek-telo">
+            <div class="radek-nazev">${jeSpravce ? "Režim správce je zapnutý" : "Režim správce"}</div>
+            <div class="radek-pod">${jeSpravce
+              ? "Můžeš upravovat úkoly a hospody. Ťukni pro vypnutí."
+              : "Na úpravy úkolů a hospod. Ostatní můžou jenom hrát."}</div>
+          </div>
+          ${jeSpravce ? ikona("check", 18) : ikona("zamek", 17)}
+        </button>
         <button class="radek" data-akce="vynulovat">
           <div class="radek-telo">
             <div class="radek-nazev" style="color:var(--spatne)">Vynulovat čárky týmu</div>
@@ -330,10 +385,16 @@ function pravidla() {
 
 /* ---------- okna ---------- */
 
+const oknoRam = (nadpis, pod, telo) => `<div class="okno" data-prekryv>
+  <div class="okno-telo" role="dialog" aria-modal="true" aria-label="${bezpecne(nadpis)}">
+    <h2>${nadpis}</h2>${pod ? `<p class="pod">${pod}</p>` : '<div style="height:16px"></div>'}
+    ${telo}
+  </div></div>`;
+
 function oknoObsah() {
   if (!okno) return "";
   switch (okno.druh) {
-    case "tymy-rychle": {
+    case "tymy-rychle":
       return oknoRam("Za koho zapisuju", "Ťukni na tým. Můžeš zapisovat komukoliv.", `
         <div class="vrstva radky" style="margin-bottom:12px">
           ${stav.tymy.map((t) => `
@@ -348,7 +409,6 @@ function oknoObsah() {
           <button class="tl" data-okno="tym-novy">${ikona("plus", 18)} Přidat tým</button>
           <button class="tl tise" data-akce="zavri">Zpátky</button>
         </div>`);
-    }
 
     case "tym-novy":
     case "tym-uprava": {
@@ -400,8 +460,7 @@ function oknoObsah() {
       const u = novy ? null : ukolPodleId(okno.id);
       if (!novy && !u) return "";
       const piva = konceptPiva || u?.piva || 1;
-      const kat = konceptKat || u?.kat || KATEGORIE[0].id;
-      const max = u?.max || 1;
+      const kat = u?.kat || KATEGORIE[0].id;
       return oknoRam(novy ? "Nový úkol" : "Upravit úkol", "", `
         <label class="pole">
           <span class="nazev">Název</span>
@@ -426,8 +485,8 @@ function oknoObsah() {
         </div>
         <label class="pole">
           <span class="nazev">Kolikrát to jde splnit</span>
-          <input type="text" inputmode="numeric" id="pole-max" value="${max}" maxlength="2" autocomplete="off">
-          <span class="poznamka" style="padding:0">Jednou = úkol hodí ${piva} ${sklonuj(piva)}.
+          <input type="text" inputmode="numeric" id="pole-max" value="${u?.max || 1}" maxlength="2" autocomplete="off">
+          <span class="poznamka" style="padding:0">Jednou = úkol hodí tolik čárek, jaká je obtížnost.
             Víckrát = čárka za každý kus.</span>
         </label>
         <div class="okno-akce">
@@ -437,15 +496,29 @@ function oknoObsah() {
           <button class="tl tise" data-akce="zavri">Zpátky</button>
         </div>`);
     }
+
+    case "spravce":
+      return oknoRam("Režim správce",
+        "Odemkne úpravy úkolů a hospod. Je to zámek proti omylu, ne bezpečnost — kdo se podívá do zdrojáku, kód si přečte.", `
+        <label class="pole">
+          <span class="nazev">Kód</span>
+          <input type="password" id="pole-kod" placeholder="" autocomplete="off" enterkeyhint="done">
+          <span class="poznamka" id="chyba-kodu" style="padding:0;display:none;color:var(--spatne)">Tenhle kód nesedí.</span>
+        </label>
+        <div class="okno-akce">
+          <button class="tl hlavni" data-akce="zapni-spravce">${ikona("check", 19)} Odemknout</button>
+          <button class="tl tise" data-akce="zavri">Zpátky</button>
+        </div>`);
+
+    case "spravce-konec":
+      return oknoRam("Vypnout režim správce", "Úpravy úkolů a hospod se zase schovají.", `
+        <div class="okno-akce">
+          <button class="tl hlavni" data-akce="vypni-spravce">${ikona("check", 19)} Vypnout</button>
+          <button class="tl tise" data-akce="zavri">Zpátky</button>
+        </div>`);
   }
   return "";
 }
-
-const oknoRam = (nadpis, pod, telo) => `<div class="okno" data-prekryv>
-  <div class="okno-telo" role="dialog" aria-modal="true" aria-label="${bezpecne(nadpis)}">
-    <h2>${nadpis}</h2>${pod ? `<p class="pod">${pod}</p>` : '<div style="height:16px"></div>'}
-    ${telo}
-  </div></div>`;
 
 /* ---------- vykreslení ---------- */
 
@@ -458,46 +531,63 @@ const LISTA = [
   { id: "pravidla", popis: "Pravidla", ikona: "i-mrizka" },
 ];
 
-export function vykresli() {
-  const posun = window.scrollY;
-  el.innerHTML = `
-    <div class="obrazovka">${POHLEDY[pohled]()}</div>
-    <nav class="lista" aria-label="Hlavní">
-      ${LISTA.map((p) => `<button data-pohled="${p.id}" class="${p.id === pohled ? "ted" : ""}"
-        aria-current="${p.id === pohled ? "page" : "false"}">
-        ${ikona(p.ikona, 20)}<span class="popis">${p.popis}</span></button>`).join("")}
-    </nav>
-    ${oknoObsah()}`;
-  window.scrollTo(0, posun);
-  if (okno) setTimeout(() => el.querySelector("#pole-nazev")?.focus(), 30);
+/** Lišta se kreslí jednou. Při překreslení obsahu se jen přepíná třída,
+ *  jinak by při každém zápisu zmizela a naskočila znovu. */
+function vykresliListu() {
+  elLista.innerHTML = LISTA.map((p) => `<button data-pohled="${p.id}"
+    class="${p.id === pohled ? "ted" : ""}" aria-current="${p.id === pohled ? "page" : "false"}">
+    ${ikona(p.ikona, 19)}<span class="popis">${p.popis}</span></button>`).join("");
+}
+function oznacListu() {
+  elLista.querySelectorAll("[data-pohled]").forEach((b) => {
+    const ted = b.dataset.pohled === pohled;
+    b.classList.toggle("ted", ted);
+    b.setAttribute("aria-current", ted ? "page" : "false");
+  });
 }
 
-const otevri = (druh, id) => {
-  okno = { druh, id };
-  konceptBarvy = null;
-  konceptPiva = null;
-  konceptKat = null;
-  vykresli();
-};
+export function vykresli() {
+  const posun = window.scrollY;
+  elObrazovka.innerHTML = vazat(`<div class="obrazovka">${POHLEDY[pohled]()}</div>`);
+  elOkno.innerHTML = vazat(oknoObsah());
+  window.scrollTo(0, posun);
+  if (okno) setTimeout(() => elOkno.querySelector("#pole-nazev, #pole-kod")?.focus(), 30);
+  // vybraná kategorie může být mimo obraz, přitáhneme ji
+  elObrazovka.querySelector('[role=tab][aria-selected=true]')
+    ?.scrollIntoView({ block: "nearest", inline: "center" });
+}
+
+const otevri = (druh, id) => { okno = { druh, id }; konceptBarvy = null; konceptPiva = null; vykresli(); };
 const zavri = () => { okno = null; vykresli(); };
-const hodnota = (id) => el.querySelector("#" + id)?.value ?? "";
+const hodnota = (id) => elOkno.querySelector("#" + id)?.value ?? "";
+
+function naPohled(id) {
+  pohled = id;
+  okno = null;
+  oznacListu();
+  vykresli();
+  window.scrollTo(0, 0);
+}
 
 /* ---------- ovládání ---------- */
 
-el.addEventListener("click", (e) => {
+function obsluha(e) {
   const c = (s) => e.target.closest(s);
 
   const naOkno = c("[data-okno]");
   if (naOkno) { otevri(naOkno.dataset.okno, naOkno.dataset.id); return; }
 
-  const naPohled = c("[data-pohled]");
-  if (naPohled) { pohled = naPohled.dataset.pohled; okno = null; vykresli(); window.scrollTo(0, 0); return; }
+  const pohledTl = c("[data-pohled]");
+  if (pohledTl) { naPohled(pohledTl.dataset.pohled); return; }
+
+  const kat = c("[data-kategorie]");
+  if (kat) { kategorieFiltr = kat.dataset.kategorie; vykresli(); window.scrollTo(0, 0); return; }
 
   const prep = c("[data-prepni-tym]");
   if (prep) { prepniTym(prep.dataset.prepniTym); zavri(); return; }
 
   const skoc = c("[data-skoc]");
-  if (skoc) { nastavHospodu(skoc.dataset.skoc); pohled = "hra"; vykresli(); window.scrollTo(0, 0); return; }
+  if (skoc) { nastavHospodu(skoc.dataset.skoc); naPohled("hra"); return; }
 
   const posun = c("[data-posun]");
   if (posun) { posunHospoduVPoradi(posun.dataset.posun, +posun.dataset.smer); return; }
@@ -523,14 +613,14 @@ el.addEventListener("click", (e) => {
   const barva = c("[data-barva]");
   if (barva) {
     konceptBarvy = barva.dataset.barva;
-    el.querySelectorAll("[data-barva]").forEach((b) =>
+    elOkno.querySelectorAll("[data-barva]").forEach((b) =>
       b.setAttribute("aria-pressed", String(b.dataset.barva === konceptBarvy)));
     return;
   }
   const pivo = c("[data-piva]");
   if (pivo) {
     konceptPiva = +pivo.dataset.piva;
-    el.querySelectorAll("[data-piva]").forEach((b) =>
+    elOkno.querySelectorAll("[data-piva]").forEach((b) =>
       b.setAttribute("aria-pressed", String(+b.dataset.piva === konceptPiva)));
     return;
   }
@@ -547,12 +637,8 @@ el.addEventListener("click", (e) => {
 
     case "uloz-tym": {
       const nazev = hodnota("pole-nazev").trim().slice(0, 40);
-      if (okno.druh === "tym-novy") {
-        const t = pridejTym(nazev || "Nová parta", konceptBarvy);
-        prepniTym(t.id);
-      } else {
-        upravTym(okno.id, { nazev: nazev || "Bez názvu", barva: konceptBarvy || undefined });
-      }
+      if (okno.druh === "tym-novy") prepniTym(pridejTym(nazev || "Nová parta", konceptBarvy).id);
+      else upravTym(okno.id, { nazev: nazev || "Bez názvu", barva: konceptBarvy || undefined });
       zavri();
       break;
     }
@@ -588,21 +674,39 @@ el.addEventListener("click", (e) => {
       if (confirm("Smazat úkol? Čárky, co za něj týmy mají, zmizí taky.")) { smazUkol(okno.id); zavri(); }
       break;
 
+    case "zapni-spravce": {
+      const zadano = hodnota("pole-kod");
+      if (zadano === ADMIN_KOD) { nastavSpravce(true); zavri(); }
+      else {
+        const ch = elOkno.querySelector("#chyba-kodu");
+        if (ch) ch.style.display = "block";
+        elOkno.querySelector("#pole-kod")?.focus();
+      }
+      break;
+    }
+    case "vypni-spravce": nastavSpravce(false); zavri(); break;
+
     case "vynulovat":
       if (confirm(`Vynulovat čárky týmu ${tym()?.nazev || ""}? Tohle se nedá vrátit.`)) {
         vynulujTym();
-        pohled = "hra";
-        vykresli();
-        window.scrollTo(0, 0);
+        naPohled("hra");
       }
       break;
   }
-});
+}
 
-el.addEventListener("keydown", (e) => {
+elObrazovka.addEventListener("click", obsluha);
+elLista.addEventListener("click", obsluha);
+elOkno.addEventListener("click", obsluha);
+
+document.addEventListener("keydown", (e) => {
   if ((e.key === "Enter" || e.key === " ") && e.target.matches("[data-prepni]")) {
     e.preventDefault();
     e.target.click();
+  }
+  if (e.key === "Enter" && e.target.matches("#pole-kod")) {
+    e.preventDefault();
+    elOkno.querySelector("[data-akce='zapni-spravce']")?.click();
   }
   if (e.key === "Escape" && okno) zavri();
 });
@@ -610,5 +714,6 @@ el.addEventListener("keydown", (e) => {
 /* ---------- start ---------- */
 
 naZmenu(vykresli);
+vykresliListu();
 vykresli();
 spustSync(vykresli);

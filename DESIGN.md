@@ -13,25 +13,26 @@ nic schovaného pod dlouhým stiskem a žádná obrazovka, kde by se dalo něco 
 
 ## Barvy
 
-Celé rozhraní stojí na třech barvách. Čtvrtá a pátá se objeví jen u obtížnosti úkolu.
+Rozhraní stojí na dvou barvách: skoro černá zeleň a krémová z loga.
+**Akcentní barva žádná není.** Hlavní akce je světlá plocha s tmavým textem,
+stejně jako logo — černá na krémové.
 
 | token | hodnota | kde |
 |---|---|---|
-| `--podklad` | `#0C1711` | pozadí appky, černě zelená |
-| `--vrstva` | `#111E17` | plochy se seznamy a kartami |
-| `--vrstva-2` | `#17281F` | tlačítka, pole, kulatá tlačítka v řádku |
-| `--text` | `#ECEBE4` | text, off white (ne čistá bílá) |
-| `--text-2` | 64 % textu | popisy, podtitulky |
-| `--text-3` | 40 % textu | drobnosti, stavy bez důrazu |
-| `--linka` | 10 % textu | vlasové předěly mezi řádky |
-| `--akcent` | `#C3F53C` | **jediný akcent** — limetka |
-| `--na-akcentu` | `#0C1711` | text na limetkové ploše |
+| `--podklad` | `#070E0A` | pozadí appky, skoro černá zeleň |
+| `--vrstva` | `#0D1711` | plochy se seznamy |
+| `--vrstva-2` | `#152219` | tlačítka, pole, kulatá tlačítka |
+| `--text` | `#EFEBE0` | text, krémová z loga |
+| `--text-2` | 62 % textu | popisy |
+| `--text-3` | 38 % textu | drobnosti |
+| `--linka` | 10 % textu | vlasové předěly |
+| `--akce` | `#EFEBE0` | hlavní tlačítko, aktivní položka lišty |
+| `--na-akci` | `#070E0A` | text na světlé ploše |
 
-Akcent nese jen čtyři věci: **hlavní tlačítko, skóre, aktivní položku v liště
-a aktuální dílek trasy.** Nic jiného limetkové není, jinak přestane fungovat jako důraz.
+Dřív tu byla limetka jako akcent. Vypadla — bez ní nese důraz jen světlost,
+což je přísnější a barvu to uvolní pro jedinou věc, která ji opravdu potřebuje.
 
-Nižší úrovně textu jsou tónované do podkladu, ne do šedi — šedá na barevné ploše
-vypadá špinavě.
+Nižší úrovně textu jsou tónované do podkladu, ne do šedi.
 
 ### Obtížnost úkolu
 
@@ -45,20 +46,52 @@ Jediné místo, kde barva nese význam:
 
 Barva sama nikdy nestačí: vedle ní je vždycky **počet půllitrů i název**.
 Kdo barvy nerozliší, pozná obtížnost stejně dobře (HIG: inclusive color).
+Barvy týmů jsou zvlášť a schválně se s těmito třemi nepotkávají.
 
-Všechny barvy mají na podkladu kontrast přes 6,5 : 1, tedy WCAG AA i pro běžný text.
-Při změně barvy to musí projít znovu.
+Všechny mají na podkladu kontrast hluboko nad WCAG AA. Při změně to musí projít znovu.
+
+### Zrno
+
+Přes celou appku leží jemné zrno (`zrno.svg`, 160 px, krytí 50 %, režim
+`soft-light`). Leží nad podkladem a pod obsahem a nereaguje na dotyk.
+Plochá tmavá barva bez něj působila jako plast.
 
 ## Písmo
 
-- **Bevan** — jen slovní značka „Tour de Pub" v hlavičce. Nikde jinde.
-- **Outfit** — všechno ostatní. 400 text, 500 ovládání a názvy, 600 nadpisy a čísla.
+Tři řezy, každý má svou práci. Logo je kresba, ne font.
 
-Čísla mají `font-variant-numeric: tabular-nums` (třída `.cislo`), aby skóre při
-přepočítání neposkakovalo.
+- **Archivo Black** — nadpisy a velká čísla, vždycky verzálkami. Těžký grotesk,
+  aby nadpis měl váhu.
+- **Gloria Hallelujah** — popisy úkolů, vysvětlivky, pravidla. Psaná ruka sedí
+  k hospodě. **Nikdy na ovládání** — tlačítka a popisky musí zůstat jednoznačné.
+- **Outfit** — ovládání, názvy a čísla.
 
-Dřív byl Bevan i na nadpisech. Na obrazovce plné seznamů to bylo těžkopádné,
-proto zůstal jen na značce, kde dělá charakter, a nadpisy nese Outfit.
+Čísla mají `font-variant-numeric: tabular-nums` (třída `.cislo`), aby skóre
+při přepočítání neposkakovalo.
+
+**Pozor na české znaky.** Architects Daughter ani Shadows Into Light nemají
+`ť` a `ď`, a ty jsou v textech úkolů všude („Hoďte", „ať", „flanďáka").
+Prohlížeč je dosadí z náhradního písma a je to v řádku poznat. Při výměně
+psacího fontu zkontroluj `ť ď ě ů ř Ú Š Č Ž Ň`; dělá to `scripts/stahni-pisma.mjs`.
+
+## Hierarchie tlačítek
+
+Tři váhy, aby bylo poznat, co je hlavní akce:
+
+1. **Hlavní** (`.tl.hlavni`) — světlá plocha, tmavý text, 58 px. Na obrazovce
+   jsou nejvýš dvě a stojí ve vlastním bloku s odstupem.
+2. **Hotová** (`.tl.hotovo`) — jen obrys. Splněná akce nesmí konkurovat nesplněné.
+3. **Vedlejší** (`.tl.tise`) — bez plochy.
+
+Posun po trase jsou **kulatá tlačítka v hlavičce štace**, ne tlačítka přes celou
+šířku. Dřív stála hned nad hlavními akcemi a měla s nimi stejnou váhu, takže
+nebylo poznat, co je důležité.
+
+## Logo
+
+Slovní značka je obtažená z kresby do drah (`scripts/prevod-loga.py` →
+`logo.svg` a `logo.js`). Kreslí se `currentColor`, takže funguje na tmavém
+i světlém podkladu. Nese ji jen hlavička; nikde se neopakuje.
 
 ## Plochy a předěly
 

@@ -6,7 +6,12 @@ import { writeFileSync, mkdirSync } from "node:fs";
 
 const UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36";
 const CHCI = [
-  ["Bevan", 400, "bevan"],
+  // nadpisy: těžký grotesk, ať mají váhu
+  ["Archivo Black", 400, "archivo-black"],
+  // popisy a vysvětlivky: psaná ruka, odpovídá hospodě.
+  // Architects Daughter nejde – nemá ť ani ď, a ty jsou v textech úkolů všude.
+  ["Gloria Hallelujah", 400, "psaci"],
+  // ovládání, názvy a čísla: musí zůstat jednoznačné
   ["Outfit", 400, "outfit-400"],
   ["Outfit", 500, "outfit-500"],
   ["Outfit", 600, "outfit-600"],

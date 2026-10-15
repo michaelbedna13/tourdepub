@@ -68,6 +68,23 @@ export function sklonujUkol(n) {
   return "úkolů";
 }
 
+// Jednopísmenné předložky a spojky (k, s, v, z, o, u, a, i) nesmí v češtině
+// zůstat na konci řádku. Přilepíme je nedělitelnou mezerou k dalšímu slovu.
+// Opakuje se, dokud se text mění: u dvou krátkých slov za sebou („a v palici")
+// spotřebuje první průchod mezeru před druhým slovem a to by zůstalo nesvázané.
+const KRATKA = /(^|[\s(\[„"'\u2014])([ksvzouaiKSVZOUAI])[ \t]+/g;
+function spoj(t) {
+  let drive;
+  do { drive = t; t = t.replace(KRATKA, "$1$2\u00A0"); } while (t !== drive);
+  return t;
+}
+
+/** Projde text mezi značkami a sváže krátká slova. Obsah značek a atributů
+ *  nechává být, aby se nerozbily cesty v SVG ani popisky pro čtečku. */
+export function vazat(html) {
+  return html.replace(/>([^<>]+)</g, (_, t) => ">" + spoj(t) + "<");
+}
+
 /** Ochrana proti vložení HTML z názvu týmu nebo úkolu. */
 export function bezpecne(s) {
   return String(s ?? "").replace(/[&<>"']/g, (z) =>

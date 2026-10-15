@@ -8,9 +8,9 @@ import { VYCHOZI_HOSPODY, VYCHOZI_UKOLY } from "./data.js";
 const KLIC = "tourdepub";
 const VERZE = 2;
 
-// Barvy týmů. Vybrané tak, aby se na černě zeleném podkladu nepletly mezi sebou
-// ani s limetkovým akcentem appky.
-export const BARVY = ["#C3F53C", "#F2765A", "#5BC8F5", "#F2C14E", "#C78BE0", "#7FD4C1"];
+// Barvy týmů. Vybrané tak, aby se na skoro černé zeleni nepletly mezi sebou
+// ani s barvami obtížnosti úkolu (mint, zlatá, korál).
+export const BARVY = ["#E0A33A", "#D96A52", "#5BA8D4", "#B07CC6", "#6FB58F", "#D4A5A5"];
 
 const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 
@@ -255,15 +255,18 @@ export function strop() {
 /** Jestli úkol v téhle štaci vůbec jde splnit. Vrací i důvod, proč ne. */
 export function dostupnost(u, t = tym()) {
   const kde = t?.hospoda;
+  // Omezení se píše pořadím štace, ne názvem hospody. Čeština by názvy musela
+  // skloňovat („mezi Zastávkou a U Ričího") a to automaticky nejde.
+  const cislo = (id) => stav.hospody.findIndex((x) => x.id === id) + 1;
   if (u.hospoda) {
-    const h = stav.hospody.find((x) => x.id === u.hospoda);
-    if (!h) return { jde: true }; // hospoda byla smazaná, omezení tím padá
-    if (u.hospoda !== kde) return { jde: false, duvod: `Jen v ${h.nazev}` };
+    const c = cislo(u.hospoda);
+    if (!c) return { jde: true }; // hospoda byla smazaná, omezení tím padá
+    if (u.hospoda !== kde) return { jde: false, duvod: `Jen ve ${c}. štaci` };
   }
   if (u.mezi) {
-    const jmena = u.mezi.map((id) => stav.hospody.find((x) => x.id === id)).filter(Boolean);
-    if (jmena.length < 2) return { jde: true };
-    if (!u.mezi.includes(kde)) return { jde: false, duvod: `Jen mezi ${jmena[0].nazev} a ${jmena[1].nazev}` };
+    const c = u.mezi.map(cislo).filter(Boolean);
+    if (c.length < 2) return { jde: true };
+    if (!u.mezi.includes(kde)) return { jde: false, duvod: `Jen mezi ${c[0]}. a ${c[1]}. štací` };
   }
   return { jde: true };
 }

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tour de Pub — Brno edition</title>
 <meta name="description" content="Zapisování čárek při Tour de Pub: devět brněnskejch špeluněk, úkoly a pořadí part.">
-<meta name="theme-color" content="#0C1711">
+<meta name="theme-color" content="#070E0A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tour de Pub">
@@ -15,7 +15,13 @@
 <link rel="stylesheet" href="styl.css">
 </head>
 <body>
-<div class="app" id="app"></div>
+<div class="app">
+  <!-- Překresluje se jen obsah obrazovky. Lišta stojí mimo, jinak by při
+       každém zápisu zmizela a objevila se znovu. -->
+  <div id="obrazovka"></div>
+</div>
+<div class="lista-obal"><nav class="lista" id="lista" aria-label="Hlavní"></nav></div>
+<div id="okno"></div>
 <script type="module" src="app.js"></script>
 <script>
   // Service worker drží web v telefonu, takže funguje i ve sklepě bez signálu.

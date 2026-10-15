@@ -1,10 +1,12 @@
 // Service worker: uloží web do telefonu, ať funguje i bez signálu.
 // Při změně webu zvedni VERZE, jinak si telefon nechá starou verzi.
-const VERZE = "tourdepub-3";
+const VERZE = "tourdepub-4";
 const SOUBORY = [
   ".", "index.html", "styl.css", "app.js", "stav.js", "data.js", "ui.js",
-  "ikony.js", "sync.js", "nastaveni.js", "ikona.svg", "manifest.json",
-  "pisma/bevan-lat.woff2", "pisma/bevan-ext.woff2",
+  "ikony.js", "sync.js", "nastaveni.js", "logo.js", "logo.svg",
+  "ikona.svg", "zrno.svg", "manifest.json",
+  "pisma/archivo-black-lat.woff2", "pisma/archivo-black-ext.woff2",
+  "pisma/psaci-lat.woff2", "pisma/psaci-ext.woff2",
   "pisma/outfit-400-lat.woff2", "pisma/outfit-400-ext.woff2",
   "pisma/outfit-500-lat.woff2", "pisma/outfit-500-ext.woff2",
   "pisma/outfit-600-lat.woff2", "pisma/outfit-600-ext.woff2",

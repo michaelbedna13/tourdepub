@@ -30,12 +30,23 @@ supabase/party.sql struktura tabulky pro živé pořadí
 
 ## Jak se to ovládá při hře
 
+### Kdo smí upravovat
+
+Hra je otevřená — kdo přijde na odkaz, vybere si tým a hraje. **Úpravy úkolů
+a hospod se objeví až po zadání kódu** v Pravidlech → Režim správce. Kód je
+`ADMIN_KOD` v `nastaveni.js`, uloží se v prohlížeči a přežije zavření.
+
+Je to zámek proti omylu, **ne bezpečnost**. Web je statický a veřejný, takže kdo
+se podívá do zdrojáku, kód si přečte. Brání tomu, aby někdo omylem přepsal úkoly
+uprostřed hry. Kdyby mělo jít o víc, musela by přibýt opravdová práva v databázi.
+
 Spodní lišta má pět obrazovek:
 
-- **Hra** — aktuální štace, dvě velká tlačítka (*Jsme v špeluňce*, *Lupnul škopek*)
-  a vaše čárky. Mezi hospodami se posouvá tlačítky *Zpátky* / *Další*.
-- **Úkoly** — všechny úkoly ve třech kategoriích. Jednorázové se odškrtávají ťuknutím
-  na řádek, opakovatelné mají − a +. Tužka vpravo úkol upraví, tlačítko dole přidá nový.
+- **Hra** — aktuální štace se šipkami po trase, dvě velká tlačítka
+  (*Jsme v špeluňce*, *Škopky jsme lupnuli*), vaše čárky a pod tím pořadí
+  všech týmů s odstupem od vedoucího.
+- **Úkoly** — nahoře přepínač kategorií, pod ním seznam. Jednorázové se odškrtávají
+  ťuknutím na řádek, opakovatelné mají − a +. V režimu správce je u každého tužka.
 - **Týmy** — kdo vede a za koho zapisuješ. Ťuknutím na tým se přepneš, takže z jednoho
   telefonu jde vést i celou hru. Tužka tým přejmenuje, přebarví nebo smaže.
 - **Hospody** — trasa. Pořadí se přehazuje šipkami, ťuknutím na název se tým přesune,
@@ -165,12 +176,29 @@ i ve 22 px ve spodní liště. Když přidáváš novou, zkontroluj ji v malém.
 
 ## Písma
 
-Bevan na nadpisy, Outfit na text, obojí SIL OFL a uložené v `pisma/`.
+Archivo Black na nadpisy, Gloria Hallelujah na popisy, Outfit na ovládání —
+všechno SIL OFL a uložené v `pisma/`.
 Lokálně kvůli dvěma věcem: web funguje bez signálu a nenačítá se nic z Googlu.
 
 Stahuje je `scripts/stahni-pisma.mjs`. Subsety se poznávají podle `unicode-range`,
-ne podle pořadí — **Bevan má na Googlu tři subsety** (vietnamese, latin-ext, latin)
-a když se vezmou první dva, chybí pak Č, Ř, Š a Ů.
+ne podle pořadí — některé fonty mají na Googlu tři subsety (vietnamese, latin-ext,
+latin) a když se vezmou první dva, chybí pak Č, Ř, Š a Ů.
+
+**U psacích fontů kontroluj `ť` a `ď`.** Architects Daughter ani Shadows Into Light
+je nemají, a v textech úkolů jsou všude. Prohlížeč je dosadí z jiného písma a je to
+v řádku poznat.
+
+## Logo
+
+`logo.svg` a `logo.js` jsou obtažené z obrázku skriptem:
+
+```bash
+node scripts/prevod-loga.mjs <obrazek.png>
+```
+
+Kreslí se barvou textu (`currentColor`), takže funguje na světlém i tmavém podkladu.
+`logo.js` je ten samý tvar jako modul, aby se vkládal rovnou do stránky bez dalšího
+požadavku. Oba soubory jsou generované, needitovat ručně.
 
 ## Nasazení
 
