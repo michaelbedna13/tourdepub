@@ -143,27 +143,39 @@ function hra() {
   const nejvic = poradi[0]?.body || 0;
 
   return `
-    ${hlava("", `ŠTACE ${i + 1} Z ${stav.hospody.length}`)}
+    ${hlava()}
     ${pruhSyncu()}
 
-    <div class="staci">
-      <button class="ikonove" data-akce="hospoda-min" ${i <= 0 ? "disabled" : ""}
-        aria-label="Předchozí špeluňka">${ikona("i-zpet", 17)}</button>
-      <div class="staci-text">
-        <h1>${bezpecne(h?.nazev || "Žádná špeluňka")}</h1>
+    <!-- Hero: jedna karta = jedna štace. Nahoře kde jsme, dole co se tu
+         dá zapsat. Dřív to byla řada stejně vážících bloků a nic nevedlo. -->
+    <div class="hero">
+      <div class="hero-vrch">
+        <div class="hero-cislo cislo">${i + 1}</div>
+        <div class="hero-sipky">
+          <button class="ikonove" data-akce="hospoda-min" ${i <= 0 ? "disabled" : ""}
+            aria-label="Předchozí špeluňka">${ikona("i-zpet", 16)}</button>
+          <button class="ikonove" data-akce="hospoda-plus" ${i >= stav.hospody.length - 1 ? "disabled" : ""}
+            aria-label="Další špeluňka">${ikona("i-zpet", 16, "otocit")}</button>
+        </div>
       </div>
-      <button class="ikonove" data-akce="hospoda-plus" ${i >= stav.hospody.length - 1 ? "disabled" : ""}
-        aria-label="Další špeluňka">${ikona("i-zpet", 17, "otocit")}</button>
-    </div>
-    <div class="trasa">${trasa}</div>
 
-    <div class="akce-bloku">
-      <button class="tl ${jePrichod ? "hotovo" : "hlavni"}" data-akce="prichod">
-        ${ikona(jePrichod ? "check" : "mista", 20)} ${jePrichod ? "Jsme tady" : "Jsme v špeluňce"}
-      </button>
-      <button class="tl ${jeSkopek ? "hotovo" : "hlavni"}" data-akce="skopek">
-        ${ikona(jeSkopek ? "check" : "piva", 20)} ${jeSkopek ? "Škopky jsme lupnuli" : "Škopky jsme lupnuli"}
-      </button>
+      <h1 class="hero-nazev">${bezpecne(h?.nazev || "Žádná špeluňka")}</h1>
+
+      <div class="hero-trasa" role="img"
+        aria-label="Štace ${i + 1} z ${stav.hospody.length}">${trasa}</div>
+
+      <div class="hero-zapis">
+        <button class="zaskrt${jePrichod ? " hotovo" : ""}" data-akce="prichod" aria-pressed="${jePrichod}">
+          <span class="zaskrt-kolecko">${ikona("check", 14)}</span>
+          <span class="zaskrt-text">Jsme v špeluňce</span>
+          <span class="zaskrt-hodnota cislo">+1</span>
+        </button>
+        <button class="zaskrt${jeSkopek ? " hotovo" : ""}" data-akce="skopek" aria-pressed="${jeSkopek}">
+          <span class="zaskrt-kolecko">${ikona("check", 14)}</span>
+          <span class="zaskrt-text">Škopky jsme lupnuli</span>
+          <span class="zaskrt-hodnota cislo">+1</span>
+        </button>
+      </div>
     </div>
 
     <div class="sekce">

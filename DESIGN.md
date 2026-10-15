@@ -74,6 +74,28 @@ při přepočítání neposkakovalo.
 Prohlížeč je dosadí z náhradního písma a je to v řádku poznat. Při výměně
 psacího fontu zkontroluj `ť ď ě ů ř Ú Š Č Ž Ň`; dělá to `scripts/stahni-pisma.mjs`.
 
+## Hero karta štace
+
+Obrazovka Hra stojí na jedné kartě, která nese **všechno o téhle štaci**:
+kolikátá je, jak se jmenuje, kde jsme na trase a co se tu dá zapsat.
+Dřív to byly čtyři samostatné bloky se stejnou vahou — číslo, název, trasa
+a dvě obří tlačítka — takže nic nevedlo a hlavní informace zanikla.
+
+- **Číslo štace** je kolečko v krémové, jediný plný prvek nahoře.
+- **Název hospody** je největší text na obrazovce (`clamp(29px, 8.6vw, 40px)`,
+  verzálky, těsné prostrkání). Je to hlavní věc, kterou tam člověk hledá.
+  Dlouhý název se zalomí do tří řádků a karta se roztáhne.
+- **Posun po trase** jsou kulatá tlačítka v rohu karty, ne tlačítka přes celou
+  šířku pod ní.
+- **Zápis** jsou dvě odškrtávátka na dně karty, ne dvě plná tlačítka. Je to
+  seznam dvou věcí, co se v každé špeluňce zapisují — tak ať to tak vypadá.
+  Kolečko se při splnění zaplní krémovou, stejně jako u úkolů.
+- **Vodoznak z čárek** v dolním rohu je jediná ozdoba na kartě. Nese téma hry
+  a je na 5 % krytí. Nahoře se pral se šipkami a vypadal jako šmouha.
+
+Pod kartou jde skóre, pak pořadí týmů, pak úkoly — každý blok tišší než
+ten nad ním.
+
 ## Hierarchie tlačítek
 
 Tři váhy, aby bylo poznat, co je hlavní akce:
