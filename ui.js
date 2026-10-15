@@ -1,10 +1,10 @@
-// Kreslení opakujících se kousků: ikony, čárky, půllitry obtížnosti.
+// Kreslení opakujících se kousků: ikony, čárky, štítek obtížnosti.
 import { IKONY } from "./ikony.js";
 
 let poradi = 0;
 
 /** Ikona jako vystřižená z papíru: plocha v barvě textu, výstřižky jsou průhledné. */
-export function ikona(jmeno, px = 24, trida = "") {
+export function ikona(jmeno, px = 22, trida = "") {
   const vrstvy = IKONY[jmeno];
   if (!vrstvy) return "";
   const id = `ik${poradi++}`;
@@ -18,22 +18,21 @@ export function ikona(jmeno, px = 24, trida = "") {
 
 /** Čárky, jak se počítaly v hospodě: čtyři svislé a pátá přes ně.
  *  Kreslí se lehce nakřivo, ať to vypadá psané rukou, ne vysázené. */
-export function carky(kolik, vyska = 34) {
-  if (kolik <= 0) return `<span class="napis">zatím nic</span>`;
+export function carky(kolik, vyska = 26) {
+  if (kolik <= 0) return `<span class="znacka-text">zatím nic</span>`;
   const skupin = Math.floor(kolik / 5), zbytek = kolik % 5;
-  const sirkaJedne = 9, mezera = 3;
+  const rozestup = 8;
   const kus = (n, prect) => {
-    // n = kolik svislých (1–4), prect = jestli jde přes ně pátá
-    const w = n * sirkaJedne + (prect ? 10 : 0) + 4;
+    const w = n * rozestup + (prect ? 9 : 0) + 4;
     let d = "";
     for (let i = 0; i < n; i++) {
       // každá čárka je jinak nakloněná a jinak dlouhá, jako psaná
-      const x = 4 + i * sirkaJedne, sklon = ((i * 7919) % 5) - 2, delta = ((i * 104729) % 4);
-      d += `<path d="M${x + sklon} 4 L${x - sklon} ${36 - delta}" />`;
+      const x = 4 + i * rozestup, sklon = ((i * 7919) % 5) - 2, delta = (i * 104729) % 4;
+      d += `<path d="M${x + sklon} 4 L${x - sklon} ${34 - delta}"/>`;
     }
-    if (prect) d += `<path d="M1 31 L${n * sirkaJedne + 9} 7" />`;
-    return `<svg width="${(w / 40) * vyska}" height="${vyska}" viewBox="0 0 ${w} 40" fill="none"
-      stroke="currentColor" stroke-width="4.6" stroke-linecap="round">${d}</svg>`;
+    if (prect) d += `<path d="M1 29 L${n * rozestup + 8} 6"/>`;
+    return `<svg width="${(w / 38) * vyska}" height="${vyska}" viewBox="0 0 ${w} 38" fill="none"
+      stroke="currentColor" stroke-width="3.4" stroke-linecap="round">${d}</svg>`;
   };
   let out = "";
   for (let i = 0; i < skupin; i++) out += kus(4, true);
@@ -41,12 +40,17 @@ export function carky(kolik, vyska = 34) {
   return `<span class="carky" role="img" aria-label="${kolik} ${sklonuj(kolik)}">${out}</span>`;
 }
 
-/** Obtížnost úkolu: 1–3 půllitry. */
-export function pullitry(kolik, slabe = false) {
-  return `<span class="piva${slabe ? " slabe" : ""}" role="img" aria-label="${kolik} ${
-    kolik === 1 ? "půllitr" : kolik < 5 ? "půllitry" : "půllitrů"
-  } obtížnosti">${Array.from({ length: kolik }, () => ikona("piva", 17)).join("")}</span>`;
+const NAZVY_OBTIZNOSTI = { 1: "Brnkačka", 2: "Větší haluz", 3: "Betelná makačka" };
+
+/** Štítek obtížnosti. Barva sama nikdy nestačí, proto je vedle ní
+ *  i počet půllitrů a název (HIG: nespoléhat jen na barvu). */
+export function obtiznost(piva, sPopisem = true) {
+  const p = Array.from({ length: piva }, () => ikona("piva", 13)).join("");
+  return `<span class="obtiznost o${piva}">
+    <span class="piva">${p}</span>${sPopisem ? NAZVY_OBTIZNOSTI[piva] : ""}</span>`;
 }
+
+export const nazevObtiznosti = (p) => NAZVY_OBTIZNOSTI[p];
 
 /** Správný tvar slova „čárka“ podle počtu. */
 export function sklonuj(n) {
@@ -56,7 +60,16 @@ export function sklonuj(n) {
   return "čárek";
 }
 
-/** Ochrana proti vložení HTML z názvu party. */
+/** Správný tvar slova „úkol“ podle počtu. */
+export function sklonujUkol(n) {
+  const a = Math.abs(n);
+  if (a === 1) return "úkol";
+  if (a >= 2 && a <= 4) return "úkoly";
+  return "úkolů";
+}
+
+/** Ochrana proti vložení HTML z názvu týmu nebo úkolu. */
 export function bezpecne(s) {
-  return String(s).replace(/[&<>"']/g, (z) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[z]));
+  return String(s ?? "").replace(/[&<>"']/g, (z) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[z]));
 }

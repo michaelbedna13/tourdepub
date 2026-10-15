@@ -1,17 +1,17 @@
 // Živé pořadí přes Supabase. Je to doplněk, ne podmínka: bez nastavení (nebo bez signálu)
-// hra běží dál z telefonu a pořadí ukáže jenom vlastní partu.
-// Klient se stahuje až když je co připojovat, aby web bez nastavení nic nenačítal zvenku.
-import { SUPABASE_URL, SUPABASE_KEY, HRA } from "./nastaveni.js";
-import { stav, naZmenu, body, rozpad } from "./stav.js";
+// hra běží dál z telefonu a v Týmech jsou vidět jen ty místní.
+// Klient se stahuje až když je co připojovat, aby web bez nastavení nenačítal nic zvenku.
+import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni.js";
+import { stav, naZmenu, body, rozpad, indexHospody } from "./stav.js";
 
 let klient = null;
 let rezim = "ukazka"; // ukazka | pripojuji | zivo | chyba
-let ostatni = [];
+let zvenku = [];
 let prekresli = () => {};
 let cekaZapis = false;
 
-export const stavSyncu = () => ({ rezim, pocet: ostatni.length });
-export const ostatniParty = () => ostatni;
+export const stavSyncu = () => ({ rezim, pocet: zvenku.length });
+export const ostatniTymy = () => zvenku;
 
 export async function spustSync(naZmenuPohledu) {
   prekresli = naZmenuPohledu;
@@ -25,16 +25,15 @@ export async function spustSync(naZmenuPohledu) {
     await posli();
     await nacti();
     klient
-      .channel(`party-${HRA}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "party", filter: `hra=eq.${HRA}` }, nacti)
+      .channel(`tourdepub-${HRA}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: TABULKA, filter: `hra=eq.${HRA}` }, nacti)
       .subscribe();
     rezim = "zivo";
     naZmenu(posliOpatrne);
     // bez signálu zápis spadne; jak se síť vrátí, dopošle se
     addEventListener("online", posliOpatrne);
   } catch {
-    // nevadí – hra funguje dál lokálně
-    rezim = "chyba";
+    rezim = "chyba"; // nevadí, hra funguje dál lokálně
   }
   prekresli();
 }
@@ -49,16 +48,17 @@ function posliOpatrne() {
 async function posli() {
   if (!klient) return;
   try {
-    await klient.from("party").upsert({
-      id: stav.parta.id,
+    // posíláme všechny místní týmy – tenhle telefon může zapisovat víc partám
+    await klient.from(TABULKA).upsert(stav.tymy.map((t) => ({
+      id: t.id,
       hra: HRA,
-      nazev: stav.parta.nazev || "Bezejmenná parta",
-      barva: stav.parta.barva,
-      hospoda: stav.hospoda,
-      body: body(),
-      rozpad: rozpad(),
+      nazev: t.nazev || "Bezejmenná parta",
+      barva: t.barva,
+      hospoda: indexHospody(t) + 1,
+      body: body(t),
+      rozpad: rozpad(t),
       upraveno: new Date().toISOString(),
-    });
+    })));
   } catch {
     // offline: zůstane to v telefonu a pošle se příště
   }
@@ -67,8 +67,9 @@ async function posli() {
 async function nacti() {
   if (!klient) return;
   try {
-    const { data } = await klient.from("party").select("*").eq("hra", HRA);
-    ostatni = (data || []).filter((p) => p.id !== stav.parta.id);
+    const { data } = await klient.from(TABULKA).select("*").eq("hra", HRA);
+    const mistni = new Set(stav.tymy.map((t) => t.id));
+    zvenku = (data || []).filter((t) => !mistni.has(t.id));
     prekresli();
   } catch {
     // ponecháme poslední známé pořadí

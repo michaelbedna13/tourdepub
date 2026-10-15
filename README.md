@@ -10,36 +10,48 @@ Nahraje se do repozitáře a servíruje přes GitHub Pages.
 ## Struktura
 
 ```
-index.html        kostra stránky
-app.js            obrazovky a ovládání
-stav.js           co má parta splněno, bodování, ukládání
-data.js           hospody a úkoly — tady se mění pravidla
-ui.js             kreslení ikon, čárek a půllitrů
-ikony.js          ZÁSTUPNÉ — generuje scripts/kresli-ikony.mjs, needitovat ručně
-sync.js           živé pořadí přes Supabase (volitelné)
-nastaveni.js      klíče k Supabase a název hry
-styl.css          celý vzhled, jeden soubor
-sw.js             service worker, drží web v telefonu i bez signálu
-manifest.json     aby šel web přidat na plochu jako appka
-pisma/            Bevan a Outfit, stažené lokálně
-scripts/          generátor ikon a stahovač písem
+index.html         kostra stránky
+app.js             obrazovky a ovládání
+stav.js            týmy, hospody, úkoly, bodování a ukládání
+data.js            VÝCHOZÍ hospody a úkoly (jen startovní sada, dál se mění v appce)
+ui.js              kreslení ikon, čárek a štítků obtížnosti
+ikony.js           ZÁSTUPNÉ — generuje scripts/kresli-ikony.mjs, needitovat ručně
+sync.js            živé pořadí přes Supabase (volitelné)
+nastaveni.js       klíče k Supabase, název tabulky a název hry
+styl.css           celý vzhled, jeden soubor
+DESIGN.md          barvy, písmo, rozměry a proč jsou takové
+sw.js              service worker, drží web v telefonu i bez signálu
+manifest.json      aby šel web přidat na plochu jako appka
+pisma/             Bevan a Outfit, stažené lokálně
+scripts/           generátor ikon a stahovač písem
 supabase/party.sql struktura tabulky pro živé pořadí
+.claude/skills/    Apple HIG skilly (zdroj: raintree-technology/apple-hig-skills, MIT)
 ```
 
 ## Jak se to ovládá při hře
 
-Spodní lišta má čtyři obrazovky:
+Spodní lišta má pět obrazovek:
 
-- **Hra** — aktuální štace, dvě velká tlačítka (*Jsme v špeluňce*, *Škopek padl*)
-  a vaše čárky. Mezi hospodami se posouvá tlačítky *Zpátky* / *Další štace*.
-- **Úkoly** — ve výchozím stavu jen to, co jde splnit v týhle štaci. Přepínač
-  *Všechny úkoly* ukáže i zbytek. Jednorázové se odškrtávají ťuknutím na řádek,
-  opakovatelné mají − a +.
-- **Pořadí** — kdo vede. Bez Supabase ukazuje jen vaši partu.
-- **Pravidla** — loňská pravidla, legenda půllitrů a seznam hospod. Tlačítkem *Sem*
-  se dá skočit na kteroukoli štaci, kdyby se pořadí hospod na place změnilo.
+- **Hra** — aktuální štace, dvě velká tlačítka (*Jsme v špeluňce*, *Lupnul škopek*)
+  a vaše čárky. Mezi hospodami se posouvá tlačítky *Zpátky* / *Další*.
+- **Úkoly** — všechny úkoly ve třech kategoriích. Jednorázové se odškrtávají ťuknutím
+  na řádek, opakovatelné mají − a +. Tužka vpravo úkol upraví, tlačítko dole přidá nový.
+- **Týmy** — kdo vede a za koho zapisuješ. Ťuknutím na tým se přepneš, takže z jednoho
+  telefonu jde vést i celou hru. Tužka tým přejmenuje, přebarví nebo smaže.
+- **Hospody** — trasa. Pořadí se přehazuje šipkami, ťuknutím na název se tým přesune,
+  tužka hospodu přejmenuje nebo smaže.
+- **Pravidla** — pravidla, legenda obtížnosti a vynulování čárek týmu.
 
-Překlik se opraví stejným ťuknutím ještě jednou. *Vynulovat naši hru* je dole v Pravidlech.
+Přes značku nahoře vpravo (jméno týmu) je rychlé přepnutí týmu odkudkoli.
+Překlik se opraví stejným ťuknutím ještě jednou.
+
+### Úkoly a hospody se dají měnit
+
+Hospody i úkoly nejsou napevno v kódu. Příští ročník si trasu i srandy naklikáš
+přímo v appce — `data.js` je jen to, čím se hra naplní poprvé.
+
+Když smažeš hospodu, zmizí s ní i čárky, co z ní týmy měly. Když byl na tu hospodu
+navázaný úkol (Bullseye jen *U Ričího*), omezení tím padá a úkol jde splnit kdekoli.
 
 ## Bodování
 
@@ -51,7 +63,7 @@ Překlik se opraví stejným ťuknutím ještě jednou. *Vynulovat naši hru* je
 
 Dohromady se dá urvat nejvíc **74 čárek** (9 + 9 + 56 z úkolů).
 
-Úkoly jsou v `data.js`. Každý má:
+Úkol má tahle pole (výchozí sada je v `data.js`, dál se mění v appce):
 
 | pole | co znamená |
 |---|---|
@@ -63,8 +75,13 @@ Dohromady se dá urvat nejvíc **74 čárek** (9 + 9 + 56 z úkolů).
 | `exkluzivni` | čárku bere jen jedna parta (Hospodský Národní) |
 | `jednouZaHospodu` | z každé špeluňky jen jednou (Brněnskej zloděj) |
 
-Nový úkol se přidá jako další položka do `UKOLY` v `data.js`. Nic dalšího se
-upravovat nemusí, obrazovky se podle toho dopočítají samy.
+Nový úkol se přidává tlačítkem dole na obrazovce Úkoly. Kdo chce připravit celou sadu
+dopředu, může místo toho upravit `VYCHOZI_UKOLY` v `data.js` — ta se ale načte jenom
+při prvním spuštění, takže pak je potřeba v prohlížeči smazat uložená data.
+
+Obtížnost a počet opakování spolu souvisí: **jednorázový úkol hodí tolik čárek, jaká je
+jeho obtížnost** (betelná makačka = 3 čárky), kdežto **opakovatelný dává čárku za kus**.
+Appka to dopočítá sama, ručně se to nenastavuje.
 
 ### Na co pozor u loňských pravidel
 
@@ -82,31 +99,45 @@ s víc betelnejma makačkama.
 
 ## Živé pořadí (volitelné)
 
-Bez nastavení běží web v **ukázkovém režimu**: všechno se ukládá jen do telefonu
-a v Pořadí je vidět jen vaše parta. Hra tak funguje úplně bez internetu.
+Bez nastavení běží web **jen z telefonu**: v Týmech jsou vidět ty, co sis tu založil,
+a hra funguje úplně bez internetu. Z jednoho mobilu se dá vést i celá hra — přepneš
+tým a zapisuješ za někoho jiného.
 
-Když chcete, aby každá parta zapisovala na svém mobilu a viděla ostatní živě:
+Živé pořadí se hodí, když chce každá parta zapisovat na svém telefonu a vidět ostatní.
 
-1. Na [supabase.com](https://supabase.com) založ projekt (stačí free).
-2. V **SQL Editoru** spusť obsah `supabase/party.sql`.
-3. V **Settings → API** zkopíruj *Project URL* a *anon public* klíč.
-4. Vlož je do `nastaveni.js`:
+### Nezakládej kvůli tomu nový projekt
+
+Supabase má na free plánu strop **dva běžící projekty**, ale **tabulek může mít jeden
+projekt kolik chce.** Takže pusť `supabase/party.sql` v projektu, který už používáš
+(klidně v tom od untrois). Tabulka se jmenuje `tourdepub_tymy`, takže se ti tam nic
+nepomíchá, a za jeden večer se tří part nedotkne ani okraje půlgigového limitu.
+
+1. Otevři projekt, co už máš, a v **SQL Editoru** spusť obsah `supabase/party.sql`.
+2. V **Settings → API** zkopíruj *Project URL* a *anon public* klíč.
+3. Vlož je do `nastaveni.js`:
 
 ```js
 export const SUPABASE_URL = "https://neco.supabase.co";
 export const SUPABASE_KEY = "eyJ...";
 ```
 
-5. Nahraj a každá parta si otevře stejnou adresu a nastaví si svoje jméno a barvu.
+4. Nahraj a každá parta si otevře stejnou adresu.
 
 Klíč `anon` je určený do prohlížeče, takže ho klidně nahraj do repozitáře.
 Tabulka je ale otevřená komukoli s odkazem — je to na jeden večer mezi známými.
 Kdyby to mělo viset na internetu dýl, přidej přihlášení.
 
 `HRA` v `nastaveni.js` odděluje ročníky. Příští rok ji změň, ať se party nemíchají
-s letošními.
+s letošními. `TABULKA` se mění jen tehdy, když by ti jméno kolidovalo s něčím vlastním.
 
 Bez signálu se zapisuje dál do telefonu a pošle se to, až bude signál.
+
+### Kdyby ses chtěl Supabase vyhnout úplně
+
+Jde to přes Google Apps Script a Google tabulku — stejně jako přihláška na kemp
+ve florbalkurim. Je to zadarmo, bez stropu na projekty a data vidíš rovnou v tabulce.
+Není tam ale živé posílání změn, takže by se muselo jednou za pár vteřin ptát samo.
+Pro dvě tři party na jeden večer by to stačilo; kdybys to chtěl, dopíšu to.
 
 ## Appka na ploše
 

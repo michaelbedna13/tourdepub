@@ -1,19 +1,10 @@
-// Hospody a úkoly podle pravidel Tour de Pub – Brno edition.
+// Výchozí hospody a úkoly podle pravidel Tour de Pub – Brno edition.
+// Tohle je jenom startovní sada. Jakmile se hra rozjede, drží si hospody i úkoly
+// vlastní kopii ve stavu (stav.js) a dají se upravovat přímo v appce.
+//
 // Čárka = bod. "piva" je obtížnost (1 brnkačka, 2 větší haluz, 3 betelná makačka),
-// "body" je kolik čárek padne za jedno splnění a "max" kolikrát to jde opakovat.
-// U většiny úkolů body = piva; u opakovatelných dávají pravidla čárku za kus, proto se liší.
-
-export const HOSPODY = [
-  { c: 1, nazev: "Lucky Bastard" },
-  { c: 2, nazev: "Bláhovka" },
-  { c: 3, nazev: "Zastávka" },
-  { c: 4, nazev: "U Ričího" },
-  { c: 5, nazev: "Na dobré cestě" },
-  { c: 6, nazev: "U Seminárů" },
-  { c: 7, nazev: "U Cajpla" },
-  { c: 8, nazev: "Trojka" },
-  { c: 9, nazev: "Music Lab / Desert" },
-];
+// "body" kolik čárek padne za jedno splnění a "max" kolikrát to jde opakovat.
+// U většiny úkolů body = piva; u opakovatelných dávají pravidla čárku za kus.
 
 export const KATEGORIE = [
   { id: "kecy", nazev: "Kecy a šméčka", ikona: "kecy" },
@@ -21,13 +12,25 @@ export const KATEGORIE = [
   { id: "zranice", nazev: "Žranice a divadlo", ikona: "zranice" },
 ];
 
-// Dvě čárky, které se nabíhají v každé špeluňce – nejsou to úkoly, patří k docházce.
-export const ZAKLAD = [
-  { id: "prichod", nazev: "Jsme v špeluňce", popis: "Čárka za každou špeluňku, do který vlezete.", ikona: "hospoda" },
-  { id: "skopek", nazev: "Škopek padl", popis: "Čárka, když v tý štaci lupne aspoň půlka partyje jeden škopek.", ikona: "piva" },
+export const VYCHOZI_HOSPODY = [
+  { id: "h1", nazev: "Lucky Bastard" },
+  { id: "h2", nazev: "Bláhovka" },
+  { id: "h3", nazev: "Zastávka" },
+  { id: "h4", nazev: "U Ričího" },
+  { id: "h5", nazev: "Na dobré cestě" },
+  { id: "h6", nazev: "U Seminárů" },
+  { id: "h7", nazev: "U Cajpla" },
+  { id: "h8", nazev: "Trojka" },
+  { id: "h9", nazev: "Music Lab / Desert" },
 ];
 
-export const UKOLY = [
+// Dvě čárky, které se nabíhají v každé špeluňce. Nejsou to úkoly, patří k docházce.
+export const ZAKLAD = [
+  { id: "prichod", nazev: "Jsme v špeluňce", popis: "Čárka za každou špeluňku, do který vlezete." },
+  { id: "skopek", nazev: "Škopek padl", popis: "Čárka, když v tý štaci lupne aspoň půlka partyje jeden škopek." },
+];
+
+export const VYCHOZI_UKOLY = [
   // ---------- Kecy a šméčka ----------
   { id: "caluje", kat: "kecy", piva: 1, body: 1, max: 5, nazev: "Borec, co to cáluje",
     popis: "Hoďte do nějakýho náhodnýho borca nebo baby panduláka. Za každou palici jedna čárka.",
@@ -50,20 +53,20 @@ export const UKOLY = [
 
   // ---------- Tělo v luftě ----------
   { id: "budny", kat: "telo", piva: 1, body: 1, max: 1, nazev: "Srostlý budny",
-    popis: "Dva z vás si musí svázat glajdy k sobě a tak dovalit na další štaci.", mezi: [3, 4] },
+    popis: "Dva z vás si musí svázat glajdy k sobě a tak dovalit na další štaci.", mezi: ["h3", "h4"] },
   { id: "hajzl", kat: "telo", piva: 1, body: 1, max: 1, nazev: "Hajzlovej úlet",
     popis: "Jeden z vás musí jít na hajzl opačnýho pohlaví." },
   { id: "pumpa", kat: "telo", piva: 1, body: 1, max: 1, nazev: "Pouliční pumpa",
     popis: "Odchytněte na ulici nějakýho flanďáka a chtějte po něm, ať vám vočumí, jak dáváte kliky, dřepy nebo balet." },
   { id: "taxal", kat: "telo", piva: 2, body: 2, max: 1, nazev: "Živej taxál",
-    popis: "Jeden z partyje nesmí na cestě šlápnout na zem. Jak ho tam dopravíte (na hřbetě, v pazórách), je na vás.", mezi: [4, 5] },
+    popis: "Jeden z partyje nesmí na cestě šlápnout na zem. Jak ho tam dopravíte (na hřbetě, v pazórách), je na vás.", mezi: ["h4", "h5"] },
   { id: "lajna", kat: "telo", piva: 2, body: 2, max: 1, nazev: "Vopičí lajna",
     popis: "Jak zacálujete, valí celá parta z lokálu pryč po všech čtyřech." },
   { id: "rev", kat: "telo", piva: 2, body: 2, max: 1, nazev: "Řev jak z JZD",
     popis: "Někdo z vás musí v hospodě hodit betelnýho říha a pak na celej lokál zařvat „SORÁČ, LIDI!“." },
   { id: "bullseye", kat: "telo", piva: 3, body: 1, max: 3, nazev: "Bullseye!", ikona: "sipka",
     popis: "Napalte šipku do středu. Za první je čárka, za každou další taky.",
-    pozn: "Max. 3 čárky.", hospoda: 4 },
+    pozn: "Max. 3 čárky.", hospoda: "h4" },
   { id: "bicak", kat: "telo", piva: 3, body: 3, max: 1, nazev: "Betelný bicák",
     popis: "Až 3 borci z partyje musí čumět na plnej škopek na nataženej pazóře celou minutu.",
     pozn: "Jak to jeden podělá, celá parta má hovno." },
@@ -87,7 +90,8 @@ export const UKOLY = [
     popis: "Nechte se jako parta vyblejsknout od cizáka. Furt do něj ale valte, že je levej, že ta fotka stojí za hovno a ať se snaží (s hopsáním, bez hopsání, ksichty…)." },
 ];
 
-export const UKOL_PODLE_ID = Object.fromEntries(UKOLY.map((u) => [u.id, u]));
-
-/** Kolik čárek jde z úkolů nasbírat nejvíc (bez docházky a škopků). */
-export const STROP_UKOLY = UKOLY.reduce((s, u) => s + u.body * u.max, 0);
+export const OBTIZNOST = [
+  { piva: 1, nazev: "Brnkačka" },
+  { piva: 2, nazev: "Větší haluz" },
+  { piva: 3, nazev: "Betelná makačka" },
+];
