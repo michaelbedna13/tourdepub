@@ -193,6 +193,22 @@ latin) a když se vezmou první dva, chybí pak Č, Ř, Š a Ů.
 je nemají, a v textech úkolů jsou všude. Prohlížeč je dosadí z jiného písma a je to
 v řádku poznat.
 
+## Ikony appky
+
+`ikona-*.png` a `ikona.svg` generuje:
+
+```bash
+node scripts/ikony-appky.mjs            # logo (výchozí)
+node scripts/ikony-appky.mjs --pullitr  # místo loga půllitr
+```
+
+Kresba se snímkuje přes HTML obal, kde se roztáhne na celou plochu.
+**Snímkovat SVG přímo nejde** — má vlastní rozměr, takže se místo zmenšení
+jen ořízne roh. Přesně tím byla ikona na ploše dlouho skoro prázdná.
+
+iOS si ikonu drží i po aktualizaci webu. Aby se projevila nová, je potřeba
+appku z plochy smazat a přidat znovu.
+
 ## Logo
 
 `logo.svg` a `logo.js` jsou obtažené z obrázku skriptem:

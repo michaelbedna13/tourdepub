@@ -117,15 +117,32 @@ async function nacti() {
 }
 
 /** Supabase vrací kód i radu, a ty rozhodnou, co je špatně. Samotné „Failed to
- *  fetch" nestačí na nic. */
+ *  fetch" nestačí na nic. Nejčastější případy rovnou přeložíme do rady,
+ *  co s tím, ať se nemusí luštit anglická hláška v hospodě. */
 function popisChyby(e) {
   if (!e) return "neznámá chyba";
+  const kod = e.code || "";
+  const zprava = e.message || String(e);
+
+  // tabulka v projektu není
+  if (kod === "PGRST205" || kod === "42P01" || /schema cache|does not exist/i.test(zprava))
+    return `Tabulka „${TABULKA}" v projektu není. Spusť v Supabase SQL Editoru obsah supabase/party.sql.`;
+  // klíč neplatí nebo je starý
+  if (kod === "PGRST301" || kod === "401" || /JWT|api key|Invalid authentication/i.test(zprava))
+    return "Klíč neplatí. Zkontroluj SUPABASE_KEY v nastaveni.js proti Settings → API v Supabase.";
+  // čtení zakázané pravidly
+  if (kod === "42501" || /row-level security|permission denied/i.test(zprava))
+    return `Pravidla (RLS) nepouští ke čtení. Spusť v Supabase znovu část se zásadami z supabase/party.sql.`;
+  // adresa projektu
+  if (/Failed to fetch|NetworkError|ERR_NAME_NOT_RESOLVED/i.test(zprava))
+    return "Nedá se spojit se Supabase. Zkontroluj SUPABASE_URL v nastaveni.js, nebo nemáš signál.";
+
   const kusy = [];
-  if (e.code) kusy.push(e.code);
-  if (e.message) kusy.push(e.message);
+  if (kod) kusy.push(kod);
+  kusy.push(zprava);
   if (e.hint) kusy.push("Rada: " + e.hint);
   if (e.details) kusy.push(e.details);
-  return kusy.length ? kusy.join(" · ") : String(e);
+  return kusy.join(" · ");
 }
 
 /** Zkusit se připojit znovu, aniž by se načítala celá stránka. */
