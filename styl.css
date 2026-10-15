@@ -393,30 +393,31 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   font-family:var(--psaci)}
 
 /* ---------- úvodní obrazovka ---------- */
-/* Drží se chvilku i po načtení, ať spuštění z plochy nepůsobí jako
-   bliknutí. Navazuje na obrázek, který ukazuje iOS, takže podklad
-   i velikost loga musí sedět. */
-#uvod{
-  position:fixed;inset:0;z-index:100;display:grid;place-items:center;
-  background:var(--podklad);
-  transition:opacity .42s var(--krok);
-}
-#uvod img{
-  width:52vw;max-width:260px;height:auto;display:block;
-  animation:uvod-logo .72s var(--krok) both;
-}
+/* Drží se chvilku i po načtení, ať spuštění z plochy nepůsobí jako bliknutí.
+   Navazuje na obrázek, který ukazuje iOS, takže podklad i poměr loga sedí.
+   Základ je v hlavičce index.html, tady je jen pohyb. */
+#uvod{transition:opacity .45s var(--krok)}
+/* animace se spustí teprve, až je logo načtené (data-nacteno z onload) */
+#uvod img[data-nacteno]{animation:uvod-logo .66s var(--krok) both}
 #uvod.odchazi{opacity:0;pointer-events:none}
-#uvod.odchazi img{animation:uvod-pryc .42s var(--krok) both}
+#uvod.odchazi img{animation:uvod-pryc .45s var(--krok) both}
 @keyframes uvod-logo{
-  from{opacity:0;transform:scale(.88) translateY(8px)}
+  from{opacity:0;transform:scale(.9) translateY(10px)}
   to{opacity:1;transform:none}
 }
 @keyframes uvod-pryc{
   from{opacity:1;transform:none}
-  to{opacity:0;transform:scale(1.06)}
+  to{opacity:0;transform:scale(1.04)}
+}
+/* obsah se pod odcházející obrazovkou jemně zvedne, ať to není střih */
+.obrazovka{animation:obsah-prichod .5s var(--krok) both}
+@keyframes obsah-prichod{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:none}
 }
 @media (prefers-reduced-motion:reduce){
-  #uvod img,#uvod.odchazi img{animation:none}
+  #uvod img[data-nacteno],#uvod.odchazi img,.obrazovka{animation:none}
+  #uvod img{opacity:1}
 }
 
 /* odměna po zápisu */

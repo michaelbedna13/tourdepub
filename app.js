@@ -768,16 +768,35 @@ try {
   throw e;
 }
 
-/** Úvodní obrazovka zmizí, až když je appka vykreslená A zároveň uběhla
- *  chvilka od spuštění. Bez té chvilky by na rychlém telefonu jen bliklo. */
+/** Úvodní obrazovka odejde, až je všechno hotové: logo se stihlo ukázat,
+ *  písma jsou načtená (jinak by text pod ní po odchodu přeskočil) a uběhla
+ *  chvilka od spuštění, aby to na rychlém telefonu jen neproblklo. */
 (function schovejUvod() {
   const uvod = document.getElementById("uvod");
   if (!uvod) return;
-  const NEJMIN = 1150; // ms od načtení stránky
-  const zbyva = Math.max(0, NEJMIN - performance.now());
-  setTimeout(() => {
+  const NEJMIN = 1050;          // ms od načtení stránky
+  const PO_LOGU = 550;          // ms od chvíle, kdy se logo objevilo
+  const obrazek = uvod.querySelector("img");
+
+  const nacteno = obrazek?.dataset.nacteno
+    ? Promise.resolve()
+    : new Promise((hotovo) => {
+        if (!obrazek) return hotovo();
+        obrazek.addEventListener("load", hotovo, { once: true });
+        obrazek.addEventListener("error", hotovo, { once: true });
+        setTimeout(hotovo, 1500); // kdyby se logo nenačetlo vůbec
+      });
+
+  const pockej = (ms) => new Promise((h) => setTimeout(h, ms));
+  const pisma = document.fonts?.ready || Promise.resolve();
+
+  Promise.all([
+    nacteno.then(() => pockej(PO_LOGU)),
+    pockej(Math.max(0, NEJMIN - performance.now())),
+    pisma,
+  ]).then(() => {
     uvod.classList.add("odchazi");
     uvod.addEventListener("transitionend", () => uvod.remove(), { once: true });
-    setTimeout(() => uvod.remove(), 800); // kdyby přechod neproběhl
-  }, zbyva);
+    setTimeout(() => uvod.remove(), 900); // kdyby přechod neproběhl
+  });
 })();

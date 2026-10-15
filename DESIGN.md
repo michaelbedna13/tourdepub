@@ -126,9 +126,19 @@ Při spuštění z plochy ukáže iOS obrázek z `uvodni/`, hned po něm naváž
 vlastní obrazovka ve stránce (`#uvod`). Obě mají stejný podklad a logo ve
 stejném poměru (52 % šířky), takže přechod neposkočí.
 
-Drží se **aspoň 1150 ms od načtení** a pak odejde prolnutím. Bez toho minima
-by na rychlém telefonu jen bliklo. Logo přijede z 88 % velikosti a zespodu,
-odchází lehkým zvětšením — jeden pohyb, ne efekty.
+Odejde, až platí všechno tohle naráz: **uběhlo 1050 ms od načtení**, **logo je
+aspoň 550 ms vidět** a **písma jsou načtená**. Každá podmínka řeší jedno bliknutí:
+
+- bez toho minima by na rychlém telefonu jen bliklo;
+- animace se spouští teprve `data-nacteno` z `onload` obrázku — jinak by běžela
+  nad prázdným místem, obrázek by dorazil později a logo by jen naskočilo;
+- bez čekání na písma by text pod obrazovkou po jejím odchodu přeskočil.
+
+Logo přijede z 90 % velikosti a zespodu, odchází lehkým zvětšením; obsah se pod
+ním zároveň zvedne o 8 px. Jeden pohyb, ne efekty.
+
+**Podklad a rozměr loga jsou i v hlavičce `index.html`**, ne jen ve `styl.css`.
+Než se stylopis stáhne, kreslí prohlížeč bílou a na tmavé appce to zabliká.
 
 Logo je tu jako `<img src="logo-uvodni.svg">` s barvou zapečenou napevno.
 V `<img>` si `currentColor` vzít nejde, vyšel by černý. Proto je ta varianta

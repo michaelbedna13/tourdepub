@@ -38,12 +38,20 @@
   media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <link rel="apple-touch-startup-image" href="uvodni/440x956@3x.png"
   media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<style>
+  /* Rovnou v hlavičce, ne ve stylu: než se stáhne styl.css, kreslí prohlížeč
+     bílou a na tmavé appce to zabliká. Tohle platí od prvního vykreslení. */
+  html,body{background:#070E0A;margin:0}
+  #uvod{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#070E0A}
+  #uvod img{width:52vw;max-width:260px;height:auto;display:block;opacity:0}
+</style>
 <link rel="stylesheet" href="styl.css">
 </head>
 <body>
 <!-- Úvodní obrazovka. Je rovnou ve stránce, ne z JS, aby naskočila hned
      a navázala na tu, kterou ukazuje iOS při spuštění z plochy. -->
-<div id="uvod"><img src="logo-uvodni.svg" alt="Tour de Pub" width="450" height="359"></div>
+<div id="uvod"><img src="logo-uvodni.svg" alt="Tour de Pub" width="450" height="359"
+  onload="this.dataset.nacteno=1" onerror="this.dataset.nacteno=1"></div>
 
 <div class="app">
   <!-- Překresluje se jen obsah obrazovky. Lišta stojí mimo, jinak by při
