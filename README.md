@@ -124,9 +124,11 @@ projekt kolik chce.** Takže pusť `supabase/party.sql` v projektu, který už p
 (klidně v tom od untrois). Tabulka se jmenuje `tourdepub_tymy`, takže se ti tam nic
 nepomíchá, a za jeden večer se tří part nedotkne ani okraje půlgigového limitu.
 
-1. Otevři projekt, co už máš, a v **SQL Editoru** spusť obsah `supabase/party.sql`.
-2. V **Settings → API** zkopíruj *Project URL* a *anon public* klíč.
-3. Vlož je do `nastaveni.js`:
+1. Otevři projekt, co už máš (u nás untrois), vlevo **SQL Editor** → **New query**.
+2. Vlož celý obsah `supabase/party.sql` a dej **Run**. Skript jde pustit
+   i opakovaně, nic nerozbije.
+3. Ověř v **Table Editor**, že přibyla tabulka `tourdepub_tymy`.
+4. V **Settings → API** zkopíruj *Project URL* a klíč a vlož je do `nastaveni.js`:
 
 ```js
 export const SUPABASE_URL = "https://neco.supabase.co";

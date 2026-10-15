@@ -35,4 +35,16 @@ drop policy if exists "kdokoli upravuje" on public.tourdepub_tymy;
 create policy "kdokoli upravuje" on public.tourdepub_tymy for update using (true);
 
 -- Aby se změny rozesílaly ostatním telefonům živě.
-alter publication supabase_realtime add table public.tourdepub_tymy;
+-- Přidání se dělá podmíněně, aby druhé spuštění skriptu nespadlo na tom,
+-- že už tam tabulka je.
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'tourdepub_tymy'
+  ) then
+    alter publication supabase_realtime add table public.tourdepub_tymy;
+  end if;
+end $$;
