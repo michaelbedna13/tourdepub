@@ -86,7 +86,13 @@ def main(cesta):
                 "// Generuje scripts/prevod-loga.py z obrázku – needitovat ručně.\n"
                 'export const LOGO = ' + json.dumps(svg.strip(), ensure_ascii=False) + ";\n")
 
-    print("logo.svg + logo.js: %d drah, %.1f kB, viewBox %s×%s"
+    # Varianta s napevno krémovou barvou pro <img> na úvodní obrazovce.
+    # Logo v <img> si barvu textu vzít nemůže, currentColor by vyšel černý.
+    with open(os.path.join(os.path.dirname(__file__), "..", "logo-uvodni.svg"),
+              "w", encoding="utf-8") as f:
+        f.write(svg.replace('fill="currentColor"', 'fill="#EFEBE0"'))
+
+    print("logo.svg + logo.js + logo-uvodni.svg: %d drah, %.1f kB, viewBox %s×%s"
           % (len(kusy), len(svg) / 1024, n(sirka), n(vyska)))
 
 if __name__ == "__main__":

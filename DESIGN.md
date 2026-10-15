@@ -120,6 +120,20 @@ Stínů je v celé appce minimum. Na tmavém podkladu nefungují a dělají nepo
 - Spodní lišta je přisazená ke spodku, průsvitná s rozmazáním a vlasovou linkou
   nahoře, pět položek. Respektuje `safe-area-inset-bottom`.
 
+## Úvodní obrazovka
+
+Při spuštění z plochy ukáže iOS obrázek z `uvodni/`, hned po něm naváže
+vlastní obrazovka ve stránce (`#uvod`). Obě mají stejný podklad a logo ve
+stejném poměru (52 % šířky), takže přechod neposkočí.
+
+Drží se **aspoň 1150 ms od načtení** a pak odejde prolnutím. Bez toho minima
+by na rychlém telefonu jen bliklo. Logo přijede z 88 % velikosti a zespodu,
+odchází lehkým zvětšením — jeden pohyb, ne efekty.
+
+Logo je tu jako `<img src="logo-uvodni.svg">` s barvou zapečenou napevno.
+V `<img>` si `currentColor` vzít nejde, vyšel by černý. Proto je ta varianta
+zvlášť a generuje se spolu s ostatními.
+
 ## Pohyb
 
 Jeden okamžik, ne efekty všude: po zápisu čárky **vyletí `+1`** a zmizí.

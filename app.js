@@ -783,3 +783,17 @@ try {
   hlaskaOPaduApp(e);
   throw e;
 }
+
+/** Úvodní obrazovka zmizí, až když je appka vykreslená A zároveň uběhla
+ *  chvilka od spuštění. Bez té chvilky by na rychlém telefonu jen bliklo. */
+(function schovejUvod() {
+  const uvod = document.getElementById("uvod");
+  if (!uvod) return;
+  const NEJMIN = 1150; // ms od načtení stránky
+  const zbyva = Math.max(0, NEJMIN - performance.now());
+  setTimeout(() => {
+    uvod.classList.add("odchazi");
+    uvod.addEventListener("transitionend", () => uvod.remove(), { once: true });
+    setTimeout(() => uvod.remove(), 800); // kdyby přechod neproběhl
+  }, zbyva);
+})();

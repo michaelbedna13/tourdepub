@@ -392,6 +392,33 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .legenda-radek{display:flex;align-items:center;gap:11px;font-size:15px;color:var(--text-2);
   font-family:var(--psaci)}
 
+/* ---------- úvodní obrazovka ---------- */
+/* Drží se chvilku i po načtení, ať spuštění z plochy nepůsobí jako
+   bliknutí. Navazuje na obrázek, který ukazuje iOS, takže podklad
+   i velikost loga musí sedět. */
+#uvod{
+  position:fixed;inset:0;z-index:100;display:grid;place-items:center;
+  background:var(--podklad);
+  transition:opacity .42s var(--krok);
+}
+#uvod img{
+  width:52vw;max-width:260px;height:auto;display:block;
+  animation:uvod-logo .72s var(--krok) both;
+}
+#uvod.odchazi{opacity:0;pointer-events:none}
+#uvod.odchazi img{animation:uvod-pryc .42s var(--krok) both}
+@keyframes uvod-logo{
+  from{opacity:0;transform:scale(.88) translateY(8px)}
+  to{opacity:1;transform:none}
+}
+@keyframes uvod-pryc{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:scale(1.06)}
+}
+@media (prefers-reduced-motion:reduce){
+  #uvod img,#uvod.odchazi img{animation:none}
+}
+
 /* odměna po zápisu */
 .plusjedna{position:fixed;left:50%;bottom:52%;z-index:50;font-family:var(--nadpisy);font-size:38px;
   color:var(--text);pointer-events:none;animation:vyletet .9s var(--krok) forwards}

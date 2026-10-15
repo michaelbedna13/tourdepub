@@ -1,9 +1,9 @@
 // Service worker: uloží web do telefonu, ať funguje i bez signálu.
 // Při změně webu zvedni VERZE, jinak si telefon nechá starou verzi.
-const VERZE = "tourdepub-10";
+const VERZE = "tourdepub-11";
 const SOUBORY = [
   ".", "index.html", "styl.css", "app.js", "stav.js", "data.js", "ui.js",
-  "ikony.js", "sync.js", "nastaveni.js", "logo.js", "logo.svg",
+  "ikony.js", "sync.js", "nastaveni.js", "logo.js", "logo.svg", "logo-uvodni.svg",
   "ikona.svg", "zrno.svg", "manifest.json",
   "pisma/archivo-black-lat.woff2", "pisma/archivo-black-ext.woff2",
   "pisma/psaci-lat.woff2", "pisma/psaci-ext.woff2",

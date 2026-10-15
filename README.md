@@ -238,10 +238,14 @@ požadavku. Oba soubory jsou generované, needitovat ručně.
 V rozhraní logo není — nese ho ikona appky, úvodní obrazovka a patička Pravidel.
 Proč, je v `DESIGN.md`.
 
-## Úvodní obrazovky
+## Úvodní obrazovka
 
-`uvodni/` jsou obrázky, které iOS ukáže při spuštění appky z plochy. Bez nich
-se objeví jen prázdná barva. Generuje je:
+Jsou dvě a navazují na sebe. `uvodni/` jsou obrázky, které ukáže **iOS** při
+spuštění appky z plochy — bez nich se objeví jen prázdná barva. Hned po nich
+naváže **vlastní obrazovka ve stránce** (`#uvod` v `index.html`), která se drží
+aspoň 1150 ms a pak odejde prolnutím. Délka se mění v `app.js` u `NEJMIN`.
+
+Systémové obrázky generuje:
 
 ```bash
 node scripts/uvodni-obrazovky.mjs
