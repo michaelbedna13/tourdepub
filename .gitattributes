@@ -1,0 +1,14 @@
+# Jak má GitHub počítat jazyky a zobrazovat diffy.
+
+# ikony.js nejsou psané řádky kódu, ale vygenerované SVG dráhy ikon
+# (dělá je scripts/kresli-ikony.mjs). Nafukovalo to podíl JavaScriptu
+# a v diffu se to pokaždé rozbalilo na 45 kB čísel.
+ikony.js linguist-generated=true
+
+# Apple HIG skilly jsou převzaté odjinud (raintree-technology/apple-hig-skills),
+# nepíšeme je my.
+.claude/skills/** linguist-vendored=true
+
+# Písma a obrázky jsou binární, ať se je git nesnaží slučovat.
+*.woff2 binary
+*.png binary
