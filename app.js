@@ -391,12 +391,12 @@ function pravidla() {
           </div>
           ${jeSpravce ? ikona("check", 18) : ikona("zamek", 17)}
         </button>
-        <button class="radek" data-akce="vynulovat">
+        ${jeSpravce ? `<button class="radek" data-akce="vynulovat">
           <div class="radek-telo">
             <div class="radek-nazev" style="color:var(--spatne)">Vynulovat čárky týmu</div>
             <div class="radek-pod">Smaže zápisy týmu ${bezpecne(tym()?.nazev || "")}. Hospody a úkoly zůstanou.</div>
           </div>
-        </button>
+        </button>` : ""}
       </div>
     </div>
 
@@ -712,6 +712,8 @@ function obsluha(e) {
     case "vypni-spravce": nastavSpravce(false); zavri(); break;
 
     case "vynulovat":
+      // zámek i tady, ne jen schované tlačítko – je to nevratné
+      if (!jeSpravce) break;
       if (confirm(`Vynulovat čárky týmu ${tym()?.nazev || ""}? Tohle se nedá vrátit.`)) {
         vynulujTym();
         naPohled("hra");

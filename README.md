@@ -51,7 +51,8 @@ Spodní lišta má pět obrazovek:
   telefonu jde vést i celou hru. Tužka tým přejmenuje, přebarví nebo smaže.
 - **Hospody** — trasa. Pořadí se přehazuje šipkami, ťuknutím na název se tým přesune,
   tužka hospodu přejmenuje nebo smaže.
-- **Pravidla** — pravidla, legenda obtížnosti a vynulování čárek týmu.
+- **Pravidla** — pravidla, legenda obtížnosti a režim správce. Vynulovat čárky
+  týmu jde jen ve správcovském režimu; je to nevratné.
 
 Přes značku nahoře vpravo (jméno týmu) je rychlé přepnutí týmu odkudkoli.
 Překlik se opraví stejným ťuknutím ještě jednou.
