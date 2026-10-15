@@ -137,11 +137,23 @@ input,textarea,select{caret-color:var(--text)}
   .obrazovka{padding-top:calc(max(env(safe-area-inset-top),50px) + 8px)}
 }
 
-/* ---------- hlavička se značkou ---------- */
+/* ---------- horní lišta ---------- */
+/* Vlevo nadpis obrazovky, vpravo tým. Logo tu nebylo – trojřádková kresba
+   s rozervaným okrajem nemá vedle úhledné pilulky co zarovnat a pralo se
+   o místo s nadpisem. Značku nese ikona appky, úvodní obrazovka a patička. */
 .hlava{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  min-height:44px;margin-bottom:22px}
-.logo{display:block;width:92px;color:var(--text)}
-.logo svg{display:block;width:100%;height:auto}
+  min-height:44px;margin-bottom:16px}
+.hlava-text{min-width:0;flex:1}
+.hlava-text h1{font-size:27px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlava-drobne{font-family:var(--ovladani);font-size:12.5px;color:var(--text-3);
+  letter-spacing:.07em}
+.podnadpis{color:var(--text-2);font-size:15px;margin:-6px 0 18px}
+/* patička Pravidel – jediné místo v rozhraní, kde se značka ukáže */
+.paticka{display:flex;flex-direction:column;align-items:center;gap:10px;
+  margin-top:40px;padding-bottom:6px;color:var(--text-3)}
+.logo-paticka{display:block;width:84px;opacity:.3}
+.logo-paticka svg{display:block;width:100%;height:auto}
+.paticka span:last-child{font-family:var(--ovladani);font-size:12.5px}
 .prepinac-tymu{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 13px;
   border-radius:var(--pilulka);background:var(--vrstva-2);
   font-family:var(--ovladani);font-size:14px;max-width:58%}

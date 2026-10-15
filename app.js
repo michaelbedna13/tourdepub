@@ -14,9 +14,26 @@ import {
 import { ikona, carky, obtiznost, sklonuj, sklonujUkol, bezpecne, vazat } from "./ui.js";
 import { spustSync, stavSyncu, ostatniTymy } from "./sync.js";
 
-const elObrazovka = document.getElementById("obrazovka");
-const elLista = document.getElementById("lista");
-const elOkno = document.getElementById("okno");
+/** Postaví kostru stránky, když chybí.
+ *
+ *  Service worker umí vydat starou index.html a k ní už novou app.js. Stará
+ *  kostra měla jiná id, nová appka je nenašla, spadla na prvním řádku a zůstala
+ *  černá plocha. Tohle tomu předejde: appka si kostru v takovém případě postaví
+ *  sama a je jedno, jak stará stránka pod ní je. */
+function kostra() {
+  if (!document.getElementById("obrazovka")) {
+    document.body.innerHTML =
+      '<div class="app"><div id="obrazovka"></div></div>' +
+      '<div class="lista-obal"><nav class="lista" id="lista" aria-label="Hlavní"></nav></div>' +
+      '<div id="okno"></div>';
+  }
+  return {
+    obrazovka: document.getElementById("obrazovka"),
+    lista: document.getElementById("lista"),
+    okno: document.getElementById("okno"),
+  };
+}
+const { obrazovka: elObrazovka, lista: elLista, okno: elOkno } = kostra();
 
 let pohled = "hra";
 let kategorieFiltr = "vse";
@@ -49,10 +66,17 @@ function odmena(text) {
   if (navigator.vibrate) navigator.vibrate(10);
 }
 
-function hlava() {
+/** Horní lišta: vlevo nadpis obrazovky (nebo kde zrovna jsme), vpravo tým.
+ *  Logo tu nebylo k ničemu — pralo se o místo s nadpisem a jeho rozervaný
+ *  okraj neměl vedle úhledné pilulky co zarovnat. Značku nese ikona appky,
+ *  úvodní obrazovka a patička Pravidel. */
+function hlava(nadpis = "", drobne = "") {
   const t = tym();
   return `<div class="hlava">
-    <span class="logo">${LOGO}</span>
+    <div class="hlava-text">
+      ${drobne ? `<div class="hlava-drobne cislo">${drobne}</div>` : ""}
+      ${nadpis ? `<h1>${nadpis}</h1>` : ""}
+    </div>
     <button class="prepinac-tymu" data-okno="tymy-rychle" aria-label="Přepnout tým">
       <span class="tecka" style="background:${bezpecne(t?.barva || BARVY[0])}"></span>
       <b>${bezpecne(t?.nazev || "Bez týmu")}</b>
@@ -94,7 +118,7 @@ function poradiTymu() {
 
 function hra() {
   const t = tym();
-  if (!t) return hlava() + `<div class="prazdno">Nejdřív si založ tým.</div>`;
+  if (!t) return hlava("Hra") + `<div class="prazdno">Nejdřív si založ tým.</div>`;
   const h = hospodaTed();
   const i = indexHospody();
   const r = rozpad();
@@ -112,7 +136,7 @@ function hra() {
   const nejvic = poradi[0]?.body || 0;
 
   return `
-    ${hlava()}
+    ${hlava("", `ŠTACE ${i + 1} Z ${stav.hospody.length}`)}
     ${pruhSyncu()}
 
     <div class="staci">
@@ -120,7 +144,6 @@ function hra() {
         aria-label="Předchozí špeluňka">${ikona("i-zpet", 17)}</button>
       <div class="staci-text">
         <h1>${bezpecne(h?.nazev || "Žádná špeluňka")}</h1>
-        <div class="staci-kolik cislo">ŠTACE ${i + 1} Z ${stav.hospody.length}</div>
       </div>
       <button class="ikonove" data-akce="hospoda-plus" ${i >= stav.hospody.length - 1 ? "disabled" : ""}
         aria-label="Další špeluňka">${ikona("i-zpet", 17, "otocit")}</button>
@@ -188,11 +211,8 @@ function ukoly() {
   };
 
   return `
-    ${hlava()}
-    <div class="nadpis">
-      <h1>Úkoly</h1>
-      <p class="cislo">Splněno ${r.splneno} z ${stav.ukoly.length} · ${r.ukoly} ${sklonuj(r.ukoly)} za srandy</p>
-    </div>
+    ${hlava("Úkoly")}
+    <p class="podnadpis cislo">Splněno ${r.splneno} z ${stav.ukoly.length} · ${r.ukoly} ${sklonuj(r.ukoly)} za srandy</p>
     <div class="prepinac" role="tablist">
       ${zalozka("vse", "Všechno", stav.ukoly)}
       ${KATEGORIE.map((k) => zalozka(k.id, k.nazev, stav.ukoly.filter((u) => u.kat === k.id))).join("")}
@@ -269,11 +289,8 @@ function tymy() {
     </div>`).join("");
 
   return `
-    ${hlava()}
-    <div class="nadpis">
-      <h1>Týmy</h1>
-      <p>Ťukni na tým, za který chceš zapisovat.</p>
-    </div>
+    ${hlava("Týmy")}
+    <p class="podnadpis psane">Ťukni na tým, za který chceš zapisovat.</p>
     ${pruhSyncu(true)}
     <div class="vrstva radky">${radky}</div>
     <div class="sekce">
@@ -313,12 +330,9 @@ function hospody() {
     </div>`).join("");
 
   return `
-    ${hlava()}
-    <div class="nadpis">
-      <h1>Hospody</h1>
-      <p>${jeSpravce ? "Pořadí určuje trasu. Šipkami se přehazuje."
+    ${hlava("Hospody")}
+    <p class="podnadpis psane">${jeSpravce ? "Pořadí určuje trasu. Šipkami se přehazuje."
                      : "Ťukni na hospodu, ať se tam tým přesune."}</p>
-    </div>
     <div class="vrstva radky">${radky}</div>
     ${jeSpravce ? `<div class="sekce">
       <button class="tl" data-okno="hospoda-nova">${ikona("plus", 18)} Přidat hospodu</button>
@@ -331,9 +345,8 @@ function hospody() {
 function pravidla() {
   const s = strop();
   return `
-    ${hlava()}
+    ${hlava("Pravidla")}
     <div class="pravidla">
-      <h1 style="margin-bottom:16px;font-size:27px">Pravidla</h1>
       <p>Bacha, to není jenom takový to klasický večerní nasávání v Štatlu. Tady se jede
       betelná řežba přes brněnský špeluňky, kde čárky nemáš jenom za vyžahnutý pruty,
       ale hlavně za to, že máš koule, dobrej kšaft a v palici to nemáš vypatlaný.</p>
@@ -379,6 +392,11 @@ function pravidla() {
           </div>
         </button>
       </div>
+    </div>
+
+    <div class="paticka">
+      <span class="logo-paticka">${LOGO}</span>
+      <span>© Mišák</span>
     </div>
   `;
 }
@@ -713,7 +731,25 @@ document.addEventListener("keydown", (e) => {
 
 /* ---------- start ---------- */
 
-naZmenu(vykresli);
-vykresliListu();
-vykresli();
-spustSync(vykresli);
+/** Poslední záchrana: když se cokoli rozsype, ať tam není černá plocha bez
+ *  vysvětlení. V hospodě po pár pivech je hláška s tlačítkem k nezaplacení. */
+function hlaskaOPaduApp(e) {
+  const d = document.getElementById("obrazovka") || document.body;
+  d.innerHTML = `<div class="obrazovka"><div class="prazdno">
+    <p style="margin-bottom:6px">Appka se zasekla.</p>
+    <p class="drobne" style="font-size:13px;color:var(--text-3)">${
+      String(e?.message || e).replace(/[<>&]/g, "")}</p>
+    <button class="tl hlavni" style="margin-top:18px" onclick="location.reload()">Načíst znovu</button>
+  </div></div>`;
+}
+addEventListener("error", (e) => { if (!document.getElementById("obrazovka")?.children.length) hlaskaOPaduApp(e.error || e); });
+
+try {
+  naZmenu(vykresli);
+  vykresliListu();
+  vykresli();
+  spustSync(vykresli);
+} catch (e) {
+  hlaskaOPaduApp(e);
+  throw e;
+}

@@ -1,6 +1,6 @@
 // Service worker: uloží web do telefonu, ať funguje i bez signálu.
 // Při změně webu zvedni VERZE, jinak si telefon nechá starou verzi.
-const VERZE = "tourdepub-4";
+const VERZE = "tourdepub-5";
 const SOUBORY = [
   ".", "index.html", "styl.css", "app.js", "stav.js", "data.js", "ui.js",
   "ikony.js", "sync.js", "nastaveni.js", "logo.js", "logo.svg",
@@ -10,6 +10,18 @@ const SOUBORY = [
   "pisma/outfit-400-lat.woff2", "pisma/outfit-400-ext.woff2",
   "pisma/outfit-500-lat.woff2", "pisma/outfit-500-ext.woff2",
   "pisma/outfit-600-lat.woff2", "pisma/outfit-600-ext.woff2",
+  "uvodni/320x568@2x.png",
+  "uvodni/375x667@2x.png",
+  "uvodni/375x812@3x.png",
+  "uvodni/390x844@3x.png",
+  "uvodni/393x852@3x.png",
+  "uvodni/402x874@3x.png",
+  "uvodni/414x736@3x.png",
+  "uvodni/414x896@2x.png",
+  "uvodni/414x896@3x.png",
+  "uvodni/428x926@3x.png",
+  "uvodni/430x932@3x.png",
+  "uvodni/440x956@3x.png",
 ];
 
 self.addEventListener("install", (e) => {

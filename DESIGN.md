@@ -91,7 +91,18 @@ nebylo poznat, co je důležité.
 
 Slovní značka je obtažená z kresby do drah (`scripts/prevod-loga.py` →
 `logo.svg` a `logo.js`). Kreslí se `currentColor`, takže funguje na tmavém
-i světlém podkladu. Nese ji jen hlavička; nikde se neopakuje.
+i světlém podkladu.
+
+**V rozhraní není.** Stála v horní liště vedle pilulky týmu a nefungovalo to:
+je trojřádková, s rozervaným okrajem a bez jasné účaří, takže vedle úhledné
+pilulky neměla co zarovnat, a protože seděla vlevo nahoře, prala se o místo
+s nadpisem obrazovky. Výsledkem byly dva titulky nad sebou a ten skutečný
+vypadal podřadně.
+
+Značku teď nese **ikona appky**, **úvodní obrazovka při spuštění**
+(`uvodni/`, generuje `scripts/uvodni-obrazovky.mjs`) a **patička Pravidel**,
+kde stojí potichu na 30 % krytí. Horní lištu drží nadpis obrazovky vlevo
+a tým vpravo; na Hře je vlevo místo nadpisu „ŠTACE 2 Z 9".
 
 ## Plochy a předěly
 

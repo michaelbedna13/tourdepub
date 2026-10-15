@@ -159,6 +159,10 @@ adresního řádku a funguje i ve sklepě bez signálu.
 **Po každé změně webu zvedni `VERZE` v `sw.js`.** Jinak si telefon nechá
 starou verzi a nových úkolů se nedočkáš.
 
+Kdyby se přesto sešla stará stránka s novým skriptem, appka si kostru postaví
+sama a nic se nerozsype — dřív v takovém případě zůstala černá plocha. A kdyby
+spadlo něco jiného, ukáže se hláška s tlačítkem *Načíst znovu*, ne prázdno.
+
 ## Ikony
 
 Ikony jsou tlusté siluety s výstřižky, obrys křivý jako stříhaný tupýma nůžkama.
@@ -199,6 +203,21 @@ node scripts/prevod-loga.mjs <obrazek.png>
 Kreslí se barvou textu (`currentColor`), takže funguje na světlém i tmavém podkladu.
 `logo.js` je ten samý tvar jako modul, aby se vkládal rovnou do stránky bez dalšího
 požadavku. Oba soubory jsou generované, needitovat ručně.
+
+V rozhraní logo není — nese ho ikona appky, úvodní obrazovka a patička Pravidel.
+Proč, je v `DESIGN.md`.
+
+## Úvodní obrazovky
+
+`uvodni/` jsou obrázky, které iOS ukáže při spuštění appky z plochy. Bez nich
+se objeví jen prázdná barva. Generuje je:
+
+```bash
+node scripts/uvodni-obrazovky.mjs
+```
+
+Skript vypíše i `<link>` značky — při přidání nového rozměru je potřeba je
+přenést do `index.html` a soubory doplnit do seznamu v `sw.js`.
 
 ## Nasazení
 
