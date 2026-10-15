@@ -41,10 +41,22 @@ function hlava() {
   </div>`;
 }
 
-const pruhUkazky = () => stavSyncu().rezim === "ukazka"
-  ? `<div class="rezim">${ikona("zamek", 16)}
-      <span>Zapisuje se jen do tohohle telefonu. Jak zapnout živé pořadí, je v README.</span></div>`
-  : "";
+/** Pruh o tom, jestli se skóre sdílí. Rozlišuje tři stavy, protože „tváříme se
+ *  připojeně, ale nic se neposílá“ je ten nejhorší, co může nastat. */
+function pruhSyncu(podrobne = false) {
+  const s = stavSyncu();
+  if (s.rezim === "ukazka")
+    return `<div class="rezim">${ikona("zamek", 16)}
+      <span>Zapisuje se jen do tohohle telefonu. Jak zapnout živé pořadí, je v README.</span></div>`;
+  if (s.rezim === "chyba")
+    return `<div class="rezim chybny">${ikona("zamek", 16)}
+      <span>Živé pořadí se nepřipojilo, hra běží dál jen z telefonu.${
+        podrobne && s.chyba ? ` <br><span class="drobne">${bezpecne(s.chyba)}</span>` : ""}</span></div>`;
+  if (s.rezim === "zivo" && podrobne)
+    return `<div class="rezim zivy">${ikona("check", 16)}
+      <span>Živé pořadí běží${s.pocet ? `, vidíš ${s.pocet} ${s.pocet === 1 ? "partu" : s.pocet < 5 ? "party" : "part"} z jinejch telefonů` : " – zatím nikdo jinej nepřipojenej"}.</span></div>`;
+  return "";
+}
 
 /* ---------- obrazovka: Hra ---------- */
 
@@ -66,7 +78,7 @@ function hra() {
 
   return `
     ${hlava()}
-    ${pruhUkazky()}
+    ${pruhSyncu()}
 
     <div class="staci">
       <div class="staci-poradi cislo">${i + 1}</div>
@@ -217,7 +229,7 @@ function tymy() {
       <h1>Týmy</h1>
       <p>Ťukni na tým, za který chceš zapisovat.</p>
     </div>
-    ${pruhUkazky()}
+    ${pruhSyncu(true)}
     <div class="vrstva radky">${radky}</div>
     <div class="sekce">
       <button class="tl" data-okno="tym-novy">${ikona("plus", 18)} Přidat tým</button>

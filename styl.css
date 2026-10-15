@@ -306,6 +306,10 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--akcent);outline-
 .rezim{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:var(--r-sm);
   background:var(--vrstva);font-size:13.5px;color:var(--text-2);margin-bottom:20px;line-height:1.45}
 .rezim .ikona{color:var(--text-3);margin-top:1px}
+.rezim.chybny{background:rgba(242,118,90,.1);color:#F7A592}
+.rezim.chybny .ikona{color:var(--spatne)}
+.rezim.zivy .ikona{color:var(--akcent)}
+.rezim .drobne{color:var(--text-3);font-size:12.5px;word-break:break-word}
 
 /* pravidla */
 .pravidla h2{font-size:17px;margin:26px 0 10px}
