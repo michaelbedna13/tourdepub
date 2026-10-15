@@ -12,7 +12,7 @@ import {
   pridejNovyUkol, upravUkol, smazUkol, ukolPodleId, BARVY,
 } from "./stav.js";
 import { ikona, carky, obtiznost, sklonuj, sklonujUkol, bezpecne, vazat } from "./ui.js";
-import { spustSync, stavSyncu, ostatniTymy, zkusZnovu, smazTymZeServeru } from "./sync.js";
+import { spustSync, stavSyncu, zkusZnovu, smazTymZeServeru } from "./sync.js";
 
 /** Postaví kostru stránky, když chybí.
  *
@@ -110,14 +110,15 @@ function pruhSyncu(podrobne = false) {
 }
 
 /** Všechny týmy (místní i ze serveru) seřazené podle čárek. */
+/** Všechny týmy, seřazené podle čárek. Po sloučení se serverem jsou všechny
+ *  místní, takže jdou upravovat odkudkoli. */
 function poradiTymu() {
-  const mistni = stav.tymy.map((t) => ({
-    id: t.id, nazev: t.nazev || "Bez názvu", barva: t.barva, body: body(t),
-    rozpad: rozpad(t), hospoda: indexHospody(t) + 1, mistni: true,
-  }));
-  const zvenku = ostatniTymy().filter((z) => !mistni.some((m) => m.id === z.id));
-  return [...mistni, ...zvenku]
-    .sort((a, b) => b.body - a.body || (b.rozpad?.makacky || 0) - (a.rozpad?.makacky || 0));
+  return stav.tymy
+    .map((t) => ({
+      id: t.id, nazev: t.nazev || "Bez názvu", barva: t.barva, body: body(t),
+      rozpad: rozpad(t), hospoda: indexHospody(t) + 1,
+    }))
+    .sort((a, b) => b.body - a.body || b.rozpad.makacky - a.rozpad.makacky);
 }
 
 /* ---------- obrazovka: Hra ---------- */
@@ -279,8 +280,7 @@ function tymy() {
   const radky = poradi.map((p, i) => `
     <div class="radek${i === 0 && p.body > 0 ? " vede" : ""}${p.id === stav.tymId ? " ja" : ""}">
       <div class="poradi-cislo cislo">${i + 1}</div>
-      ${p.mistni ? `<button class="radek-telo" data-prepni-tym="${p.id}" style="text-align:left">`
-                 : `<div class="radek-telo">`}
+      <button class="radek-telo" data-prepni-tym="${p.id}" style="text-align:left">
         <div class="radek-nazev">
           <span class="tecka" style="background:${bezpecne(p.barva)}"></span>
           ${bezpecne(p.nazev)}
@@ -288,23 +288,15 @@ function tymy() {
         </div>
         <div class="radek-pod cislo">${p.rozpad?.splneno || 0} ${sklonujUkol(p.rozpad?.splneno || 0)} · ${
           p.rozpad?.makacky || 0} ${(p.rozpad?.makacky || 0) === 1 ? "makačka" : "makaček"} · štace ${p.hospoda}</div>
-      ${p.mistni ? "</button>" : "</div>"}
+      </button>
       <div class="radek-body cislo">${p.body}</div>
-      ${p.mistni
-        ? `<button class="ikonove holy" data-okno="tym-uprava" data-id="${p.id}"
-            aria-label="Upravit ${bezpecne(p.nazev)}">${ikona("i-tuzka", 16)}</button>`
-        : jeSpravce
-        ? `<button class="ikonove holy cerveny" data-smaz-cizi="${p.id}"
-            aria-label="Smazat ${bezpecne(p.nazev)}">${ikona("i-kos", 16)}</button>`
-        : ""}
+      <button class="ikonove holy" data-okno="tym-uprava" data-id="${p.id}"
+        aria-label="Upravit ${bezpecne(p.nazev)}">${ikona("i-tuzka", 16)}</button>
     </div>`).join("");
 
   return `
     ${hlava("Týmy")}
-    <p class="podnadpis psane">Ťukni na tým, za který chceš zapisovat.${
-      jeSpravce && poradi.some((p) => !p.mistni)
-        ? " Týmy z jiných telefonů jdou jen smazat."
-        : ""}</p>
+    <p class="podnadpis psane">Ťukni na tým, za který chceš zapisovat.</p>
     ${pruhSyncu(true)}
     <div class="vrstva radky">${radky}</div>
     <div class="sekce">
@@ -614,14 +606,6 @@ function obsluha(e) {
 
   const kat = c("[data-kategorie]");
   if (kat) { kategorieFiltr = kat.dataset.kategorie; vykresli(); window.scrollTo(0, 0); return; }
-
-  const cizi = c("[data-smaz-cizi]");
-  if (cizi) {
-    // tým z jiného telefonu, místně ho nemáme – jde smazat jen na serveru
-    if (jeSpravce && confirm("Smazat tým z pořadí? Zmizí všem."))
-      smazTymZeServeru(cizi.dataset.smazCizi).then(vykresli);
-    return;
-  }
 
   const prep = c("[data-prepni-tym]");
   if (prep) { prepniTym(prep.dataset.prepniTym); zavri(); return; }

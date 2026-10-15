@@ -19,13 +19,16 @@ const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.rand
  *  se na server neposílá — jinak by se v pořadí objevila „Naše parta" z každého
  *  telefonu i prohlížeče, který web jen otevřel. */
 export function novyTym(nazev = "", barva = BARVY[0], vlastni = true) {
-  return { id: noveId(), nazev, barva, vlastni, hospoda: null,
-           prichod: {}, skopek: {}, ukoly: {}, zlodej: {} };
+  return { id: noveId(), nazev, barva, vlastni, upraveno: null, bylNaServeru: false,
+           hospoda: null, prichod: {}, skopek: {}, ukoly: {}, zlodej: {} };
 }
 
-/** Označí tým za používaný, takže se od teď posílá ostatním. */
-function pouzity(t) {
-  if (t && !t.vlastni) t.vlastni = true;
+/** Označí tým za používaný a orazítkuje změnu.
+ *  Razítko rozhoduje při slučování se serverem, čí verze je novější. */
+function dotknuto(t) {
+  if (!t) return;
+  t.vlastni = true;
+  t.upraveno = new Date().toISOString();
 }
 
 function prazdnyStav() {
@@ -114,6 +117,7 @@ export const tym = () => stav.tymy.find((t) => t.id === stav.tymId) || stav.tymy
 export function pridejTym(nazev, barva) {
   const t = novyTym(nazev, barva || BARVY[stav.tymy.length % BARVY.length]);
   t.hospoda = stav.hospody[0]?.id || null;
+  t.upraveno = new Date().toISOString();
   stav.tymy.push(t);
   uloz();
   return t;
@@ -123,7 +127,7 @@ export function upravTym(id, zmeny) {
   const t = stav.tymy.find((x) => x.id === id);
   if (!t) return;
   Object.assign(t, zmeny);
-  pouzity(t); // pojmenovaný tým už patří ostatním na oči
+  dotknuto(t); // pojmenovaný tým už patří ostatním na oči
   uloz();
 }
 
@@ -154,6 +158,7 @@ export const indexHospody = (t = tym()) => {
 export function nastavHospodu(id) {
   const t = tym();
   if (!t) return;
+  dotknuto(t);
   t.hospoda = id;
   uloz();
 }
@@ -308,7 +313,7 @@ export function jdePridat(u, t = tym()) {
 export function prepniZaklad(druh) {
   const t = tym(), kde = t?.hospoda;
   if (!t || !kde) return false;
-  pouzity(t);
+  dotknuto(t);
   t[druh][kde] = !t[druh][kde];
   if (!t[druh][kde]) delete t[druh][kde];
   uloz();
@@ -318,7 +323,7 @@ export function prepniZaklad(druh) {
 export function pridejUkol(u) {
   const t = tym();
   if (!jdePridat(u, t)) return false;
-  pouzity(t);
+  dotknuto(t);
   t.ukoly[u.id] = kolikrat(u.id, t) + 1;
   if (u.jednouZaHospodu) t.zlodej[t.hospoda] = true;
   uloz();
@@ -328,6 +333,7 @@ export function pridejUkol(u) {
 export function uberUkol(u) {
   const t = tym(), ted = kolikrat(u.id, t);
   if (ted <= 0) return false;
+  dotknuto(t);
   t.ukoly[u.id] = ted - 1;
   if (t.ukoly[u.id] === 0) delete t.ukoly[u.id];
   if (u.jednouZaHospodu && t.zlodej[t.hospoda]) delete t.zlodej[t.hospoda];
@@ -339,5 +345,53 @@ export function vynulujTym(id = stav.tymId) {
   const t = stav.tymy.find((x) => x.id === id);
   if (!t) return;
   Object.assign(t, { prichod: {}, skopek: {}, ukoly: {}, zlodej: {}, hospoda: stav.hospody[0]?.id || null });
+  dotknuto(t);
+  uloz();
+}
+
+/* ---------- slučování se serverem ---------- */
+
+/** Co se o týmu posílá ostatním. Posílá se celý stav, ne jen výsledek —
+ *  jinak by tým šlo upravovat jenom na telefonu, kde vznikl. */
+export function kOdeslani(t) {
+  return {
+    id: t.id,
+    nazev: t.nazev || "Bezejmenná parta",
+    barva: t.barva,
+    hospoda: indexHospody(t) + 1,
+    body: body(t),
+    rozpad: rozpad(t),
+    stav: { hospoda: t.hospoda, prichod: t.prichod, skopek: t.skopek,
+            ukoly: t.ukoly, zlodej: t.zlodej },
+    upraveno: t.upraveno || new Date().toISOString(),
+  };
+}
+
+/** Sloučí týmy ze serveru do místních. Novější razítko vyhrává; tým, který
+ *  ze serveru zmizel, zmizí i tady, pokud tam někdy byl. */
+export function slucZeServeru(radky) {
+  const naServeru = new Set(radky.map((r) => r.id));
+
+  for (const r of radky) {
+    const zeServeru = {
+      nazev: r.nazev, barva: r.barva, vlastni: true, upraveno: r.upraveno,
+      bylNaServeru: true,
+      hospoda: r.stav?.hospoda ?? stav.hospody[0]?.id ?? null,
+      prichod: r.stav?.prichod || {}, skopek: r.stav?.skopek || {},
+      ukoly: r.stav?.ukoly || {}, zlodej: r.stav?.zlodej || {},
+    };
+    const mistni = stav.tymy.find((t) => t.id === r.id);
+    if (!mistni) stav.tymy.push({ id: r.id, ...zeServeru });
+    else if (!mistni.upraveno || (r.upraveno && r.upraveno > mistni.upraveno))
+      Object.assign(mistni, zeServeru);
+    else mistni.bylNaServeru = true;
+  }
+
+  // tým smazaný na jiném telefonu musí zmizet i tady
+  stav.tymy = stav.tymy.filter((t) => !t.bylNaServeru || naServeru.has(t.id));
+  if (!stav.tymy.length) stav.tymy = [novyTym("Naše parta", BARVY[0], false)];
+  if (!stav.tymy.some((t) => t.id === stav.tymId)) stav.tymId = stav.tymy[0].id;
+
+  srovnejStace(stav);
   uloz();
 }

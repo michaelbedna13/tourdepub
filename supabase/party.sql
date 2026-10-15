@@ -16,8 +16,14 @@ create table if not exists public.tourdepub_tymy (
   hospoda   int  not null default 1,
   body      int  not null default 0,
   rozpad    jsonb not null default '{}'::jsonb,
+  -- celý stav týmu, ne jen výsledek: bez něj by šel tým upravovat jenom
+  -- na telefonu, kde vznikl
+  stav      jsonb not null default '{}'::jsonb,
   upraveno  timestamptz not null default now()
 );
+
+-- pro tabulky založené dřív, než sloupec existoval
+alter table public.tourdepub_tymy add column if not exists stav jsonb not null default '{}'::jsonb;
 
 create index if not exists tourdepub_tymy_hra_idx on public.tourdepub_tymy (hra);
 

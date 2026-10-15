@@ -2,23 +2,24 @@
 // hra běží dál z telefonu a v Týmech jsou vidět jen ty místní.
 // Klient se stahuje až když je co připojovat, aby web bez nastavení nenačítal nic zvenku.
 import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni.js";
-import { stav, naZmenu, body, rozpad, indexHospody } from "./stav.js";
+import { stav, naZmenu, kOdeslani, slucZeServeru } from "./stav.js";
 
 let klient = null;
 let rezim = "ukazka"; // ukazka | pripojuji | zivo | chyba
-let zvenku = [];
+let naposledy = [];
 let prekresli = () => {};
 let cekaZapis = false;
 let chyba = "";
 
 export const stavSyncu = () => ({
   rezim,
-  pocet: zvenku.length,
+  pocet: naposledy.length,
   chyba,
   // bez signálu to není špatné nastavení, jen se nemá kam připojit
   offline: typeof navigator !== "undefined" && navigator.onLine === false,
 });
-export const ostatniTymy = () => zvenku;
+/** Po sloučení jsou všechny týmy místní, tohle zůstává jen kvůli počtu. */
+export const ostatniTymy = () => [];
 
 export async function spustSync(naZmenuPohledu) {
   prekresli = naZmenuPohledu;
@@ -81,17 +82,11 @@ function posliOpatrne() {
 async function posli() {
   if (!klient) return false;
   try {
-    // posíláme všechny místní týmy – tenhle telefon může zapisovat víc partám
-    const { error } = await klient.from(TABULKA).upsert(stav.tymy.map((t) => ({
-      id: t.id,
-      hra: HRA,
-      nazev: t.nazev || "Bezejmenná parta",
-      barva: t.barva,
-      hospoda: indexHospody(t) + 1,
-      body: body(t),
-      rozpad: rozpad(t),
-      upraveno: new Date().toISOString(),
-    })));
+    // Posílají se jen týmy, se kterými někdo opravdu pracuje. Tým, co si appka
+    // založila sama a nikdo se ho nedotkl, zůstane jen v telefonu.
+    const k = stav.tymy.filter((t) => t.vlastni);
+    if (!k.length) return true;
+    const { error } = await klient.from(TABULKA).upsert(k.map(kOdeslani));
     if (error) throw error;
     return true;
   } catch {
@@ -104,10 +99,9 @@ async function nacti() {
   try {
     const { data, error } = await klient.from(TABULKA).select("*").eq("hra", HRA);
     if (error) throw error;
-    const mistni = new Set(stav.tymy.map((t) => t.id));
-    zvenku = (data || []).filter((t) => !mistni.has(t.id));
+    naposledy = data || [];
+    slucZeServeru(naposledy); // uloz() uvnitř překreslí
     chyba = "";
-    prekresli();
     return true;
   } catch (e) {
     chyba = popisChyby(e);
@@ -151,7 +145,7 @@ export async function smazTymZeServeru(id) {
   if (!klient) return;
   try {
     await klient.from(TABULKA).delete().eq("id", id);
-    zvenku = zvenku.filter((t) => t.id !== id);
+    naposledy = naposledy.filter((t) => t.id !== id);
   } catch {
     // nevadí, místní stav je už bez něj
   }
