@@ -174,8 +174,19 @@ a když se vezmou první dva, chybí pak Č, Ř, Š a Ů.
 
 ## Nasazení
 
-1. Settings → Pages → větev `main`, složka `/`.
-2. Případně do kořene `CNAME` s doménou.
+Běží na GitHub Pages: **https://michaelbedna13.github.io/tourdepub/**
+
+1. Settings → Pages → *Deploy from a branch*, větev `claude/admiring-euler-ci2d58`,
+   složka `/ (root)`. Repozitář nemá `main`, tahle větev je výchozí.
+2. Každý push na tu větev nasadí znovu, trvá to asi minutu. Postup je vidět
+   v záložce Actions pod „pages build and deployment".
+3. Prázdný soubor `.nojekyll` v kořeni vypíná Jekyll. Bez něj by GitHub stránku
+   hnal přes generátor blogů, který zahazuje soubory začínající podtržítkem.
+   Nic takového tu sice není, ale build je bez něj zbytečně pomalejší.
+4. Případně do kořene `CNAME` s vlastní doménou.
+
+**Když se změna neprojeví**, nejčastěji to není Pages, ale service worker —
+zvedni `VERZE` v `sw.js`. Na telefonu, co appku má na ploše, jinak zůstane stará verze.
 
 Cesty k souborům jsou relativní, takže web funguje na doméně,
 na `michaelbedna13.github.io/tourdepub/` i po otevření z disku.
