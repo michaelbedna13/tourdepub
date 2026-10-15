@@ -12,7 +12,7 @@ import {
   pridejNovyUkol, upravUkol, smazUkol, ukolPodleId, BARVY,
 } from "./stav.js";
 import { ikona, carky, obtiznost, sklonuj, sklonujUkol, bezpecne, vazat } from "./ui.js";
-import { spustSync, stavSyncu, ostatniTymy, zkusZnovu } from "./sync.js";
+import { spustSync, stavSyncu, ostatniTymy, zkusZnovu, smazTymZeServeru } from "./sync.js";
 
 /** Postaví kostru stránky, když chybí.
  *
@@ -668,7 +668,12 @@ function obsluha(e) {
       break;
     }
     case "smaz-tym":
-      if (confirm("Smazat tým i s jeho čárkami? Tohle se nedá vrátit.")) { smazTym(okno.id); zavri(); }
+      if (confirm("Smazat tým i s jeho čárkami? Tohle se nedá vrátit.")) {
+        const id = okno.id;
+        smazTym(id);
+        smazTymZeServeru(id); // ať nezůstane viset ostatním v pořadí
+        zavri();
+      }
       break;
 
     case "uloz-hospodu": {

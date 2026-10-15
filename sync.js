@@ -145,6 +145,18 @@ function popisChyby(e) {
   return kusy.join(" · ");
 }
 
+/** Smaže tým i ze serveru. Bez toho by se po smazání vrátil zpátky jako „cizí"
+ *  tým z jiného telefonu a strašil by v pořadí dál. */
+export async function smazTymZeServeru(id) {
+  if (!klient) return;
+  try {
+    await klient.from(TABULKA).delete().eq("id", id);
+    zvenku = zvenku.filter((t) => t.id !== id);
+  } catch {
+    // nevadí, místní stav je už bez něj
+  }
+}
+
 /** Zkusit se připojit znovu, aniž by se načítala celá stránka. */
 export async function zkusZnovu() {
   klient = null;

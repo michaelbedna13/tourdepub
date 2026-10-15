@@ -128,6 +128,11 @@ nepomíchá, a za jeden večer se tří part nedotkne ani okraje půlgigového l
    a vlevo dej **SQL Editor** → **New query**.
 2. Vlož celý obsah `supabase/party.sql` a dej **Run**. Skript jde pustit
    i opakovaně, nic nerozbije.
+
+   **Nevynechávej řádek s `grant`.** Samotná RLS pravidla nestačí — role `anon`,
+   pod kterou jede klíč v prohlížeči, musí mít k tabulce přístup, jinak vrátí
+   Supabase `42501 permission denied`. Tabulka založená přes Table Editor to
+   dostane sama, založená přes SQL ne.
 3. Ověř v **Table Editor**, že přibyla tabulka `tourdepub_tymy`.
 4. V **Settings → API** zkopíruj *Project URL* a klíč a vlož je do `nastaveni.js`:
 

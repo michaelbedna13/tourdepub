@@ -23,6 +23,12 @@ create index if not exists tourdepub_tymy_hra_idx on public.tourdepub_tymy (hra)
 
 alter table public.tourdepub_tymy enable row level security;
 
+-- Oprávnění na úrovni tabulky. Samotná RLS pravidla nestačí: role anon, pod kterou
+-- jede klíč v prohlížeči, musí mít k tabulce vůbec přístup, jinak vrátí PostgREST
+-- „42501 permission denied". Když se tabulka zakládá přes Table Editor, přidá to
+-- Supabase samo; při založení přes SQL ne.
+grant select, insert, update, delete on public.tourdepub_tymy to anon, authenticated;
+
 -- Hra běží jeden večer mezi známými, tak je to otevřené komukoli s odkazem.
 -- Kdyby to mělo viset na internetu dýl, nahraď to přihlášením.
 drop policy if exists "kdokoli cte" on public.tourdepub_tymy;
@@ -33,6 +39,10 @@ create policy "kdokoli zapisuje" on public.tourdepub_tymy for insert with check 
 
 drop policy if exists "kdokoli upravuje" on public.tourdepub_tymy;
 create policy "kdokoli upravuje" on public.tourdepub_tymy for update using (true);
+
+-- Smazaný tým musí zmizet i ostatním, jinak by v pořadí strašil dál.
+drop policy if exists "kdokoli maze" on public.tourdepub_tymy;
+create policy "kdokoli maze" on public.tourdepub_tymy for delete using (true);
 
 -- Aby se změny rozesílaly ostatním telefonům živě.
 -- Přidání se dělá podmíněně, aby druhé spuštění skriptu nespadlo na tom,
