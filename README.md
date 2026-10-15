@@ -175,6 +175,18 @@ Web má `manifest.json` i service worker, takže jde přidat na plochu jako appk
 v Safari **Sdílet → Přidat na plochu**. Pak se otevírá na celou obrazovku bez
 adresního řádku a funguje i ve sklepě bez signálu.
 
+### Proč tu service worker je
+
+Kvůli jediné věci: **sklepy bez signálu**. Když iOS appku na pozadí ukončí
+a ty ji dole u baru otevřeš znovu, bez něj se nenačte vůbec nic. Statickému
+webu, který si jen prohlížíš, by k ničemu nebyl.
+
+Chová se takhle: zkusí síť, ale **nejvýš 2,5 vteřiny** — v hospodě se slabým
+signálem je lepší sáhnout do zásoby než čekat, až to spojení vzdá. Co se
+povede stáhnout, uloží; chybové odpovědi ne. Mezipaměť prohlížeče obchází
+(`cache: "no-store"`), protože GitHub Pages posílá soubory s desetiminutovou
+platností a bez toho by i po načtení znovu vydal starou verzi.
+
 **Po každé změně webu zvedni `VERZE` v `sw.js`.** Jinak si telefon nechá
 starou verzi a nových úkolů se nedočkáš.
 

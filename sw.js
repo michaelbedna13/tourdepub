@@ -1,6 +1,6 @@
 // Service worker: uloží web do telefonu, ať funguje i bez signálu.
 // Při změně webu zvedni VERZE, jinak si telefon nechá starou verzi.
-const VERZE = "tourdepub-13";
+const VERZE = "tourdepub-14";
 const SOUBORY = [
   ".", "index.html", "styl.css", "app.js", "stav.js", "data.js", "ui.js",
   "ikony.js", "sync.js", "nastaveni.js", "logo.js", "logo.svg", "logo-uvodni.svg",
@@ -37,19 +37,36 @@ self.addEventListener("activate", (e) => {
     .then(() => self.clients.claim()));
 });
 
+/** Zkusí síť, ale jen chvilku. Ve sklepě v hospodě bývá signál tak tak
+ *  a čekat deset vteřin, než spojení vzdá, je horší než sáhnout do zásoby. */
+function sitKratce(pozadavek, limit) {
+  return new Promise((hotovo, chyba) => {
+    const casovac = setTimeout(() => chyba(new Error("síť trvá moc dlouho")), limit);
+    // cache:"no-store": GitHub Pages posílá soubory s platností deset minut
+    // a bez toho by prohlížeč vydal starou verzi i při načtení znovu
+    fetch(pozadavek, { cache: "no-store" }).then(
+      (odpoved) => { clearTimeout(casovac); hotovo(odpoved); },
+      (e) => { clearTimeout(casovac); chyba(e); },
+    );
+  });
+}
+
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return;
-  // Nejdřív síť (ať se změny projeví), při výpadku to, co máme uložené.
-  // cache:"no-store" je tu podstatné: GitHub Pages posílá soubory s platností
-  // deset minut a bez toho by prohlížeč vydal starou verzi i při načtení znovu.
+
   e.respondWith(
-    fetch(e.request, { cache: "no-store" })
+    sitKratce(e.request, 2500)
       .then((odpoved) => {
-        const kopie = odpoved.clone();
-        caches.open(VERZE).then((c) => c.put(e.request, kopie)).catch(() => {});
+        // ukládáme jen to, co se opravdu povedlo; chybovou stránku bychom
+        // jinak vydávali i příště
+        if (odpoved.ok) {
+          const kopie = odpoved.clone();
+          caches.open(VERZE).then((c) => c.put(e.request, kopie)).catch(() => {});
+        }
         return odpoved;
       })
-      .catch(() => caches.match(e.request).then((z) => z || caches.match("index.html")))
+      .catch(() =>
+        caches.match(e.request).then((z) => z || caches.match("index.html"))),
   );
 });
