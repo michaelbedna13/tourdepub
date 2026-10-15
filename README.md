@@ -175,20 +175,19 @@ Web má `manifest.json` i service worker, takže jde přidat na plochu jako appk
 v Safari **Sdílet → Přidat na plochu**. Pak se otevírá na celou obrazovku bez
 adresního řádku a funguje i ve sklepě bez signálu.
 
-### Proč tu service worker je
+### Service worker tu není
 
-Kvůli jediné věci: **sklepy bez signálu**. Když iOS appku na pozadí ukončí
-a ty ji dole u baru otevřeš znovu, bez něj se nenačte vůbec nic. Statickému
-webu, který si jen prohlížíš, by k ničemu nebyl.
+Dřív byl, kvůli běhu bez signálu. V hospodách na trase ale signál je, takže
+nepřinášel nic – jen se kvůli němu nová verze dostávala do telefonu až na
+popohnání a jednou po aktualizaci zůstala černá plocha.
 
-Chová se takhle: zkusí síť, ale **nejvýš 2,5 vteřiny** — v hospodě se slabým
-signálem je lepší sáhnout do zásoby než čekat, až to spojení vzdá. Co se
-povede stáhnout, uloží; chybové odpovědi ne. Mezipaměť prohlížeče obchází
-(`cache: "no-store"`), protože GitHub Pages posílá soubory s desetiminutovou
-platností a bez toho by i po načtení znovu vydal starou verzi.
+`sw.js` v repu zůstal schválně: je to verze, která se **sama odhlásí a smaže
+zásobu**. Prohlížeč, který si ten starý zaregistroval, by si ho jinak držel dál.
+Až budou všechna zařízení chvíli bez něj, může soubor zmizet úplně.
 
-**Po každé změně webu zvedni `VERZE` v `sw.js`.** Jinak si telefon nechá
-starou verzi a nových úkolů se nedočkáš.
+Na plochu se appka přidává pořád stejně – to zařizuje `manifest.json`,
+service worker na to potřeba není. Bez signálu funguje jen tehdy, když je
+už otevřená; zápisy se drží v telefonu a pošlou se, až bude síť.
 
 Kdyby se přesto sešla stará stránka s novým skriptem, appka si kostru postaví
 sama a nic se nerozsype — dřív v takovém případě zůstala černá plocha. A kdyby

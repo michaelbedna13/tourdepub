@@ -62,9 +62,14 @@
 <div id="okno"></div>
 <script type="module" src="app.js"></script>
 <script>
-  // Service worker drží web v telefonu, takže funguje i ve sklepě bez signálu.
+  // Dřív tu byl service worker kvůli běhu bez signálu. V hospodách na trase
+  // signál je, takže nic nepřinášel a jen bránil tomu, aby se nová verze
+  // dostala do telefonu. Tohle po něm uklidí na zařízeních, kde ještě zůstal.
   if ("serviceWorker" in navigator) {
-    addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    navigator.serviceWorker.getRegistrations()
+      .then((r) => r.forEach((x) => x.unregister()))
+      .catch(() => {});
+    if (window.caches) caches.keys().then((k) => k.forEach((x) => caches.delete(x))).catch(() => {});
   }
 </script>
 </body>

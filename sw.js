@@ -1,72 +1,19 @@
-// Service worker: uloží web do telefonu, ať funguje i bez signálu.
-// Při změně webu zvedni VERZE, jinak si telefon nechá starou verzi.
-const VERZE = "tourdepub-14";
-const SOUBORY = [
-  ".", "index.html", "styl.css", "app.js", "stav.js", "data.js", "ui.js",
-  "ikony.js", "sync.js", "nastaveni.js", "logo.js", "logo.svg", "logo-uvodni.svg",
-  "ikona.svg", "zrno.svg", "manifest.json",
-  "pisma/archivo-black-lat.woff2", "pisma/archivo-black-ext.woff2",
-  "pisma/psaci-lat.woff2", "pisma/psaci-ext.woff2",
-  "pisma/outfit-400-lat.woff2", "pisma/outfit-400-ext.woff2",
-  "pisma/outfit-500-lat.woff2", "pisma/outfit-500-ext.woff2",
-  "pisma/outfit-600-lat.woff2", "pisma/outfit-600-ext.woff2",
-  "uvodni/320x568@2x.png",
-  "uvodni/375x667@2x.png",
-  "uvodni/375x812@3x.png",
-  "uvodni/390x844@3x.png",
-  "uvodni/393x852@3x.png",
-  "uvodni/402x874@3x.png",
-  "uvodni/414x736@3x.png",
-  "uvodni/414x896@2x.png",
-  "uvodni/414x896@3x.png",
-  "uvodni/428x926@3x.png",
-  "uvodni/430x932@3x.png",
-  "uvodni/440x956@3x.png",
-];
+// Service worker, který se sám odhlásí a uklidí po sobě.
+//
+// Dřív tu jeden byl, aby web fungoval bez signálu. Ve všech hospodách na trase
+// ale signál je, takže nic nepřinášel – jen se kvůli němu nová verze dostávala
+// do telefonu až na popohnání a jednou zůstala i černá plocha.
+//
+// Prázdný soubor by nestačil: prohlížeč, který si ten starý zaregistroval, by
+// si ho držel dál. Proto tahle verze, která se odregistruje a smaže zásobu.
+// Až budou všechna zařízení chvíli bez něj, může soubor zmizet úplně.
 
-self.addEventListener("install", (e) => {
-  // addAll spadne celé, když chybí jediný soubor – proto po jednom
-  e.waitUntil(caches.open(VERZE)
-    .then((c) => Promise.all(SOUBORY.map((s) => c.add(s).catch(() => {}))))
-    .then(() => self.skipWaiting()));
-});
+self.addEventListener("install", () => self.skipWaiting());
 
 self.addEventListener("activate", (e) => {
-  e.waitUntil(caches.keys()
-    .then((k) => Promise.all(k.filter((x) => x !== VERZE).map((x) => caches.delete(x))))
-    .then(() => self.clients.claim()));
-});
-
-/** Zkusí síť, ale jen chvilku. Ve sklepě v hospodě bývá signál tak tak
- *  a čekat deset vteřin, než spojení vzdá, je horší než sáhnout do zásoby. */
-function sitKratce(pozadavek, limit) {
-  return new Promise((hotovo, chyba) => {
-    const casovac = setTimeout(() => chyba(new Error("síť trvá moc dlouho")), limit);
-    // cache:"no-store": GitHub Pages posílá soubory s platností deset minut
-    // a bez toho by prohlížeč vydal starou verzi i při načtení znovu
-    fetch(pozadavek, { cache: "no-store" }).then(
-      (odpoved) => { clearTimeout(casovac); hotovo(odpoved); },
-      (e) => { clearTimeout(casovac); chyba(e); },
-    );
-  });
-}
-
-self.addEventListener("fetch", (e) => {
-  const url = new URL(e.request.url);
-  if (e.request.method !== "GET" || url.origin !== location.origin) return;
-
-  e.respondWith(
-    sitKratce(e.request, 2500)
-      .then((odpoved) => {
-        // ukládáme jen to, co se opravdu povedlo; chybovou stránku bychom
-        // jinak vydávali i příště
-        if (odpoved.ok) {
-          const kopie = odpoved.clone();
-          caches.open(VERZE).then((c) => c.put(e.request, kopie)).catch(() => {});
-        }
-        return odpoved;
-      })
-      .catch(() =>
-        caches.match(e.request).then((z) => z || caches.match("index.html"))),
-  );
+  e.waitUntil((async () => {
+    for (const klic of await caches.keys()) await caches.delete(klic);
+    await self.registration.unregister();
+    for (const klient of await self.clients.matchAll()) klient.navigate(klient.url);
+  })());
 });
