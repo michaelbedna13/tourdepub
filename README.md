@@ -49,6 +49,12 @@ Spodní lišta má pět obrazovek:
   ťuknutím na řádek, opakovatelné mají − a +. V režimu správce je u každého tužka.
 - **Týmy** — kdo vede a za koho zapisuješ. Ťuknutím na tým se přepneš, takže z jednoho
   telefonu jde vést i celou hru. Tužka tým přejmenuje, přebarví nebo smaže.
+
+  Telefon, který web jen otevře, **žádný tým ostatním neukáže**. Appka si sice
+  jeden založí, ale posílá ho, až když ho někdo pojmenuje nebo s ním zapíše
+  první čárku. Jinak by se v pořadí objevila „Naše parta" z každého mobilu
+  i karty prohlížeče, která se kdy podívala. V režimu správce jde tým, co přišel
+  z jiného telefonu, smazat košem — ostatním pak zmizí taky.
 - **Hospody** — trasa. Pořadí se přehazuje šipkami, ťuknutím na název se tým přesune,
   tužka hospodu přejmenuje nebo smaže.
 - **Pravidla** — pravidla, legenda obtížnosti a režim správce. Vynulovat čárky

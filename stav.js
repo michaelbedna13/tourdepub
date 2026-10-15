@@ -14,12 +14,23 @@ export const BARVY = ["#E0A33A", "#D96A52", "#5BA8D4", "#B07CC6", "#6FB58F", "#D
 
 const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 
-export function novyTym(nazev = "", barva = BARVY[0]) {
-  return { id: noveId(), nazev, barva, hospoda: null, prichod: {}, skopek: {}, ukoly: {}, zlodej: {} };
+/** `vlastni` říká, jestli s týmem někdo opravdu pracoval. Tým, co si appka
+ *  založila sama při prvním spuštění a nikdo ho nepojmenoval ani s ním nehrál,
+ *  se na server neposílá — jinak by se v pořadí objevila „Naše parta" z každého
+ *  telefonu i prohlížeče, který web jen otevřel. */
+export function novyTym(nazev = "", barva = BARVY[0], vlastni = true) {
+  return { id: noveId(), nazev, barva, vlastni, hospoda: null,
+           prichod: {}, skopek: {}, ukoly: {}, zlodej: {} };
+}
+
+/** Označí tým za používaný, takže se od teď posílá ostatním. */
+function pouzity(t) {
+  if (t && !t.vlastni) t.vlastni = true;
 }
 
 function prazdnyStav() {
-  const t = novyTym("Naše parta", BARVY[0]);
+  // false: dokud ho nikdo nepojmenuje ani s ním nezahraje, zůstane jen tady
+  const t = novyTym("Naše parta", BARVY[0], false);
   t.hospoda = VYCHOZI_HOSPODY[0].id;
   return {
     verze: VERZE,
@@ -62,6 +73,16 @@ function nacti() {
   }
   if (!z.tymy.some((t) => t.id === z.tymId)) z.tymId = z.tymy[0].id;
   srovnejStace(z);
+  // starší uložené stavy příznak nemají; tým s vlastním jménem nebo s čárkami
+  // je zjevně používaný
+  for (const t of z.tymy) {
+    if (t.vlastni === undefined) {
+      t.vlastni = t.nazev !== "Naše parta"
+        || Object.keys(t.prichod).length > 0
+        || Object.keys(t.skopek).length > 0
+        || Object.keys(t.ukoly).length > 0;
+    }
+  }
   return z;
 }
 
@@ -102,6 +123,7 @@ export function upravTym(id, zmeny) {
   const t = stav.tymy.find((x) => x.id === id);
   if (!t) return;
   Object.assign(t, zmeny);
+  pouzity(t); // pojmenovaný tým už patří ostatním na oči
   uloz();
 }
 
@@ -286,6 +308,7 @@ export function jdePridat(u, t = tym()) {
 export function prepniZaklad(druh) {
   const t = tym(), kde = t?.hospoda;
   if (!t || !kde) return false;
+  pouzity(t);
   t[druh][kde] = !t[druh][kde];
   if (!t[druh][kde]) delete t[druh][kde];
   uloz();
@@ -295,6 +318,7 @@ export function prepniZaklad(druh) {
 export function pridejUkol(u) {
   const t = tym();
   if (!jdePridat(u, t)) return false;
+  pouzity(t);
   t.ukoly[u.id] = kolikrat(u.id, t) + 1;
   if (u.jednouZaHospodu) t.zlodej[t.hospoda] = true;
   uloz();

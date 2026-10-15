@@ -290,13 +290,21 @@ function tymy() {
           p.rozpad?.makacky || 0} ${(p.rozpad?.makacky || 0) === 1 ? "makačka" : "makaček"} · štace ${p.hospoda}</div>
       ${p.mistni ? "</button>" : "</div>"}
       <div class="radek-body cislo">${p.body}</div>
-      ${p.mistni ? `<button class="ikonove holy" data-okno="tym-uprava" data-id="${p.id}"
-        aria-label="Upravit ${bezpecne(p.nazev)}">${ikona("i-tuzka", 16)}</button>` : ""}
+      ${p.mistni
+        ? `<button class="ikonove holy" data-okno="tym-uprava" data-id="${p.id}"
+            aria-label="Upravit ${bezpecne(p.nazev)}">${ikona("i-tuzka", 16)}</button>`
+        : jeSpravce
+        ? `<button class="ikonove holy cerveny" data-smaz-cizi="${p.id}"
+            aria-label="Smazat ${bezpecne(p.nazev)}">${ikona("i-kos", 16)}</button>`
+        : ""}
     </div>`).join("");
 
   return `
     ${hlava("Týmy")}
-    <p class="podnadpis psane">Ťukni na tým, za který chceš zapisovat.</p>
+    <p class="podnadpis psane">Ťukni na tým, za který chceš zapisovat.${
+      jeSpravce && poradi.some((p) => !p.mistni)
+        ? " Týmy z jiných telefonů jdou jen smazat."
+        : ""}</p>
     ${pruhSyncu(true)}
     <div class="vrstva radky">${radky}</div>
     <div class="sekce">
@@ -606,6 +614,14 @@ function obsluha(e) {
 
   const kat = c("[data-kategorie]");
   if (kat) { kategorieFiltr = kat.dataset.kategorie; vykresli(); window.scrollTo(0, 0); return; }
+
+  const cizi = c("[data-smaz-cizi]");
+  if (cizi) {
+    // tým z jiného telefonu, místně ho nemáme – jde smazat jen na serveru
+    if (jeSpravce && confirm("Smazat tým z pořadí? Zmizí všem."))
+      smazTymZeServeru(cizi.dataset.smazCizi).then(vykresli);
+    return;
+  }
 
   const prep = c("[data-prepni-tym]");
   if (prep) { prepniTym(prep.dataset.prepniTym); zavri(); return; }
