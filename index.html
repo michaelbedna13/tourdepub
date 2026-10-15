@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tour de Pub — Brno edition</title>
+<meta name="description" content="Zapisování čárek při Tour de Pub: devět brněnskejch špeluněk, úkoly a pořadí part.">
+<meta name="theme-color" content="#1C3C2A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tour de Pub">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="ikona.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="ikona-180.png">
+<link rel="stylesheet" href="styl.css">
+</head>
+<body>
+<div class="app" id="app"></div>
+<script type="module" src="app.js"></script>
+<script>
+  // Service worker drží web v telefonu, takže funguje i ve sklepě bez signálu.
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
+</script>
+</body>
+</html>
