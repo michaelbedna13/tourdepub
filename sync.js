@@ -53,7 +53,7 @@ export async function spustSync(naZmenuPohledu) {
 }
 
 // Verze musí umět nový formát klíče (sb_publishable_…). Starší klient ho nepozná
-// a připojení selže. Drž ji stejnou, jakou má untrois.
+// a připojení selže. Drž ji stejnou, jakou má osobní aplikace (untrois).
 const VERZE_KLIENTA = "2.117.2";
 const CDN = [
   `https://esm.sh/@supabase/supabase-js@${VERZE_KLIENTA}`,

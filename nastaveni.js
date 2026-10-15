@@ -1,5 +1,5 @@
 // Připojení k Supabase pro živé pořadí mezi telefony.
-// Je to projekt od untrois – kvůli hře není potřeba zakládat nový, tabulek může
+// Je to projekt `osobni-aplikace` – kvůli hře není potřeba zakládat nový, tabulek může
 // mít jeden projekt kolik chce. Klíč je publishable, do prohlížeče patří a je
 // veřejný záměrně; data chrání Row Level Security (viz supabase/party.sql).
 // Když se URL a klíč vyprázdní, běží web jen z tohohle telefonu.

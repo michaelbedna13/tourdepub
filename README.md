@@ -121,10 +121,11 @@ tým a zapisuješ za někoho jiného.
 
 Supabase má na free plánu strop **dva běžící projekty**, ale **tabulek může mít jeden
 projekt kolik chce.** Takže pusť `supabase/party.sql` v projektu, který už používáš
-(klidně v tom od untrois). Tabulka se jmenuje `tourdepub_tymy`, takže se ti tam nic
+(u nás `osobni-aplikace`). Tabulka se jmenuje `tourdepub_tymy`, takže se ti tam nic
 nepomíchá, a za jeden večer se tří part nedotkne ani okraje půlgigového limitu.
 
-1. Otevři projekt, co už máš (u nás untrois), vlevo **SQL Editor** → **New query**.
+1. Otevři projekt, co už máš — v Supabase se jmenuje **`osobni-aplikace`** —
+   a vlevo dej **SQL Editor** → **New query**.
 2. Vlož celý obsah `supabase/party.sql` a dej **Run**. Skript jde pustit
    i opakovaně, nic nerozbije.
 3. Ověř v **Table Editor**, že přibyla tabulka `tourdepub_tymy`.
