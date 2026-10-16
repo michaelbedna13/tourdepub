@@ -6,13 +6,53 @@
 // "body" kolik čárek padne za jedno splnění a "max" kolikrát to jde opakovat.
 // U většiny úkolů body = piva; u opakovatelných dávají pravidla čárku za kus.
 
-export const KATEGORIE = [
-  { id: "kecy", nazev: "Kecy a šméčka", ikona: "kecy" },
-  { id: "telo", nazev: "Tělo v luftě", ikona: "telo" },
-  { id: "zranice", nazev: "Žranice a divadlo", ikona: "zranice" },
+import type { JmenoIkony } from "./ikony";
+
+export interface Kategorie {
+  id: string;
+  nazev: string;
+  ikona: JmenoIkony;
+  /** Barva karty kategorie na obrazovce Úkoly. */
+  barva: string;
+}
+
+export interface Ukol {
+  id: string;
+  kat: string;
+  nazev: string;
+  popis: string;
+  /** Obtížnost 1–3, kreslí se jako půllitry. */
+  piva: 1 | 2 | 3;
+  /** Kolik čárek padne za jedno splnění. */
+  body: number;
+  /** Kolikrát to jde opakovat. */
+  max: number;
+  pozn?: string;
+  ikona?: JmenoIkony;
+  /** Jde splnit jen v téhle hospodě (id). */
+  hospoda?: string;
+  /** Jde splnit jen na cestě mezi dvěma hospodami (id). */
+  mezi?: [string, string];
+  /** Čárku bere jen jedna parta. */
+  exkluzivni?: boolean;
+  /** Z každé hospody jen jednou. */
+  jednouZaHospodu?: boolean;
+  /** Přidaný v appce, ne z výchozí sady. */
+  vlastni?: boolean;
+}
+
+export interface Hospoda {
+  id: string;
+  nazev: string;
+}
+
+export const KATEGORIE: Kategorie[] = [
+  { id: "kecy", nazev: "Kecy a šméčka", ikona: "kecy", barva: "#7FD4C1" },
+  { id: "telo", nazev: "Tělo v luftě", ikona: "telo", barva: "#F2C14E" },
+  { id: "zranice", nazev: "Žranice a divadlo", ikona: "zranice", barva: "#F2765A" },
 ];
 
-export const VYCHOZI_HOSPODY = [
+export const VYCHOZI_HOSPODY: Hospoda[] = [
   { id: "h1", nazev: "Lucky Bastard" },
   { id: "h2", nazev: "Bláhovka" },
   { id: "h3", nazev: "Zastávka" },
@@ -25,12 +65,12 @@ export const VYCHOZI_HOSPODY = [
 ];
 
 // Dvě čárky, které se nabíhají v každé špeluňce. Nejsou to úkoly, patří k docházce.
-export const ZAKLAD = [
+export const ZAKLAD: { id: string; nazev: string; popis: string }[] = [
   { id: "prichod", nazev: "Jsme v špeluňce", popis: "Čárka za každou špeluňku, do který vlezete." },
-  { id: "skopek", nazev: "Škopek padl", popis: "Čárka, když v tý štaci lupne aspoň půlka partyje jeden škopek." },
+  { id: "skopek", nazev: "Škopky jsme lupnuli", popis: "Čárka, když v tý štaci lupne aspoň půlka partyje jeden škopek." },
 ];
 
-export const VYCHOZI_UKOLY = [
+export const VYCHOZI_UKOLY: Ukol[] = [
   // ---------- Kecy a šméčka ----------
   { id: "caluje", kat: "kecy", piva: 1, body: 1, max: 5, nazev: "Borec, co to cáluje",
     popis: "Hoďte do nějakýho náhodnýho borca nebo baby panduláka. Za každou palici jedna čárka.",
@@ -53,13 +93,13 @@ export const VYCHOZI_UKOLY = [
 
   // ---------- Tělo v luftě ----------
   { id: "budny", kat: "telo", piva: 1, body: 1, max: 1, nazev: "Srostlý budny",
-    popis: "Dva z vás si musí svázat glajdy k sobě a tak dovalit na další štaci.", mezi: ["h3", "h4"] },
+    popis: "Dva z vás si musí svázat glajdy k sobě a tak dovalit na další štaci.", mezi: ["h3", "h4"] as [string, string] },
   { id: "hajzl", kat: "telo", piva: 1, body: 1, max: 1, nazev: "Hajzlovej úlet",
     popis: "Jeden z vás musí jít na hajzl opačnýho pohlaví." },
   { id: "pumpa", kat: "telo", piva: 1, body: 1, max: 1, nazev: "Pouliční pumpa",
     popis: "Odchytněte na ulici nějakýho flanďáka a chtějte po něm, ať vám vočumí, jak dáváte kliky, dřepy nebo balet." },
   { id: "taxal", kat: "telo", piva: 2, body: 2, max: 1, nazev: "Živej taxál",
-    popis: "Jeden z partyje nesmí na cestě šlápnout na zem. Jak ho tam dopravíte (na hřbetě, v pazórách), je na vás.", mezi: ["h4", "h5"] },
+    popis: "Jeden z partyje nesmí na cestě šlápnout na zem. Jak ho tam dopravíte (na hřbetě, v pazórách), je na vás.", mezi: ["h4", "h5"] as [string, string] },
   { id: "lajna", kat: "telo", piva: 2, body: 2, max: 1, nazev: "Vopičí lajna",
     popis: "Jak zacálujete, valí celá parta z lokálu pryč po všech čtyřech." },
   { id: "rev", kat: "telo", piva: 2, body: 2, max: 1, nazev: "Řev jak z JZD",
@@ -90,7 +130,7 @@ export const VYCHOZI_UKOLY = [
     popis: "Nechte se jako parta vyblejsknout od cizáka. Furt do něj ale valte, že je levej, že ta fotka stojí za hovno a ať se snaží (s hopsáním, bez hopsání, ksichty…)." },
 ];
 
-export const OBTIZNOST = [
+export const OBTIZNOST: { piva: 1 | 2 | 3; nazev: string }[] = [
   { piva: 1, nazev: "Brnkačka" },
   { piva: 2, nazev: "Větší haluz" },
   { piva: 3, nazev: "Betelná makačka" },

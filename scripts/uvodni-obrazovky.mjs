@@ -6,7 +6,7 @@ import { chromium } from "playwright";
 import { readFileSync, mkdirSync } from "node:fs";
 
 const PODKLAD = "#070E0A";
-const logo = readFileSync(new URL("../logo.svg", import.meta.url), "utf8");
+const logo = readFileSync(new URL("../public/logo.svg", import.meta.url), "utf8");
 
 // šířka × výška v bodech displeje a poměr pixelů; pokrývá iPhony od SE po 16 Pro Max
 const ZARIZENI = [
@@ -25,7 +25,7 @@ for (const [w, h, r] of ZARIZENI) {
     display:grid;place-items:center">
     <div style="width:${Math.round(w * 0.52)}px;color:#EFEBE0">${logo}</div></body></html>`);
   const soubor = `uvodni/${w}x${h}@${r}x.png`;
-  await p.screenshot({ path: new URL("../" + soubor, import.meta.url).pathname });
+  await p.screenshot({ path: new URL("../public/" + soubor, import.meta.url).pathname });
   await p.close();
   znacky.push(`<link rel="apple-touch-startup-image" href="${soubor}"\n  media="(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${r}) and (orientation: portrait)">`);
 }

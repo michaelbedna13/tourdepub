@@ -4,29 +4,47 @@ Web ke hře: devět brněnskejch špeluněk, 23 úkolů a počítání čárek.
 Staví se na mobil do ruky v hospodě — velké terče, vysoký kontrast, hlavní akce dole
 na dosah palce. Na počítači stojí uprostřed na ploše.
 
-Žádný build, žádné npm. Je to HTML, jedno CSS a pár souborů JS jako modulů.
-Nahraje se do repozitáře a servíruje přes GitHub Pages.
+Appka je ve stejném stroji jako osobní aplikace (untrois): **Vite + React + TypeScript**,
+nasazení na GitHub Pages z Actions.
+
+```bash
+npm install
+npm run dev        # vývoj na localhostu
+npm run build      # produkce do dist/
+npm run typecheck  # jenom kontrola typů
+```
 
 ## Struktura
 
 ```
-index.html         kostra stránky
-app.js             obrazovky a ovládání
-stav.js            týmy, hospody, úkoly, bodování a ukládání
-data.js            VÝCHOZÍ hospody a úkoly (jen startovní sada, dál se mění v appce)
-ui.js              kreslení ikon, čárek a štítků obtížnosti
-ikony.js           ZÁSTUPNÉ — generuje scripts/kresli-ikony.mjs, needitovat ručně
-sync.js            živé pořadí přes Supabase (volitelné)
-nastaveni.js       klíče k Supabase, název tabulky a název hry
-styl.css           celý vzhled, jeden soubor
-DESIGN.md          barvy, písmo, rozměry a proč jsou takové
-sw.js              service worker, drží web v telefonu i bez signálu
-manifest.json      aby šel web přidat na plochu jako appka
-pisma/             Bevan a Outfit, stažené lokálně
-scripts/           generátor ikon a stahovač písem
-supabase/party.sql struktura tabulky pro živé pořadí
-.claude/skills/    Apple HIG skilly (zdroj: raintree-technology/apple-hig-skills, MIT)
+index.html              kostra stránky a úvodní obrazovka s logem
+src/main.tsx            start appky
+src/App.tsx             trasy, kostra obrazovky, spodní lišta
+src/obrazovky/          Hra, Úkoly, Kategorie, Týmy, Hospody, Pravidla
+src/components/         Ikona, Čárky, Obtížnost, Hlava, Lišta, Okno, Úvod, …
+src/lib/stav.ts         týmy, hospody, úkoly, bodování a ukládání
+src/lib/data.ts         VÝCHOZÍ hospody a úkoly (startovní sada, dál se mění v appce)
+src/lib/sync.ts         živé pořadí přes Supabase (volitelné)
+src/lib/nastaveni.ts    klíče k Supabase, název tabulky, název hry a kód správce
+src/lib/format.ts       skloňování a vázání krátkých slov
+src/lib/ikony.ts        ZÁSTUPNÉ — generuje scripts/kresli-ikony.mjs, needitovat ručně
+src/lib/logo.ts         ZÁSTUPNÉ — generuje scripts/prevod-loga.py, needitovat ručně
+src/styles/app.css      celý vzhled, jeden soubor
+src/styles/pisma.css    @font-face, rozsahy znaků
+src/assets/             písma, zrno a čárky (všechno, na co sahá CSS)
+public/                 ikony appky, logo a úvodní obrazovky pro iPhone
+DESIGN.md               barvy, písmo, rozměry a proč jsou takové
+scripts/                generátor ikon, stahovač písem, převod loga
+supabase/party.sql      struktura tabulky pro živé pořadí
+.claude/skills/         Apple HIG skilly (zdroj: raintree-technology/apple-hig-skills, MIT)
 ```
+
+### Stav bez knihovny na stav
+
+`src/lib/stav.ts` drží jeden měnitelný objekt a seznam posluchačů; obrazovky se na něj
+přihlásí přes `useStav()` (`useSyncExternalStore`). Zapisuje se do něj odkudkoli — z obrazovek,
+ze synchronizace, z posluchače `online` — a kopírovat při každé čárce celý stav by bylo
+k ničemu. Stejně je na tom `sync.ts` (`useSync()`) a `spravce.ts` (`useSpravce()`).
 
 ## Jak se to ovládá při hře
 
@@ -34,7 +52,7 @@ supabase/party.sql struktura tabulky pro živé pořadí
 
 Hra je otevřená — kdo přijde na odkaz, vybere si tým a hraje. **Úpravy úkolů
 a hospod se objeví až po zadání kódu** v Pravidlech → Režim správce. Kód je
-`ADMIN_KOD` v `nastaveni.js`, uloží se v prohlížeči a přežije zavření.
+`ADMIN_KOD` v `src/lib/nastaveni.ts`, uloží se v prohlížeči a přežije zavření.
 
 Je to zámek proti omylu, **ne bezpečnost**. Web je statický a veřejný, takže kdo
 se podívá do zdrojáku, kód si přečte. Brání tomu, aby někdo omylem přepsal úkoly
@@ -42,11 +60,14 @@ uprostřed hry. Kdyby mělo jít o víc, musela by přibýt opravdová práva v 
 
 Spodní lišta má pět obrazovek:
 
-- **Hra** — aktuální štace se šipkami po trase, dvě velká tlačítka
-  (*Jsme v špeluňce*, *Škopky jsme lupnuli*), vaše čárky a pod tím pořadí
+- **Hra** — hero karta štace: kolikátá je, jak se jmenuje, kde jste na trase
+  a dvě odškrtávátka (*Jsme v špeluňce*, *Škopky jsme lupnuli*). **Karty se
+  přepínají švihem do boku** — v hospodě jednou rukou je to rychlejší než mířit
+  na šipku; šipky zůstaly pro myš a pro jistotu. Pod kartou vaše čárky a pořadí
   všech týmů s odstupem od vedoucího.
-- **Úkoly** — nahoře přepínač kategorií, pod ním seznam. Jednorázové se odškrtávají
-  ťuknutím na řádek, opakovatelné mají − a +. V režimu správce je u každého tužka.
+- **Úkoly** — tři barevné karty kategorií (kolik je splněno a kolik je tady
+  na dosah). Ťuknutím se otevře seznam: jednorázové se odškrtávají ťuknutím na
+  řádek, opakovatelné mají − a +. V režimu správce je u každého tužka.
 - **Týmy** — kdo vede a za koho zapisuješ. Ťuknutím na tým se přepneš, takže z jednoho
   telefonu jde vést i celou hru. Tužka tým přejmenuje, přebarví nebo smaže.
 
@@ -70,7 +91,7 @@ Překlik se opraví stejným ťuknutím ještě jednou.
 ### Úkoly a hospody se dají měnit
 
 Hospody i úkoly nejsou napevno v kódu. Příští ročník si trasu i srandy naklikáš
-přímo v appce — `data.js` je jen to, čím se hra naplní poprvé.
+přímo v appce — `src/lib/data.ts` je jen to, čím se hra naplní poprvé.
 
 Když smažeš hospodu, zmizí s ní i čárky, co z ní týmy měly. Když byl na tu hospodu
 navázaný úkol (Bullseye jen *U Ričího*), omezení tím padá a úkol jde splnit kdekoli.
@@ -85,7 +106,7 @@ navázaný úkol (Bullseye jen *U Ričího*), omezení tím padá a úkol jde sp
 
 Dohromady se dá urvat nejvíc **74 čárek** (9 + 9 + 56 z úkolů).
 
-Úkol má tahle pole (výchozí sada je v `data.js`, dál se mění v appce):
+Úkol má tahle pole (výchozí sada je v `src/lib/data.ts`, dál se mění v appce):
 
 | pole | co znamená |
 |---|---|
@@ -98,7 +119,7 @@ Dohromady se dá urvat nejvíc **74 čárek** (9 + 9 + 56 z úkolů).
 | `jednouZaHospodu` | z každé špeluňky jen jednou (Brněnskej zloděj) |
 
 Nový úkol se přidává tlačítkem dole na obrazovce Úkoly. Kdo chce připravit celou sadu
-dopředu, může místo toho upravit `VYCHOZI_UKOLY` v `data.js` — ta se ale načte jenom
+dopředu, může místo toho upravit `VYCHOZI_UKOLY` v `src/lib/data.ts` — ta se ale načte jenom
 při prvním spuštění, takže pak je potřeba v prohlížeči smazat uložená data.
 
 Obtížnost a počet opakování spolu souvisí: **jednorázový úkol hodí tolik čárek, jaká je
@@ -144,7 +165,7 @@ nepomíchá, a za jeden večer se tří part nedotkne ani okraje půlgigového l
    Supabase `42501 permission denied`. Tabulka založená přes Table Editor to
    dostane sama, založená přes SQL ne.
 3. Ověř v **Table Editor**, že přibyla tabulka `tourdepub_tymy`.
-4. V **Settings → API** zkopíruj *Project URL* a klíč a vlož je do `nastaveni.js`:
+4. V **Settings → API** zkopíruj *Project URL* a klíč a vlož je do `src/lib/nastaveni.ts`:
 
 ```js
 export const SUPABASE_URL = "https://neco.supabase.co";
@@ -157,7 +178,7 @@ Klíč `anon` je určený do prohlížeče, takže ho klidně nahraj do repozit�
 Tabulka je ale otevřená komukoli s odkazem — je to na jeden večer mezi známými.
 Kdyby to mělo viset na internetu dýl, přidej přihlášení.
 
-`HRA` v `nastaveni.js` odděluje ročníky. Příští rok ji změň, ať se party nemíchají
+`HRA` v `src/lib/nastaveni.ts` odděluje ročníky. Příští rok ji změň, ať se party nemíchají
 s letošními. `TABULKA` se mění jen tehdy, když by ti jméno kolidovalo s něčím vlastním.
 
 Bez signálu se zapisuje dál do telefonu a pošle se to, až bude signál.
@@ -181,22 +202,22 @@ Dřív byl, kvůli běhu bez signálu. V hospodách na trase ale signál je, tak
 nepřinášel nic – jen se kvůli němu nová verze dostávala do telefonu až na
 popohnání a jednou po aktualizaci zůstala černá plocha.
 
-`sw.js` v repu zůstal schválně: je to verze, která se **sama odhlásí a smaže
-zásobu**. Prohlížeč, který si ten starý zaregistroval, by si ho jinak držel dál.
-Až budou všechna zařízení chvíli bez něj, může soubor zmizet úplně.
+Odhlášení po něm dělá pár řádků v `src/main.tsx`: appka při spuštění zruší každou
+registraci a smaže zásobu. Prohlížeč, který si ten starý zaregistroval, by si ho
+jinak držel dál. Až budou všechna zařízení chvíli bez něj, může ten kousek zmizet.
 
 Na plochu se appka přidává pořád stejně – to zařizuje `manifest.json`,
 service worker na to potřeba není. Bez signálu funguje jen tehdy, když je
 už otevřená; zápisy se drží v telefonu a pošlou se, až bude síť.
 
-Kdyby se přesto sešla stará stránka s novým skriptem, appka si kostru postaví
-sama a nic se nerozsype — dřív v takovém případě zůstala černá plocha. A kdyby
-spadlo něco jiného, ukáže se hláška s tlačítkem *Načíst znovu*, ne prázdno.
+Kdyby něco spadlo, chytí to `<Zachrana>` a ukáže hlášku s tlačítkem *Načíst znovu*,
+ne černou plochu. Názvy souborů v `dist/` nesou otisk obsahu, takže stará stránka
+nemůže potkat nový skript.
 
 ## Ikony
 
 Ikony jsou tlusté siluety s výstřižky, obrys křivý jako stříhaný tupýma nůžkama.
-Kreslí je `scripts/kresli-ikony.mjs` do `ikony.js`:
+Kreslí je `scripts/kresli-ikony.mjs` do `src/lib/ikony.ts`:
 
 ```bash
 node scripts/kresli-ikony.mjs
@@ -211,7 +232,7 @@ i ve 22 px ve spodní liště. Když přidáváš novou, zkontroluj ji v malém.
 ## Písma
 
 Archivo Black na nadpisy, Gloria Hallelujah na popisy, Outfit na ovládání —
-všechno SIL OFL a uložené v `pisma/`.
+všechno SIL OFL a uložené v `src/assets/fonts/`.
 Lokálně kvůli dvěma věcem: web funguje bez signálu a nenačítá se nic z Googlu.
 
 Stahuje je `scripts/stahni-pisma.mjs`. Subsety se poznávají podle `unicode-range`,
@@ -240,25 +261,33 @@ appku z plochy smazat a přidat znovu.
 
 ## Logo
 
-`logo.svg` a `logo.js` jsou obtažené z obrázku skriptem:
+`logo.svg` a `src/lib/logo.ts` jsou obtažené z obrázku skriptem:
 
 ```bash
 node scripts/prevod-loga.mjs <obrazek.png>
 ```
 
 Kreslí se barvou textu (`currentColor`), takže funguje na světlém i tmavém podkladu.
-`logo.js` je ten samý tvar jako modul, aby se vkládal rovnou do stránky bez dalšího
-požadavku. Oba soubory jsou generované, needitovat ručně.
+`src/lib/logo.ts` je ten samý tvar jako dráha pro komponentu `<Logo>`, aby se vkládal
+rovnou do stránky bez dalšího požadavku. Oba soubory jsou generované, needitovat ručně.
 
 V rozhraní logo není — nese ho ikona appky, úvodní obrazovka a patička Pravidel.
 Proč, je v `DESIGN.md`.
 
-## Úvodní obrazovka
+## Úvod po spuštění
 
-Jsou dvě a navazují na sebe. `uvodni/` jsou obrázky, které ukáže **iOS** při
-spuštění appky z plochy — bez nich se objeví jen prázdná barva. Hned po nich
-naváže **vlastní obrazovka ve stránce** (`#uvod` v `index.html`), která se drží
-aspoň 1150 ms a pak odejde prolnutím. Délka se mění v `app.js` u `NEJMIN`.
+Běží **po každém spuštění** a vždycky jde přeskočit. Má dvě části:
+
+1. **Logo.** `public/uvodni/` jsou obrázky, které ukáže iOS při spuštění appky
+   z plochy — bez nich se objeví jen prázdná barva. Hned po nich naváže
+   `#uvod` v `index.html`: je rovnou ve stránce, aby naskočil dřív, než se stáhne
+   skript. Drží se aspoň 1100 ms, než se načtou písma, a pak odejde prolnutím.
+2. **Průprava.** Tři stránky s textem a animací (`src/components/Uvod.tsx`).
+   Přehazují se samy po 2,4 s, ťuknutím nebo švihem do boku; *Přeskočit* je
+   pořád na očích a poslední stránka má *Jedeme*.
+
+Časování a obsah jsou nahoře v `Uvod.tsx` (`NA_STRANKU`, `LOGO_NEJMIN`, `PRUPRAVA`).
+Appka se pod úvodem už kreslí a připojuje k Supabase, takže po doběhnutí je hotová.
 
 Systémové obrázky generuje:
 
@@ -267,25 +296,25 @@ node scripts/uvodni-obrazovky.mjs
 ```
 
 Skript vypíše i `<link>` značky — při přidání nového rozměru je potřeba je
-přenést do `index.html` a soubory doplnit do seznamu v `sw.js`.
+přenést do `index.html`.
 
 ## Nasazení
 
 Běží na GitHub Pages: **https://michaelbedna13.github.io/tourdepub/**
 
-1. Settings → Pages → *Deploy from a branch*, větev `claude/admiring-euler-ci2d58`,
-   složka `/ (root)`. Repozitář nemá `main`, tahle větev je výchozí.
-2. Každý push na tu větev nasadí znovu, trvá to asi minutu. Postup je vidět
-   v záložce Actions pod „pages build and deployment".
-3. Prázdný soubor `.nojekyll` v kořeni vypíná Jekyll. Bez něj by GitHub stránku
-   hnal přes generátor blogů, který zahazuje soubory začínající podtržítkem.
-   Nic takového tu sice není, ale build je bez něj zbytečně pomalejší.
-4. Případně do kořene `CNAME` s vlastní doménou.
+Appka se od přepisu do Reactu musí sestavit, takže ji nasazuje workflow,
+ne servírování složky z větve.
 
-**Když se změna neprojeví**, nejčastěji to není Pages, ale service worker —
-zvedni `VERZE` v `sw.js`. Na telefonu, co appku má na ploše, jinak zůstane stará verze.
+1. **Settings → Pages → Source: `GitHub Actions`.** (Dřív tam bylo *Deploy from
+   a branch* — tohle je jediná věc, kterou je po přepisu potřeba přepnout ručně.)
+2. Každý push na `claude/admiring-euler-ci2d58` spustí
+   `.github/workflows/nasazeni.yml`: `npm ci`, `npm run build`, nahrání `dist/`.
+   Trvá to asi dvě minuty a je to vidět v záložce Actions.
+3. Podsložku `/tourdepub/` zná build z `base` ve `vite.config.ts`. S vlastní
+   doménou stačí build s `VITE_BASE=/` a `CNAME` v `public/`.
 
-Cesty k souborům jsou relativní, takže web funguje na doméně,
-na `michaelbedna13.github.io/tourdepub/` i po otevření z disku.
+**Když se změna neprojeví**, je to buď ještě běžící workflow, nebo stará stránka
+v telefonu — stačí ji zatáhnout dolů a načíst znovu. Service worker, který to
+kdysi držel, už v appce není.
 
 © Mišák

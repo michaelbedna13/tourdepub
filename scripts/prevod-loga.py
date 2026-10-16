@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 import potrace
 
-CIL = os.path.join(os.path.dirname(__file__), "..", "logo.svg")
+CIL = os.path.join(os.path.dirname(__file__), "..", "public", "logo.svg")
 
 def main(cesta):
     im = Image.open(cesta).convert("L")
@@ -73,26 +73,24 @@ def main(cesta):
     with open(CIL, "w", encoding="utf-8") as f:
         f.write(svg)
 
-    # Stejné dráhy i jako modul, ať jde logo vložit rovnou do stránky.
+    # Dráha i jako modul, ať jde logo vložit rovnou do stránky komponentou <Logo>.
     # Načítat logo.svg zvlášť by znamenalo další požadavek a probliknutí.
-    js = os.path.join(os.path.dirname(__file__), "..", "logo.js")
-    with open(js, "w", encoding="utf-8") as f:
-        f.write("// Slovní značka Tour de Pub jako dráhy.\n"
+    ts = os.path.join(os.path.dirname(__file__), "..", "src", "lib", "logo.ts")
+    with open(ts, "w", encoding="utf-8") as f:
+        f.write("// Slovní značka Tour de Pub jako jedna dráha.\n"
                 "// Generuje scripts/prevod-loga.py z obrázku – needitovat ručně.\n"
-                "export const LOGO = %s;\n" % repr(svg.strip()).replace("'", '"', 1)[::1].replace('"', "'", 0))
-    # repr() v Pythonu dá uvozovky podle obsahu; pro jistotu přepíšeme ručně
-    with open(js, "w", encoding="utf-8") as f:
-        f.write("// Slovní značka Tour de Pub jako dráhy.\n"
-                "// Generuje scripts/prevod-loga.py z obrázku – needitovat ručně.\n"
-                'export const LOGO = ' + json.dumps(svg.strip(), ensure_ascii=False) + ";\n")
+                "// Kreslí ji <Logo> (src/components/Logo.tsx).\n"
+                "export const LOGO_VIEWBOX = %s;\n"
+                "export const LOGO_CESTA = %s;\n"
+                % (json.dumps("0 0 %s %s" % (n(sirka), n(vyska))), json.dumps(d)))
 
     # Varianta s napevno krémovou barvou pro <img> na úvodní obrazovce.
     # Logo v <img> si barvu textu vzít nemůže, currentColor by vyšel černý.
-    with open(os.path.join(os.path.dirname(__file__), "..", "logo-uvodni.svg"),
+    with open(os.path.join(os.path.dirname(__file__), "..", "public", "logo-uvodni.svg"),
               "w", encoding="utf-8") as f:
         f.write(svg.replace('fill="currentColor"', 'fill="#EFEBE0"'))
 
-    print("logo.svg + logo.js + logo-uvodni.svg: %d drah, %.1f kB, viewBox %s×%s"
+    print("logo.svg + logo.ts + logo-uvodni.svg: %d drah, %.1f kB, viewBox %s×%s"
           % (len(kusy), len(svg) / 1024, n(sirka), n(vyska)))
 
 if __name__ == "__main__":

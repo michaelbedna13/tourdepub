@@ -1,4 +1,4 @@
-// Nakreslí ikony Tour de Pub a zapíše je do ikony.js.
+// Nakreslí ikony Tour de Pub a zapíše je do src/lib/ikony.ts.
 // Styl: tlusté černé siluety s bílými výstřižky, obrys křivý jako stříhaný tupýma nůžkama.
 // Vrstvy v pořadí: "i" = papír (barva textu), "c" = výstřižek (průhledný).
 // Tenké tahy se v malém slijí, proto je všechno tlusté. viewBox 0 0 100 100.
@@ -230,9 +230,11 @@ for (const [k, f] of Object.entries(IKONY)) {
   seed = 7 + k.length * 13; // pevná náhodnost na ikonu, ať se změnou jedné nepřekreslí ostatní
   out.push(`  ${/^[a-z][a-zA-Z0-9]*$/.test(k) ? k : JSON.stringify(k)}: ${JSON.stringify(f())},`);
 }
-writeFileSync(new URL("../ikony.js", import.meta.url),
+writeFileSync(new URL("../src/lib/ikony.ts", import.meta.url),
   `// Ikony Tour de Pub: tlusté siluety s výstřižky, okraj křivý jako stříhaný tupýma nůžkama.\n` +
   `// Generuje scripts/kresli-ikony.mjs – needitovat ručně.\n` +
   `// Vrstvy: "i" = papír (barva textu), "c" = výstřižek (průhledný). viewBox 0 0 100 100.\n` +
-  `export const IKONY = {\n${out.join("\n")}\n};\n`);
-console.log("ikony.js:", Object.keys(IKONY).length, "ikon");
+  `export type Vrstva = ["i" | "c", string];\n` +
+  `export type JmenoIkony = keyof typeof IKONY;\n\n` +
+  `export const IKONY = {\n${out.join("\n")}\n} satisfies Record<string, Vrstva[]>;\n`);
+console.log("src/lib/ikony.ts:", Object.keys(IKONY).length, "ikon");

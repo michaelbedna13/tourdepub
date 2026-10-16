@@ -1,49 +1,15 @@
 /* ============================================================
    TOUR DE PUB
    Skoro černá zeleň se zrnem, krémová z loga, žádná akcentní barva.
-   Barva nese význam jen u obtížnosti úkolu — a nikdy sama:
-   vedle ní je vždycky počet půllitrů i název (HIG: inclusive color).
+   Barva nese význam na dvou místech, a nikdy sama: u obtížnosti úkolu
+   (vedle ní je vždycky počet půllitrů i název) a na kartách kategorií
+   (vedle barvy je ikona i jméno kategorie) — HIG: inclusive color.
+   Jsou to stejné tři odstíny, aby v appce nebyly dvě barevné soustavy.
+   Proto se v seznamu úkolů barva kategorie neukazuje, jen tenká čára
+   pod nadpisem; význam tam nesou půllitry.
    Appka je jen tmavá. Hraje se v noci v hospodě, světlý režim nedává smysl.
-   Tři řezy písma, každý má svou práci: Archivo Black nadpisy,
-   Gloria Hallelujah popisy, Outfit ovládání a čísla.
    ============================================================ */
 
-@font-face{font-family:"Archivo Black";font-style:normal;font-weight:400;font-display:swap;
-  src:url("pisma/archivo-black-lat.woff2") format("woff2");
-  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Archivo Black";font-style:normal;font-weight:400;font-display:swap;
-  src:url("pisma/archivo-black-ext.woff2") format("woff2");
-  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Psaci";font-style:normal;font-weight:400;font-display:swap;
-  src:url("pisma/psaci-lat.woff2") format("woff2");
-  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Psaci";font-style:normal;font-weight:400;font-display:swap;
-  src:url("pisma/psaci-ext.woff2") format("woff2");
-  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Outfit";font-style:normal;font-weight:400;font-display:swap;
-  src:url("pisma/outfit-400-lat.woff2") format("woff2");
-  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Outfit";font-style:normal;font-weight:400;font-display:swap;
-  src:url("pisma/outfit-400-ext.woff2") format("woff2");
-  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Outfit";font-style:normal;font-weight:500;font-display:swap;
-  src:url("pisma/outfit-500-lat.woff2") format("woff2");
-  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Outfit";font-style:normal;font-weight:500;font-display:swap;
-  src:url("pisma/outfit-500-ext.woff2") format("woff2");
-  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Outfit";font-style:normal;font-weight:600;font-display:swap;
-  src:url("pisma/outfit-600-lat.woff2") format("woff2");
-  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Outfit";font-style:normal;font-weight:600;font-display:swap;
-  src:url("pisma/outfit-600-ext.woff2") format("woff2");
-  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Outfit UI";font-style:normal;font-weight:400;font-display:swap;
-  src:url("pisma/outfit-600-lat.woff2") format("woff2");
-  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Outfit UI";font-style:normal;font-weight:400;font-display:swap;
-  src:url("pisma/outfit-600-ext.woff2") format("woff2");
-  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 :root{
   /* podklad: skoro černá zeleň, vrstvy o stupínek výš */
   --podklad:#070E0A;
@@ -62,7 +28,7 @@
   --akce:#EFEBE0;
   --na-akci:#070E0A;
 
-  /* obtížnost úkolu – jediné místo v appce, kde barva nese význam */
+  /* obtížnost úkolu a karty kategorií – jediné tři barvy v appce */
   --ob1:#7FD4C1;
   --ob2:#F2C14E;
   --ob3:#F2765A;
@@ -78,6 +44,7 @@
   --pilulka:999px;
   --lista-v:62px;
   --sirka:540px;
+  --okraj:18px;
   --krok:cubic-bezier(.32,.72,0,1);
   color-scheme:dark;
 }
@@ -96,10 +63,9 @@ body{
    Režim soft-light podklad oživí, aniž by ho zašpinil. */
 body::before{
   content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:url("zrno.svg");background-size:160px 160px;
+  background-image:url("../assets/zrno.svg");background-size:160px 160px;
   opacity:.5;mix-blend-mode:soft-light;
 }
-.app{position:relative;z-index:1}
 
 h1,h2,h3{margin:0;font-family:var(--nadpisy);font-weight:400;line-height:1.08;
   letter-spacing:-.01em;text-transform:uppercase}
@@ -107,7 +73,7 @@ h1{font-size:25px}
 h2{font-size:17px}
 h3{font-size:15px}
 p{margin:0}
-a{color:var(--text)}
+a{color:var(--text);text-decoration:none}
 button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;border:0;background:none;
   font-family:var(--pismo)}
 button:disabled{cursor:default}
@@ -122,19 +88,29 @@ input,textarea,select{caret-color:var(--text)}
 .cislo{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 .ikona{display:block;flex:none}
 .otocit{transform:scaleX(-1)}
-.jen-ctecka{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
-  clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.spatne{color:var(--spatne)}
+.drobne{font-size:13px;color:var(--text-3);word-break:break-word}
 /* psaná ruka: popisy a vysvětlivky, ne ovládání – tlačítka musí zůstat jednoznačná */
 .psane{font-family:var(--psaci);line-height:1.55;letter-spacing:.005em}
 
 /* ---------- kostra ---------- */
-.app{max-width:var(--sirka);margin:0 auto;min-height:100dvh}
+/* pás hero karet přetéká přes okraje obrazovky; na širší obrazovce by vykoukl
+   i ven ze sloupce appky, tak se tady ořízne (clip, ne hidden – ten by udělal
+   z appky posuvnou plochu a rozbil plovoucí lištu) */
+.app{position:relative;z-index:1;max-width:var(--sirka);margin:0 auto;min-height:100dvh;
+  overflow-x:clip}
 .obrazovka{
-  padding:calc(env(safe-area-inset-top) + 8px) 18px
+  display:block;
+  padding:calc(env(safe-area-inset-top) + 8px) var(--okraj)
           calc(var(--lista-v) + env(safe-area-inset-bottom) + 26px);
+  animation:obsah-prichod .34s var(--krok) both;
 }
 @media (display-mode:standalone){
   .obrazovka{padding-top:calc(max(env(safe-area-inset-top),50px) + 8px)}
+}
+@keyframes obsah-prichod{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:none}
 }
 
 /* ---------- horní lišta ---------- */
@@ -151,8 +127,7 @@ input,textarea,select{caret-color:var(--text)}
 /* patička Pravidel – jediné místo v rozhraní, kde se značka ukáže */
 .paticka{display:flex;flex-direction:column;align-items:center;gap:10px;
   margin-top:40px;padding-bottom:6px;color:var(--text-3)}
-.logo-paticka{display:block;width:84px;opacity:.3}
-.logo-paticka svg{display:block;width:100%;height:auto}
+.logo-paticka{display:block;width:84px;height:auto;opacity:.3}
 .paticka span:last-child{font-family:var(--ovladani);font-size:12.5px}
 .prepinac-tymu{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 13px;
   border-radius:var(--pilulka);background:var(--vrstva-2);
@@ -162,9 +137,6 @@ input,textarea,select{caret-color:var(--text)}
 .tecka{width:9px;height:9px;border-radius:50%;flex:none}
 
 /* ---------- nadpisy sekcí ---------- */
-.nadpis{margin-bottom:18px}
-.nadpis h1{margin-bottom:6px;font-size:27px}
-.nadpis p{color:var(--text-2);font-size:16px}
 .sekce{margin-top:26px}
 .sekce-hlava{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;padding:0 2px}
 .sekce-hlava h2{font-size:13px;color:var(--text-3);letter-spacing:.06em}
@@ -174,6 +146,7 @@ input,textarea,select{caret-color:var(--text)}
 .vrstva{background:var(--vrstva);border-radius:var(--r);overflow:hidden}
 .vrstva.prodyseny{padding:18px}
 .radky > * + *{border-top:1px solid var(--linka-sl)}
+.strop-cislo{font-family:var(--nadpisy);color:var(--text)}
 
 /* ---------- tlačítka: tři váhy, ať je jasné, co je hlavní ---------- */
 /* 1. hlavní akce – světlá plocha, tmavý text */
@@ -192,8 +165,6 @@ input,textarea,select{caret-color:var(--text)}
 .tl.nebezpecne{background:transparent;color:var(--spatne);box-shadow:inset 0 0 0 1px rgba(242,118,90,.28)}
 .tl:disabled{opacity:.3}
 .tl.maly{min-height:40px;font-size:14px;padding:9px 15px;width:auto}
-.tl-rada{display:flex;gap:9px}
-.tl-rada .tl{flex:1}
 
 /* kulaté tlačítko (posun mezi štacemi, úpravy v řádku) */
 .ikonove{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;
@@ -202,22 +173,34 @@ input,textarea,select{caret-color:var(--text)}
 .ikonove:active{transform:scale(.9)}
 .ikonove:disabled{opacity:.25}
 .ikonove.holy{background:transparent}
-.ikonove.cerveny{color:var(--spatne)}
 
-/* ---------- Hra: hero karta štace ---------- */
-/* Jedna karta nese všechno o téhle štaci: kolikátá je, jak se jmenuje,
-   kde jsme na trase a co se tu dá zapsat. Dřív to byly čtyři samostatné
-   bloky se stejnou vahou, takže nic nevedlo. */
+/* ---------- Hra: pás hero karet ---------- */
+/* Jedna karta nese celou štaci: kolikátá je, jak se jmenuje, kde jsme na trase
+   a co se tu dá zapsat. Karty stojí vedle sebe a přepínají se švihem do boku —
+   v hospodě jednou rukou je švih rychlejší než mířit na šipku. Šipky zůstaly
+   pro myš a pro jistotu. */
+.hero-pas{
+  display:flex;gap:10px;position:relative;
+  margin:0 calc(var(--okraj) * -1);padding:2px var(--okraj) 6px;
+  overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;scroll-padding-left:var(--okraj);
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.hero-pas::-webkit-scrollbar{display:none}
 .hero{
+  flex:0 0 calc(100% - 34px);scroll-snap-align:start;
   background:var(--vrstva);border-radius:var(--r);padding:16px 18px 14px;
   position:relative;overflow:hidden;
+  transition:opacity .22s var(--krok);
 }
+/* karta, co jen vykukuje, nemá přetahovat pozornost */
+.hero:not(.ted){opacity:.5}
 /* Vodoznak z čárek — jediná ozdoba na kartě, a nese téma hry.
    Sedí v dolním rohu za odškrtávátky; nahoře se pral se šipkami
    a vypadal jako šmouha, ne jako záměr. */
 .hero::after{
   content:"";position:absolute;right:-38px;bottom:-24px;width:150px;height:122px;
-  background:url("carky.svg") no-repeat right bottom/contain;
+  background:url("../assets/carky.svg") no-repeat right bottom/contain;
   opacity:.05;pointer-events:none;
 }
 .hero-vrch{display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -232,14 +215,17 @@ input,textarea,select{caret-color:var(--text)}
 
 /* název hospody je hlavní věc na obrazovce, tak ať to tak vypadá */
 .hero-nazev{
-  font-size:clamp(29px,8.6vw,40px);line-height:.98;letter-spacing:-.02em;
+  font-size:clamp(27px,7.8vw,38px);line-height:.98;letter-spacing:-.02em;
   margin:14px 0 0;overflow-wrap:anywhere;position:relative;z-index:1;
 }
 
-.hero-trasa{display:flex;gap:3px;margin:16px 0 14px;position:relative;z-index:1}
+.hero-trasa{display:flex;align-items:center;gap:10px;margin:16px 0 14px;
+  position:relative;z-index:1}
+.trasa-body{display:flex;gap:3px;flex:1;min-width:0}
 .trasa-bod{flex:1;height:3px;border-radius:2px;background:var(--linka)}
 .trasa-bod.splneno{background:var(--text-3)}
 .trasa-bod.ted{background:var(--text)}
+.hero-stace{font-family:var(--ovladani);font-size:12.5px;color:var(--text-3);flex:none}
 
 /* dvě věci, co se v každé špeluňce zapisují – jako odškrtávátka, ne jako
    dvě obří tlačítka, která přebila zbytek obrazovky */
@@ -283,16 +269,37 @@ input,textarea,select{caret-color:var(--text)}
 .pruh-tymu.ja .jmeno{color:var(--text)}
 .pruh-tymu:not(.ja) .jmeno{color:var(--text-2)}
 
-/* ---------- přepínač kategorií ---------- */
-.prepinac{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
-  margin:0 -18px 16px;padding:0 18px 2px}
-.prepinac::-webkit-scrollbar{display:none}
-.prepinac button{flex:none;min-height:40px;padding:9px 15px;border-radius:var(--pilulka);
-  background:var(--vrstva-2);color:var(--text-2);font-family:var(--ovladani);font-size:14.5px;
-  display:flex;align-items:center;gap:7px;transition:background .16s,color .16s}
-.prepinac button .pocet{font-size:12.5px;opacity:.6}
-.prepinac button[aria-selected=true]{background:var(--akce);color:var(--na-akci)}
-.prepinac button[aria-selected=true] .pocet{opacity:.55}
+/* ---------- Úkoly: karty kategorií ---------- */
+/* Tři barevné karty místo jednoho seznamu dvaceti tří úkolů. Barva není
+   ozdoba: drží kategorii pohromadě přes celou appku. Text je tmavý, protože
+   na světlé ploše je čitelnější než krémový (kontrast nad 10:1). */
+.kat-karty{display:flex;flex-direction:column;gap:12px}
+.kat-karta{
+  display:block;position:relative;overflow:hidden;
+  border-radius:var(--r);padding:16px 18px 15px;min-height:124px;
+  color:var(--na-akci);
+  transition:transform .14s var(--krok),filter .16s;
+}
+.kat-karta:active{transform:scale(.985);filter:brightness(.95)}
+/* ikona kategorie jako vodoznak – velká, přetéká z rohu, nebere místo textu */
+.kat-vodoznak{position:absolute;right:-20px;bottom:-30px;opacity:.15;pointer-events:none}
+.kat-vrch{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  position:relative;z-index:1}
+.kat-pocet{font-family:var(--nadpisy);font-size:15px;line-height:1;
+  padding:6px 11px;border-radius:var(--pilulka);background:rgba(7,14,10,.13)}
+.kat-sipka{opacity:.6}
+.kat-nazev{position:relative;z-index:1;margin-top:26px;padding-right:64px;
+  font-size:24px;line-height:.98;letter-spacing:-.015em;overflow-wrap:anywhere}
+.kat-pod{position:relative;z-index:1;display:block;margin-top:7px;
+  font-family:var(--ovladani);font-size:13px;opacity:.72}
+/* V seznamu úkolů zůstane z barvy kategorie jen čárka nad nadpisem; význam
+   tam nesou půllitry obtížnosti a dvě barevné soustavy vedle sebe by se pletly.
+   Nadpis stojí pod lištou, ne v ní – do lišty se vedle pilulky týmu nevešel
+   a ořezával se na „Kecy a …“. */
+.kat-hlavicka{margin:-4px 0 14px}
+.kat-cara{height:4px;width:46px;border-radius:2px;margin-bottom:12px}
+.kat-hlavicka h1{font-size:clamp(26px,7.4vw,34px);line-height:.98;letter-spacing:-.02em;
+  overflow-wrap:anywhere}
 
 /* ---------- seznam úkolů ---------- */
 .ukol{display:block;width:100%;text-align:left;padding:15px 16px;background:transparent;
@@ -340,20 +347,19 @@ input,textarea,select{caret-color:var(--text)}
 
 /* ---------- řádky seznamů ---------- */
 .radek{display:flex;align-items:center;gap:13px;padding:14px 16px;width:100%;text-align:left}
-.radek-telo{flex:1;min-width:0}
+.radek-telo{flex:1;min-width:0;text-align:left}
 .radek-nazev{font-family:var(--ovladani);font-size:16px;display:flex;align-items:center;gap:8px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .radek-pod{font-family:var(--ovladani);font-size:13px;color:var(--text-2);margin-top:2px}
 .radek-vpravo{flex:none;display:flex;align-items:center;gap:4px}
 .poradi-cislo{width:20px;flex:none;font-family:var(--nadpisy);font-size:14px;color:var(--text-3)}
 .radek.vede .poradi-cislo{color:var(--text)}
-.radek.ja{background:rgba(239,235,224,.045)}
+.radek.ja,.radek.ted{background:rgba(239,235,224,.045)}
 .radek-body{font-family:var(--nadpisy);font-size:19px;flex:none}
-.radek.ted{background:rgba(239,235,224,.045)}
 
 /* ---------- pole ---------- */
-label.pole{display:block;margin-bottom:15px}
-label.pole .nazev{font-family:var(--ovladani);font-size:13px;color:var(--text-2);
+label.pole,div.pole{display:block;margin-bottom:15px}
+.pole .nazev{font-family:var(--ovladani);font-size:13px;color:var(--text-2);
   display:block;margin-bottom:6px}
 input[type=text],input[type=password],textarea,select{
   width:100%;min-height:48px;padding:12px 14px;border-radius:var(--r-sm);
@@ -378,7 +384,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 
 /* ---------- spodní lišta ---------- */
 /* Plovoucí pilulka ze skla, ne pruh s ikonami přes celou šířku.
-   Aktivní položka je světlá pilulka s tmavou ikonou. */
+   Aktivní položka je světlá pilulka s tmavou ikonou a názvem. */
 .lista-obal{position:fixed;left:0;right:0;bottom:0;z-index:20;
   display:flex;justify-content:center;pointer-events:none;
   padding:0 16px calc(env(safe-area-inset-bottom) + 10px)}
@@ -386,14 +392,14 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   background:rgba(13,23,17,.78);backdrop-filter:blur(22px) saturate(1.5);
   -webkit-backdrop-filter:blur(22px) saturate(1.5);
   border-radius:var(--pilulka);box-shadow:0 1px 0 0 rgba(239,235,224,.07) inset,0 12px 32px rgba(0,0,0,.5)}
-.lista button{display:flex;align-items:center;gap:7px;min-height:44px;padding:0 14px;
+.lista a{display:flex;align-items:center;gap:7px;min-height:44px;padding:0 14px;
   border-radius:var(--pilulka);color:var(--text-3);
   transition:background .2s var(--krok),color .2s var(--krok),padding .2s var(--krok)}
-.lista button .popis{font-family:var(--ovladani);font-size:13.5px;
+.lista a .popis{font-family:var(--ovladani);font-size:13.5px;
   max-width:0;overflow:hidden;white-space:nowrap;opacity:0;
   transition:max-width .22s var(--krok),opacity .18s}
-.lista button.ted{background:var(--akce);color:var(--na-akci);padding:0 16px}
-.lista button.ted .popis{max-width:88px;opacity:1}
+.lista a.ted{background:var(--akce);color:var(--na-akci);padding:0 16px}
+.lista a.ted .popis{max-width:88px;opacity:1}
 
 /* ---------- okno ---------- */
 .okno{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;
@@ -413,7 +419,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   font-family:var(--psaci);font-size:15px}
 .prazdno .ikona{margin:0 auto 12px;color:var(--text-3)}
 .poznamka{font-family:var(--psaci);font-size:14px;color:var(--text-3);line-height:1.5;
-  margin-top:10px;padding:0 2px}
+  margin-top:10px;padding:0 2px;display:block}
 .rezim{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:var(--r-sm);
   background:var(--vrstva);font-size:13.5px;color:var(--text-2);margin-bottom:18px;line-height:1.5;
   font-family:var(--psaci)}
@@ -421,7 +427,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .rezim.chybny{background:rgba(242,118,90,.09);color:#F5A491}
 .rezim.chybny .ikona{color:var(--spatne)}
 .rezim.zivy .ikona{color:var(--text)}
-.rezim .drobne{color:var(--text-3);font-size:13px;word-break:break-word;font-family:var(--pismo)}
+.rezim .drobne{font-family:var(--pismo)}
 
 /* pravidla */
 .pravidla h2{font-size:15px;margin:24px 0 10px;color:var(--text-3);letter-spacing:.06em}
@@ -436,12 +442,10 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .legenda-radek{display:flex;align-items:center;gap:11px;font-size:15px;color:var(--text-2);
   font-family:var(--psaci)}
 
-/* ---------- úvodní obrazovka ---------- */
-/* Drží se chvilku i po načtení, ať spuštění z plochy nepůsobí jako bliknutí.
-   Navazuje na obrázek, který ukazuje iOS, takže podklad i poměr loga sedí.
-   Základ je v hlavičce index.html, tady je jen pohyb. */
+/* ---------- úvod po spuštění ---------- */
+/* Logo kreslí rovnou index.html (#uvod), ať je vidět, než se stáhne skript.
+   React nad ním drží jen Přeskočit a po doběhnutí ho odklidí. */
 #uvod{transition:opacity .45s var(--krok)}
-/* animace se spustí teprve, až je logo načtené (data-nacteno z onload) */
 #uvod img[data-nacteno]{animation:uvod-logo .66s var(--krok) both}
 #uvod.odchazi{opacity:0;pointer-events:none}
 #uvod.odchazi img{animation:uvod-pryc .45s var(--krok) both}
@@ -453,15 +457,45 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   from{opacity:1;transform:none}
   to{opacity:0;transform:scale(1.04)}
 }
-/* obsah se pod odcházející obrazovkou jemně zvedne, ať to není střih */
-.obrazovka{animation:obsah-prichod .5s var(--krok) both}
-@keyframes obsah-prichod{
-  from{opacity:0;transform:translateY(8px)}
+
+/* průprava: tři stránky, ťuknutím nebo švihem dál, Přeskočit pořád na očích */
+.uvod-vrstva{
+  position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top) + 20px) 26px calc(env(safe-area-inset-bottom) + 24px);
+  background:var(--podklad);touch-action:pan-y;
+  animation:zjevit .3s var(--krok);
+}
+/* dokud svítí logo z index.html, je vrstva průhledná a nepřekáží */
+.uvod-vrstva.pod-logem{background:transparent;pointer-events:none;animation:none}
+.uvod-preskocit{
+  position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:14px;
+  min-height:44px;padding:0 16px;border-radius:var(--pilulka);pointer-events:auto;
+  font-family:var(--ovladani);font-size:14px;color:var(--text-3);
+}
+.uvod-stranka{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  max-width:360px;margin:auto 0;
+}
+.uvod-ikona{color:var(--text);animation:uvod-ikona .5s var(--krok) both}
+.uvod-nadpis{margin-top:26px;font-size:clamp(28px,8.4vw,38px);line-height:.98;
+  letter-spacing:-.02em;animation:uvod-text .45s .08s var(--krok) both}
+.uvod-text{margin-top:14px;font-size:17px;color:var(--text-2);
+  animation:uvod-text .45s .16s var(--krok) both}
+.uvod-spodek{display:flex;flex-direction:column;align-items:center;gap:22px;width:100%;
+  max-width:320px}
+.uvod-tecky{display:flex;gap:6px}
+.uvod-tecka{width:26px;height:3px;border-radius:2px;background:var(--linka);
+  transition:background .25s var(--krok)}
+.uvod-tecka.bylo{background:var(--text-3)}
+.uvod-tecka.ted{background:var(--text)}
+@keyframes uvod-ikona{
+  from{opacity:0;transform:scale(.7) rotate(-6deg)}
   to{opacity:1;transform:none}
 }
-@media (prefers-reduced-motion:reduce){
-  #uvod img[data-nacteno],#uvod.odchazi img,.obrazovka{animation:none}
-  #uvod img{opacity:1}
+@keyframes uvod-text{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:none}
 }
 
 /* odměna po zápisu */
@@ -475,8 +509,12 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  #uvod img{opacity:1}
+  .hero-pas{scroll-behavior:auto}
 }
 @media (min-width:600px){
   body{background:#040806}
   .app{min-height:100dvh;box-shadow:0 0 0 1px rgba(239,235,224,.05)}
+  /* na širší obrazovce se vejde celá karta i náhled další */
+  .hero{flex-basis:calc(100% - 56px)}
 }

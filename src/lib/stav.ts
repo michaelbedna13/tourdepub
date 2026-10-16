@@ -1,12 +1,72 @@
 // Stav hry: týmy, hospody, úkoly a kdo má co splněno.
-// Hospody i úkoly jsou editovatelné, proto si stav drží vlastní kopii; data.js je jen
+// Hospody i úkoly jsou editovatelné, proto si stav drží vlastní kopii; data.ts je jen
 // výchozí sada, ze které se to poprvé naplní.
 // Ukládá se do telefonu (localStorage) a volitelně do Supabase, aby ostatní viděli skóre
 // živě. Telefon je vždycky zdroj pravdy – bez signálu se zapisuje dál a pošle se to potom.
-import { VYCHOZI_HOSPODY, VYCHOZI_UKOLY } from "./data.js";
+//
+// Je to jeden měnitelný objekt, ne stav v Reactu: zapisuje se do něj odkudkoli
+// (z obrazovek, ze synchronizace, z posluchače „online") a obrazovky se na něj
+// přihlásí přes useStav(). Kopírovat při každé čárce celý stav by tu bylo k ničemu.
+import { useSyncExternalStore } from "react";
+import { VYCHOZI_HOSPODY, VYCHOZI_UKOLY, type Hospoda, type Ukol } from "./data";
 
 const KLIC = "tourdepub";
 const VERZE = 2;
+
+/** Jedna parta: jak se jmenuje, kde stojí a co má zapsané. */
+export interface Tym {
+  id: string;
+  nazev: string;
+  barva: string;
+  /** Pracoval s týmem někdo doopravdy? Nepoužívaný se na server neposílá. */
+  vlastni: boolean;
+  /** Razítko poslední změny – rozhoduje při slučování se serverem. */
+  upraveno: string | null;
+  /** Byl tým někdy vidět na serveru? Když odtud zmizí, zmizí i tady. */
+  bylNaServeru: boolean;
+  /** Id hospody, ve které parta zrovna stojí. */
+  hospoda: string | null;
+  /** Id hospody → jsme tam byli. */
+  prichod: Record<string, boolean>;
+  /** Id hospody → škopek padl. */
+  skopek: Record<string, boolean>;
+  /** Id úkolu → kolikrát splněno. */
+  ukoly: Record<string, number>;
+  /** Id hospody → odsud už parta něco šlohla (Brněnskej zloděj). */
+  zlodej: Record<string, boolean>;
+}
+
+export interface Stav {
+  verze: number;
+  tymy: Tym[];
+  /** Za který tým se na tomhle telefonu zapisuje. */
+  tymId: string;
+  hospody: Hospoda[];
+  ukoly: Ukol[];
+}
+
+/** Co se o týmu posílá na server. */
+export interface RadekTymu {
+  id: string;
+  nazev: string;
+  barva: string;
+  hospoda: number;
+  body: number;
+  rozpad: Rozpad;
+  stav: Pick<Tym, "hospoda" | "prichod" | "skopek" | "ukoly" | "zlodej">;
+  upraveno: string;
+}
+
+export interface Rozpad {
+  dochazka: number;
+  skopky: number;
+  ukoly: number;
+  splneno: number;
+  makacky: number;
+}
+
+/** Druhy čárek, které se nabíhají v každé špeluňce. */
+export type Zaklad = "prichod" | "skopek";
 
 // Barvy týmů. Vybrané tak, aby se na skoro černé zeleni nepletly mezi sebou
 // ani s barvami obtížnosti úkolu (mint, zlatá, korál).
@@ -16,22 +76,22 @@ const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.rand
 
 /** `vlastni` říká, jestli s týmem někdo opravdu pracoval. Tým, co si appka
  *  založila sama při prvním spuštění a nikdo ho nepojmenoval ani s ním nehrál,
- *  se na server neposílá — jinak by se v pořadí objevila „Naše parta" z každého
+ *  se na server neposílá — jinak by se v pořadí objevila „Naše parta“ z každého
  *  telefonu i prohlížeče, který web jen otevřel. */
-export function novyTym(nazev = "", barva = BARVY[0], vlastni = true) {
+export function novyTym(nazev = "", barva = BARVY[0], vlastni = true): Tym {
   return { id: noveId(), nazev, barva, vlastni, upraveno: null, bylNaServeru: false,
            hospoda: null, prichod: {}, skopek: {}, ukoly: {}, zlodej: {} };
 }
 
 /** Označí tým za používaný a orazítkuje změnu.
  *  Razítko rozhoduje při slučování se serverem, čí verze je novější. */
-function dotknuto(t) {
+function dotknuto(t: Tym | undefined) {
   if (!t) return;
   t.vlastni = true;
   t.upraveno = new Date().toISOString();
 }
 
-function prazdnyStav() {
+function prazdnyStav(): Stav {
   // false: dokud ho nikdo nepojmenuje ani s ním nezahraje, zůstane jen tady
   const t = novyTym("Naše parta", BARVY[0], false);
   t.hospoda = VYCHOZI_HOSPODY[0].id;
@@ -44,10 +104,12 @@ function prazdnyStav() {
   };
 }
 
-export const stav = nacti();
+/** Co se dá vyčíst z localStorage. Může to být i stav z dřívější verze,
+ *  tak se na to kouká jako na neznámý objekt a tvar se dorovná níž. */
+type Ulozeno = Record<string, any>;
 
-function nacti() {
-  let ulozeno = null;
+function nacti(): Stav {
+  let ulozeno: Ulozeno | null = null;
   try {
     ulozeno = JSON.parse(localStorage.getItem(KLIC) || "null");
   } catch {
@@ -68,7 +130,7 @@ function nacti() {
     return { ...prazdnyStav(), tymy: [t], tymId: t.id };
   }
 
-  const z = { ...prazdnyStav(), ...ulozeno };
+  const z: Stav = { ...prazdnyStav(), ...(ulozeno as Stav) };
   if (!z.tymy?.length) {
     const t = novyTym("Naše parta", BARVY[0]);
     z.tymy = [t];
@@ -89,19 +151,29 @@ function nacti() {
   return z;
 }
 
+export const stav: Stav = nacti();
+
 /** Každý tým musí stát v nějaké existující hospodě. Tým se štací null (nový tým)
  *  nebo štací, která se mezitím smazala, by neměl kam zapsat čárku a zápis by tiše propadl. */
-function srovnejStace(z) {
+function srovnejStace(z: Stav) {
   const prvni = z.hospody[0]?.id || null;
   for (const t of z.tymy) {
     if (!t.hospoda || !z.hospody.some((h) => h.id === t.hospoda)) t.hospoda = prvni;
   }
 }
 
-const posluchaci = new Set();
-export const naZmenu = (f) => (posluchaci.add(f), () => posluchaci.delete(f));
+const posluchaci = new Set<() => void>();
+export function naZmenu(f: () => void) {
+  posluchaci.add(f);
+  return () => posluchaci.delete(f);
+}
+
+// Číslo verze stavu. React se podle něj dozví, že se něco změnilo – kdyby
+// snímek byl sám objekt stavu, nepoznal by to, protože se mění zevnitř.
+let revize = 0;
 
 export function uloz() {
+  revize++;
   try {
     localStorage.setItem(KLIC, JSON.stringify(stav));
   } catch {
@@ -110,11 +182,17 @@ export function uloz() {
   posluchaci.forEach((f) => f());
 }
 
+/** Přihlásí obrazovku na změny stavu. Vrací ten jeden a jediný stav. */
+export function useStav(): Stav {
+  useSyncExternalStore(naZmenu, () => revize, () => revize);
+  return stav;
+}
+
 /* ---------- týmy ---------- */
 
-export const tym = () => stav.tymy.find((t) => t.id === stav.tymId) || stav.tymy[0];
+export const tym = (): Tym | undefined => stav.tymy.find((t) => t.id === stav.tymId) || stav.tymy[0];
 
-export function pridejTym(nazev, barva) {
+export function pridejTym(nazev: string, barva?: string | null): Tym {
   const t = novyTym(nazev, barva || BARVY[stav.tymy.length % BARVY.length]);
   t.hospoda = stav.hospody[0]?.id || null;
   t.upraveno = new Date().toISOString();
@@ -123,15 +201,16 @@ export function pridejTym(nazev, barva) {
   return t;
 }
 
-export function upravTym(id, zmeny) {
+export function upravTym(id: string, zmeny: Partial<Pick<Tym, "nazev" | "barva">>) {
   const t = stav.tymy.find((x) => x.id === id);
   if (!t) return;
-  Object.assign(t, zmeny);
+  if (zmeny.nazev !== undefined) t.nazev = zmeny.nazev;
+  if (zmeny.barva !== undefined) t.barva = zmeny.barva;
   dotknuto(t); // pojmenovaný tým už patří ostatním na oči
   uloz();
 }
 
-export function smazTym(id) {
+export function smazTym(id: string): boolean {
   if (stav.tymy.length <= 1) return false; // poslední tým nemažeme, hra by neměla za koho zapisovat
   stav.tymy = stav.tymy.filter((t) => t.id !== id);
   if (stav.tymId === id) stav.tymId = stav.tymy[0].id;
@@ -139,7 +218,7 @@ export function smazTym(id) {
   return true;
 }
 
-export function prepniTym(id) {
+export function prepniTym(id: string) {
   if (!stav.tymy.some((t) => t.id === id)) return;
   stav.tymId = id;
   uloz();
@@ -147,41 +226,41 @@ export function prepniTym(id) {
 
 /* ---------- hospody ---------- */
 
-export const hospodaTed = (t = tym()) =>
+export const hospodaTed = (t = tym()): Hospoda | null =>
   stav.hospody.find((h) => h.id === t?.hospoda) || stav.hospody[0] || null;
 
-export const indexHospody = (t = tym()) => {
+export const indexHospody = (t = tym()): number => {
   const i = stav.hospody.findIndex((h) => h.id === t?.hospoda);
   return i < 0 ? 0 : i;
 };
 
-export function nastavHospodu(id) {
+export function nastavHospodu(id: string) {
   const t = tym();
-  if (!t) return;
+  if (!t || t.hospoda === id) return;
   dotknuto(t);
   t.hospoda = id;
   uloz();
 }
 
-export function posunHospodu(o) {
-  const i = indexHospody(), cil = stav.hospody[i + o];
+export function posunHospodu(o: number) {
+  const cil = stav.hospody[indexHospody() + o];
   if (cil) nastavHospodu(cil.id);
 }
 
-export function pridejHospodu(nazev) {
+export function pridejHospodu(nazev: string) {
   stav.hospody.push({ id: noveId(), nazev: nazev.trim().slice(0, 60) || "Nová špeluňka" });
   srovnejStace(stav);
   uloz();
 }
 
-export function upravHospodu(id, nazev) {
+export function upravHospodu(id: string, nazev: string) {
   const h = stav.hospody.find((x) => x.id === id);
   if (!h) return;
   h.nazev = nazev.trim().slice(0, 60) || h.nazev;
   uloz();
 }
 
-export function smazHospodu(id) {
+export function smazHospodu(id: string): boolean {
   if (stav.hospody.length <= 1) return false;
   stav.hospody = stav.hospody.filter((h) => h.id !== id);
   // zápisy k té hospodě i štace týmů, co v ní stály, musí jít s ní
@@ -195,8 +274,9 @@ export function smazHospodu(id) {
   return true;
 }
 
-export function posunHospoduVPoradi(id, o) {
-  const i = stav.hospody.findIndex((h) => h.id === id), j = i + o;
+export function posunHospoduVPoradi(id: string, o: number) {
+  const i = stav.hospody.findIndex((h) => h.id === id);
+  const j = i + o;
   if (i < 0 || j < 0 || j >= stav.hospody.length) return;
   const [h] = stav.hospody.splice(i, 1);
   stav.hospody.splice(j, 0, h);
@@ -205,30 +285,44 @@ export function posunHospoduVPoradi(id, o) {
 
 /* ---------- úkoly ---------- */
 
-export const ukolPodleId = (id) => stav.ukoly.find((u) => u.id === id);
+export const ukolPodleId = (id: string): Ukol | undefined => stav.ukoly.find((u) => u.id === id);
 
-export function pridejNovyUkol(data) {
-  const u = {
+/** Co přijde z formuláře úkolu. */
+export interface KonceptUkolu {
+  kat?: string;
+  nazev?: string;
+  popis?: string;
+  piva?: number;
+  max?: number;
+}
+
+const vObtiznost = (n: unknown): 1 | 2 | 3 =>
+  (Math.min(3, Math.max(1, Math.round(Number(n) || 1))) as 1 | 2 | 3);
+
+export function pridejNovyUkol(data: KonceptUkolu): Ukol {
+  const piva = vObtiznost(data.piva);
+  const max = Math.min(20, Math.max(1, Number(data.max) || 1));
+  const u: Ukol = {
     id: noveId(),
     kat: data.kat || "kecy",
     nazev: (data.nazev || "").trim().slice(0, 80) || "Nový úkol",
     popis: (data.popis || "").trim().slice(0, 400),
-    piva: Math.min(3, Math.max(1, +data.piva || 1)),
-    max: Math.min(20, Math.max(1, +data.max || 1)),
+    piva,
+    // u jednorázových je hodnota rovna obtížnosti, u opakovatelných je čárka za kus
+    body: max > 1 ? 1 : piva,
+    max,
     vlastni: true,
   };
-  // u jednorázových je hodnota rovna obtížnosti, u opakovatelných je čárka za kus
-  u.body = u.max > 1 ? 1 : u.piva;
   stav.ukoly.push(u);
   uloz();
   return u;
 }
 
-export function upravUkol(id, zmeny) {
+export function upravUkol(id: string, zmeny: KonceptUkolu) {
   const u = ukolPodleId(id);
   if (!u) return;
-  if (zmeny.piva != null) u.piva = Math.min(3, Math.max(1, +zmeny.piva));
-  if (zmeny.max != null) u.max = Math.min(20, Math.max(1, +zmeny.max));
+  if (zmeny.piva != null) u.piva = vObtiznost(zmeny.piva);
+  if (zmeny.max != null) u.max = Math.min(20, Math.max(1, Number(zmeny.max) || 1));
   if (zmeny.nazev != null) u.nazev = zmeny.nazev.trim().slice(0, 80) || u.nazev;
   if (zmeny.popis != null) u.popis = zmeny.popis.trim().slice(0, 400);
   if (zmeny.kat != null) u.kat = zmeny.kat;
@@ -238,7 +332,7 @@ export function upravUkol(id, zmeny) {
   uloz();
 }
 
-export function smazUkol(id) {
+export function smazUkol(id: string) {
   stav.ukoly = stav.ukoly.filter((u) => u.id !== id);
   for (const t of stav.tymy) delete t.ukoly[id];
   uloz();
@@ -246,7 +340,7 @@ export function smazUkol(id) {
 
 /* ---------- bodování ---------- */
 
-export function body(t = tym()) {
+export function body(t = tym()): number {
   if (!t) return 0;
   const zaDochazku = Object.values(t.prichod).filter(Boolean).length;
   const zaSkopky = Object.values(t.skopek).filter(Boolean).length;
@@ -257,7 +351,7 @@ export function body(t = tym()) {
   return zaDochazku + zaSkopky + zaUkoly;
 }
 
-export function rozpad(t = tym()) {
+export function rozpad(t = tym()): Rozpad {
   if (!t) return { dochazka: 0, skopky: 0, ukoly: 0, splneno: 0, makacky: 0 };
   return {
     dochazka: Object.values(t.prichod).filter(Boolean).length,
@@ -277,14 +371,25 @@ export function strop() {
   return { hospody: stav.hospody.length, ukoly: zaUkoly, celkem: stav.hospody.length * 2 + zaUkoly };
 }
 
+/** Pořadí všech týmů podle čárek. Po sloučení se serverem jsou všechny místní,
+ *  takže jdou upravovat odkudkoli. */
+export function poradiTymu() {
+  return stav.tymy
+    .map((t) => ({
+      id: t.id, nazev: t.nazev || "Bez názvu", barva: t.barva, body: body(t),
+      rozpad: rozpad(t), hospoda: indexHospody(t) + 1,
+    }))
+    .sort((a, b) => b.body - a.body || b.rozpad.makacky - a.rozpad.makacky);
+}
+
 /* ---------- co kde jde ---------- */
 
 /** Jestli úkol v téhle štaci vůbec jde splnit. Vrací i důvod, proč ne. */
-export function dostupnost(u, t = tym()) {
+export function dostupnost(u: Ukol, t = tym()): { jde: boolean; duvod?: string } {
   const kde = t?.hospoda;
   // Omezení se píše pořadím štace, ne názvem hospody. Čeština by názvy musela
-  // skloňovat („mezi Zastávkou a U Ričího") a to automaticky nejde.
-  const cislo = (id) => stav.hospody.findIndex((x) => x.id === id) + 1;
+  // skloňovat („mezi Zastávkou a U Ričího“) a to automaticky nejde.
+  const cislo = (id: string) => stav.hospody.findIndex((x) => x.id === id) + 1;
   if (u.hospoda) {
     const c = cislo(u.hospoda);
     if (!c) return { jde: true }; // hospoda byla smazaná, omezení tím padá
@@ -293,50 +398,55 @@ export function dostupnost(u, t = tym()) {
   if (u.mezi) {
     const c = u.mezi.map(cislo).filter(Boolean);
     if (c.length < 2) return { jde: true };
-    if (!u.mezi.includes(kde)) return { jde: false, duvod: `Jen mezi ${c[0]}. a ${c[1]}. štací` };
+    if (!kde || !u.mezi.includes(kde)) return { jde: false, duvod: `Jen mezi ${c[0]}. a ${c[1]}. štací` };
   }
   return { jde: true };
 }
 
-export const kolikrat = (id, t = tym()) => t?.ukoly[id] || 0;
+export const kolikrat = (id: string, t = tym()): number => t?.ukoly[id] || 0;
 
-export function jdePridat(u, t = tym()) {
+export function jdePridat(u: Ukol, t = tym()): boolean {
   if (!t) return false;
   if (!dostupnost(u, t).jde) return false;
   if (kolikrat(u.id, t) >= u.max) return false;
-  if (u.jednouZaHospodu && t.zlodej[t.hospoda]) return false;
+  if (u.jednouZaHospodu && t.hospoda && t.zlodej[t.hospoda]) return false;
   return true;
 }
 
 /* ---------- zápisy ---------- */
 
-export function prepniZaklad(druh) {
-  const t = tym(), kde = t?.hospoda;
-  if (!t || !kde) return false;
+/** Zapíše nebo smaže čárku za špeluňku / škopek. `kde` je id hospody; bez něj
+ *  se bere ta, ve které tým zrovna stojí. Hero karta ho posílá vždycky,
+ *  ať se ťuknutí doprostřed švihu nezapíše vedle. */
+export function prepniZaklad(druh: Zaklad, kde?: string): boolean {
+  const t = tym();
+  const h = kde || t?.hospoda;
+  if (!t || !h) return false;
   dotknuto(t);
-  t[druh][kde] = !t[druh][kde];
-  if (!t[druh][kde]) delete t[druh][kde];
+  if (t[druh][h]) delete t[druh][h];
+  else t[druh][h] = true;
   uloz();
-  return !!t[druh][kde];
+  return !!t[druh][h];
 }
 
-export function pridejUkol(u) {
+export function pridejUkol(u: Ukol): boolean {
   const t = tym();
-  if (!jdePridat(u, t)) return false;
+  if (!t || !jdePridat(u, t)) return false;
   dotknuto(t);
   t.ukoly[u.id] = kolikrat(u.id, t) + 1;
-  if (u.jednouZaHospodu) t.zlodej[t.hospoda] = true;
+  if (u.jednouZaHospodu && t.hospoda) t.zlodej[t.hospoda] = true;
   uloz();
   return true;
 }
 
-export function uberUkol(u) {
-  const t = tym(), ted = kolikrat(u.id, t);
-  if (ted <= 0) return false;
+export function uberUkol(u: Ukol): boolean {
+  const t = tym();
+  const ted = kolikrat(u.id, t);
+  if (!t || ted <= 0) return false;
   dotknuto(t);
   t.ukoly[u.id] = ted - 1;
   if (t.ukoly[u.id] === 0) delete t.ukoly[u.id];
-  if (u.jednouZaHospodu && t.zlodej[t.hospoda]) delete t.zlodej[t.hospoda];
+  if (u.jednouZaHospodu && t.hospoda && t.zlodej[t.hospoda]) delete t.zlodej[t.hospoda];
   uloz();
   return true;
 }
@@ -353,7 +463,7 @@ export function vynulujTym(id = stav.tymId) {
 
 /** Co se o týmu posílá ostatním. Posílá se celý stav, ne jen výsledek —
  *  jinak by tým šlo upravovat jenom na telefonu, kde vznikl. */
-export function kOdeslani(t) {
+export function kOdeslani(t: Tym): RadekTymu {
   return {
     id: t.id,
     nazev: t.nazev || "Bezejmenná parta",
@@ -369,7 +479,7 @@ export function kOdeslani(t) {
 
 /** Sloučí týmy ze serveru do místních. Novější razítko vyhrává; tým, který
  *  ze serveru zmizel, zmizí i tady, pokud tam někdy byl. */
-export function slucZeServeru(radky) {
+export function slucZeServeru(radky: RadekTymu[]) {
   const naServeru = new Set(radky.map((r) => r.id));
 
   for (const r of radky) {

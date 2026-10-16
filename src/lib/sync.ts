@@ -1,46 +1,78 @@
 // Živé pořadí přes Supabase. Je to doplněk, ne podmínka: bez nastavení (nebo bez signálu)
 // hra běží dál z telefonu a v Týmech jsou vidět jen ty místní.
-// Klient se stahuje až když je co připojovat, aby web bez nastavení nenačítal nic zvenku.
-import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni.js";
-import { stav, naZmenu, kOdeslani, slucZeServeru } from "./stav.js";
+// Klient se nahrává až když je co připojovat (dynamický import), ať se kvůli něčemu,
+// co nemusí být zapnuté, nestahuje ke každému spuštění sto kilobajtů.
+import { useSyncExternalStore } from "react";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni";
+import { stav, naZmenu, kOdeslani, slucZeServeru, type RadekTymu } from "./stav";
 
-let klient = null;
-let rezim = "ukazka"; // ukazka | pripojuji | zivo | chyba
-let naposledy = [];
-let prekresli = () => {};
+/** ukazka = jen tenhle telefon · pripojuji · zivo · chyba = nepodařilo se */
+export type Rezim = "ukazka" | "pripojuji" | "zivo" | "chyba";
+
+export interface StavSyncu {
+  rezim: Rezim;
+  /** Kolik řádků stojí na serveru. */
+  pocet: number;
+  chyba: string;
+  /** Bez signálu to není špatné nastavení, jen se nemá kam připojit. */
+  offline: boolean;
+}
+
+let klient: SupabaseClient | null = null;
+let rezim: Rezim = "ukazka";
+let naposledy: RadekTymu[] = [];
 let cekaZapis = false;
 let chyba = "";
 
-export const stavSyncu = () => ({
+let revize = 0;
+const posluchaci = new Set<() => void>();
+function zmena() {
+  revize++;
+  posluchaci.forEach((f) => f());
+}
+
+export const stavSyncu = (): StavSyncu => ({
   rezim,
   pocet: naposledy.length,
   chyba,
-  // bez signálu to není špatné nastavení, jen se nemá kam připojit
   offline: typeof navigator !== "undefined" && navigator.onLine === false,
 });
-/** Po sloučení jsou všechny týmy místní, tohle zůstává jen kvůli počtu. */
-export const ostatniTymy = () => [];
 
-export async function spustSync(naZmenuPohledu) {
-  prekresli = naZmenuPohledu;
+/** Přihlásí obrazovku na změny připojení. */
+export function useSync(): StavSyncu {
+  useSyncExternalStore(
+    (f) => { posluchaci.add(f); return () => posluchaci.delete(f); },
+    () => revize,
+    () => revize,
+  );
+  return stavSyncu();
+}
+
+let spusteno = false;
+
+export async function spustSync() {
+  if (spusteno) return;
+  spusteno = true;
   if (!SUPABASE_URL || !SUPABASE_KEY) return; // ukázkový režim
 
   rezim = "pripojuji";
-  prekresli();
+  zmena();
   try {
-    const { createClient } = await nactiKlienta();
+    const { createClient } = await import("@supabase/supabase-js");
     klient = createClient(SUPABASE_URL, SUPABASE_KEY);
     // První čtení musí projít, jinak bychom se tvářili připojeně a nic by se nesdílelo.
     // Typicky tu spadne chybějící tabulka nebo špatný klíč – to se musí poznat.
     if (!(await nacti())) {
       rezim = "chyba";
-      prekresli();
+      zmena();
       return;
     }
     await posli();
     klient
       .channel(`tourdepub-${HRA}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: TABULKA, filter: `hra=eq.${HRA}` }, nacti)
+      .on("postgres_changes", { event: "*", schema: "public", table: TABULKA, filter: `hra=eq.${HRA}` },
+          () => { nacti(); })
       .subscribe();
     rezim = "zivo";
     naZmenu(posliOpatrne);
@@ -50,26 +82,7 @@ export async function spustSync(naZmenuPohledu) {
     chyba = popisChyby(e);
     rezim = "chyba"; // nevadí, hra funguje dál lokálně
   }
-  prekresli();
-}
-
-// Verze musí umět nový formát klíče (sb_publishable_…). Starší klient ho nepozná
-// a připojení selže. Drž ji stejnou, jakou má osobní aplikace (untrois).
-const VERZE_KLIENTA = "2.117.2";
-const CDN = [
-  `https://esm.sh/@supabase/supabase-js@${VERZE_KLIENTA}`,
-  `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@${VERZE_KLIENTA}/+esm`,
-];
-
-/** Stáhne klienta. Když první CDN nejede, zkusí druhé — na jedné adrese
- *  by celé živé pořadí viselo zbytečně. */
-async function nactiKlienta() {
-  let posledni;
-  for (const adresa of CDN) {
-    try { return await import(/* @vite-ignore */ adresa); }
-    catch (e) { posledni = e; }
-  }
-  throw new Error("Nepodařilo se stáhnout klienta Supabase: " + popisChyby(posledni));
+  zmena();
 }
 
 /** Zapisovat při každém ťuknutí by bylo zbytečně často, tak se to slučuje. */
@@ -79,7 +92,7 @@ function posliOpatrne() {
   setTimeout(() => { cekaZapis = false; posli(); }, 700);
 }
 
-async function posli() {
+async function posli(): Promise<boolean> {
   if (!klient) return false;
   try {
     // Posílají se jen týmy, se kterými někdo opravdu pracuje. Tým, co si appka
@@ -94,58 +107,61 @@ async function posli() {
   }
 }
 
-async function nacti() {
+async function nacti(): Promise<boolean> {
   if (!klient) return false;
   try {
     const { data, error } = await klient.from(TABULKA).select("*").eq("hra", HRA);
     if (error) throw error;
-    naposledy = data || [];
-    slucZeServeru(naposledy); // uloz() uvnitř překreslí
+    naposledy = (data || []) as RadekTymu[];
+    slucZeServeru(naposledy); // uloz() uvnitř překreslí obrazovky
     chyba = "";
+    zmena();
     return true;
   } catch (e) {
     chyba = popisChyby(e);
-    prekresli();
+    zmena();
     return false; // ponecháme poslední známé pořadí
   }
 }
 
 /** Supabase vrací kód i radu, a ty rozhodnou, co je špatně. Samotné „Failed to
- *  fetch" nestačí na nic. Nejčastější případy rovnou přeložíme do rady,
+ *  fetch“ nestačí na nic. Nejčastější případy rovnou přeložíme do rady,
  *  co s tím, ať se nemusí luštit anglická hláška v hospodě. */
-function popisChyby(e) {
+function popisChyby(e: unknown): string {
   if (!e) return "neznámá chyba";
-  const kod = e.code || "";
-  const zprava = e.message || String(e);
+  const o = e as { code?: string; message?: string; hint?: string; details?: string };
+  const kod = o.code || "";
+  const zprava = o.message || String(e);
 
   // tabulka v projektu není
   if (kod === "PGRST205" || kod === "42P01" || /schema cache|does not exist/i.test(zprava))
-    return `Tabulka „${TABULKA}" v projektu není. Spusť v Supabase SQL Editoru obsah supabase/party.sql.`;
+    return `Tabulka „${TABULKA}“ v projektu není. Spusť v Supabase SQL Editoru obsah supabase/party.sql.`;
   // klíč neplatí nebo je starý
   if (kod === "PGRST301" || kod === "401" || /JWT|api key|Invalid authentication/i.test(zprava))
-    return "Klíč neplatí. Zkontroluj SUPABASE_KEY v nastaveni.js proti Settings → API v Supabase.";
+    return "Klíč neplatí. Zkontroluj SUPABASE_KEY v src/lib/nastaveni.ts proti Settings → API v Supabase.";
   // čtení zakázané pravidly
   if (kod === "42501" || /row-level security|permission denied/i.test(zprava))
-    return `Pravidla (RLS) nepouští ke čtení. Spusť v Supabase znovu část se zásadami z supabase/party.sql.`;
+    return "Pravidla (RLS) nepouští ke čtení. Spusť v Supabase znovu část se zásadami z supabase/party.sql.";
   // adresa projektu
   if (/Failed to fetch|NetworkError|ERR_NAME_NOT_RESOLVED/i.test(zprava))
-    return "Nedá se spojit se Supabase. Zkontroluj SUPABASE_URL v nastaveni.js, nebo nemáš signál.";
+    return "Nedá se spojit se Supabase. Zkontroluj SUPABASE_URL v src/lib/nastaveni.ts, nebo nemáš signál.";
 
-  const kusy = [];
+  const kusy: string[] = [];
   if (kod) kusy.push(kod);
   kusy.push(zprava);
-  if (e.hint) kusy.push("Rada: " + e.hint);
-  if (e.details) kusy.push(e.details);
+  if (o.hint) kusy.push("Rada: " + o.hint);
+  if (o.details) kusy.push(o.details);
   return kusy.join(" · ");
 }
 
-/** Smaže tým i ze serveru. Bez toho by se po smazání vrátil zpátky jako „cizí"
+/** Smaže tým i ze serveru. Bez toho by se po smazání vrátil zpátky jako „cizí“
  *  tým z jiného telefonu a strašil by v pořadí dál. */
-export async function smazTymZeServeru(id) {
+export async function smazTymZeServeru(id: string) {
   if (!klient) return;
   try {
     await klient.from(TABULKA).delete().eq("id", id);
     naposledy = naposledy.filter((t) => t.id !== id);
+    zmena();
   } catch {
     // nevadí, místní stav je už bez něj
   }
@@ -156,5 +172,6 @@ export async function zkusZnovu() {
   klient = null;
   rezim = "ukazka";
   chyba = "";
-  await spustSync(prekresli);
+  spusteno = false;
+  await spustSync();
 }

@@ -1,6 +1,7 @@
-// Stáhne Bevan a Outfit z Google Fonts do pisma/, aby web fungoval offline
-// a nic se nenačítalo z Googlu. Subsety se poznají podle unicode-range, ne podle
-// pořadí – Bevan jich má tři (vietnamese, latin-ext, latin) a snadno se splete.
+// Stáhne písma z Google Fonts do src/assets/fonts/, aby se nic nenačítalo z Googlu
+// a appka šla i bez signálu. Subsety se poznají podle unicode-range, ne podle
+// pořadí – některá písma jich mají tři (vietnamese, latin-ext, latin) a snadno se splete:
+// vzít první dva by znamenalo web bez Č, Ř, Š a Ů.
 // Spuštění: node scripts/stahni-pisma.mjs
 import { writeFileSync, mkdirSync } from "node:fs";
 
@@ -17,7 +18,7 @@ const CHCI = [
   ["Outfit", 600, "outfit-600"],
 ];
 
-mkdirSync(new URL("../pisma/", import.meta.url), { recursive: true });
+mkdirSync(new URL("../src/assets/fonts/", import.meta.url), { recursive: true });
 
 for (const [rodina, vaha, zaklad] of CHCI) {
   const css = await (await fetch(
@@ -35,7 +36,7 @@ for (const [rodina, vaha, zaklad] of CHCI) {
     if (!druh) continue;
     const data = Buffer.from(await (await fetch(url, { headers: { "User-Agent": UA } })).arrayBuffer());
     const soubor = `${zaklad}-${druh}.woff2`;
-    writeFileSync(new URL(`../pisma/${soubor}`, import.meta.url), data);
+    writeFileSync(new URL(`../src/assets/fonts/${soubor}`, import.meta.url), data);
     console.log(soubor.padEnd(22), String(data.length).padStart(6), "B");
   }
 }

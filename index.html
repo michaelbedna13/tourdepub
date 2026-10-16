@@ -2,75 +2,58 @@
 <html lang="cs">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Tour de Pub — Brno edition</title>
 <meta name="description" content="Zapisování čárek při Tour de Pub: devět brněnskejch špeluněk, úkoly a pořadí part.">
 <meta name="theme-color" content="#070E0A">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tour de Pub">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="ikona.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="ikona-180.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/ikona.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/ikona-180.png">
 <!-- Úvodní obrazovky pro appku na ploše iPhonu. Bez nich ukáže iOS při
      spuštění jen prázdnou barvu. Generuje scripts/uvodni-obrazovky.mjs. -->
-<link rel="apple-touch-startup-image" href="uvodni/320x568@2x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/320x568@2x.png"
   media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/375x667@2x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/375x667@2x.png"
   media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/414x736@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/414x736@3x.png"
   media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/375x812@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/375x812@3x.png"
   media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/414x896@2x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/414x896@2x.png"
   media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/414x896@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/414x896@3x.png"
   media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/390x844@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/390x844@3x.png"
   media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/428x926@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/428x926@3x.png"
   media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/393x852@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/393x852@3x.png"
   media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/430x932@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/430x932@3x.png"
   media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/402x874@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/402x874@3x.png"
   media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="uvodni/440x956@3x.png"
+<link rel="apple-touch-startup-image" href="/uvodni/440x956@3x.png"
   media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <style>
-  /* Rovnou v hlavičce, ne ve stylu: než se stáhne styl.css, kreslí prohlížeč
+  /* Rovnou v hlavičce, ne ve stylu: než se stáhne app.css, kreslí prohlížeč
      bílou a na tmavé appce to zabliká. Tohle platí od prvního vykreslení. */
   html,body{background:#070E0A;margin:0}
+  /* Úvodní obrazovka s logem. Je rovnou ve stránce, ne z Reactu, aby naskočila
+     hned a navázala na tu, kterou ukazuje iOS při spuštění z plochy.
+     Odklidí ji <Uvod> (src/components/Uvod.tsx), až doběhne. */
   #uvod{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#070E0A}
   #uvod img{width:52vw;max-width:260px;height:auto;display:block;opacity:0}
 </style>
-<link rel="stylesheet" href="styl.css">
 </head>
 <body>
-<!-- Úvodní obrazovka. Je rovnou ve stránce, ne z JS, aby naskočila hned
-     a navázala na tu, kterou ukazuje iOS při spuštění z plochy. -->
-<div id="uvod"><img src="logo-uvodni.svg" alt="Tour de Pub" width="450" height="359"
+<div id="uvod"><img src="/logo-uvodni.svg" alt="Tour de Pub" width="450" height="359"
   onload="this.dataset.nacteno=1" onerror="this.dataset.nacteno=1"></div>
-
-<div class="app">
-  <!-- Překresluje se jen obsah obrazovky. Lišta stojí mimo, jinak by při
-       každém zápisu zmizela a objevila se znovu. -->
-  <div id="obrazovka"></div>
-</div>
-<div class="lista-obal"><nav class="lista" id="lista" aria-label="Hlavní"></nav></div>
-<div id="okno"></div>
-<script type="module" src="app.js"></script>
-<script>
-  // Dřív tu byl service worker kvůli běhu bez signálu. V hospodách na trase
-  // signál je, takže nic nepřinášel a jen bránil tomu, aby se nová verze
-  // dostala do telefonu. Tohle po něm uklidí na zařízeních, kde ještě zůstal.
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations()
-      .then((r) => r.forEach((x) => x.unregister()))
-      .catch(() => {});
-    if (window.caches) caches.keys().then((k) => k.forEach((x) => caches.delete(x))).catch(() => {});
-  }
-</script>
+<div id="app"></div>
+<script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

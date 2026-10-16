@@ -9,8 +9,8 @@ const PODKLAD = "#070E0A";
 const KRESBA = "#EFEBE0";
 const pullitr = process.argv.includes("--pullitr");
 
-const logo = readFileSync(new URL("../logo.svg", import.meta.url), "utf8");
-const { IKONY } = await import("../ikony.js");
+const logo = readFileSync(new URL("../public/logo.svg", import.meta.url), "utf8");
+const { IKONY } = await import("../src/lib/ikony.ts");
 const maskaPullitr = IKONY.piva
   .map(([d, p]) => `<path d="${p}" fill="${d === "i" ? "#fff" : "#000"}"/>`).join("");
 const pullitrSvg = `<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block">
@@ -37,14 +37,14 @@ for (const [soubor, px, podil] of [
   const p = await b.newPage({ viewport: { width: px, height: px }, deviceScaleFactor: 1 });
   await p.setContent(stranka(podil));
   await p.waitForTimeout(80);
-  await p.screenshot({ path: new URL("../" + soubor, import.meta.url).pathname });
+  await p.screenshot({ path: new URL("../public/" + soubor, import.meta.url).pathname });
   await p.close();
   console.log(soubor, px + "×" + px);
 }
 await b.close();
 
 // stejný tvar i jako SVG pro záložku v prohlížeči
-writeFileSync(new URL("../ikona.svg", import.meta.url),
+writeFileSync(new URL("../public/ikona.svg", import.meta.url),
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
 <rect width="100" height="100" fill="${PODKLAD}"/>
 <g transform="translate(50,50) scale(0.74) translate(-50,-50)">${

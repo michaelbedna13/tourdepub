@@ -1,7 +1,8 @@
 # Design
 
-Zdroj pravdy v kódu: `styl.css` (tokeny jako CSS proměnné), `ui.js` (čárky, štítky
-obtížnosti, ikony), `scripts/kresli-ikony.mjs` → `ikony.js`.
+Zdroj pravdy v kódu: `src/styles/app.css` (tokeny jako CSS proměnné),
+`src/components/` (čárky, štítky obtížnosti, ikony),
+`scripts/kresli-ikony.mjs` → `src/lib/ikony.ts`.
 Ergonomii ověřují Apple HIG skilly v `.claude/skills/` (kontext v
 `.claude/apple-design-context.md`); vzhled si ale řídí tenhle soubor, HIG ho nepřepisuje.
 
@@ -36,7 +37,7 @@ Nižší úrovně textu jsou tónované do podkladu, ne do šedi.
 
 ### Obtížnost úkolu
 
-Jediné místo, kde barva nese význam:
+První ze dvou míst, kde barva nese význam:
 
 | | barva | |
 |---|---|---|
@@ -50,9 +51,31 @@ Barvy týmů jsou zvlášť a schválně se s těmito třemi nepotkávají.
 
 Všechny mají na podkladu kontrast hluboko nad WCAG AA. Při změně to musí projít znovu.
 
+### Karty kategorií
+
+Druhé místo. Obrazovka Úkoly je rozcestí: tři velké karty, každá v plné barvě
+s tmavým textem (`--na-akci`, kontrast přes 10:1) a velkou ikonou jako vodoznakem.
+
+| kategorie | barva |
+|---|---|
+| Kecy a šméčka | `--ob1` `#7FD4C1` |
+| Tělo v luftě | `--ob2` `#F2C14E` |
+| Žranice a divadlo | `--ob3` `#F2765A` |
+
+**Jsou to schválně ty samé tři odstíny jako u obtížnosti.** Přidat další tři by
+znamenalo šest barev v appce, která žádnou akcentní nemá — a to by vzalo barvě
+všechnu váhu. Aby se dva významy nepletly, nestojí nikdy vedle sebe:
+
+- na kartě kategorie není ani jeden štítek obtížnosti;
+- v seznamu úkolů zůstane z barvy kategorie jen **čtyřpixelová čárka nad nadpisem**,
+  nic dalšího se jí netónuje — význam tam nesou půllitry.
+
+I tady platí, že barva sama nestačí: na kartě je vedle ní ikona kategorie,
+její jméno i počet splněných úkolů.
+
 ### Zrno
 
-Přes celou appku leží jemné zrno (`zrno.svg`, 160 px, krytí 50 %, režim
+Přes celou appku leží jemné zrno (`src/assets/zrno.svg`, 160 px, krytí 50 %, režim
 `soft-light`). Leží nad podkladem a pod obsahem a nereaguje na dotyk.
 Plochá tmavá barva bez něj působila jako plast.
 
@@ -82,11 +105,17 @@ Dřív to byly čtyři samostatné bloky se stejnou vahou — číslo, název, t
 a dvě obří tlačítka — takže nic nevedlo a hlavní informace zanikla.
 
 - **Číslo štace** je kolečko v krémové, jediný plný prvek nahoře.
-- **Název hospody** je největší text na obrazovce (`clamp(29px, 8.6vw, 40px)`,
+- **Název hospody** je největší text na obrazovce (`clamp(27px, 7.8vw, 38px)`,
   verzálky, těsné prostrkání). Je to hlavní věc, kterou tam člověk hledá.
   Dlouhý název se zalomí do tří řádků a karta se roztáhne.
-- **Posun po trase** jsou kulatá tlačítka v rohu karty, ne tlačítka přes celou
-  šířku pod ní.
+- **Posun po trase je švih do boku.** Karty všech štací stojí vedle sebe
+  v pásu se `scroll-snap`; další vykukuje zpoza okraje, takže je vidět, že
+  se tam dá sáhnout. V hospodě jednou rukou je švih rychlejší a spolehlivější
+  než mířit na malý terč. Kulatá šipková tlačítka v rohu karty zůstala pro myš
+  a pro jistotu — gesto, které nemá viditelnou obdobu, by někdo nenašel (HIG).
+  Štace se přepne, **až posun ustane**: jinak by jeden švih přepsal stav týmu
+  devětkrát za sebou.
+- **Vykukující karta je ztlumená** na 50 % krytí, ať je jasné, která platí.
 - **Zápis** jsou dvě odškrtávátka na dně karty, ne dvě plná tlačítka. Je to
   seznam dvou věcí, co se v každé špeluňce zapisují — tak ať to tak vypadá.
   Kolečko se při splnění zaplní krémovou, stejně jako u úkolů.
@@ -112,7 +141,7 @@ nebylo poznat, co je důležité.
 ## Logo
 
 Slovní značka je obtažená z kresby do drah (`scripts/prevod-loga.py` →
-`logo.svg` a `logo.js`). Kreslí se `currentColor`, takže funguje na tmavém
+`logo.svg` a `src/lib/logo.ts`). Kreslí se `currentColor`, takže funguje na tmavém
 i světlém podkladu.
 
 **V rozhraní není.** Stála v horní liště vedle pilulky týmu a nefungovalo to:
@@ -142,14 +171,20 @@ Stínů je v celé appce minimum. Na tmavém podkladu nefungují a dělají nepo
 - Spodní lišta je přisazená ke spodku, průsvitná s rozmazáním a vlasovou linkou
   nahoře, pět položek. Respektuje `safe-area-inset-bottom`.
 
-## Úvodní obrazovka
+## Úvod po spuštění
 
-Při spuštění z plochy ukáže iOS obrázek z `uvodni/`, hned po něm naváže
-vlastní obrazovka ve stránce (`#uvod`). Obě mají stejný podklad a logo ve
-stejném poměru (52 % šířky), takže přechod neposkočí.
+Běží **po každém spuštění** a vždycky jde přeskočit. Je to Mišákovo zadání:
+appka se otvírá jednou za večer a úvod je kus té hry, ne překážka. *Přeskočit*
+je proto pořád na očích, od první vteřiny, a ťuknutí kamkoli posune dál.
 
-Odejde, až platí všechno tohle naráz: **uběhlo 1050 ms od načtení**, **logo je
-aspoň 550 ms vidět** a **písma jsou načtená**. Každá podmínka řeší jedno bliknutí:
+**1. Logo.** Při spuštění z plochy ukáže iOS obrázek z `public/uvodni/`, hned po něm
+naváže vlastní obrazovka ve stránce (`#uvod`). Obě mají stejný podklad a logo ve
+stejném poměru (52 % šířky), takže přechod neposkočí. React logo nekreslí — kreslí
+ho rovnou `index.html`, aby bylo vidět dřív, než se stáhne a spustí skript; `<Uvod>`
+nad ním drží jen *Přeskočit* a pak ho odklidí.
+
+Odejde, až platí všechno tohle naráz: **uběhlo 1100 ms od načtení**, **logo je
+načtené** a **písma jsou načtená**. Každá podmínka řeší jedno bliknutí:
 
 - bez toho minima by na rychlém telefonu jen bliklo;
 - animace se spouští teprve `data-nacteno` z `onload` obrázku — jinak by běžela
@@ -159,7 +194,12 @@ aspoň 550 ms vidět** a **písma jsou načtená**. Každá podmínka řeší je
 Logo přijede z 90 % velikosti a zespodu, odchází lehkým zvětšením; obsah se pod
 ním zároveň zvedne o 8 px. Jeden pohyb, ne efekty.
 
-**Podklad a rozměr loga jsou i v hlavičce `index.html`**, ne jen ve `styl.css`.
+**2. Průprava.** Tři stránky: ikona, nadpis a jedna věta psanou rukou. Přehazují se
+samy po 2,4 s, ťuknutím nebo švihem; poslední má *Jedeme*. Tři proužky dole říkají,
+kolik toho zbývá — úvod, u kterého není vidět konec, je otrava. Na každé stránce
+se hýbe jedna věc po druhé (ikona, nadpis, text), ne všechno naráz.
+
+**Podklad a rozměr loga jsou i v hlavičce `index.html`**, ne jen v `app.css`.
 Než se stylopis stáhne, kreslí prohlížeč bílou a na tmavé appce to zabliká.
 
 Logo je tu jako `<img src="logo-uvodni.svg">` s barvou zapečenou napevno.
