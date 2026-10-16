@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { HashRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
-import { Lista } from "./components/Lista";
 import { PotvrzeniHost } from "./components/Potvrzeni";
 import { Uvod } from "./components/Uvod";
 import { spustSync } from "./lib/sync";
@@ -51,7 +50,6 @@ function Kostra() {
       <main className="obrazovka" key={pathname}>
         <Outlet />
       </main>
-      <Lista />
     </div>
   );
 }

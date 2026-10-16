@@ -27,7 +27,7 @@ stejně jako logo — černá na krémové.
 | `--text-2` | 62 % textu | popisy |
 | `--text-3` | 38 % textu | drobnosti |
 | `--linka` | 10 % textu | vlasové předěly |
-| `--akce` | `#EFEBE0` | hlavní tlačítko, aktivní položka lišty |
+| `--akce` | `#EFEBE0` | hlavní tlačítko, splněné odškrtávátko |
 | `--na-akci` | `#070E0A` | text na světlé ploše |
 
 Dřív tu byla limetka jako akcent. Vypadla — bez ní nese důraz jen světlost,
@@ -125,6 +125,17 @@ a dvě obří tlačítka — takže nic nevedlo a hlavní informace zanikla.
 Pod kartou jde skóre, pak pořadí týmů, pak úkoly — každý blok tišší než
 ten nad ním.
 
+## Navigace
+
+Mezi obrazovkami se chodí **hamburgerem vpravo nahoře**, ne spodní lištou.
+Lišta zabírala pruh přes celou šířku na každé obrazovce a z pěti obrazovek se
+při hře používají hlavně dvě; teď je místo pro obsah.
+
+Samotné rozcestí ale **vyjíždí zespodu**, jako ostatní okna. Horní roh je pro
+palec ten nejhorší kus obrazovky a ťuká se do toho jednou rukou v hospodě —
+tak ať je tam nahoře jenom spoušť a terče dole. Položka, na které zrovna jsi,
+má světlejší plochu a fajfku; ťuknutí na ni jen zajede nahoru.
+
 ## Hierarchie tlačítek
 
 Tři váhy, aby bylo poznat, co je hlavní akce:
@@ -151,9 +162,10 @@ s nadpisem obrazovky. Výsledkem byly dva titulky nad sebou a ten skutečný
 vypadal podřadně.
 
 Značku teď nese **ikona appky**, **úvodní obrazovka při spuštění**
-(`uvodni/`, generuje `scripts/uvodni-obrazovky.mjs`) a **patička Pravidel**,
-kde stojí potichu na 30 % krytí. Horní lištu drží nadpis obrazovky vlevo
-a tým vpravo; na Hře je vlevo místo nadpisu „ŠTACE 2 Z 9".
+(`public/uvodni/`, generuje `scripts/uvodni-obrazovky.mjs`) a **patička Pravidel**,
+kde stojí potichu na 30 % krytí. V horní liště je nadpis obrazovky vlevo
+a vpravo tým s hamburgerem; na Hře nadpis chybí schválně — tam vede název
+hospody na hero kartě a dva titulky nad sebou by si konkurovaly.
 
 ## Plochy a předěly
 
@@ -168,8 +180,7 @@ Stínů je v celé appce minimum. Na tmavém podkladu nefungují a dělají nepo
 - Jeden sloupec, okraj 18 px, max. šířka 540 px (na počítači uprostřed).
 - Dotykové terče aspoň 44 px. Hlavní tlačítko 54 px, běžné 50 px,
   kulaté v řádku 36 px s odsazením okolo.
-- Spodní lišta je přisazená ke spodku, průsvitná s rozmazáním a vlasovou linkou
-  nahoře, pět položek. Respektuje `safe-area-inset-bottom`.
+- Okna a rozcestí vyjíždějí od spodní hrany a respektují `safe-area-inset-bottom`.
 
 ## Úvod po spuštění
 
@@ -217,8 +228,10 @@ Křivka `cubic-bezier(.32,.72,0,1)`. `prefers-reduced-motion` všechno vypíná.
 Tlusté siluety s průhlednými výstřižky, obrys křivý jako stříhaný tupýma nůžkama.
 Generuje je `scripts/kresli-ikony.mjs`, ručně se needitují.
 
-Tenké tahy se v malém slijí, proto je všechno tlusté — ikony se používají i ve 20 px
-ve spodní liště. Nová ikona se vždycky zkontroluje v malém, ne jen ve velkém.
+Tenké tahy se v malém slijí, proto je všechno tlusté. Kymácení okraje se musí
+krotit podle velikosti tvaru: na proužcích hamburgeru (15 jednotek na výšku)
+běžná hodnota 2,2 rozvlnila okraj tak, že se tři proužky slily do vlnovky.
+Nová ikona se vždycky zkontroluje v malém, ne jen ve velkém.
 
 Žádné emoji ani unicode znaky místo ikon.
 

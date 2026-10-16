@@ -219,6 +219,13 @@ const IKONY = {
     C(cut(rect(38, 44, 46, 82, 2), { ...ROUGH, amp: 1.1, step: 6 })),
     C(cut(rect(54, 44, 62, 82, 2), { ...ROUGH, amp: 1.1, step: 6 })),
   ],
+  // tři natrhané proužky – hamburger, ale vystřižený, ne vysázený.
+  // Kymácení je tu menší než jinde (amp 1, řidší krok): na proužku vysokém
+  // 15 jednotek ho běžné 2,2 rozvlní tak, že se v malém slijí dohromady.
+  "i-menu": () => {
+    const pruh = (y) => I(cut(rect(12, y, 88, y + 15, 3), { ...ROUGH, amp: 1, step: 14 }));
+    return [pruh(17.5), pruh(42.5), pruh(67.5)];
+  },
   "i-uzivatel": () => [
     I(cut(ell(50, 32, 18, 18, 16), { ...ROUGH, amp: 2 })),
     I(cut([[14, 90], [16, 70], [32, 58], [50, 54], [68, 58], [84, 70], [86, 90]], HRUBE)),

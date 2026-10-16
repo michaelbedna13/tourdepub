@@ -42,7 +42,6 @@
   --r:18px;
   --r-sm:12px;
   --pilulka:999px;
-  --lista-v:62px;
   --sirka:540px;
   --okraj:18px;
   --krok:cubic-bezier(.32,.72,0,1);
@@ -102,7 +101,7 @@ input,textarea,select{caret-color:var(--text)}
 .obrazovka{
   display:block;
   padding:calc(env(safe-area-inset-top) + 8px) var(--okraj)
-          calc(var(--lista-v) + env(safe-area-inset-bottom) + 26px);
+          calc(env(safe-area-inset-bottom) + 30px);
   animation:obsah-prichod .34s var(--krok) both;
 }
 @media (display-mode:standalone){
@@ -117,10 +116,14 @@ input,textarea,select{caret-color:var(--text)}
 /* Vlevo nadpis obrazovky, vpravo tým. Logo tu nebylo – trojřádková kresba
    s rozervaným okrajem nemá vedle úhledné pilulky co zarovnat a pralo se
    o místo s nadpisem. Značku nese ikona appky, úvodní obrazovka a patička. */
-.hlava{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  min-height:44px;margin-bottom:16px}
-.hlava-text{min-width:0;flex:1}
-.hlava-text h1{font-size:27px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlava{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:16px}
+/* nadpis se smí zkrátit, ale nikdy nesmí zmizet úplně: do lišty se vedle sebe
+   tlačí tři věci a dlouhé jméno týmu na úzkém telefonu ho jinak vytlačí na nulu */
+.hlava-text{flex:1 1 auto;min-width:86px}
+.hlava-text h1{font-size:clamp(22px,7vw,27px);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* na Hře nadpis není, tak ať si místo nebere */
+.hlava-text:empty{flex:1 1 0;min-width:0}
 .hlava-drobne{font-family:var(--ovladani);font-size:12.5px;color:var(--text-3);
   letter-spacing:.07em}
 .podnadpis{color:var(--text-2);font-size:15px;margin:-6px 0 18px}
@@ -131,7 +134,9 @@ input,textarea,select{caret-color:var(--text)}
 .paticka span:last-child{font-family:var(--ovladani);font-size:12.5px}
 .prepinac-tymu{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 13px;
   border-radius:var(--pilulka);background:var(--vrstva-2);
-  font-family:var(--ovladani);font-size:14px;max-width:58%}
+  font-family:var(--ovladani);font-size:14px;min-width:0;flex:0 1 auto;max-width:50%}
+/* na Hře žádný nadpis není, tak si jméno týmu může vzít, kolik potřebuje */
+.hlava-text:empty + .prepinac-tymu{max-width:74%}
 .prepinac-tymu b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prepinac-tymu .ikona{color:var(--text-3)}
 .tecka{width:9px;height:9px;border-radius:50%;flex:none}
@@ -382,24 +387,17 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .volba-ob button[aria-pressed=true].v2{background:rgba(242,193,78,.17);color:var(--ob2)}
 .volba-ob button[aria-pressed=true].v3{background:rgba(242,118,90,.17);color:var(--ob3)}
 
-/* ---------- spodní lišta ---------- */
-/* Plovoucí pilulka ze skla, ne pruh s ikonami přes celou šířku.
-   Aktivní položka je světlá pilulka s tmavou ikonou a názvem. */
-.lista-obal{position:fixed;left:0;right:0;bottom:0;z-index:20;
-  display:flex;justify-content:center;pointer-events:none;
-  padding:0 16px calc(env(safe-area-inset-bottom) + 10px)}
-.lista{display:flex;gap:3px;padding:5px;pointer-events:auto;
-  background:rgba(13,23,17,.78);backdrop-filter:blur(22px) saturate(1.5);
-  -webkit-backdrop-filter:blur(22px) saturate(1.5);
-  border-radius:var(--pilulka);box-shadow:0 1px 0 0 rgba(239,235,224,.07) inset,0 12px 32px rgba(0,0,0,.5)}
-.lista a{display:flex;align-items:center;gap:7px;min-height:44px;padding:0 14px;
-  border-radius:var(--pilulka);color:var(--text-3);
-  transition:background .2s var(--krok),color .2s var(--krok),padding .2s var(--krok)}
-.lista a .popis{font-family:var(--ovladani);font-size:13.5px;
-  max-width:0;overflow:hidden;white-space:nowrap;opacity:0;
-  transition:max-width .22s var(--krok),opacity .18s}
-.lista a.ted{background:var(--akce);color:var(--na-akci);padding:0 16px}
-.lista a.ted .popis{max-width:88px;opacity:1}
+/* ---------- menu ---------- */
+/* Hamburger stojí v horní liště vedle pilulky týmu; rozcestí pod ním vyjíždí
+   zespodu jako ostatní okna. Tlačítko nahoře, terče dole: ťuká se do nich
+   jednou rukou v hospodě a horní roh je pro palec ten nejhorší kus obrazovky. */
+.menu-tl{flex:none}
+.menu-radek{gap:14px}
+.menu-radek .ikona{color:var(--text-2)}
+.menu-radek.ted .ikona{color:var(--text)}
+.menu-radek .radek-nazev{font-size:17px}
+.menu-radek:not(.ted) .radek-nazev{color:var(--text-2)}
+.menu-radek{min-height:58px}
 
 /* ---------- okno ---------- */
 .okno{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;

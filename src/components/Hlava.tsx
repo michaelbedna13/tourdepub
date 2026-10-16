@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { body, prepniTym, stav, tym, useStav } from "../lib/stav";
 import { Ikona } from "./Ikona";
+import { Menu } from "./Menu";
 import { Okno } from "./Okno";
 import { OknoTymu } from "./OknoTymu";
 
@@ -40,6 +41,7 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
           <b>{t?.nazev || "Bez týmu"}</b>
           <Ikona jmeno="i-dolu" px={13} />
         </button>
+        <Menu />
       </div>
 
       {okno === "prepinac" && (

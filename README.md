@@ -19,9 +19,9 @@ npm run typecheck  # jenom kontrola typů
 ```
 index.html              kostra stránky a úvodní obrazovka s logem
 src/main.tsx            start appky
-src/App.tsx             trasy, kostra obrazovky, spodní lišta
+src/App.tsx             trasy a kostra obrazovky
 src/obrazovky/          Hra, Úkoly, Kategorie, Týmy, Hospody, Pravidla
-src/components/         Ikona, Čárky, Obtížnost, Hlava, Lišta, Okno, Úvod, …
+src/components/         Ikona, Čárky, Obtížnost, Hlava, Menu, Okno, Úvod, …
 src/lib/stav.ts         týmy, hospody, úkoly, bodování a ukládání
 src/lib/data.ts         VÝCHOZÍ hospody a úkoly (startovní sada, dál se mění v appce)
 src/lib/sync.ts         živé pořadí přes Supabase (volitelné)
@@ -58,7 +58,7 @@ Je to zámek proti omylu, **ne bezpečnost**. Web je statický a veřejný, tak�
 se podívá do zdrojáku, kód si přečte. Brání tomu, aby někdo omylem přepsal úkoly
 uprostřed hry. Kdyby mělo jít o víc, musela by přibýt opravdová práva v databázi.
 
-Spodní lišta má pět obrazovek:
+Pod hamburgerem vpravo nahoře je pět obrazovek:
 
 - **Hra** — hero karta štace: kolikátá je, jak se jmenuje, kde jste na trase
   a dvě odškrtávátka (*Jsme v špeluňce*, *Škopky jsme lupnuli*). **Karty se
@@ -226,8 +226,9 @@ node scripts/kresli-ikony.mjs
 Náhodnost je pevná, takže stejný kód dá pokaždé stejné ikony. Každá ikona má
 vlastní semínko odvozené od názvu, takže změna jedné nepřekreslí ostatní.
 
-Tenké tahy se v malém slijí do kaše, proto je všechno tlusté — ikony se používají
-i ve 22 px ve spodní liště. Když přidáváš novou, zkontroluj ji v malém.
+Tenké tahy se v malém slijí do kaše, proto je všechno tlusté — nejmenší jsou
+půllitry obtížnosti ve 13 px. Když přidáváš novou, zkontroluj ji v malém:
+hamburger se takhle poprvé slil do vlnovky, než se mu stáhlo kymácení.
 
 ## Písma
 
