@@ -160,7 +160,20 @@ input,textarea,select{caret-color:var(--text)}
 /* Vlevo nadpis obrazovky, vpravo tým. Logo tu nebylo – trojřádková kresba
    s rozervaným okrajem nemá vedle úhledné pilulky co zarovnat a pralo se
    o místo s nadpisem. Značku nese ikona appky, úvodní obrazovka a patička. */
-.hlava{display:flex;align-items:center;gap:10px;min-height:44px;margin-bottom:32px}
+.hlava{display:flex;align-items:center;gap:10px;min-height:44px;
+  /* Lišta zůstává nahoře i při posunu – na dlouhém seznamu úkolů byl
+     přepínač týmu i menu jinak až někde nad obrazovkou. Táhne se přes
+     okraje obrazovky, aby pod ní nic neprobleskovalo, takže co byl
+     u .obrazovka odsazením, je tady vycpávkou. */
+  position:sticky;top:0;z-index:20;background:var(--podklad);
+  margin:calc(-1 * (env(safe-area-inset-top) + 18px)) calc(-1 * var(--okraj)) 22px;
+  padding:calc(env(safe-area-inset-top) + 18px) var(--okraj) 10px;
+}
+/* text nemá pod lištou mizet střihem, ale vyblednout */
+.hlava::after{
+  content:"";position:absolute;left:0;right:0;top:100%;height:16px;pointer-events:none;
+  background:linear-gradient(var(--podklad),transparent);
+}
 /* nadpis se smí zkrátit, ale nikdy nesmí zmizet úplně: do lišty se vedle sebe
    tlačí tři věci a dlouhé jméno týmu na úzkém telefonu ho jinak vytlačí na nulu */
 .hlava-text{flex:1 1 auto;min-width:86px}
@@ -269,7 +282,12 @@ input,textarea,select{caret-color:var(--text)}
    Karty v pásu jsou stejně vysoké podle té nejdelší, a bez toho by u kratších
    názvů vznikla díra a odškrtávátka by při švihu skákala nahoru a dolů. */
 .hero-nazev{
-  font-size:clamp(30px,8.6vw,42px);line-height:var(--radky-nadpis);letter-spacing:-.025em;
+  /* Jediný řez navíc, co Hagrid má, je sedmistovka — a název hospody je
+     hlavní věc na obrazovce, tak ji unese. Tučný Hagrid je ale široký,
+     takže stažení je menší než u ostatních nadpisů; jinak se verzálky
+     slejvají do jednoho bloku. */
+  font-weight:700;
+  font-size:clamp(30px,8.6vw,42px);line-height:var(--radky-nadpis);letter-spacing:-.005em;
   margin:18px 0 0;min-height:calc(2em * var(--radky-nadpis));
   overflow-wrap:anywhere;position:relative;z-index:1;
 }
