@@ -21,8 +21,11 @@
 
   /* text: krémová z loga */
   --text:#EFEBE0;
-  --text-2:rgba(239,235,224,.62);
-  --text-3:rgba(239,235,224,.38);
+  --text-2:rgba(239,235,224,.66);
+  /* Byla to osmatřicítka. V téhle vrstvě ale nejsou jen popisky — jsou tu
+     i pravidla, podle kterých se hraje („Max. 5 různejch palic“). V šeru
+     v hospodě a po pár pivech se to nedalo přečíst. */
+  --text-3:rgba(239,235,224,.47);
   --linka:rgba(239,235,224,.10);
   --linka-sl:rgba(239,235,224,.055);
 
@@ -95,6 +98,19 @@ body{
   font-family:var(--pismo);font-size:16px;line-height:1.6;font-synthesis:none;
   -webkit-font-smoothing:antialiased;
 }
+/* Teplé světlo shora, chladnější odlesk zdola. Appka je skoro černá a bez
+   tohohle vypadala jako terminál, ne jako večer v hospodě — je to jediný
+   způsob, jak do ní dostat rozsah, aniž by se rozsvítila.
+   Leží NAD lištou (z-index 25, pod oknem): kdyby bylo pod ní, lišta by si
+   svůj kus světla zakryla vlastním podkladem a nahoře by vznikl šev.
+   Je to obyčejný přechod, žádné míchání barev – nic to nestojí. */
+body::after{
+  content:"";position:fixed;inset:0;z-index:25;pointer-events:none;
+  background:
+    radial-gradient(130% 58% at 50% -6%, rgba(242,193,78,.11), transparent 64%),
+    radial-gradient(120% 40% at 50% 106%, rgba(127,212,193,.06), transparent 62%);
+}
+
 /* Zrno přes celou appku. Leží nad podkladem, ale pod obsahem, a nereaguje na dotyk.
    Režim soft-light podklad oživí, aniž by ho zašpinil. */
 body::before{
