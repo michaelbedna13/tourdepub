@@ -166,8 +166,11 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
         {cislo}
       </span>
 
+      {/* Kolečko s číslem štace tu bývalo taky, ale číslo pak stálo na kartě
+          třikrát – v kolečku, ve velkém za názvem a ještě jako 1/9 u trasy.
+          Zůstalo to velké; drží roh karty samo a je to to první, co padne
+          do oka při švihu. */}
       <div className="hero-vrch">
-        <div className="hero-cislo cislo">{cislo}</div>
         {hotova && (
           <span className="hero-razitko" aria-hidden="true">
             <svg className="razitko-ramecek" viewBox="0 0 172 60" aria-hidden="true">
@@ -185,7 +188,6 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
       </div>
 
       <h1 className="hero-nazev">{h.nazev}</h1>
-      <JakDlouho od={odKdy} />
 
       <div className="hero-trasa">
         <div className="trasa-body" role="img" aria-label={`Štace ${cislo} z ${stav.hospody.length}`}>
@@ -196,6 +198,8 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
         </div>
         <span className="hero-stace cislo">{cislo}/{stav.hospody.length}</span>
       </div>
+
+      <JakDlouho od={odKdy} />
 
       <div className="hero-zapis">
         {ZAKLAD.map((z) => {
