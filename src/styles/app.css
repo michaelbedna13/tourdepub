@@ -68,6 +68,14 @@
   --t-text:15px;
   --t-hlavni:17px;
 
+  /* Odsazení obrazovky odshora. Lišta ho ruší záporným okrajem a zase přidává
+     vycpávkou, aby se její podklad roztáhl až k hornímu kraji — obě čísla
+     proto musí být to samé. Když se rozešla (appka z plochy měla jiné
+     odsazení než prohlížeč), vyšla přirozená poloha lišty nad nulu, lišta
+     se přilepila hned na začátku a sjela o ten rozdíl dolů přes podnadpis.
+     V prohlížeči to nebylo vidět, protože tam je safe-area nula. */
+  --vrch:calc(env(safe-area-inset-top) + 18px);
+
   /* Proklad velkých nadpisů. Česká verzálka nese háčky a čárky nad výškou
      písmen, takže u víceřádkového nadpisu sedí diakritika spodního řádku
      na účaří horního (ČÁRKY NEJSOU ZA / CHLAST, NA DOBRÉ / CESTĚ). Sázet
@@ -133,8 +141,7 @@ input,textarea,select{caret-color:var(--text)}
   overflow-x:clip}
 .obrazovka{
   display:block;
-  padding:calc(env(safe-area-inset-top) + 18px) var(--okraj)
-          calc(env(safe-area-inset-bottom) + 48px);
+  padding:var(--vrch) var(--okraj) calc(env(safe-area-inset-bottom) + 48px);
   /* backwards, ne both. Obrazovka se při příchodu posouvá, takže v klíčových
      snímcích je transform — a „forwards“ ho nechá doplňovat navěky, i když
      je koncová hodnota none. Prohlížeč pak s obrazovkou zachází jako s
@@ -144,8 +151,11 @@ input,textarea,select{caret-color:var(--text)}
      dopředu stejně není co. */
   animation:obsah-prichod .34s var(--krok) backwards;
 }
+/* Z plochy appka kreslí i pod stavovou lištu, a na telefonech, kde je
+   safe-area nula, by se nadpis schoval pod hodiny. Mění se token, ne
+   odsazení: musí se to propsat i do lišty. */
 @media (display-mode:standalone){
-  .obrazovka{padding-top:calc(max(env(safe-area-inset-top),50px) + 8px)}
+  :root{--vrch:calc(max(env(safe-area-inset-top),50px) + 8px)}
 }
 @keyframes obsah-prichod{
   from{opacity:0;transform:translateY(8px)}
@@ -173,8 +183,8 @@ input,textarea,select{caret-color:var(--text)}
      okraje obrazovky, aby pod ní nic neprobleskovalo, takže co byl
      u .obrazovka odsazením, je tady vycpávkou. */
   position:sticky;top:0;z-index:20;background:var(--podklad);
-  margin:calc(-1 * (env(safe-area-inset-top) + 18px)) calc(-1 * var(--okraj)) 22px;
-  padding:calc(env(safe-area-inset-top) + 18px) var(--okraj) 10px;
+  margin:calc(-1 * var(--vrch)) calc(-1 * var(--okraj)) 22px;
+  padding:var(--vrch) var(--okraj) 10px;
 }
 /* Pod lištou bylo prolnutí do ztracena. Vypadalo to jako chyba vykreslení:
    podnadpis začíná přesně na její spodní hraně, takže v prolnutí ležel i
