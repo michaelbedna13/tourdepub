@@ -139,7 +139,21 @@ input,textarea,select{caret-color:var(--text)}
    z appky posuvnou plochu a rozbil plovoucí lištu) */
 .app{position:relative;z-index:1;max-width:var(--sirka);margin:0 auto;min-height:100dvh;
   overflow-x:clip}
+/* ---------- zeď hospody: čárky za celou appkou ---------- */
+/* Leží pod obsahem a nad zrnem. Je tak slabá, že se dá přehlédnout – má
+   dávat večeru pocit, že se něco plní, ne se hlásit o slovo. */
+.zed{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  color:var(--text);opacity:.075}
+.zed-skupina{position:absolute;width:auto;overflow:visible;display:block}
+.zed-skupina path{
+  stroke-dasharray:44;stroke-dashoffset:44;
+  animation:zed-tah .55s var(--krok) both;
+}
+@keyframes zed-tah{to{stroke-dashoffset:0}}
+
 .obrazovka{
+  /* nad zdí */
+  position:relative;z-index:1;
   display:block;
   padding:var(--vrch) var(--okraj) calc(env(safe-area-inset-bottom) + 48px);
   /* backwards, ne both. Obrazovka se při příchodu posouvá, takže v klíčových
@@ -678,7 +692,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important;transition-duration:.001ms !important}
   #uvod img{opacity:1}
-  .uvod-carky path{stroke-dashoffset:0}
+  .uvod-carky path,.zed-skupina path{stroke-dashoffset:0}
   .hero-pas{scroll-behavior:auto}
 }
 @media (min-width:600px){
