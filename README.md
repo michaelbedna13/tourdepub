@@ -302,6 +302,10 @@ Běží **po každém spuštění** a vždycky jde přeskočit. Má dvě části
    skript. React pak vykreslí svoje logo na přesně to samé místo a statické
    odklidí, takže mezi nimi není vidět žádný střih. Pod značkou se dokreslí
    pět čárek, jedna po druhé.
+
+   Celý úvod je **jedna neprůhledná vrstva** a písma se načítají ručně
+   (`document.fonts.load`), ne jen přes `document.fonts.ready` — obojí proto,
+   aby to nikde neprobliklo. Podrobnosti jsou v `DESIGN.md`.
 2. **Průprava.** Čtyři stránky příběhu (`src/components/Uvod.tsx`).
    **Žádná se nepřehodí sama** — dál se jde tlačítkem *Dál* nebo švihem do boku,
    poslední má *Jedeme na to*. *Přeskočit* je pořád na očích.

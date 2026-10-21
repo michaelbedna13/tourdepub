@@ -46,17 +46,17 @@
   /* Logo je rovnou ve stránce, ne z Reactu, aby naskočilo dřív, než se stáhne
      skript, a navázalo na obrázek, který ukazuje iOS při spuštění z plochy.
      React pak vykreslí to svoje na přesně stejné místo a tohle odklidí
-     (<Uvod> v src/components/Uvod.tsx) — proto se tu nic nehýbe ani nemění
-     velikost, jinak by logo při převzetí poskočilo. */
+     (<Uvod> v src/components/Uvod.tsx).
+
+     Žádné prolnutí ani změna velikosti: React převezme logo kdykoli během
+     načítání, a kdyby se tu zrovna prolínalo, skočila by jeho jasnost z půlky
+     na plnou. Buď obrázek ještě není, nebo je — nic mezi tím. */
   #uvod{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#070E0A}
-  #uvod img{width:52vw;max-width:260px;height:auto;display:block;
-    opacity:0;transition:opacity .22s ease}
-  #uvod img[data-nacteno]{opacity:1}
+  #uvod img{width:52vw;max-width:260px;height:auto;display:block}
 </style>
 </head>
 <body>
-<div id="uvod"><img src="/logo-uvodni.svg" alt="Tour de Pub" width="450" height="359"
-  onload="this.dataset.nacteno=1" onerror="this.dataset.nacteno=1"></div>
+<div id="uvod"><img src="/logo-uvodni.svg" alt="Tour de Pub" width="450" height="359"></div>
 <div id="app"></div>
 <script type="module" src="/src/main.tsx"></script>
 </body>

@@ -41,14 +41,21 @@
   --nadpisy:"Nadpisy","Archivo Black","Arial Black",system-ui,sans-serif;
   --psaci:"Psaci","Bradley Hand","Segoe Print",cursive;
 
-  --r:20px;
-  --r-sm:14px;
+  --r:24px;
+  --r-sm:16px;
   --pilulka:999px;
   --sirka:540px;
   --okraj:20px;
-  /* svislý rytmus: mezera mezi sekcemi a vnitřní okraj ploch */
-  --mezera:34px;
-  --vnitrek:18px;
+  /* Svislý rytmus: mezera mezi sekcemi a vnitřní okraj ploch. */
+  --mezera:44px;
+  --vnitrek:22px;
+
+  /* Tři velikosti textu na celou appku, nic mezi tím. Bylo jich deset
+     (12, 12,5, 13, 13,5, 14, 14,5, 15, 16, 16,5, 17) a rozdíl o půl bodu
+     nikdo nepřečte jako záměr — jen to dělá hluk. */
+  --t-drobne:13px;
+  --t-text:15px;
+  --t-hlavni:17px;
   --krok:cubic-bezier(.32,.72,0,1);
   color-scheme:dark;
 }
@@ -60,7 +67,7 @@ html{
 }
 body{
   margin:0;background:var(--podklad);color:var(--text);
-  font-family:var(--pismo);font-size:16px;line-height:1.55;font-synthesis:none;
+  font-family:var(--pismo);font-size:16px;line-height:1.6;font-synthesis:none;
   -webkit-font-smoothing:antialiased;
 }
 /* Zrno přes celou appku. Leží nad podkladem, ale pod obsahem, a nereaguje na dotyk.
@@ -74,8 +81,8 @@ body::before{
 h1,h2,h3{margin:0;font-family:var(--nadpisy);font-weight:800;line-height:1.06;
   letter-spacing:-.015em;text-transform:uppercase}
 h1{font-size:26px}
-h2{font-size:17px}
-h3{font-size:15px}
+h2{font-size:var(--t-hlavni)}
+h3{font-size:var(--t-text)}
 p{margin:0}
 a{color:var(--text);text-decoration:none}
 button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;border:0;background:none;
@@ -93,7 +100,7 @@ input,textarea,select{caret-color:var(--text)}
 .ikona{display:block;flex:none}
 .otocit{transform:scaleX(-1)}
 .spatne{color:var(--spatne)}
-.drobne{font-size:13px;color:var(--text-3);word-break:break-word}
+.drobne{font-size:var(--t-drobne);color:var(--text-3);word-break:break-word}
 /* Psaná ruka má v appce jediné místo: vyprávění. Úvod a první odstavce
    Pravidel. Dřív byla i v popisech úkolů, v nápovědách pod nadpisy, v oknech
    a v prázdných stavech – na jedné obrazovce se pak potkala tři písma a bylo
@@ -108,8 +115,8 @@ input,textarea,select{caret-color:var(--text)}
   overflow-x:clip}
 .obrazovka{
   display:block;
-  padding:calc(env(safe-area-inset-top) + 14px) var(--okraj)
-          calc(env(safe-area-inset-bottom) + 40px);
+  padding:calc(env(safe-area-inset-top) + 18px) var(--okraj)
+          calc(env(safe-area-inset-bottom) + 48px);
   animation:obsah-prichod .34s var(--krok) both;
 }
 @media (display-mode:standalone){
@@ -135,7 +142,7 @@ input,textarea,select{caret-color:var(--text)}
 /* Vlevo nadpis obrazovky, vpravo tým. Logo tu nebylo – trojřádková kresba
    s rozervaným okrajem nemá vedle úhledné pilulky co zarovnat a pralo se
    o místo s nadpisem. Značku nese ikona appky, úvodní obrazovka a patička. */
-.hlava{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:24px}
+.hlava{display:flex;align-items:center;gap:10px;min-height:44px;margin-bottom:32px}
 /* nadpis se smí zkrátit, ale nikdy nesmí zmizet úplně: do lišty se vedle sebe
    tlačí tři věci a dlouhé jméno týmu na úzkém telefonu ho jinak vytlačí na nulu */
 .hlava-text{flex:1 1 auto;min-width:86px}
@@ -143,17 +150,21 @@ input,textarea,select{caret-color:var(--text)}
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* na Hře nadpis není, tak ať si místo nebere */
 .hlava-text:empty{flex:1 1 0;min-width:0}
-.hlava-drobne{font-family:var(--pismo);font-weight:500;font-size:12.5px;color:var(--text-3);
+.hlava-drobne{font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);color:var(--text-3);
   letter-spacing:.07em}
-.podnadpis{color:var(--text-2);font-size:15px;margin:-10px 0 24px}
+/* Podnadpis patří k tomu, co je nad ním, ne doprostřed. Záporný okraj
+   byl dřív napevno v podnadpisu a na obrazovce kategorie, kde nad ním
+   stojí nadpis s barevnou čárou, si ukousl i jeho mezeru. */
+.podnadpis{color:var(--text-2);font-size:var(--t-text);margin:0 0 32px}
+.hlava + .podnadpis{margin-top:-22px}
 /* patička Pravidel – jediné místo v rozhraní, kde se značka ukáže */
 .paticka{display:flex;flex-direction:column;align-items:center;gap:10px;
   margin-top:40px;padding-bottom:6px;color:var(--text-3)}
 .logo-paticka{display:block;width:84px;height:auto;opacity:.3}
-.paticka span:last-child{font-family:var(--pismo);font-weight:500;font-size:12.5px}
+.paticka span:last-child{font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne)}
 .prepinac-tymu{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 13px;
   border-radius:var(--pilulka);background:var(--vrstva-2);
-  font-family:var(--pismo);font-weight:500;font-size:14px;min-width:0;flex:0 1 auto;max-width:50%}
+  font-family:var(--pismo);font-weight:500;font-size:var(--t-text);min-width:0;flex:0 1 auto;max-width:50%}
 /* na Hře žádný nadpis není, tak si jméno týmu může vzít, kolik potřebuje */
 .hlava-text:empty + .prepinac-tymu{max-width:74%}
 .prepinac-tymu b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -162,9 +173,9 @@ input,textarea,select{caret-color:var(--text)}
 
 /* ---------- nadpisy sekcí ---------- */
 .sekce{margin-top:var(--mezera)}
-.sekce-hlava{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding:0 2px}
-.sekce-hlava h2{font-size:13px;color:var(--text-3);letter-spacing:.06em}
-.sekce-hlava .pocet{margin-left:auto;font-family:var(--pismo);font-weight:500;font-size:13px;color:var(--text-3)}
+.sekce-hlava{display:flex;align-items:baseline;gap:10px;margin-bottom:16px;padding:0 4px}
+.sekce-hlava h2{font-size:var(--t-drobne);color:var(--text-3);letter-spacing:.06em}
+.sekce-hlava .pocet{margin-left:auto;font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);color:var(--text-3)}
 
 /* ---------- plochy ---------- */
 .vrstva{background:var(--vrstva);border-radius:var(--r);overflow:hidden}
@@ -175,20 +186,20 @@ input,textarea,select{caret-color:var(--text)}
 /* ---------- tlačítka: tři váhy, ať je jasné, co je hlavní ---------- */
 /* 1. hlavní akce – světlá plocha, tmavý text */
 .tl{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
-  min-height:52px;padding:14px 18px;border-radius:var(--pilulka);
-  font-family:var(--pismo);font-weight:500;font-size:16px;background:var(--vrstva-2);color:var(--text);
+  min-height:54px;padding:15px 20px;border-radius:var(--pilulka);
+  font-family:var(--pismo);font-weight:500;font-size:var(--t-hlavni);background:var(--vrstva-2);color:var(--text);
   transition:transform .14s var(--krok),background .16s,opacity .16s}
 .tl:active{transform:scale(.97)}
-.tl.hlavni{background:var(--akce);color:var(--na-akci);min-height:58px;font-size:17px}
+.tl.hlavni{background:var(--akce);color:var(--na-akci);min-height:60px;font-size:var(--t-hlavni)}
 .tl.hlavni .ikona{color:var(--na-akci)}
 /* 2. hotová akce – jen obrys, ať nekonkuruje nesplněné */
 .tl.hotovo{background:transparent;color:var(--text-2);box-shadow:inset 0 0 0 1px var(--linka)}
 .tl.hotovo .ikona{color:var(--text-2)}
 /* 3. vedlejší – bez plochy */
-.tl.tise{background:transparent;color:var(--text-2);min-height:46px;font-size:15px}
+.tl.tise{background:transparent;color:var(--text-2);min-height:46px;font-size:var(--t-text)}
 .tl.nebezpecne{background:transparent;color:var(--spatne);box-shadow:inset 0 0 0 1px rgba(242,118,90,.28)}
 .tl:disabled{opacity:.3}
-.tl.maly{min-height:40px;font-size:14px;padding:9px 15px;width:auto}
+.tl.maly{min-height:40px;font-size:var(--t-text);padding:9px 15px;width:auto}
 
 /* kulaté tlačítko (posun mezi štacemi, úpravy v řádku) */
 .ikonove{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;
@@ -214,35 +225,34 @@ input,textarea,select{caret-color:var(--text)}
 .hero-pas::-webkit-scrollbar{display:none}
 .hero{
   flex:0 0 calc(100% - 34px);scroll-snap-align:start;
-  background:var(--vrstva);border-radius:var(--r);padding:18px 20px 16px;
+  background:var(--vrstva);border-radius:var(--r);padding:20px 22px 18px;
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;
   transition:opacity .12s linear;
 }
 /* karta, co jen vykukuje, nemá přetahovat pozornost */
 .hero:not(.ted){opacity:.45}
-/* Vodoznak z čárek — jediná ozdoba na kartě, a nese téma hry.
-   Sedí v dolním rohu za odškrtávátky; nahoře se pral se šipkami
-   a vypadal jako šmouha, ne jako záměr. */
-.hero::after{
-  content:"";position:absolute;right:-38px;bottom:-24px;width:150px;height:122px;
-  background:url("../assets/carky.svg") no-repeat right bottom/contain;
-  opacity:.05;pointer-events:none;
-}
+/* Vodoznak z čárek v dolním rohu karty je pryč. Ležel přesně za texty
+   odškrtávátek a na tmavém podkladu z něj byla šmouha, ne ozdoba —
+   a appka má být vzdušná, ne pomalovaná. Čárky mají svoje místo
+   ve skóre, kde něco znamenají. */
 .hero-vrch{display:flex;align-items:center;justify-content:space-between;gap:12px;
   position:relative;z-index:1}
 .hero-cislo{
   display:grid;place-items:center;width:38px;height:38px;flex:none;border-radius:50%;
   background:var(--akce);color:var(--na-akci);
-  font-family:var(--nadpisy);font-size:17px;line-height:1;
+  font-family:var(--nadpisy);font-size:var(--t-hlavni);line-height:1;
 }
 .hero-sipky{display:flex;gap:6px}
-.hero-sipky .ikonove{width:38px;height:38px;background:var(--vrstva-2)}
+.hero-sipky .ikonove{width:36px;height:36px;background:transparent;color:var(--text-3)}
 
 /* název hospody je hlavní věc na obrazovce, tak ať to tak vypadá */
+/* Místo na dva řádky drží karta vždycky, i když se název vejde na jeden.
+   Karty v pásu jsou stejně vysoké podle té nejdelší, a bez toho by u kratších
+   názvů vznikla díra a odškrtávátka by při švihu skákala nahoru a dolů. */
 .hero-nazev{
   font-size:clamp(30px,8.6vw,42px);line-height:1;letter-spacing:-.025em;
-  margin:18px 0 0;overflow-wrap:anywhere;position:relative;z-index:1;
+  margin:18px 0 0;min-height:2em;overflow-wrap:anywhere;position:relative;z-index:1;
 }
 
 .hero-trasa{display:flex;align-items:center;gap:12px;margin:20px 0 18px;
@@ -251,16 +261,15 @@ input,textarea,select{caret-color:var(--text)}
 .trasa-bod{flex:1;height:3px;border-radius:2px;background:var(--linka)}
 .trasa-bod.splneno{background:var(--text-3)}
 .trasa-bod.ted{background:var(--text)}
-.hero-stace{font-family:var(--pismo);font-weight:500;font-size:12.5px;color:var(--text-3);flex:none}
+.hero-stace{font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);color:var(--text-3);flex:none}
 
 /* dvě věci, co se v každé špeluňce zapisují – jako odškrtávátka, ne jako
    dvě obří tlačítka, která přebila zbytek obrazovky */
-/* karty v pásu jsou stejně vysoké podle té nejdelší; odškrtávátka proto
-   drží dolní hranu, ať nezůstanou viset uprostřed karty */
-.hero-zapis{position:relative;z-index:1;margin:auto -20px -16px;
+/* odškrtávátka drží dolní hranu karty */
+.hero-zapis{position:relative;z-index:1;margin:auto -22px -18px;
   border-top:1px solid var(--linka-sl)}
 .zaskrt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
-  padding:16px 20px;min-height:60px;transition:background .16s}
+  padding:18px 22px;min-height:66px;transition:background .16s}
 .zaskrt + .zaskrt{border-top:1px solid var(--linka-sl)}
 .zaskrt:active{background:var(--vrstva-2)}
 .zaskrt-kolecko{
@@ -272,27 +281,27 @@ input,textarea,select{caret-color:var(--text)}
   transition:opacity .2s var(--krok),transform .2s var(--krok)}
 .zaskrt.hotovo .zaskrt-kolecko{background:var(--akce);box-shadow:none}
 .zaskrt.hotovo .zaskrt-kolecko .ikona{opacity:1;transform:scale(1)}
-.zaskrt-text{flex:1;min-width:0;font-family:var(--pismo);font-weight:500;font-size:16px}
+.zaskrt-text{flex:1;min-width:0;font-family:var(--pismo);font-weight:500;font-size:var(--t-hlavni)}
 .zaskrt.hotovo .zaskrt-text{color:var(--text-2)}
-.zaskrt-hodnota{font-family:var(--nadpisy);font-size:14px;color:var(--text-3);flex:none}
+.zaskrt-hodnota{font-family:var(--nadpisy);font-size:var(--t-text);color:var(--text-3);flex:none}
 .zaskrt.hotovo .zaskrt-hodnota{color:var(--text-2)}
 
 /* ---------- skóre a pořadí týmů na Hře ---------- */
-.skore-velke{display:flex;align-items:flex-end;gap:16px;padding:var(--vnitrek)}
-.skore-cislo{font-family:var(--nadpisy);font-size:48px;line-height:.78;letter-spacing:-.02em;flex:none}
+.skore-velke{display:flex;align-items:flex-end;gap:18px;padding:26px var(--vnitrek)}
+.skore-cislo{font-family:var(--nadpisy);font-size:52px;line-height:.78;letter-spacing:-.03em;flex:none}
 .skore-vedle{min-width:0;flex:1}
-.skore-vedle .carky{color:var(--text-3);margin-bottom:7px}
-.skore-popis{font-family:var(--pismo);font-weight:500;font-size:12.5px;color:var(--text-3);line-height:1.4}
+.skore-vedle .carky{color:var(--text-3);margin-bottom:12px}
+.skore-popis{font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);color:var(--text-3);line-height:1.5}
 .carky{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:flex-end}
 .carky svg{display:block;overflow:visible}
 
 /* mini tabulka: jak si vedou týmy */
-.pruh-tymu{display:flex;align-items:center;gap:12px;padding:14px var(--vnitrek)}
+.pruh-tymu{display:flex;align-items:center;gap:12px;padding:18px var(--vnitrek)}
 .pruh-tymu .tecka{width:8px;height:8px}
-.pruh-tymu .jmeno{flex:1;min-width:0;font-family:var(--pismo);font-weight:500;font-size:14.5px;
+.pruh-tymu .jmeno{flex:1;min-width:0;font-family:var(--pismo);font-weight:500;font-size:var(--t-text);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pruh-tymu .odstup{font-family:var(--pismo);font-weight:500;font-size:12.5px;color:var(--text-3);flex:none}
-.pruh-tymu .cifra{font-family:var(--nadpisy);font-size:17px;flex:none;min-width:30px;text-align:right}
+.pruh-tymu .odstup{font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);color:var(--text-3);flex:none}
+.pruh-tymu .cifra{font-family:var(--nadpisy);font-size:var(--t-hlavni);flex:none;min-width:30px;text-align:right}
 .pruh-tymu.ja{background:rgba(239,235,224,.045)}
 .pruh-tymu.ja .jmeno{color:var(--text)}
 .pruh-tymu:not(.ja) .jmeno{color:var(--text-2)}
@@ -301,10 +310,10 @@ input,textarea,select{caret-color:var(--text)}
 /* Tři barevné karty místo jednoho seznamu dvaceti tří úkolů. Barva není
    ozdoba: drží kategorii pohromadě přes celou appku. Text je tmavý, protože
    na světlé ploše je čitelnější než krémový (kontrast nad 10:1). */
-.kat-karty{display:flex;flex-direction:column;gap:14px}
+.kat-karty{display:flex;flex-direction:column;gap:16px}
 .kat-karta{
   display:block;position:relative;overflow:hidden;
-  border-radius:var(--r);padding:18px 20px 18px;min-height:138px;
+  border-radius:var(--r);padding:22px 24px;min-height:152px;
   color:var(--na-akci);
   transition:transform .14s var(--krok),filter .16s;
 }
@@ -313,31 +322,31 @@ input,textarea,select{caret-color:var(--text)}
 .kat-vodoznak{position:absolute;right:-20px;bottom:-30px;opacity:.15;pointer-events:none}
 .kat-vrch{display:flex;align-items:center;justify-content:space-between;gap:10px;
   position:relative;z-index:1}
-.kat-pocet{font-family:var(--nadpisy);font-size:15px;line-height:1;
+.kat-pocet{font-family:var(--nadpisy);font-size:var(--t-text);line-height:1;
   padding:6px 11px;border-radius:var(--pilulka);background:rgba(7,14,10,.13)}
 .kat-sipka{opacity:.6}
 .kat-nazev{position:relative;z-index:1;margin-top:32px;padding-right:64px;
   font-size:25px;line-height:1;letter-spacing:-.02em;overflow-wrap:anywhere}
 .kat-pod{position:relative;z-index:1;display:block;margin-top:9px;
-  font-family:var(--pismo);font-weight:500;font-size:13px;opacity:.72}
+  font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);opacity:.72}
 /* V seznamu úkolů zůstane z barvy kategorie jen čárka nad nadpisem; význam
    tam nesou půllitry obtížnosti a dvě barevné soustavy vedle sebe by se pletly.
    Nadpis stojí pod lištou, ne v ní – do lišty se vedle pilulky týmu nevešel
    a ořezával se na „Kecy a …“. */
-.kat-hlavicka{margin:-4px 0 14px}
+.kat-hlavicka{margin:-6px 0 10px}
 .kat-cara{height:4px;width:46px;border-radius:2px;margin-bottom:12px}
 .kat-hlavicka h1{font-size:clamp(26px,7.4vw,34px);line-height:.98;letter-spacing:-.02em;
   overflow-wrap:anywhere}
 
 /* ---------- seznam úkolů ---------- */
-.ukol{display:block;width:100%;text-align:left;padding:18px var(--vnitrek);background:transparent;
+.ukol{display:block;width:100%;text-align:left;padding:22px var(--vnitrek);background:transparent;
   transition:background .16s}
 .ukol[role=button]{cursor:pointer}
 .ukol[role=button]:active{background:var(--vrstva-2)}
 .ukol-hlava{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
-.ukol-nazev{font-family:var(--pismo);font-weight:600;font-size:16.5px;line-height:1.3;flex:1;min-width:0;padding-top:4px}
-.ukol-popis{font-size:14.5px;color:var(--text-2);line-height:1.6;margin-top:9px}
-.ukol-pozn{font-size:13.5px;color:var(--text-3);line-height:1.55;margin-top:7px}
+.ukol-nazev{font-family:var(--pismo);font-weight:600;font-size:var(--t-hlavni);line-height:1.3;flex:1;min-width:0;padding-top:4px}
+.ukol-popis{font-size:var(--t-text);color:var(--text-2);line-height:1.6;margin-top:9px}
+.ukol-pozn{font-size:var(--t-drobne);color:var(--text-3);line-height:1.55;margin-top:7px}
 .ukol-stav{display:flex;align-items:flex-start;gap:8px;margin-top:14px}
 .ukol-chipy{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0;padding-top:3px}
 .ukol.splneno .ukol-nazev{color:var(--text-2)}
@@ -346,14 +355,14 @@ input,textarea,select{caret-color:var(--text)}
 /* obtížnost: barva + půllitry + text, nikdy jen barva */
 .obtiznost{display:inline-flex;align-items:center;gap:6px;flex:none;
   padding:4px 10px 4px 8px;border-radius:var(--pilulka);
-  font-family:var(--pismo);font-weight:500;font-size:12.5px;line-height:1.2}
+  font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);line-height:1.2}
 .obtiznost .piva{display:flex;gap:2px}
 .obtiznost.o1{background:rgba(127,212,193,.13);color:var(--ob1)}
 .obtiznost.o2{background:rgba(242,193,78,.13);color:var(--ob2)}
 .obtiznost.o3{background:rgba(242,118,90,.13);color:var(--ob3)}
 
-.znacka-text{font-family:var(--pismo);font-weight:500;font-size:12.5px;color:var(--text-3)}
-.odznak{font-family:var(--pismo);font-weight:500;font-size:12px;padding:4px 10px;border-radius:var(--pilulka);
+.znacka-text{font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);color:var(--text-3)}
+.odznak{font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);padding:4px 10px;border-radius:var(--pilulka);
   background:rgba(239,235,224,.06);color:var(--text-2)}
 .odznak.duraz{background:var(--akce);color:var(--na-akci)}
 
@@ -369,29 +378,29 @@ input,textarea,select{caret-color:var(--text)}
   display:grid;place-items:center;transition:transform .13s var(--krok),opacity .16s}
 .pocitadlo button:active{transform:scale(.88)}
 .pocitadlo button:disabled{opacity:.28}
-.pocitadlo .kolik{font-family:var(--nadpisy);font-size:15px;min-width:20px;text-align:center}
+.pocitadlo .kolik{font-family:var(--nadpisy);font-size:var(--t-text);min-width:20px;text-align:center}
 
 /* ---------- řádky seznamů ---------- */
-.radek{display:flex;align-items:center;gap:14px;padding:16px var(--vnitrek);width:100%;text-align:left}
+.radek{display:flex;align-items:center;gap:14px;padding:18px var(--vnitrek);width:100%;text-align:left}
 .radek-telo{flex:1;min-width:0;text-align:left}
-.radek-nazev{font-family:var(--pismo);font-weight:500;font-size:16px;display:flex;align-items:center;gap:8px;
+.radek-nazev{font-family:var(--pismo);font-weight:500;font-size:var(--t-hlavni);display:flex;align-items:center;gap:8px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.radek-pod{font-family:var(--pismo);font-weight:400;font-size:13.5px;color:var(--text-2);margin-top:3px}
+.radek-pod{font-family:var(--pismo);font-weight:400;font-size:var(--t-drobne);color:var(--text-2);margin-top:3px}
 .radek-vpravo{flex:none;display:flex;align-items:center;gap:4px}
-.poradi-cislo{width:20px;flex:none;font-family:var(--nadpisy);font-size:14px;color:var(--text-3)}
+.poradi-cislo{width:20px;flex:none;font-family:var(--nadpisy);font-size:var(--t-text);color:var(--text-3)}
 .radek.vede .poradi-cislo{color:var(--text)}
 .radek.ja,.radek.ted{background:rgba(239,235,224,.045)}
 .radek-body{font-family:var(--nadpisy);font-size:19px;flex:none}
 
 /* ---------- pole ---------- */
 label.pole,div.pole{display:block;margin-bottom:15px}
-.pole .nazev{font-family:var(--pismo);font-weight:500;font-size:13px;color:var(--text-2);
+.pole .nazev{font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);color:var(--text-2);
   display:block;margin-bottom:6px}
 input[type=text],input[type=password],textarea,select{
   width:100%;min-height:48px;padding:12px 14px;border-radius:var(--r-sm);
   background:var(--vrstva-2);border:0;color:var(--text);
-  font-family:var(--pismo);font-size:16px;line-height:1.4}
-textarea{min-height:92px;resize:vertical;font-size:16px;line-height:1.55}
+  font-family:var(--pismo);font-size:var(--t-hlavni);line-height:1.4}
+textarea{min-height:92px;resize:vertical;font-size:var(--t-hlavni);line-height:1.55}
 input::placeholder,textarea::placeholder{color:var(--text-3)}
 input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-offset:0}
 .barvy{display:flex;gap:9px;flex-wrap:wrap}
@@ -402,7 +411,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .volba-ob{display:flex;gap:8px}
 .volba-ob button{flex:1;min-height:54px;border-radius:var(--r-sm);background:var(--vrstva-2);
   display:grid;place-items:center;gap:3px;padding:8px 4px;
-  font-family:var(--pismo);font-weight:500;font-size:12px;color:var(--text-2);transition:background .16s}
+  font-family:var(--pismo);font-weight:500;font-size:var(--t-drobne);color:var(--text-2);transition:background .16s}
 .volba-ob button .piva{display:flex;gap:2px}
 .volba-ob button[aria-pressed=true].v1{background:rgba(127,212,193,.17);color:var(--ob1)}
 .volba-ob button[aria-pressed=true].v2{background:rgba(242,193,78,.17);color:var(--ob2)}
@@ -416,7 +425,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .menu-radek{gap:14px}
 .menu-radek .ikona{color:var(--text-2)}
 .menu-radek.ted .ikona{color:var(--text)}
-.menu-radek .radek-nazev{font-size:17px}
+.menu-radek .radek-nazev{font-size:var(--t-hlavni)}
 .menu-radek:not(.ted) .radek-nazev{color:var(--text-2)}
 .menu-radek{min-height:58px}
 
@@ -425,21 +434,21 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   background:rgba(3,7,5,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
   animation:zjevit .18s var(--krok)}
 .okno-telo{width:100%;max-width:var(--sirka);background:var(--vrstva);
-  border-radius:24px 24px 0 0;padding:22px 18px calc(20px + env(safe-area-inset-bottom));
+  border-radius:28px 28px 0 0;padding:26px 22px calc(24px + env(safe-area-inset-bottom));
   max-height:90dvh;overflow:auto;animation:vyjet .26s var(--krok)}
 .okno-telo h2{font-size:20px;margin-bottom:5px}
-.okno-telo .pod{color:var(--text-2);font-size:15px;margin-bottom:20px;line-height:1.55}
+.okno-telo .pod{color:var(--text-2);font-size:var(--t-text);margin-bottom:20px;line-height:1.55}
 .okno-akce{display:flex;flex-direction:column;gap:9px;margin-top:6px}
 @keyframes zjevit{from{opacity:0}}
 @keyframes vyjet{from{transform:translateY(22px)}}
 
 /* ---------- drobnosti ---------- */
-.prazdno{text-align:center;padding:40px 20px;color:var(--text-2);font-size:15px}
+.prazdno{text-align:center;padding:40px 20px;color:var(--text-2);font-size:var(--t-text)}
 .prazdno .ikona{margin:0 auto 12px;color:var(--text-3)}
-.poznamka{font-size:13.5px;color:var(--text-3);line-height:1.55;
+.poznamka{font-size:var(--t-drobne);color:var(--text-3);line-height:1.55;
   margin-top:10px;padding:0 2px;display:block}
 .rezim{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;border-radius:var(--r-sm);
-  background:var(--vrstva);font-size:13.5px;color:var(--text-2);margin-bottom:22px;line-height:1.55}
+  background:var(--vrstva);font-size:var(--t-drobne);color:var(--text-2);margin-bottom:22px;line-height:1.55}
 .rezim .ikona{color:var(--text-3);margin-top:2px}
 .rezim.chybny{background:rgba(242,118,90,.09);color:#F5A491}
 .rezim.chybny .ikona{color:var(--spatne)}
@@ -447,17 +456,17 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .rezim .drobne{opacity:.9}
 
 /* pravidla */
-.pravidla h2{font-size:14px;margin:34px 0 12px;color:var(--text-3);letter-spacing:.07em}
-.pravidla p{margin-bottom:12px;color:var(--text-2);line-height:1.65;font-size:15px}
-.pravidla ol{margin:0 0 14px;padding-left:22px;color:var(--text-2);line-height:1.65;font-size:15px}
+.pravidla h2{font-size:var(--t-text);margin:34px 0 12px;color:var(--text-3);letter-spacing:.07em}
+.pravidla p{margin-bottom:12px;color:var(--text-2);line-height:1.65;font-size:var(--t-text)}
+.pravidla ol{margin:0 0 14px;padding-left:22px;color:var(--text-2);line-height:1.65;font-size:var(--t-text)}
 .pravidla li{margin-bottom:12px}
 .pravidla b{color:var(--text);font-weight:600}
 /* jen úvodní vyprávění je psané rukou */
-.pravidla-uvod{font-family:var(--psaci);font-size:16px;line-height:1.62;color:var(--text-2);
+.pravidla-uvod{font-family:var(--psaci);font-size:var(--t-hlavni);line-height:1.62;color:var(--text-2);
   margin-bottom:22px}
 .pravidla-uvod p{font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:14px}
 .legenda{display:flex;flex-direction:column;gap:12px}
-.legenda-radek{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--text-2)}
+.legenda-radek{display:flex;align-items:center;gap:12px;font-size:var(--t-text);color:var(--text-2)}
 
 /* ---------- úvod po spuštění ---------- */
 /* Jedna neprůhledná vrstva od prvního snímku až do konce; uvnitř se jen
@@ -465,15 +474,18 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    index.html odcházelo prolnutím a průprava se zároveň zjevovala, takže
    mezi nimi na okamžik prosvítala appka. To bylo to bliknutí. */
 .uvod{
-  position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:120;
   padding:calc(env(safe-area-inset-top) + 24px) 28px calc(env(safe-area-inset-bottom) + 28px);
   background:var(--podklad);
+  transition:opacity .3s var(--krok);
 }
+/* na konci se úvod vytratí, nevypne se střihem */
+.uvod.zavira{opacity:0;pointer-events:none}
+/* nad obsahem průpravy, jinak by do něj ťuknutí na Přeskočit spadlo */
 .uvod-preskocit{
-  position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:12px;
+  position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + 14px);right:12px;
   min-height:44px;padding:0 16px;border-radius:var(--pilulka);
-  font-weight:500;font-size:14px;color:var(--text-3);
+  font-weight:500;font-size:var(--t-text);color:var(--text-3);
 }
 
 /* značka: logo sedí přesně tam, kde ho kreslí index.html, a čárky pod ním
@@ -482,7 +494,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .uvod-znacka{
   position:absolute;left:50%;top:50%;translate:-50% -50%;
   width:52vw;max-width:260px;color:var(--text);
-  transition:opacity .34s var(--krok),scale .34s var(--krok),translate .34s var(--krok);
+  transition:opacity .28s var(--krok),scale .4s var(--krok),translate .4s var(--krok);
 }
 .uvod-logo{display:block;width:100%;height:auto}
 .uvod-znacka.odchazi{opacity:0;scale:.96;translate:-50% calc(-50% - 16px)}
@@ -496,29 +508,35 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 }
 @keyframes carka-kresli{to{stroke-dashoffset:0}}
 
-/* průprava: čtyři stránky, dál se jde tlačítkem nebo švihem — nikdy sama */
+/* Průprava: čtyři stránky, dál se jde tlačítkem nebo švihem — nikdy sama.
+   Celá stránka přichází jako jeden kus. Dřív měl každý kousek vlastní zpoždění
+   a tlačítko naskočilo rovnou na plno, takže byl snímek, kde svítilo tlačítko
+   nad skoro prázdnou obrazovkou. */
+.uvod-obsah{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  /* o chvilku později než začne odcházet značka: prázdný snímek mezi nimi
+     nevznikne, ale ani se nepřekrývají tak, že by text ležel přes logo */
+  padding:inherit;animation:uvod-prichod .34s .16s var(--krok) both;
+}
 .uvod-stranka{
   display:flex;flex-direction:column;align-items:center;text-align:center;
   max-width:380px;margin:auto 0;
 }
-.uvod-ikona{color:var(--text);animation:uvod-ikona .5s var(--krok) both}
+.uvod-ikona{color:var(--text)}
 .uvod-nadpis{margin-top:36px;font-size:clamp(29px,8.6vw,38px);line-height:1.02;
-  letter-spacing:-.025em;animation:uvod-text .45s .08s var(--krok) both}
-.uvod-text{margin-top:20px;font-size:17px;line-height:1.7;color:var(--text-2);
-  animation:uvod-text .45s .16s var(--krok) both}
+  letter-spacing:-.025em}
+.uvod-text{margin-top:20px;font-size:var(--t-hlavni);line-height:1.7;color:var(--text-2)}
 .uvod-spodek{display:flex;flex-direction:column;align-items:center;gap:26px;
   width:100%;max-width:320px;padding-bottom:8px}
+/* při přepnutí stránky se mění jen obsah, ne celá vrstva */
+.uvod-stranka{animation:uvod-prichod .26s var(--krok) both}
 .uvod-tecky{display:flex;gap:7px}
 .uvod-tecka{width:24px;height:3px;border-radius:2px;background:var(--linka);
   transition:background .25s var(--krok)}
 .uvod-tecka.bylo{background:var(--text-3)}
 .uvod-tecka.ted{background:var(--text)}
-@keyframes uvod-ikona{
-  from{opacity:0;transform:scale(.72) rotate(-6deg)}
-  to{opacity:1;transform:none}
-}
-@keyframes uvod-text{
-  from{opacity:0;transform:translateY(14px)}
+@keyframes uvod-prichod{
+  from{opacity:0;transform:translateY(12px)}
   to{opacity:1;transform:none}
 }
 

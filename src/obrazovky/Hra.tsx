@@ -46,25 +46,29 @@ export function Hra() {
         </div>
       </div>
 
-      <div className="sekce">
-        <div className="sekce-hlava">
-          <h2>JAK NA TOM JSOU</h2>
-          <span className="pocet">{poradi.length} {sklonujTym(poradi.length)}</span>
+      {/* Dokud hraje jedna parta, není co srovnávat – „vede, odstup 0" je
+          jen řádek navíc. Naskočí to, jakmile přibude druhý tým. */}
+      {poradi.length > 1 && (
+        <div className="sekce">
+          <div className="sekce-hlava">
+            <h2>JAK NA TOM JSOU</h2>
+            <span className="pocet">{poradi.length} {sklonujTym(poradi.length)}</span>
+          </div>
+          <div className="vrstva radky">
+            {poradi.map((p) => {
+              const rozdil = p.body - nejvic;
+              return (
+                <div key={p.id} className={`pruh-tymu${p.id === stav.tymId ? " ja" : ""}`}>
+                  <span className="tecka" style={{ background: p.barva }} />
+                  <span className="jmeno">{p.nazev}</span>
+                  <span className="odstup cislo">{rozdil === 0 ? "vede" : rozdil}</span>
+                  <span className="cifra cislo">{p.body}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div className="vrstva radky">
-          {poradi.map((p) => {
-            const rozdil = p.body - nejvic;
-            return (
-              <div key={p.id} className={`pruh-tymu${p.id === stav.tymId ? " ja" : ""}`}>
-                <span className="tecka" style={{ background: p.barva }} />
-                <span className="jmeno">{p.nazev}</span>
-                <span className="odstup cislo">{rozdil === 0 ? "vede" : rozdil}</span>
-                <span className="cifra cislo">{p.body}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      )}
 
       <div className="sekce">
         <Link className="tl" to="/ukoly">

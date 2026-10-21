@@ -13,12 +13,17 @@ import type { JmenoIkony } from "../lib/ikony";
 import { Ikona } from "./Ikona";
 import { Logo } from "./Logo";
 
-/** Nejmíň takhle dlouho zůstane značka, ať se čárky stihnou dokreslit. */
+/** Nejmíň takhle dlouho zůstane značka od načtení stránky. */
 const ZNACKA_NEJMIN = 1700;
-/** Kdyby se logo z index.html nenačetlo vůbec, nečeká se na něj věčně. */
-const LOGO_NEJVIC = 1800;
-/** Jak dlouho značka odchází, než naskočí první stránka. */
-const ODCHOD = 260;
+/** A nejmíň takhle dlouho od chvíle, kdy se rozběhl React.
+ *  Na pomalé síti se stránka načítá dýl než ZNACKA_NEJMIN, takže by se
+ *  značka ukázala a ve stejném okamžiku zase odešla — čárky by se nestihly
+ *  dokreslit a vypadalo by to jako záblesk. */
+const ZNACKA_PO_STARTU = 1000;
+/** Na písma se nečeká věčně; po téhle době se jede i s náhradními. */
+const PISMA_NEJVIC = 2500;
+/** Jak dlouho se úvod vytrácí, než se odklidí. */
+const ZAVRENI = 300;
 
 interface Stranka {
   ikona: JmenoIkony;
@@ -43,34 +48,54 @@ function odklidStatickeLogo() {
   document.getElementById("uvod")?.remove();
 }
 
+/** Načte přesně ta písma, kterými je průprava vysázená.
+ *
+ *  `document.fonts.ready` na tohle nestačí: slibuje jen, že doběhlo, co si
+ *  stránka **už vyžádala**, a dokud svítí logo, nic Bricolage ani psanou ruku
+ *  nepoužívá. Bez tohohle se průprava vysází náhradním písmem a po chvilce
+ *  přeskočí do správného — a přesně to vypadá jako probliknutí. */
+function nactiPisma(): Promise<unknown> {
+  const vzorek = "ŠČŘŽĚÚŮ příklad";
+  const chci = [`800 1rem "Nadpisy"`, `1rem "Psaci"`, `500 1rem "Outfit"`];
+  try {
+    return Promise.all(chci.map((f) => document.fonts.load(f, vzorek)))
+      .then(() => document.fonts.ready);
+  } catch {
+    return Promise.resolve(); // prohlížeč bez Font Loading API
+  }
+}
+
 export function Uvod({ hotovo }: { hotovo: () => void }) {
   // -1 = značka, 0+ = stránka průpravy
   const [kde, setKde] = useState(-1);
-  const [odchazi, setOdchazi] = useState(false);
+  const [zavira, setZavira] = useState(false);
   const svih = useRef<number | null>(null);
 
   // Statické logo zmizí ve stejném snímku, ve kterém React vykreslí to svoje
   // na to samé místo. Prolnutí mezi nimi by bylo vidět jako bliknutí.
   useLayoutEffect(odklidStatickeLogo, []);
 
-  // Značka odejde, až je všechno hotové: čárky se dokreslily a písma jsou
-  // načtená (jinak by text průpravy po jejich dotažení přeskočil).
+  // Značka odejde, až se čárky dokreslily a písma jsou opravdu načtená.
+  // Značka a první stránka se prolnou přes sebe — kdyby jedna odešla dřív,
+  // než druhá přijde, byl by mezi nimi prázdný snímek.
   useEffect(() => {
     let platne = true;
     const pockej = (ms: number) => new Promise((h) => setTimeout(h, ms));
     Promise.all([
-      pockej(Math.max(0, ZNACKA_NEJMIN - performance.now())),
-      Promise.race([document.fonts?.ready ?? Promise.resolve(), pockej(LOGO_NEJVIC)]),
-    ]).then(() => {
-      if (!platne) return;
-      setOdchazi(true);
-      setTimeout(() => { if (platne) setKde(0); }, ODCHOD);
-    });
+      pockej(Math.max(ZNACKA_PO_STARTU, ZNACKA_NEJMIN - performance.now())),
+      Promise.race([nactiPisma(), pockej(PISMA_NEJVIC)]),
+    ]).then(() => { if (platne) setKde(0); });
     return () => { platne = false; };
   }, []);
 
+  /** Úvod se nevypne střihem, ale vytratí se. */
+  function zavri() {
+    setZavira(true);
+    setTimeout(hotovo, ZAVRENI);
+  }
+
   function dal() {
-    if (kde + 1 >= PRUPRAVA.length) hotovo();
+    if (kde + 1 >= PRUPRAVA.length) zavri();
     else setKde(kde + 1);
   }
 
@@ -78,7 +103,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   const s = PRUPRAVA[Math.max(0, kde)];
 
   return (
-    <div className="uvod" role="dialog" aria-label="Úvod"
+    <div className={`uvod${zavira ? " zavira" : ""}`} role="dialog" aria-label="Úvod"
       onPointerDown={(e) => { svih.current = e.clientX; }}
       onPointerUp={(e) => {
         const z = svih.current;
@@ -89,18 +114,18 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
         else if (dx > 50) setKde(Math.max(0, kde - 1));
       }}
     >
-      <button className="uvod-preskocit" onClick={hotovo}
+      <button className="uvod-preskocit" onClick={zavri}
         onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
 
-      {kde < 0 && (
-        <div className={`uvod-znacka${odchazi ? " odchazi" : ""}`}>
-          <Logo trida="uvod-logo" />
-          <CarkyKreslene />
-        </div>
-      )}
+      {/* značka zůstává vykreslená a jen se vytrácí, zatímco první stránka
+          už přichází — jinak by mezi nimi blikl prázdný podklad */}
+      <div className={`uvod-znacka${kde >= 0 ? " odchazi" : ""}`} aria-hidden={kde >= 0}>
+        <Logo trida="uvod-logo" />
+        <CarkyKreslene />
+      </div>
 
       {kde >= 0 && (
-        <>
+        <div className="uvod-obsah">
           <div className="uvod-stranka" key={kde}>
             <Ikona jmeno={s.ikona} px={84} trida="uvod-ikona" />
             <h1 className="uvod-nadpis">{vazat(s.nadpis)}</h1>
@@ -118,7 +143,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
               {posledni ? <><Ikona jmeno="piva" px={19} /> Jedeme na to</> : "Dál"}
             </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

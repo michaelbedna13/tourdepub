@@ -103,6 +103,21 @@ ne odhadovat z ukázky s latinkou.
 Nepoužívej přejmenované řezy („Outfit UI" byla šestistovka tvářící se jako
 čtyřstovka). Vypadá to v kódu jako čtvrtá rodina a plete to.
 
+### Tři velikosti, nic mezi tím
+
+| token | velikost | kde |
+|---|---|---|
+| `--t-drobne` | 13 px | štítky, odznaky, podřádky |
+| `--t-text` | 15 px | popisy, nápovědy, vedlejší tlačítka |
+| `--t-hlavni` | 17 px | názvy v řádcích, tlačítka, pole |
+
+Bylo jich deset (12, 12,5, 13, 13,5, 14, 14,5, 15, 16, 16,5, 17). Rozdíl o půl
+bodu nikdo nepřečte jako záměr — vypadá to jako nepořádek a drobné písmo navíc
+nutí nacpat na obrazovku víc, než se tam má vejít. **Nová velikost se nepřidává**,
+hledá se, která ze tří sedí.
+
+Pole formuláře musí zůstat aspoň na 16 px, jinak iOS při ťuknutí stránku přiblíží.
+
 Čísla mají `font-variant-numeric: tabular-nums` (třída `.cislo`), aby skóre
 při přepočítání neposkakovalo.
 
@@ -137,8 +152,14 @@ a dvě obří tlačítka — takže nic nevedlo a hlavní informace zanikla.
 - **Zápis** jsou dvě odškrtávátka na dně karty, ne dvě plná tlačítka. Je to
   seznam dvou věcí, co se v každé špeluňce zapisují — tak ať to tak vypadá.
   Kolečko se při splnění zaplní krémovou, stejně jako u úkolů.
-- **Vodoznak z čárek** v dolním rohu je jediná ozdoba na kartě. Nese téma hry
-  a je na 5 % krytí. Nahoře se pral se šipkami a vypadal jako šmouha.
+- **Název drží místo na dva řádky**, i když se vejde na jeden. Karty v pásu
+  jsou stejně vysoké podle té nejdelší a bez toho by u kratších názvů zůstala
+  díra a odškrtávátka by při švihu skákala nahoru a dolů.
+- **Šipky jsou tiché** — bez plochy, v barvě drobného textu. Hlavní cesta je
+  švih; šipky jsou záloha, ne nabídka.
+- **Žádný vodoznak.** V dolním rohu karty bývaly čárky na 5 % krytí. Ležely
+  přesně za texty odškrtávátek a na tmavém podkladu z nich byla šmouha, ne
+  ozdoba. Čárky mají svoje místo ve skóre, kde něco znamenají.
 
 Pod kartou jde skóre, pak pořadí týmů, pak úkoly — každý blok tišší než
 ten nad ním.
@@ -211,7 +232,13 @@ Stínů je v celé appce minimum. Na tmavém podkladu nefungují a dělají nepo
 
 ## Rozměry
 
-- Jeden sloupec, okraj 18 px, max. šířka 540 px (na počítači uprostřed).
+Vzdušnost nedělá jedna velká mezera, ale **důsledný rytmus a málo prvků**:
+`--mezera` (44 px) mezi sekcemi, `--vnitrek` (22 px) uvnitř ploch, rádius 24 px.
+Když se obrazovka pořád zdá nacpaná, nepomůže přidat padding — pomůže ubrat
+prvek. Proto na Hře zmizelo pořadí týmů, dokud hraje jedna parta: „vede, odstup
+0" je jen řádek navíc.
+
+- Jeden sloupec, okraj 20 px, max. šířka 540 px (na počítači uprostřed).
 - Dotykové terče aspoň 44 px. Hlavní tlačítko 54 px, běžné 50 px,
   kulaté v řádku 36 px s odsazením okolo.
 - Okna a rozcestí vyjíždějí od spodní hrany a respektují `safe-area-inset-bottom`.
@@ -222,27 +249,44 @@ Běží **po každém spuštění** a vždycky jde přeskočit. Je to Mišákovo
 appka se otvírá jednou za večer a úvod je kus té hry, ne překážka. *Přeskočit*
 je proto pořád na očích, od první vteřiny, a ťuknutí kamkoli posune dál.
 
-**1. Logo.** Při spuštění z plochy ukáže iOS obrázek z `public/uvodni/`, hned po něm
-naváže vlastní obrazovka ve stránce (`#uvod`). Obě mají stejný podklad a logo ve
-stejném poměru (52 % šířky), takže přechod neposkočí. React logo nekreslí — kreslí
-ho rovnou `index.html`, aby bylo vidět dřív, než se stáhne a spustí skript; `<Uvod>`
-nad ním drží jen *Přeskočit* a pak ho odklidí.
+**Celý úvod je jedna neprůhledná vrstva** a uvnitř se jen přepíná obsah.
+Dřív to byly dvě vrstvy přes sebe — statické logo odcházelo prolnutím a průprava
+se zároveň zjevovala, takže mezi nimi na okamžik prosvítala appka.
 
-Odejde, až platí všechno tohle naráz: **uběhlo 1100 ms od načtení**, **logo je
-načtené** a **písma jsou načtená**. Každá podmínka řeší jedno bliknutí:
+**1. Značka.** Při spuštění z plochy ukáže iOS obrázek z `public/uvodni/`, hned po
+něm naváže logo ve stránce (`#uvod` v `index.html`), aby bylo vidět dřív, než se
+stáhne a spustí skript. React pak vykreslí svoje logo na přesně stejné místo
+a statické odklidí v tom samém snímku. Proto se v `index.html` **nic neprolíná
+ani nemění velikost**: React může převzít kdykoli a uprostřed prolnutí by jasnost
+loga skočila z půlky na plnou.
+
+Značka odejde, až platí všechno tohle naráz: **uběhlo 1700 ms od načtení**,
+**aspoň 1000 ms od startu Reactu** a **písma jsou načtená**. Každá podmínka
+řeší jedno bliknutí:
 
 - bez toho minima by na rychlém telefonu jen bliklo;
-- animace se spouští teprve `data-nacteno` z `onload` obrázku — jinak by běžela
-  nad prázdným místem, obrázek by dorazil později a logo by jen naskočilo;
-- bez čekání na písma by text pod obrazovkou po jejím odchodu přeskočil.
+- bez minima od startu Reactu by se na pomalé síti (kde se stránka načítá dýl
+  než 1700 ms) značka ukázala a ve stejném okamžiku zase odešla, takže by se
+  čárky nestihly dokreslit — záblesk;
+- `document.fonts.ready` na písma nestačí. Slibuje jen, že doběhlo, co si
+  stránka **už vyžádala**, a dokud svítí logo, nic Bricolage ani psanou ruku
+  nepoužívá. Proto se o ně musí říct ručně (`document.fonts.load`), jinak se
+  průprava vysází náhradním písmem a po chvilce přeskočí do správného.
 
 Logo přijede z 90 % velikosti a zespodu, odchází lehkým zvětšením; obsah se pod
 ním zároveň zvedne o 8 px. Jeden pohyb, ne efekty.
 
-**2. Průprava.** Tři stránky: ikona, nadpis a jedna věta psanou rukou. Přehazují se
-samy po 2,4 s, ťuknutím nebo švihem; poslední má *Jedeme*. Tři proužky dole říkají,
-kolik toho zbývá — úvod, u kterého není vidět konec, je otrava. Na každé stránce
-se hýbe jedna věc po druhé (ikona, nadpis, text), ne všechno naráz.
+**2. Průprava.** Čtyři stránky: ikona, nadpis a jedna věta psanou rukou. **Žádná
+se nepřehodí sama** — dál se jde tlačítkem nebo švihem. Proužky dole říkají, kolik
+toho zbývá; úvod, u kterého není vidět konec, je otrava.
+
+Stránka přichází **jako jeden kus**, o 160 ms později, než začne odcházet značka.
+Dřív měl každý kousek vlastní zpoždění a tlačítko naskočilo rovnou na plno, takže
+byl snímek, kde svítilo tlačítko nad skoro prázdnou obrazovkou. Prodleva proti
+značce je tak dlouhá, aby mezi nimi nebyl prázdný snímek, ale ani aby text neležel
+přes logo.
+
+Na konci se úvod **vytratí**, nevypne se střihem.
 
 **Podklad a rozměr loga jsou i v hlavičce `index.html`**, ne jen v `app.css`.
 Než se stylopis stáhne, kreslí prohlížeč bílou a na tmavé appce to zabliká.
