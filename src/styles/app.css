@@ -40,9 +40,12 @@
      tři samostatné rodiny: hagrid (400/700), hagrid-black (900) a hagrid-text
      (300/400/700/800/900).
 
-     Nadpisy jedou na hagrid v sedmistovce, ne na hagrid-black. Hagrid je
-     široký řez a v devítistovce se verzálky slejvají — „CELEJ BANK BERE JEDNA"
-     se ve velkém četlo jako plot. Bold má pořád dost váhy a zůstane čitelný.
+     Nadpisy jedou na hagrid. Hagrid je široký řez, takže čím těžší váha, tím
+     víc se verzálky slejvají — v devítistovce se „CELEJ BANK BERE JEDNA"
+     četlo jako plot. Velké nadpisy proto jedou na čtyřstovce: ve velkém má
+     i ta dost síly a je v ní vidět kresba písma. Drobné verzálkové popisky
+     (h2, h3) zůstaly na sedmistovce, ve třinácti bodech by se čtyřstovka
+     ztratila.
 
      Za Hagridem stojí Bricolage a Outfit uložené přímo v appce: když Adobe
      neodpoví nebo není signál, text se vysází jimi a nic se nerozsype. */
@@ -86,8 +89,11 @@ body::before{
   opacity:.5;mix-blend-mode:soft-light;
 }
 
-h1,h2,h3{margin:0;font-family:var(--nadpisy);font-weight:700;line-height:1.06;
+h1,h2,h3{margin:0;font-family:var(--nadpisy);line-height:1.06;
   letter-spacing:-.015em;text-transform:uppercase}
+/* velké nadpisy lehce, drobné popisky tučně – viz poznámka u --nadpisy */
+h1{font-weight:400}
+h2,h3{font-weight:700}
 h1{font-size:26px}
 h2{font-size:var(--t-hlavni)}
 h3{font-size:var(--t-text)}

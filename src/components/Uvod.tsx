@@ -58,7 +58,7 @@ function nactiPisma(): Promise<unknown> {
   const vzorek = "ŠČŘŽĚÚŮ příklad";
   const chci = [
     // z Adobe Fonts (kit thr1dyh); když se kit nenačte, požadavek se odmítne
-    `700 1rem "hagrid"`, `400 1rem "hagrid-text"`, `700 1rem "hagrid-text"`,
+    `400 1rem "hagrid"`, `700 1rem "hagrid"`, `400 1rem "hagrid-text"`, `700 1rem "hagrid-text"`,
     // záloha uložená v appce
     `700 1rem "Nadpisy"`, `400 1rem "Outfit"`, `700 1rem "Outfit"`,
   ];

@@ -10,7 +10,10 @@ const CHCI = [
   // Nadpisy: těžký, ale úzký grotesk. Archivo Black ani Unbounded se nevešly –
   // „Lucky Bastard" i „Na dobré cestě" lámaly na dva řádky i v hero kartě,
   // Syne dokonce uprostřed slova („BLÁHOVK / A"). Bricolage se vejde na jeden.
-  ["Bricolage Grotesque", 800, "nadpisy"],
+  // Dvě váhy, ať záloha umí totéž co Hagrid: velké nadpisy lehce, drobné
+  // verzálkové popisky tučně.
+  ["Bricolage Grotesque", 400, "nadpisy-400"],
+  ["Bricolage Grotesque", 700, "nadpisy-700"],
   // Psaná ruka v appce není vůbec. Byla v popisech úkolů, pak už jen ve
   // vyprávění — a ani tam nesedí: appka má být čistá, ne pomalovaná.
   //

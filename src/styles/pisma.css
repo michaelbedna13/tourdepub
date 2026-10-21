@@ -1,19 +1,23 @@
 /* Záložní písma uložená přímo v appce. Hlavní je Hagrid z Adobe Fonts
    (kit v index.html); tohle se použije, když Adobe neodpoví nebo není signál.
-   Drží stejné dvě váhy jako Hagrid Text, aby se vzhled nepřeházel podle toho,
-   které písmo se zrovna načetlo: 400 text, 700 důraz. Nadpisy jsou zapsané
-   jako rozsah 700–900, protože nadpisy v appce chtějí 900 a Bricolage je
-   jen v osmistovce — bez rozsahu by prohlížeč dokresloval umělý tuk.
+   Drží stejné dvě váhy jako Hagrid, aby se vzhled nepřeházel podle toho,
+   které písmo se zrovna načetlo: 400 a 700, v nadpisech i v textu.
 
    Řeže je scripts/stahni-pisma.mjs z Google Fonts na latin + latin-ext, aby se
    do telefonu netahala azbuka. Rozsahy znaků musí zůstat, jak jsou — bez nich
    by prohlížeč nevěděl, který soubor má na „Č" nebo „ř" sáhnout. */
 
-@font-face{font-family:"Nadpisy";font-style:normal;font-weight:700 900;font-display:swap;
-  src:url("../assets/fonts/nadpisy-lat.woff2") format("woff2");
+@font-face{font-family:"Nadpisy";font-style:normal;font-weight:400;font-display:swap;
+  src:url("../assets/fonts/nadpisy-400-lat.woff2") format("woff2");
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Nadpisy";font-style:normal;font-weight:700 900;font-display:swap;
-  src:url("../assets/fonts/nadpisy-ext.woff2") format("woff2");
+@font-face{font-family:"Nadpisy";font-style:normal;font-weight:400;font-display:swap;
+  src:url("../assets/fonts/nadpisy-400-ext.woff2") format("woff2");
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Nadpisy";font-style:normal;font-weight:700;font-display:swap;
+  src:url("../assets/fonts/nadpisy-700-lat.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
+@font-face{font-family:"Nadpisy";font-style:normal;font-weight:700;font-display:swap;
+  src:url("../assets/fonts/nadpisy-700-ext.woff2") format("woff2");
   unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:"Outfit";font-style:normal;font-weight:400;font-display:swap;
   src:url("../assets/fonts/outfit-400-lat.woff2") format("woff2");
