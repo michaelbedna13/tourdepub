@@ -261,6 +261,27 @@ a statické odklidí v tom samém snímku. Proto se v `index.html` **nic neprol�
 ani nemění velikost**: React může převzít kdykoli a uprostřed prolnutí by jasnost
 loga skočila z půlky na plnou.
 
+Obě loga stojí na **pevných pixelech ze skriptu** (`--uvod-y`, `--uvod-w`),
+ne na procentech okna, a obě jsou `position: fixed`. Tři důvody, všechny
+vyzkoušené měřením (`největší posun při předání` musí být 0 px):
+
+- iPhone při spuštění z plochy **ještě dorovnává výšku okna**, takže střed
+  obrazovky se posune a logo na 50 % poskočí. Proto se střed počítá ze
+  `screen.height`, ne z `innerHeight`, když appka běží z plochy.
+- Jednotka `vw` se mění, **jakmile se objeví posuvník** — a ten se objeví
+  přesně ve chvíli, kdy se pod úvodem vykreslí appka. Logo by tím při předání
+  změnilo šířku.
+- `absolute` by počítalo od odsazení rodiče, `fixed` od okna. Obě loga musí
+  mít stejný počátek.
+
+**Pod úvodem je appka schovaná** (`html.uvodni .app{visibility:hidden}`).
+Na iOS umí jinak skleněné plochy (`backdrop-filter`) na okamžik probliknout
+přes překryv; tahle pojistka je převzatá z osobní appky, kde se to řešilo dřív.
+`visibility`, ne `display`: skrytý obsah se pořád rozměřuje, takže hero pás zná
+své pozice a po odkrytí nemusí nic dopočítávat. A schovává se `.app`, ne `#app`
+— úvod React kreslí dovnitř `#app` vedle `.app`, takže schovat celé `#app`
+znamená schovat i úvod.
+
 Značka odejde, až platí všechno tohle naráz: **uběhlo 1700 ms od načtení**,
 **aspoň 1000 ms od startu Reactu** a **písma jsou načtená**. Každá podmínka
 řeší jedno bliknutí:

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="cs">
+<html lang="cs" class="uvodni">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
@@ -53,6 +53,14 @@
   /* Rovnou v hlavičce, ne ve stylu: než se stáhne app.css, kreslí prohlížeč
      bílou a na tmavé appce to zabliká. Tohle platí od prvního vykreslení. */
   html,body{background:#070E0A;margin:0}
+  /* Pod úvodem se appka už vykresluje a načítá, jen je skrytá. Na iOS umí
+     jinak skleněné plochy (backdrop-filter) na okamžik probliknout přes
+     překryv — tohle je ta samá pojistka, co má osobní appka.
+     visibility, ne display: skrytý obsah se pořád rozměřuje, takže hero pás
+     zná své pozice a po odkrytí nemusí nic dopočítávat.
+     Schovává se .app, ne #app: úvod React kreslí dovnitř #app vedle .app,
+     takže schovat celé #app znamená schovat i úvod. */
+  html.uvodni .app{visibility:hidden}
   /* Logo je rovnou ve stránce, ne z Reactu, aby naskočilo dřív, než se stáhne
      skript, a navázalo na obrázek, který ukazuje iOS při spuštění z plochy.
      React pak vykreslí to svoje na přesně stejné místo a tohle odklidí
@@ -61,11 +69,32 @@
      Žádné prolnutí ani změna velikosti: React převezme logo kdykoli během
      načítání, a kdyby se tu zrovna prolínalo, skočila by jeho jasnost z půlky
      na plnou. Buď obrázek ještě není, nebo je — nic mezi tím. */
-  #uvod{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#070E0A}
-  #uvod img{width:52vw;max-width:260px;height:auto;display:block}
+  #uvod{position:fixed;inset:0;z-index:100;background:#070E0A}
+  /* Logo stojí na pevných pixelech ze skriptu níž (--uvod-y, --uvod-w), ne na
+     procentech okna. Dva důvody: iPhone při spuštění z plochy ještě dorovnává
+     výšku okna, takže střed obrazovky se posune a logo na 50 % by poskočilo;
+     a jednotka vw se mění, jakmile se objeví posuvník, takže by logo při
+     předání Reactu ještě změnilo šířku. Pevná poloha vůči oknu (fixed), ať
+     do toho nemluví odsazení rodiče. */
+  #uvod img{position:fixed;left:50%;top:var(--uvod-y,50vh);translate:-50% -50%;
+    width:var(--uvod-w,52vw);height:auto;display:block}
 </style>
 </head>
 <body>
+<script>
+  // Střed loga: v appce z plochy podle výšky displeje (to je konečná výška
+  // okna), jinde podle okna. Musí se nastavit dřív, než se cokoli vykreslí.
+  (function () {
+    var naPloše = navigator.standalone || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+    var v = naPloše ? Math.max(screen.height, innerHeight) : innerHeight;
+    var k = document.documentElement.style;
+    k.setProperty("--uvod-y", Math.round(v / 2) + "px");
+    k.setProperty("--uvod-w", Math.round(Math.min(innerWidth * 0.52, 260)) + "px");
+  })();
+  // Pojistka: kdyby se skript appky vůbec nerozběhl, nesmí appka zůstat
+  // skrytá napořád.
+  setTimeout(function () { document.documentElement.classList.remove("uvodni"); }, 8000);
+</script>
 <div id="uvod"><img src="/logo-uvodni.svg" alt="Tour de Pub" width="450" height="359"></div>
 <div id="app"></div>
 <script type="module" src="/src/main.tsx"></script>

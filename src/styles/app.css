@@ -491,8 +491,11 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    se dokreslí jedna po druhé. Logo samo se nehýbe, jinak by proti statické
    verzi poskočilo. */
 .uvod-znacka{
-  position:absolute;left:50%;top:50%;translate:-50% -50%;
-  width:52vw;max-width:260px;color:var(--text);
+  /* Přesně ta samá poloha i šířka jako u loga v index.html (--uvod-y, --uvod-w
+     nastaví skript tamtéž), aby při předání Reactu nebylo co poznat. Fixed,
+     ne absolute: odsazení .uvod by jinak posunulo počátek. */
+  position:fixed;left:50%;top:var(--uvod-y,50%);translate:-50% -50%;
+  width:var(--uvod-w,52vw);color:var(--text);
   transition:opacity .28s var(--krok),scale .4s var(--krok),translate .4s var(--krok);
 }
 .uvod-logo{display:block;width:100%;height:auto}

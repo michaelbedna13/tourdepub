@@ -96,6 +96,9 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
 
   /** Úvod se nevypne střihem, ale vytratí se. */
   function zavri() {
+    // appka je pod úvodem schovaná (html.uvodni v index.html); odkryje se
+    // teď, ať je vidět, jak se úvod vytrácí, a ne až po střihu
+    document.documentElement.classList.remove("uvodni");
     setZavira(true);
     setTimeout(hotovo, ZAVRENI);
   }
