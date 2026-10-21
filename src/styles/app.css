@@ -135,7 +135,14 @@ input,textarea,select{caret-color:var(--text)}
   display:block;
   padding:calc(env(safe-area-inset-top) + 18px) var(--okraj)
           calc(env(safe-area-inset-bottom) + 48px);
-  animation:obsah-prichod .34s var(--krok) both;
+  /* backwards, ne both. Obrazovka se při příchodu posouvá, takže v klíčových
+     snímcích je transform — a „forwards“ ho nechá doplňovat navěky, i když
+     je koncová hodnota none. Prohlížeč pak s obrazovkou zachází jako s
+     posunutou vrstvou a lišta uvnitř, která je position:sticky, se přestane
+     chovat podle okna: Safari ji nechá podjet obsahem. Chromium to přežije,
+     iPhone ne. Koncový snímek je stejný jako klidový stav, takže doplňovat
+     dopředu stejně není co. */
+  animation:obsah-prichod .34s var(--krok) backwards;
 }
 @media (display-mode:standalone){
   .obrazovka{padding-top:calc(max(env(safe-area-inset-top),50px) + 8px)}
