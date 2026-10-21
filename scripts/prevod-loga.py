@@ -7,7 +7,7 @@ na jakémkoli podkladu.
 
 Spuštění: python3 scripts/prevod-loga.py <obrazek>
 """
-import sys, os, json
+import sys, os, json, re
 import numpy as np
 from PIL import Image
 import potrace
@@ -84,13 +84,25 @@ def main(cesta):
                 "export const LOGO_CESTA = %s;\n"
                 % (json.dumps("0 0 %s %s" % (n(sirka), n(vyska))), json.dumps(d)))
 
-    # Varianta s napevno krémovou barvou pro <img> na úvodní obrazovce.
-    # Logo v <img> si barvu textu vzít nemůže, currentColor by vyšel černý.
-    with open(os.path.join(os.path.dirname(__file__), "..", "public", "logo-uvodni.svg"),
-              "w", encoding="utf-8") as f:
-        f.write(svg.replace('fill="currentColor"', 'fill="#EFEBE0"'))
+    # Stejná dráha i přímo do index.html mezi značky <!-- logo:start/end -->.
+    # Jako <img> by to byl samostatný soubor, který dorazí až po prvním
+    # vykreslení stránky — a mezi úvodní obrazovkou iOS (na které logo je)
+    # a naším logem by bliklo černo.
+    html = os.path.join(os.path.dirname(__file__), "..", "index.html")
+    with open(html, encoding="utf-8") as f:
+        stranka = f.read()
+    vlozene = (
+        '<svg class="logo" viewBox="0 0 %s %s" fill="#EFEBE0" fill-rule="evenodd" '
+        'role="img" aria-label="Tour de Pub"><path d="%s"/></svg>' % (n(sirka), n(vyska), d)
+    )
+    nova = re.sub(r"(<!-- logo:start -->).*?(<!-- logo:end -->)",
+                  lambda m: m.group(1) + vlozene + m.group(2), stranka, flags=re.S)
+    if nova == stranka and "logo:start" not in stranka:
+        print("POZOR: v index.html chybí značky <!-- logo:start --> a <!-- logo:end -->")
+    with open(html, "w", encoding="utf-8") as f:
+        f.write(nova)
 
-    print("logo.svg + logo.ts + logo-uvodni.svg: %d drah, %.1f kB, viewBox %s×%s"
+    print("logo.svg + logo.ts + index.html: %d drah, %.1f kB, viewBox %s×%s"
           % (len(kusy), len(svg) / 1024, n(sirka), n(vyska)))
 
 if __name__ == "__main__":

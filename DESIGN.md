@@ -316,9 +316,12 @@ Na konci se úvod **vytratí**, nevypne se střihem.
 **Podklad a rozměr loga jsou i v hlavičce `index.html`**, ne jen v `app.css`.
 Než se stylopis stáhne, kreslí prohlížeč bílou a na tmavé appce to zabliká.
 
-Logo je tu jako `<img src="logo-uvodni.svg">` s barvou zapečenou napevno.
-V `<img>` si `currentColor` vzít nejde, vyšel by černý. Proto je ta varianta
-zvlášť a generuje se spolu s ostatními.
+Logo je v `index.html` **vykreslené jako dráha**, ne jako `<img>`. Samostatný
+soubor dorazí až po prvním vykreslení stránky, takže mezi úvodní obrazovkou iOS
+(na které logo je) a naším logem bliklo černo — změřeno: box loga už stál na
+místě, ale obrázek ještě nedorazil. Takhle se vykreslí s první stránkou a žádný
+požadavek navíc není. Dráhu mezi značky `<!-- logo:start/end -->` píše
+`scripts/prevod-loga.py`, ručně se needituje.
 
 ## Pohyb
 
