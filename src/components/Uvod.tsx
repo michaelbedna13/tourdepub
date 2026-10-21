@@ -1,19 +1,24 @@
-// Úvod po každém spuštění: logo, pak krátká průprava. Vždycky jde přeskočit.
+// Úvod po každém spuštění: značka se dokreslí čárkami, pak průprava.
+// Vždycky jde přeskočit a žádná stránka se nepřehodí sama — Mišák chtěl mít
+// jistotu, že si to někdo opravdu přečetl, ne že mu to uteklo.
 //
-// Logo nekreslí React, ale rovnou index.html (#uvod). Dokud se stáhne a spustí
-// skript, je už vidět – a navazuje na obrázek, který iPhone ukazuje při spuštění
-// z plochy. React nad ním drží jen tlačítko Přeskočit a pak ho odklidí.
-import { useEffect, useRef, useState } from "react";
+// Logo kreslí React, ne jen index.html. Dřív to bylo obojí: statické logo
+// odcházelo prolnutím a průprava se přes něj zároveň zjevovala, takže mezi
+// nimi na okamžik prosvítala appka. Teď je to jedna neprůhledná vrstva,
+// uvnitř které se jen přepíná obsah; statické logo z index.html se odklidí
+// hned, jak React vykreslí to svoje na stejné místo.
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { vazat } from "../lib/format";
 import type { JmenoIkony } from "../lib/ikony";
 import { Ikona } from "./Ikona";
+import { Logo } from "./Logo";
 
-/** Jak dlouho se ukazuje jedna stránka průpravy, než se přehodí sama. */
-const NA_STRANKU = 2400;
-/** Nejmíň takhle dlouho zůstane logo, ať to na rychlém telefonu jen neprobleskne. */
-const LOGO_NEJMIN = 1100;
-/** Kdyby se logo nenačetlo vůbec, nečeká se na něj věčně. */
+/** Nejmíň takhle dlouho zůstane značka, ať se čárky stihnou dokreslit. */
+const ZNACKA_NEJMIN = 1700;
+/** Kdyby se logo z index.html nenačetlo vůbec, nečeká se na něj věčně. */
 const LOGO_NEJVIC = 1800;
+/** Jak dlouho značka odchází, než naskočí první stránka. */
+const ODCHOD = 260;
 
 interface Stranka {
   ikona: JmenoIkony;
@@ -22,112 +27,116 @@ interface Stranka {
 }
 
 const PRUPRAVA: Stranka[] = [
-  { ikona: "mista", nadpis: "Devět špeluněk, jedna noc",
-    text: "Valí se to od šesti večer do dvou do rána. Na každou štaci je tak 45 minut, courat se nevyplácí." },
-  { ikona: "carka", nadpis: "Čárky nejsou za pivo",
-    text: "Čárka za každou špeluňku, čárka za škopek — a pak hlavně za srandy. Čím větší haluz, tím víc čárek." },
-  { ikona: "koruna", nadpis: "První parta bere všecko",
-    text: "Vlezné je kilo na palici a celej bank bere ta parta, co nahrabe nejvíc čárek." },
+  { ikona: "mista", nadpis: "Večer ve Štatlu",
+    text: "Devět brněnskejch špeluněk, jedna noc a partyje, co si nedá říct. Valí se to od šesti večer do dvou do rána." },
+  { ikona: "carka", nadpis: "Čárky nejsou za chlast",
+    text: "Za každou špeluňku, do který vlezete, čárka. Za škopek čárka. Ale ty tučný padajó za srandy — za koule, za dobrej kšaft a za to, že to v palici nemáš vypatlaný." },
+  { ikona: "hospoda", nadpis: "Kdo se loudá, ten nemá",
+    text: "Na každou štaci je tak 45 minut a pak se valí dál. Jak se nějaká partyja fest loudá a ostatní na ni čumijó, za srandy v tý špeluňce nemá ani čárku." },
+  { ikona: "koruna", nadpis: "Celej bank bere jedna",
+    text: "Vlezné je kilo na palici a na konci to všecko shrábne ta parta, co nahrabala nejvíc čárek. Tak ať je to betelný." },
 ];
 
 /** Odklidí úvodní obrazovku z index.html. Nechat ji tam by znamenalo
  *  krémové logo přes celou appku. */
-function odklidLogo() {
-  const el = document.getElementById("uvod");
-  if (!el) return;
-  el.classList.add("odchazi");
-  el.addEventListener("transitionend", () => el.remove(), { once: true });
-  setTimeout(() => el.remove(), 900); // kdyby přechod neproběhl
+function odklidStatickeLogo() {
+  document.getElementById("uvod")?.remove();
 }
 
 export function Uvod({ hotovo }: { hotovo: () => void }) {
-  // -1 = ještě svítí logo z index.html
+  // -1 = značka, 0+ = stránka průpravy
   const [kde, setKde] = useState(-1);
+  const [odchazi, setOdchazi] = useState(false);
   const svih = useRef<number | null>(null);
 
-  // Logo odejde, až je všechno hotové: stihlo se ukázat, písma jsou načtená
-  // (jinak by text průpravy po jejich dotažení přeskočil) a uběhla chvilka
-  // od spuštění.
+  // Statické logo zmizí ve stejném snímku, ve kterém React vykreslí to svoje
+  // na to samé místo. Prolnutí mezi nimi by bylo vidět jako bliknutí.
+  useLayoutEffect(odklidStatickeLogo, []);
+
+  // Značka odejde, až je všechno hotové: čárky se dokreslily a písma jsou
+  // načtená (jinak by text průpravy po jejich dotažení přeskočil).
   useEffect(() => {
     let platne = true;
-    const obrazek = document.querySelector<HTMLImageElement>("#uvod img");
-    const nacteno = !obrazek || obrazek.dataset.nacteno
-      ? Promise.resolve()
-      : new Promise<void>((h) => {
-          obrazek.addEventListener("load", () => h(), { once: true });
-          obrazek.addEventListener("error", () => h(), { once: true });
-          setTimeout(h, LOGO_NEJVIC);
-        });
     const pockej = (ms: number) => new Promise((h) => setTimeout(h, ms));
-
     Promise.all([
-      nacteno,
-      pockej(Math.max(0, LOGO_NEJMIN - performance.now())),
-      document.fonts?.ready ?? Promise.resolve(),
+      pockej(Math.max(0, ZNACKA_NEJMIN - performance.now())),
+      Promise.race([document.fonts?.ready ?? Promise.resolve(), pockej(LOGO_NEJVIC)]),
     ]).then(() => {
       if (!platne) return;
-      odklidLogo();
-      setKde(0);
+      setOdchazi(true);
+      setTimeout(() => { if (platne) setKde(0); }, ODCHOD);
     });
     return () => { platne = false; };
   }, []);
 
-  // stránky se přehazují samy; z poslední se vejde do appky
-  useEffect(() => {
-    if (kde < 0) return;
-    const t = setTimeout(() => dal(), NA_STRANKU);
-    return () => clearTimeout(t);
-  }, [kde]);
-
   function dal() {
-    if (kde + 1 >= PRUPRAVA.length) konec();
+    if (kde + 1 >= PRUPRAVA.length) hotovo();
     else setKde(kde + 1);
   }
 
-  function konec() {
-    odklidLogo(); // při přeskočení ještě svítí
-    hotovo();
-  }
-
+  const posledni = kde + 1 === PRUPRAVA.length;
   const s = PRUPRAVA[Math.max(0, kde)];
 
   return (
-    <div className={`uvod-vrstva${kde < 0 ? " pod-logem" : ""}`} role="dialog" aria-label="Úvod"
+    <div className="uvod" role="dialog" aria-label="Úvod"
       onPointerDown={(e) => { svih.current = e.clientX; }}
       onPointerUp={(e) => {
         const z = svih.current;
         svih.current = null;
         if (z === null || kde < 0) return;
         const dx = e.clientX - z;
-        if (dx < -40) dal();
-        else if (dx > 40) setKde(Math.max(0, kde - 1));
-        else dal(); // ťuknutí kamkoli posune dál, ať se nemusí čekat
+        if (dx < -50) dal();
+        else if (dx > 50) setKde(Math.max(0, kde - 1));
       }}
     >
-      <button className="uvod-preskocit" onClick={konec}
+      <button className="uvod-preskocit" onClick={hotovo}
         onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
+
+      {kde < 0 && (
+        <div className={`uvod-znacka${odchazi ? " odchazi" : ""}`}>
+          <Logo trida="uvod-logo" />
+          <CarkyKreslene />
+        </div>
+      )}
 
       {kde >= 0 && (
         <>
           <div className="uvod-stranka" key={kde}>
-            <Ikona jmeno={s.ikona} px={96} trida="uvod-ikona" />
+            <Ikona jmeno={s.ikona} px={84} trida="uvod-ikona" />
             <h1 className="uvod-nadpis">{vazat(s.nadpis)}</h1>
             <p className="uvod-text psane">{vazat(s.text)}</p>
           </div>
 
           <div className="uvod-spodek">
-            <div className="uvod-tecky" role="img" aria-label={`Stránka ${kde + 1} z ${PRUPRAVA.length}`}>
+            <div className="uvod-tecky" role="img"
+              aria-label={`Stránka ${kde + 1} z ${PRUPRAVA.length}`}>
               {PRUPRAVA.map((_, i) => (
                 <span key={i} className={`uvod-tecka${i === kde ? " ted" : ""}${i < kde ? " bylo" : ""}`} />
               ))}
             </div>
-            {kde + 1 === PRUPRAVA.length && (
-              <button className="tl hlavni" onClick={konec} onPointerUp={(e) => e.stopPropagation()}>
-                <Ikona jmeno="piva" px={19} /> Jedeme</button>
-            )}
+            <button className="tl hlavni" onClick={dal} onPointerUp={(e) => e.stopPropagation()}>
+              {posledni ? <><Ikona jmeno="piva" px={19} /> Jedeme na to</> : "Dál"}
+            </button>
           </div>
         </>
       )}
     </div>
+  );
+}
+
+/** Pět čárek pod značkou, co se dokreslí jedna po druhé — čtyři svislé
+ *  a pátá přes ně. Je to jediná ozdoba, co appka má, a nese téma hry:
+ *  animace, která nic nepředstírá, jen počítá. */
+function CarkyKreslene() {
+  const tahy = [
+    "M6 5 L4 33", "M16 4 L18 31", "M27 5 L25 32", "M37 4 L39 33", "M2 29 L42 7",
+  ];
+  return (
+    <svg className="uvod-carky" viewBox="0 0 44 38" fill="none" stroke="currentColor"
+      strokeWidth={3.4} strokeLinecap="round" aria-hidden="true">
+      {tahy.map((d, i) => (
+        <path key={i} d={d} style={{ animationDelay: `${300 + i * 130}ms` }} />
+      ))}
+    </svg>
   );
 }

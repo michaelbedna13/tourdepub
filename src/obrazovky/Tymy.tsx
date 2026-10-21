@@ -18,7 +18,7 @@ export function Tymy() {
   return (
     <>
       <Hlava nadpis="Týmy" />
-      <p className="podnadpis psane">{vazat("Ťukni na tým, za který chceš zapisovat.")}</p>
+      <p className="podnadpis">{vazat("Ťukni na tým, za který chceš zapisovat.")}</p>
       <PruhSyncu podrobne />
 
       <div className="vrstva radky">
@@ -52,7 +52,7 @@ export function Tymy() {
         <div className="vrstva prodyseny">
           <h3 style={{ marginBottom: 10 }}>Kolik se dá urvat</h3>
           <p className="skore-popis cislo">{s.hospody} za špeluňky · {s.hospody} za škopky · {s.ukoly} za srandy</p>
-          <p className="psane" style={{ marginTop: 10, fontSize: 15, color: "var(--text-2)" }}>
+          <p style={{ marginTop: 12, fontSize: 15, color: "var(--text-2)" }}>
             Dohromady nejvíc <b className="cislo strop-cislo">{s.celkem}</b> {sklonuj(s.celkem)}
           </p>
         </div>

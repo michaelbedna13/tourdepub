@@ -7,12 +7,15 @@ import { writeFileSync, mkdirSync } from "node:fs";
 
 const UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36";
 const CHCI = [
-  // nadpisy: těžký grotesk, ať mají váhu
-  ["Archivo Black", 400, "archivo-black"],
-  // popisy a vysvětlivky: psaná ruka, odpovídá hospodě.
+  // Nadpisy: těžký, ale úzký grotesk. Archivo Black ani Unbounded se nevešly –
+  // „Lucky Bastard" i „Na dobré cestě" lámaly na dva řádky i v hero kartě,
+  // Syne dokonce uprostřed slova („BLÁHOVK / A"). Bricolage se vejde na jeden.
+  ["Bricolage Grotesque", 800, "nadpisy"],
+  // Vyprávění v úvodu a v Pravidlech: psaná ruka. Jinde v appce není –
+  // tři písma na jedné obrazovce vypadala jako nepořádek, ne jako záměr.
   // Architects Daughter nejde – nemá ť ani ď, a ty jsou v textech úkolů všude.
   ["Gloria Hallelujah", 400, "psaci"],
-  // ovládání, názvy a čísla: musí zůstat jednoznačné
+  // Všechno ostatní: ovládání, popisy, čísla.
   ["Outfit", 400, "outfit-400"],
   ["Outfit", 500, "outfit-500"],
   ["Outfit", 600, "outfit-600"],

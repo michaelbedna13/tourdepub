@@ -29,9 +29,9 @@ export interface Ukol {
   max: number;
   pozn?: string;
   ikona?: JmenoIkony;
-  /** Jde splnit jen v téhle hospodě (id). */
+  /** Tip, kde se úkol hodí nejvíc (id hospody). Nezamyká ho – viz tipNaStaci(). */
   hospoda?: string;
-  /** Jde splnit jen na cestě mezi dvěma hospodami (id). */
+  /** Tip na cestu mezi dvěma hospodami (id). Taky jen tip, ne zámek. */
   mezi?: [string, string];
   /** Čárku bere jen jedna parta. */
   exkluzivni?: boolean;

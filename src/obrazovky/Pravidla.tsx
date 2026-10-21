@@ -35,7 +35,10 @@ export function Pravidla() {
       <Hlava nadpis="Pravidla" />
 
       <div className="pravidla">
-        <p>{vazat("Bacha, to není jenom takový to klasický večerní nasávání v Štatlu. Tady se jede betelná řežba přes brněnský špeluňky, kde čárky nemáš jenom za vyžahnutý pruty, ale hlavně za to, že máš koule, dobrej kšaft a v palici to nemáš vypatlaný.")}</p>
+        {/* jediné místo v Pravidlech, kde se vypráví – proto psaná ruka */}
+        <div className="pravidla-uvod">
+          <p>{vazat("Bacha, to není jenom takový to klasický večerní nasávání v Štatlu. Tady se jede betelná řežba přes brněnský špeluňky, kde čárky nemáš jenom za vyžahnutý pruty, ale hlavně za to, že máš koule, dobrej kšaft a v palici to nemáš vypatlaný.")}</p>
+        </div>
         <p>
           <b>O co jde:</b> {vazat("Nahrabat víc čárek než ty druhý partyje a urvat titul z Tour De Pub.")}<br />
           <b>Vlezné do kotla:</b> Kilo na palici.<br />

@@ -60,6 +60,9 @@ uprostřed hry. Kdyby mělo jít o víc, musela by přibýt opravdová práva v 
 
 Pod hamburgerem vpravo nahoře je pět obrazovek:
 
+Mezi obrazovkami se chodí **švihem do boku** nebo hamburgerem. Uvnitř
+kategorie vede švih na další kategorii, ne na jinou obrazovku.
+
 - **Hra** — hero karta štace: kolikátá je, jak se jmenuje, kde jste na trase
   a dvě odškrtávátka (*Jsme v špeluňce*, *Škopky jsme lupnuli*). **Karty se
   přepínají švihem do boku** — v hospodě jednou rukou je to rychlejší než mířit
@@ -93,8 +96,20 @@ Překlik se opraví stejným ťuknutím ještě jednou.
 Hospody i úkoly nejsou napevno v kódu. Příští ročník si trasu i srandy naklikáš
 přímo v appce — `src/lib/data.ts` je jen to, čím se hra naplní poprvé.
 
-Když smažeš hospodu, zmizí s ní i čárky, co z ní týmy měly. Když byl na tu hospodu
-navázaný úkol (Bullseye jen *U Ričího*), omezení tím padá a úkol jde splnit kdekoli.
+Když smažeš hospodu, zmizí s ní i čárky, co z ní týmy měly. Tip u úkolu, který
+na tu hospodu ukazoval, tím zmizí taky.
+
+### Štace úkol nezamyká
+
+`hospoda` a `mezi` jsou **jenom tipy**, ne zámky — v seznamu z nich zůstane
+tichý odznak („Nejlíp ve 4. štaci") a úkol jde zapsat odkudkoli a kdykoli.
+Dřív se takový úkol dal ťuknout jen ve správné štaci a bylo to na obtíž:
+trasa se v noci stejně posouvá, parta Bullseye hodí tam, kde jsou šipky,
+a zamčené tlačítko pod prstem znamená hádku u stolu, ne lepší hru.
+Kdo byl kde, si party pohlídají samy.
+
+Výjimka zůstala jedna: **Brněnskej zloděj** bere z každé špeluňky jen jednou
+(`jednouZaHospodu`). To není omezení trasou, ale samo zadání úkolu.
 
 ## Bodování
 
@@ -113,8 +128,8 @@ Dohromady se dá urvat nejvíc **74 čárek** (9 + 9 + 56 z úkolů).
 | `piva` | obtížnost 1–3, kreslí se jako půllitry |
 | `body` | kolik čárek padne za jedno splnění |
 | `max` | kolikrát to jde opakovat |
-| `hospoda` | jde jen v téhle špeluňce (Bullseye v č. 4) |
-| `mezi` | jde jen na cestě mezi dvěma špeluňkami (Srostlý budny 3–4) |
+| `hospoda` | **tip**, kde se to hodí nejvíc (Bullseye ve 4. štaci) |
+| `mezi` | **tip** na cestu mezi dvěma štacemi (Srostlý budny 3–4) |
 | `exkluzivni` | čárku bere jen jedna parta (Hospodský Národní) |
 | `jednouZaHospodu` | z každé špeluňky jen jednou (Brněnskej zloděj) |
 
@@ -232,8 +247,10 @@ hamburger se takhle poprvé slil do vlnovky, než se mu stáhlo kymácení.
 
 ## Písma
 
-Archivo Black na nadpisy, Gloria Hallelujah na popisy, Outfit na ovládání —
-všechno SIL OFL a uložené v `src/assets/fonts/`.
+Bricolage Grotesque 800 na nadpisy, Outfit na všechno ostatní a Gloria
+Hallelujah **jen** na vyprávění v úvodu a v Pravidlech — všechno SIL OFL
+a uložené v `src/assets/fonts/`. Proč tahle sestava a ne tři písma všude,
+je v `DESIGN.md`.
 Lokálně kvůli dvěma věcem: web funguje bez signálu a nenačítá se nic z Googlu.
 
 Stahuje je `scripts/stahni-pisma.mjs`. Subsety se poznávají podle `unicode-range`,
@@ -279,15 +296,17 @@ Proč, je v `DESIGN.md`.
 
 Běží **po každém spuštění** a vždycky jde přeskočit. Má dvě části:
 
-1. **Logo.** `public/uvodni/` jsou obrázky, které ukáže iOS při spuštění appky
-   z plochy — bez nich se objeví jen prázdná barva. Hned po nich naváže
-   `#uvod` v `index.html`: je rovnou ve stránce, aby naskočil dřív, než se stáhne
-   skript. Drží se aspoň 1100 ms, než se načtou písma, a pak odejde prolnutím.
-2. **Průprava.** Tři stránky s textem a animací (`src/components/Uvod.tsx`).
-   Přehazují se samy po 2,4 s, ťuknutím nebo švihem do boku; *Přeskočit* je
-   pořád na očích a poslední stránka má *Jedeme*.
+1. **Značka.** `public/uvodni/` jsou obrázky, které ukáže iOS při spuštění appky
+   z plochy — bez nich se objeví jen prázdná barva. Hned po nich naváže `#uvod`
+   v `index.html`: je rovnou ve stránce, aby logo naskočilo dřív, než se stáhne
+   skript. React pak vykreslí svoje logo na přesně to samé místo a statické
+   odklidí, takže mezi nimi není vidět žádný střih. Pod značkou se dokreslí
+   pět čárek, jedna po druhé.
+2. **Průprava.** Čtyři stránky příběhu (`src/components/Uvod.tsx`).
+   **Žádná se nepřehodí sama** — dál se jde tlačítkem *Dál* nebo švihem do boku,
+   poslední má *Jedeme na to*. *Přeskočit* je pořád na očích.
 
-Časování a obsah jsou nahoře v `Uvod.tsx` (`NA_STRANKU`, `LOGO_NEJMIN`, `PRUPRAVA`).
+Časování a obsah jsou nahoře v `Uvod.tsx` (`ZNACKA_NEJMIN`, `PRUPRAVA`).
 Appka se pod úvodem už kreslí a připojuje k Supabase, takže po doběhnutí je hotová.
 
 Systémové obrázky generuje:

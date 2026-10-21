@@ -81,13 +81,27 @@ Plochá tmavá barva bez něj působila jako plast.
 
 ## Písmo
 
-Tři řezy, každý má svou práci. Logo je kresba, ne font.
+**Dvě rodiny na všechno a jedna navíc jen na vyprávění.** Logo je kresba, ne font.
 
-- **Archivo Black** — nadpisy a velká čísla, vždycky verzálkami. Těžký grotesk,
-  aby nadpis měl váhu.
-- **Gloria Hallelujah** — popisy úkolů, vysvětlivky, pravidla. Psaná ruka sedí
-  k hospodě. **Nikdy na ovládání** — tlačítka a popisky musí zůstat jednoznačné.
-- **Outfit** — ovládání, názvy a čísla.
+- **Bricolage Grotesque 800** — nadpisy, vždycky verzálkami.
+- **Outfit** — všechno ostatní: ovládání, popisy úkolů, čísla, nápovědy.
+  Řezy 400 / 500 / 600.
+- **Gloria Hallelujah** — **jen** úvod po spuštění a první odstavce Pravidel.
+
+Dřív se psaná ruka nacházela i v popisech úkolů, v nápovědách pod nadpisy,
+v oknech a v prázdných stavech. Na jedné obrazovce se pak potkala tři písma
+a bylo to cítit jako nepořádek, ne jako nálada — navíc se psaná ruka hůř čte
+v malém a v hospodě po pár pivech. Teď je to **jediný hlas navíc a jen tam,
+kde se vypráví**.
+
+Nadpisové písmo se vybíralo podle toho, co appka opravdu sází: **názvy hospod
+v hero kartě**. Archivo Black i Unbounded lámaly „Lucky Bastard" i „Na dobré
+cestě" na dva řádky, Syne dokonce uprostřed slova („BLÁHOVK / A"). Bricolage
+se vejde na jeden řádek u všech devíti. Při výměně se to musí zkusit znovu,
+ne odhadovat z ukázky s latinkou.
+
+Nepoužívej přejmenované řezy („Outfit UI" byla šestistovka tvářící se jako
+čtyřstovka). Vypadá to v kódu jako čtvrtá rodina a plete to.
 
 Čísla mají `font-variant-numeric: tabular-nums` (třída `.cislo`), aby skóre
 při přepočítání neposkakovalo.
@@ -115,7 +129,11 @@ a dvě obří tlačítka — takže nic nevedlo a hlavní informace zanikla.
   a pro jistotu — gesto, které nemá viditelnou obdobu, by někdo nenašel (HIG).
   Štace se přepne, **až posun ustane**: jinak by jeden švih přepsal stav týmu
   devětkrát za sebou.
-- **Vykukující karta je ztlumená** na 50 % krytí, ať je jasné, která platí.
+- **Vykukující karta je ztlumená** na 45 % krytí, ať je jasné, která platí.
+- **Která karta platí, si pás drží sám** a přepíná to v okamžiku, kdy se karta
+  dostane do obrazu; do stavu týmu se to zapíše až po dojetí. Dřív se čekalo
+  na obojí a karta se rozsvítila skoro vteřinu po švihu — vypadalo to, jako by
+  se něco načítalo.
 - **Zápis** jsou dvě odškrtávátka na dně karty, ne dvě plná tlačítka. Je to
   seznam dvou věcí, co se v každé špeluňce zapisují — tak ať to tak vypadá.
   Kolečko se při splnění zaplní krémovou, stejně jako u úkolů.
@@ -126,6 +144,22 @@ Pod kartou jde skóre, pak pořadí týmů, pak úkoly — každý blok tišší
 ten nad ním.
 
 ## Navigace
+
+Dvě cesty na to samé: **švih do boku** a **hamburger vpravo nahoře**.
+
+Švih je rychlejší a v hospodě jednou rukou přirozený, ale je neviditelný —
+kdo ho nezkusí, nenajde ho. Proto je vedle něj pořád tlačítko (HIG: gesto,
+které nemá viditelnou obdobu, nesmí být jediná cesta).
+
+Pořadí je stejné jako v menu: Hra → Úkoly → Týmy → Hospody → Pravidla.
+Uvnitř kategorie se švihem chodí **mezi kategoriemi**, ne na jinou obrazovku —
+tam člověk zrovna prochází úkoly a skok na Hospody by byl překvapení.
+
+Švih se chytí, až je jasné, že je vodorovný (12 px a půldruhákrát víc do boku
+než dolů); jakmile se jednou rozhodne pro svislý, už se nechytne, aby šikmý
+tah nehýbal obrazovkou při obyčejném scrollování. Na vodorovných pásech uvnitř
+obrazovky (hero karty, `[data-vodorovne]`) se nechytá vůbec — tam si švih řeší
+pás sám.
 
 Mezi obrazovkami se chodí **hamburgerem vpravo nahoře**, ne spodní lištou.
 Lišta zabírala pruh přes celou šířku na každé obrazovce a z pěti obrazovek se

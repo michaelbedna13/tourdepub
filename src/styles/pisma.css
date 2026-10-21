@@ -1,14 +1,15 @@
-/* Písma Tour de Pub. Tři řezy, každý má svou práci:
-   Archivo Black nadpisy, Gloria Hallelujah („Psaci") popisy, Outfit ovládání a čísla.
+/* Písma Tour de Pub. Dvě rodiny na všechno a jedna navíc jen na vyprávění:
+   Bricolage Grotesque 800 nadpisy, Outfit ovládání, popisy a čísla,
+   Gloria Hallelujah („Psaci") jen v úvodu a v Pravidlech, kde se vypráví.
    Stahuje scripts/stahni-pisma.mjs z Google Fonts a řeže na latin + latin-ext,
    aby se do telefonu netahala azbuka. Rozsahy znaků musí zůstat, jak jsou —
    bez nich by prohlížeč nevěděl, který soubor má na „Č" nebo „ř" sáhnout. */
 
-@font-face{font-family:"Archivo Black";font-style:normal;font-weight:400;font-display:swap;
-  src:url("../assets/fonts/archivo-black-lat.woff2") format("woff2");
+@font-face{font-family:"Nadpisy";font-style:normal;font-weight:800;font-display:swap;
+  src:url("../assets/fonts/nadpisy-lat.woff2") format("woff2");
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Archivo Black";font-style:normal;font-weight:400;font-display:swap;
-  src:url("../assets/fonts/archivo-black-ext.woff2") format("woff2");
+@font-face{font-family:"Nadpisy";font-style:normal;font-weight:800;font-display:swap;
+  src:url("../assets/fonts/nadpisy-ext.woff2") format("woff2");
   unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:"Psaci";font-style:normal;font-weight:400;font-display:swap;
   src:url("../assets/fonts/psaci-lat.woff2") format("woff2");
@@ -32,11 +33,5 @@
   src:url("../assets/fonts/outfit-600-lat.woff2") format("woff2");
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
 @font-face{font-family:"Outfit";font-style:normal;font-weight:600;font-display:swap;
-  src:url("../assets/fonts/outfit-600-ext.woff2") format("woff2");
-  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Outfit UI";font-style:normal;font-weight:400;font-display:swap;
-  src:url("../assets/fonts/outfit-600-lat.woff2") format("woff2");
-  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF,U+FFFD}
-@font-face{font-family:"Outfit UI";font-style:normal;font-weight:400;font-display:swap;
   src:url("../assets/fonts/outfit-600-ext.woff2") format("woff2");
   unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}

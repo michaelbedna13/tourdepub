@@ -384,30 +384,29 @@ export function poradiTymu() {
 
 /* ---------- co kde jde ---------- */
 
-/** Jestli úkol v téhle štaci vůbec jde splnit. Vrací i důvod, proč ne. */
-export function dostupnost(u: Ukol, t = tym()): { jde: boolean; duvod?: string } {
-  const kde = t?.hospoda;
-  // Omezení se píše pořadím štace, ne názvem hospody. Čeština by názvy musela
-  // skloňovat („mezi Zastávkou a U Ričího“) a to automaticky nejde.
+/** Kam se úkol hodí nejvíc. Je to **jenom tip, ne zámek**: hra se nedá
+ *  naplánovat tak, aby trasa vyšla na minutu, a zamčený úkol, který parta
+ *  zrovna splnila, znamená hádku u stolu. Kdo je kde, si party pohlídají samy.
+ *
+ *  Štace se píše pořadím, ne názvem hospody. Čeština by názvy musela skloňovat
+ *  („mezi Zastávkou a U Ričího“) a to automaticky nejde. */
+export function tipNaStaci(u: Ukol): string | null {
   const cislo = (id: string) => stav.hospody.findIndex((x) => x.id === id) + 1;
   if (u.hospoda) {
     const c = cislo(u.hospoda);
-    if (!c) return { jde: true }; // hospoda byla smazaná, omezení tím padá
-    if (u.hospoda !== kde) return { jde: false, duvod: `Jen ve ${c}. štaci` };
+    return c ? `Nejlíp ve ${c}. štaci` : null; // hospoda byla smazaná, tip tím padá
   }
   if (u.mezi) {
     const c = u.mezi.map(cislo).filter(Boolean);
-    if (c.length < 2) return { jde: true };
-    if (!kde || !u.mezi.includes(kde)) return { jde: false, duvod: `Jen mezi ${c[0]}. a ${c[1]}. štací` };
+    return c.length === 2 ? `Nejlíp mezi ${c[0]}. a ${c[1]}. štací` : null;
   }
-  return { jde: true };
+  return null;
 }
 
 export const kolikrat = (id: string, t = tym()): number => t?.ukoly[id] || 0;
 
 export function jdePridat(u: Ukol, t = tym()): boolean {
   if (!t) return false;
-  if (!dostupnost(u, t).jde) return false;
   if (kolikrat(u.id, t) >= u.max) return false;
   if (u.jednouZaHospodu && t.hospoda && t.zlodej[t.hospoda]) return false;
   return true;

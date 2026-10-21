@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Carky } from "../components/Carky";
 import { Hlava } from "../components/Hlava";
@@ -79,15 +79,22 @@ export function Hra() {
 /* ---------- hero karty štací ---------- */
 
 /** Karty štací vedle sebe, přepínají se švihem do boku i šipkami.
- *  Švih je pro jednu ruku v hospodě rychlejší než mířit na malý terč. */
+ *  Švih je pro jednu ruku v hospodě rychlejší než mířit na malý terč.
+ *
+ *  Která karta zrovna platí, si pás drží sám (`videna`) a přepisuje to hned,
+ *  jak se karta dostane do obrazu. Do stavu týmu se to zapíše až po dojetí.
+ *  Dřív se čekalo na obojí a karta se rozsvítila skoro vteřinu po švihu —
+ *  vypadalo to, jako by se něco načítalo. */
 function HeroPas() {
   const i = indexHospody();
+  const [videna, setVidena] = useState(i);
   const pas = useRef<HTMLDivElement>(null);
   const hned = useRef(true);
   const cas = useRef(0);
 
   // srovná posun na aktivní štaci: po šipkách, po skoku z Hospod i po spuštění
   useEffect(() => {
+    setVidena(i);
     const p = pas.current;
     const karta = p?.children[i] as HTMLElement | undefined;
     const prvni = p?.children[0] as HTMLElement | undefined;
@@ -101,29 +108,36 @@ function HeroPas() {
 
   useEffect(() => () => window.clearTimeout(cas.current), []);
 
-  /** Po dojetí švihu se štace přepne na kartu, co zůstala v obraze.
-   *  Čeká se, až posun ustane – jinak by se za jednoho švihu přepsala štace
-   *  několikrát a každé přepsání je zápis do stavu týmu. */
+  /** Která karta je nejblíž levému kraji pásu. */
+  function vObraze(): number {
+    const p = pas.current;
+    const prvni = p?.children[0] as HTMLElement | undefined;
+    if (!p || !prvni) return videna;
+    let nej = 0;
+    let nejblize = Infinity;
+    Array.from(p.children).forEach((el, j) => {
+      const d = Math.abs((el as HTMLElement).offsetLeft - prvni.offsetLeft - p.scrollLeft);
+      if (d < nejblize) { nejblize = d; nej = j; }
+    });
+    return nej;
+  }
+
   function naPosun() {
+    // rozsvítit hned, jakmile je karta v obraze (překreslí se jen při změně)
+    const ted = vObraze();
+    if (ted !== videna) setVidena(ted);
+    // zápis do stavu týmu až po dojetí: jeden švih by ho jinak přepsal
+    // několikrát za sebou a každý zápis jde i do telefonu a na server
     window.clearTimeout(cas.current);
     cas.current = window.setTimeout(() => {
-      const p = pas.current;
-      const prvni = p?.children[0] as HTMLElement | undefined;
-      if (!p || !prvni) return;
-      let nej = 0;
-      let nejblize = Infinity;
-      Array.from(p.children).forEach((el, j) => {
-        const d = Math.abs((el as HTMLElement).offsetLeft - prvni.offsetLeft - p.scrollLeft);
-        if (d < nejblize) { nejblize = d; nej = j; }
-      });
-      const cil = stav.hospody[nej];
+      const cil = stav.hospody[vObraze()];
       if (cil) nastavHospodu(cil.id);
-    }, 140);
+    }, 90);
   }
 
   return (
-    <div className="hero-pas" ref={pas} onScroll={naPosun}>
-      {stav.hospody.map((h, j) => <HeroKarta key={h.id} h={h} cislo={j + 1} aktivni={j === i} />)}
+    <div className="hero-pas" ref={pas} onScroll={naPosun} data-vodorovne>
+      {stav.hospody.map((h, j) => <HeroKarta key={h.id} h={h} cislo={j + 1} aktivni={j === videna} />)}
     </div>
   );
 }

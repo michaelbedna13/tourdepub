@@ -23,7 +23,7 @@ export function Hospody() {
   return (
     <>
       <Hlava nadpis="Hospody" />
-      <p className="podnadpis psane">
+      <p className="podnadpis">
         {vazat(spravce ? "Pořadí určuje trasu. Šipkami se přehazuje." : "Ťukni na hospodu, ať se tam tým přesune.")}
       </p>
 

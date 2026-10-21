@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { HashRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { PotvrzeniHost } from "./components/Potvrzeni";
 import { Uvod } from "./components/Uvod";
+import { KATEGORIE } from "./lib/data";
+import { useSvih } from "./lib/svih";
 import { spustSync } from "./lib/sync";
 import { Hospody } from "./obrazovky/Hospody";
 import { Hra } from "./obrazovky/Hra";
@@ -40,14 +42,22 @@ export function App() {
   );
 }
 
+// Pořadí pro švih do boku. Stejné jako v menu, ať se to nepere.
+const HLAVNI = ["/", "/ukoly", "/tymy", "/hospody", "/pravidla"];
+const KATEGORIE_CESTY = KATEGORIE.map((k) => `/ukoly/${k.id}`);
+
 function Kostra() {
   const { pathname } = useLocation();
+  // V kategorii se švihem chodí mezi kategoriemi, ne na jinou obrazovku –
+  // tam člověk zrovna prochází úkoly a skok na Hospody by byl překvapení.
+  const svih = useSvih(pathname.startsWith("/ukoly/") ? KATEGORIE_CESTY : HLAVNI);
   // ještě před vykreslením nové obrazovky, ať neproblikne na staré pozici
   useLayoutEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
-    <div className="app">
-      {/* klíč podle adresy: každá obrazovka se jemně zvedne, ne střih */}
-      <main className="obrazovka" key={pathname}>
+    <div className="app" {...svih.obal}>
+      {/* klíč podle adresy: každá obrazovka přijede, ne střih */}
+      <main className={`obrazovka${svih.prichod ? ` z-${svih.prichod}` : ""}`}
+        key={pathname} style={svih.styl}>
         <Outlet />
       </main>
     </div>

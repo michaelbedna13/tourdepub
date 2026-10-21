@@ -1,7 +1,7 @@
 import type { Ukol } from "../lib/data";
 import { sklonuj, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
-import { dostupnost, jdePridat, kolikrat, pridejUkol, tym, uberUkol } from "../lib/stav";
+import { jdePridat, kolikrat, pridejUkol, tipNaStaci, tym, uberUkol } from "../lib/stav";
 import { Ikona } from "./Ikona";
 import { Obtiznost } from "./Obtiznost";
 
@@ -16,15 +16,15 @@ interface Props {
 export function RadekUkolu({ u, uprav }: Props) {
   const t = tym();
   const kolik = kolikrat(u.id, t);
-  const dost = dostupnost(u, t);
   const opakovatelny = u.max > 1;
   const splneno = kolik > 0 && (opakovatelny ? kolik >= u.max : true);
 
+  // Štace je tip, ne zámek – úkol jde zapsat kdykoli a odkudkoli.
   const odznaky = [
-    !dost.jde ? dost.duvod : null,
+    tipNaStaci(u),
     u.exkluzivni ? "Bere jen jedna parta" : null,
     opakovatelny ? `${u.body} ${sklonuj(u.body)} za kus, až ${u.body * u.max}` : null,
-    u.jednouZaHospodu && dost.jde && t?.hospoda && t.zlodej[t.hospoda] ? "Z týhle špeluňky už máte" : null,
+    u.jednouZaHospodu && t?.hospoda && t.zlodej[t.hospoda] ? "Z týhle špeluňky už máte" : null,
   ].filter(Boolean) as string[];
 
   function prepni() {
@@ -33,7 +33,7 @@ export function RadekUkolu({ u, uprav }: Props) {
     else if (pridejUkol(u)) odmena("+" + u.body);
   }
 
-  const tridy = ["ukol", splneno && "splneno", !dost.jde && "zamceno"].filter(Boolean).join(" ");
+  const tridy = ["ukol", splneno && "splneno"].filter(Boolean).join(" ");
 
   return (
     <div className={tridy}

@@ -43,11 +43,15 @@
   /* Rovnou v hlavičce, ne ve stylu: než se stáhne app.css, kreslí prohlížeč
      bílou a na tmavé appce to zabliká. Tohle platí od prvního vykreslení. */
   html,body{background:#070E0A;margin:0}
-  /* Úvodní obrazovka s logem. Je rovnou ve stránce, ne z Reactu, aby naskočila
-     hned a navázala na tu, kterou ukazuje iOS při spuštění z plochy.
-     Odklidí ji <Uvod> (src/components/Uvod.tsx), až doběhne. */
+  /* Logo je rovnou ve stránce, ne z Reactu, aby naskočilo dřív, než se stáhne
+     skript, a navázalo na obrázek, který ukazuje iOS při spuštění z plochy.
+     React pak vykreslí to svoje na přesně stejné místo a tohle odklidí
+     (<Uvod> v src/components/Uvod.tsx) — proto se tu nic nehýbe ani nemění
+     velikost, jinak by logo při převzetí poskočilo. */
   #uvod{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#070E0A}
-  #uvod img{width:52vw;max-width:260px;height:auto;display:block;opacity:0}
+  #uvod img{width:52vw;max-width:260px;height:auto;display:block;
+    opacity:0;transition:opacity .22s ease}
+  #uvod img[data-nacteno]{opacity:1}
 </style>
 </head>
 <body>
