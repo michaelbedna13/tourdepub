@@ -67,6 +67,12 @@
   --t-drobne:13px;
   --t-text:15px;
   --t-hlavni:17px;
+
+  /* Proklad velkých nadpisů. Česká verzálka nese háčky a čárky nad výškou
+     písmen, takže u víceřádkového nadpisu sedí diakritika spodního řádku
+     na účaří horního (ČÁRKY NEJSOU ZA / CHLAST, NA DOBRÉ / CESTĚ). Sázet
+     verzálky na jedničku jde v angličtině, u nás ne. */
+  --radky-nadpis:1.16;
   --krok:cubic-bezier(.32,.72,0,1);
   color-scheme:dark;
 }
@@ -89,7 +95,7 @@ body::before{
   opacity:.5;mix-blend-mode:soft-light;
 }
 
-h1,h2,h3{margin:0;font-family:var(--nadpisy);line-height:1.06;
+h1,h2,h3{margin:0;font-family:var(--nadpisy);line-height:var(--radky-nadpis);
   letter-spacing:-.015em;text-transform:uppercase}
 /* velké nadpisy lehce, drobné popisky tučně – viz poznámka u --nadpisy */
 h1{font-weight:400}
@@ -263,8 +269,9 @@ input,textarea,select{caret-color:var(--text)}
    Karty v pásu jsou stejně vysoké podle té nejdelší, a bez toho by u kratších
    názvů vznikla díra a odškrtávátka by při švihu skákala nahoru a dolů. */
 .hero-nazev{
-  font-size:clamp(30px,8.6vw,42px);line-height:1;letter-spacing:-.025em;
-  margin:18px 0 0;min-height:2em;overflow-wrap:anywhere;position:relative;z-index:1;
+  font-size:clamp(30px,8.6vw,42px);line-height:var(--radky-nadpis);letter-spacing:-.025em;
+  margin:18px 0 0;min-height:calc(2em * var(--radky-nadpis));
+  overflow-wrap:anywhere;position:relative;z-index:1;
 }
 
 .hero-trasa{display:flex;align-items:center;gap:12px;margin:20px 0 18px;
@@ -303,7 +310,7 @@ input,textarea,select{caret-color:var(--text)}
 .skore-cislo{font-family:var(--nadpisy);font-size:52px;line-height:.78;letter-spacing:-.03em;flex:none}
 .skore-vedle{min-width:0;flex:1}
 .skore-vedle .carky{color:var(--text-3);margin-bottom:12px}
-.skore-popis{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3);line-height:1.5}
+.skore-popis{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3);line-height:1.62}
 .carky{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:flex-end}
 .carky svg{display:block;overflow:visible}
 
@@ -338,7 +345,7 @@ input,textarea,select{caret-color:var(--text)}
   padding:6px 11px;border-radius:var(--pilulka);background:rgba(7,14,10,.13)}
 .kat-sipka{opacity:.6}
 .kat-nazev{position:relative;z-index:1;margin-top:32px;padding-right:64px;
-  font-size:25px;line-height:1;letter-spacing:-.02em;overflow-wrap:anywhere}
+  font-size:25px;line-height:var(--radky-nadpis);letter-spacing:-.02em;overflow-wrap:anywhere}
 .kat-pod{position:relative;z-index:1;display:block;margin-top:9px;
   font-family:var(--pismo);font-size:var(--t-drobne);opacity:.72}
 /* V seznamu úkolů zůstane z barvy kategorie jen čárka nad nadpisem; význam
@@ -347,7 +354,7 @@ input,textarea,select{caret-color:var(--text)}
    a ořezával se na „Kecy a …“. */
 .kat-hlavicka{margin:-6px 0 10px}
 .kat-cara{height:4px;width:46px;border-radius:2px;margin-bottom:12px}
-.kat-hlavicka h1{font-size:clamp(26px,7.4vw,34px);line-height:.98;letter-spacing:-.02em;
+.kat-hlavicka h1{font-size:clamp(26px,7.4vw,34px);line-height:var(--radky-nadpis);letter-spacing:-.02em;
   overflow-wrap:anywhere}
 
 /* ---------- seznam úkolů ---------- */
@@ -551,7 +558,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   max-width:380px;margin:auto 0;
 }
 .uvod-ikona{color:var(--text)}
-.uvod-nadpis{margin-top:36px;font-size:clamp(29px,8.6vw,38px);line-height:1.02;
+.uvod-nadpis{margin-top:36px;font-size:clamp(29px,8.6vw,38px);line-height:var(--radky-nadpis);
   letter-spacing:-.025em}
 .uvod-text{margin-top:20px;font-size:var(--t-hlavni);line-height:1.7;color:var(--text-2)}
 /* Dál / Jedeme: jen tichý popisek, ne svítící tlačítko. Ťuknout jde kamkoli
