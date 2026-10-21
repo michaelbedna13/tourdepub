@@ -149,11 +149,19 @@ function HeroPas() {
 function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: boolean }) {
   const t = tym();
   const posledni = cislo === stav.hospody.length;
+  // štace je hotová, když je zapsaný příchod i škopek – pak na kartu klapne razítko
+  const hotova = !!t?.prichod[h.id] && !!t?.skopek[h.id];
 
   return (
-    <section className={`hero${aktivni ? " ted" : ""}`} aria-label={`${cislo}. štace: ${h.nazev}`}>
+    <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
+      aria-label={`${cislo}. štace: ${h.nazev}${hotova ? " (hotová)" : ""}`}>
+      {/* číslo štace ještě jednou, ve velkém a potichu: karty jsou jinak k
+          nerozeznání a tohle jim dá tvář, aniž by to něco přidalo na čtení */}
+      <span className="hero-duch cislo" aria-hidden="true">{cislo}</span>
+
       <div className="hero-vrch">
         <div className="hero-cislo cislo">{cislo}</div>
+        {hotova && <span className="hero-razitko" aria-hidden="true">Hotovo</span>}
         <div className="hero-sipky">
           <button className="ikonove" onClick={() => posunHospodu(-1)} disabled={cislo === 1}
             aria-label="Předchozí špeluňka"><Ikona jmeno="i-zpet" px={16} /></button>
