@@ -38,11 +38,16 @@
 
   /* Hagrid (Zetafonts) z Adobe Fonts, kit thr1dyh je v index.html. Jsou to
      tři samostatné rodiny: hagrid (400/700), hagrid-black (900) a hagrid-text
-     (300/400/700/800/900). Nadpisy chtějí tu nejtěžší, text tu čtecí.
-     Za nimi stojí Bricolage a Outfit uložené přímo v appce: když Adobe
+     (300/400/700/800/900).
+
+     Nadpisy jedou na hagrid v sedmistovce, ne na hagrid-black. Hagrid je
+     široký řez a v devítistovce se verzálky slejvají — „CELEJ BANK BERE JEDNA"
+     se ve velkém četlo jako plot. Bold má pořád dost váhy a zůstane čitelný.
+
+     Za Hagridem stojí Bricolage a Outfit uložené přímo v appce: když Adobe
      neodpoví nebo není signál, text se vysází jimi a nic se nerozsype. */
   --pismo:"hagrid-text","Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --nadpisy:"hagrid-black","hagrid","Nadpisy","Archivo Black",system-ui,sans-serif;
+  --nadpisy:"hagrid","Nadpisy","Archivo Black",system-ui,sans-serif;
 
   --r:24px;
   --r-sm:16px;
@@ -81,7 +86,7 @@ body::before{
   opacity:.5;mix-blend-mode:soft-light;
 }
 
-h1,h2,h3{margin:0;font-family:var(--nadpisy);font-weight:900;line-height:1.06;
+h1,h2,h3{margin:0;font-family:var(--nadpisy);font-weight:700;line-height:1.06;
   letter-spacing:-.015em;text-transform:uppercase}
 h1{font-size:26px}
 h2{font-size:var(--t-hlavni)}
