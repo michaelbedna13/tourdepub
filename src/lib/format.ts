@@ -28,6 +28,25 @@ export function sklonujTym(n: number): string {
   return "týmů";
 }
 
+/** Trojice tvarů podle počtu: 1 / 2–4 / zbytek. */
+const tvar = (n: number, jeden: string, par: string, hodne: string): string => {
+  const a = Math.abs(n);
+  return a === 1 ? jeden : a >= 2 && a <= 4 ? par : hodne;
+};
+
+/** Jak dlouho už to trvá, česky a ve čtvrtém pádu – věta zní „jste tady dvacet
+ *  minut“, ne „0:20“. Pod minutu se nic nepočítá: v hospodě nikoho nezajímá,
+ *  jestli je to čtyřicet vteřin. */
+export function jakDlouho(odMs: number, ted = Date.now()): string {
+  const minut = Math.max(0, Math.floor((ted - odMs) / 60000));
+  if (minut < 1) return "chvilku";
+  if (minut < 60) return minut === 1 ? "minutu" : `${minut} ${tvar(minut, "minutu", "minuty", "minut")}`;
+  const h = Math.floor(minut / 60), m = minut % 60;
+  const hodiny = h === 1 ? "hodinu" : `${h} ${tvar(h, "hodinu", "hodiny", "hodin")}`;
+  if (!m) return hodiny;
+  return `${hodiny} a ${m === 1 ? "minutu" : `${m} ${tvar(m, "minutu", "minuty", "minut")}`}`;
+}
+
 // Jednopísmenné předložky a spojky (k, s, v, z, o, u, a, i) nesmí v češtině
 // zůstat na konci řádku. Opakuje se, dokud se text mění: u dvou krátkých slov
 // za sebou („a v palici“) spotřebuje první průchod mezeru před druhým slovem

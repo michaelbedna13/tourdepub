@@ -28,6 +28,9 @@ export interface Tym {
   hospoda: string | null;
   /** Id hospody → jsme tam byli. */
   prichod: Record<string, boolean>;
+  /** Id hospody → kdy se zapsal příchod (ms). Jen pro „jste tady dvacet minut“,
+   *  na body to nemá vliv. Odepsaný příchod čas smaže. */
+  prichodCas: Record<string, number>;
   /** Id hospody → škopek padl. */
   skopek: Record<string, boolean>;
   /** Id úkolu → kolikrát splněno. */
@@ -53,7 +56,7 @@ export interface RadekTymu {
   hospoda: number;
   body: number;
   rozpad: Rozpad;
-  stav: Pick<Tym, "hospoda" | "prichod" | "skopek" | "ukoly" | "zlodej">;
+  stav: Pick<Tym, "hospoda" | "prichod" | "prichodCas" | "skopek" | "ukoly" | "zlodej">;
   upraveno: string;
 }
 
@@ -80,7 +83,7 @@ const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.rand
  *  telefonu i prohlížeče, který web jen otevřel. */
 export function novyTym(nazev = "", barva = BARVY[0], vlastni = true): Tym {
   return { id: noveId(), nazev, barva, vlastni, upraveno: null, bylNaServeru: false,
-           hospoda: null, prichod: {}, skopek: {}, ukoly: {}, zlodej: {} };
+           hospoda: null, prichod: {}, prichodCas: {}, skopek: {}, ukoly: {}, zlodej: {} };
 }
 
 /** Označí tým za používaný a orazítkuje změnu.
@@ -141,6 +144,8 @@ function nacti(): Stav {
   // starší uložené stavy příznak nemají; tým s vlastním jménem nebo s čárkami
   // je zjevně používaný
   for (const t of z.tymy) {
+    // starší uložený stav časy příchodů nemá; karta si pak nemá co ukázat a je to v pořádku
+    if (!t.prichodCas) t.prichodCas = {};
     if (t.vlastni === undefined) {
       t.vlastni = t.nazev !== "Naše parta"
         || Object.keys(t.prichod).length > 0
@@ -266,6 +271,7 @@ export function smazHospodu(id: string): boolean {
   // zápisy k té hospodě i štace týmů, co v ní stály, musí jít s ní
   for (const t of stav.tymy) {
     delete t.prichod[id];
+    delete t.prichodCas[id];
     delete t.skopek[id];
     delete t.zlodej[id];
     if (t.hospoda === id) t.hospoda = stav.hospody[0]?.id || null;
@@ -424,6 +430,11 @@ export function prepniZaklad(druh: Zaklad, kde?: string): boolean {
   dotknuto(t);
   if (t[druh][h]) delete t[druh][h];
   else t[druh][h] = true;
+  // čas příchodu drží jen kvůli „jste tady dvacet minut“; odepsaný příchod ho bere s sebou
+  if (druh === "prichod") {
+    if (t.prichod[h]) t.prichodCas[h] = Date.now();
+    else delete t.prichodCas[h];
+  }
   uloz();
   return !!t[druh][h];
 }
@@ -470,8 +481,8 @@ export function kOdeslani(t: Tym): RadekTymu {
     hospoda: indexHospody(t) + 1,
     body: body(t),
     rozpad: rozpad(t),
-    stav: { hospoda: t.hospoda, prichod: t.prichod, skopek: t.skopek,
-            ukoly: t.ukoly, zlodej: t.zlodej },
+    stav: { hospoda: t.hospoda, prichod: t.prichod, prichodCas: t.prichodCas,
+            skopek: t.skopek, ukoly: t.ukoly, zlodej: t.zlodej },
     upraveno: t.upraveno || new Date().toISOString(),
   };
 }
@@ -486,7 +497,8 @@ export function slucZeServeru(radky: RadekTymu[]) {
       nazev: r.nazev, barva: r.barva, vlastni: true, upraveno: r.upraveno,
       bylNaServeru: true,
       hospoda: r.stav?.hospoda ?? stav.hospody[0]?.id ?? null,
-      prichod: r.stav?.prichod || {}, skopek: r.stav?.skopek || {},
+      prichod: r.stav?.prichod || {}, prichodCas: r.stav?.prichodCas || {},
+      skopek: r.stav?.skopek || {},
       ukoly: r.stav?.ukoly || {}, zlodej: r.stav?.zlodej || {},
     };
     const mistni = stav.tymy.find((t) => t.id === r.id);

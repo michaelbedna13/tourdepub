@@ -5,8 +5,9 @@ import { Hlava } from "../components/Hlava";
 import { Ikona } from "../components/Ikona";
 import { PruhSyncu } from "../components/PruhSyncu";
 import { ZAKLAD, type Hospoda } from "../lib/data";
-import { sklonujTym, sklonujUkol, vazat } from "../lib/format";
+import { jakDlouho, sklonujTym, sklonujUkol, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
+import { RAZITKO } from "../lib/razitko";
 import {
   body, indexHospody, jdePridat, nastavHospodu, poradiTymu, posunHospodu,
   prepniZaklad, rozpad, stav, tym, useStav, type Zaklad,
@@ -151,17 +152,30 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   const posledni = cislo === stav.hospody.length;
   // štace je hotová, když je zapsaný příchod i škopek – pak na kartu klapne razítko
   const hotova = !!t?.prichod[h.id] && !!t?.skopek[h.id];
+  const odKdy = t?.prichodCas[h.id];
+  // zápis má být vidět i na kartě, ne jen na odškrtávátku: velké číslo
+  // štace krátce zesílí. Klíč se mění se zápisem, čímž se animace spustí znovu.
+  const [puls, setPuls] = useState(0);
 
   return (
     <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
       aria-label={`${cislo}. štace: ${h.nazev}${hotova ? " (hotová)" : ""}`}>
       {/* číslo štace ještě jednou, ve velkém a potichu: karty jsou jinak k
           nerozeznání a tohle jim dá tvář, aniž by to něco přidalo na čtení */}
-      <span className="hero-duch cislo" aria-hidden="true">{cislo}</span>
+      <span className={`hero-duch cislo${puls ? " zabliklo" : ""}`} key={puls} aria-hidden="true">
+        {cislo}
+      </span>
 
       <div className="hero-vrch">
         <div className="hero-cislo cislo">{cislo}</div>
-        {hotova && <span className="hero-razitko" aria-hidden="true">Hotovo</span>}
+        {hotova && (
+          <span className="hero-razitko" aria-hidden="true">
+            <svg className="razitko-ramecek" viewBox="0 0 172 60" aria-hidden="true">
+              <path d={RAZITKO} fillRule="evenodd" />
+            </svg>
+            Hotovo
+          </span>
+        )}
         <div className="hero-sipky">
           <button className="ikonove" onClick={() => posunHospodu(-1)} disabled={cislo === 1}
             aria-label="Předchozí špeluňka"><Ikona jmeno="i-zpet" px={16} /></button>
@@ -171,6 +185,7 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
       </div>
 
       <h1 className="hero-nazev">{h.nazev}</h1>
+      <JakDlouho od={odKdy} />
 
       <div className="hero-trasa">
         <div className="trasa-body" role="img" aria-label={`Štace ${cislo} z ${stav.hospody.length}`}>
@@ -187,7 +202,10 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
           const hotovo = !!t?.[z.id as Zaklad][h.id];
           return (
             <button key={z.id} className={`zaskrt${hotovo ? " hotovo" : ""}`} aria-pressed={hotovo}
-              onClick={() => { if (prepniZaklad(z.id as Zaklad, h.id)) odmena("+1"); }}>
+              onClick={() => {
+                if (prepniZaklad(z.id as Zaklad, h.id)) odmena("+1");
+                setPuls((x) => x + 1);
+              }}>
               <span className="zaskrt-kolecko"><Ikona jmeno="check" px={14} /></span>
               <span className="zaskrt-text">{vazat(z.nazev)}</span>
               <span className="zaskrt-hodnota cislo">+1</span>
@@ -197,4 +215,17 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
       </div>
     </section>
   );
+}
+
+/** Jak dlouho parta v téhle špeluňce sedí. Přepočítá se jednou za půl minuty:
+ *  na vteřiny to nikdo nekouká a častější překreslování by jen bralo baterku.
+ *  Řádka drží místo i bez zapsaného příchodu — karty v pásu jsou stejně vysoké
+ *  a bez toho by trasa pod názvem při švihu skákala nahoru a dolů. */
+function JakDlouho({ od }: { od?: number }) {
+  const [, tik] = useState(0);
+  useEffect(() => {
+    const i = window.setInterval(() => tik((x) => x + 1), 30000);
+    return () => window.clearInterval(i);
+  }, []);
+  return <div className="hero-cas">{od === undefined ? null : vazat(`Jste tady ${jakDlouho(od)}`)}</div>;
 }
