@@ -11,10 +11,8 @@ const CHCI = [
   // „Lucky Bastard" i „Na dobré cestě" lámaly na dva řádky i v hero kartě,
   // Syne dokonce uprostřed slova („BLÁHOVK / A"). Bricolage se vejde na jeden.
   ["Bricolage Grotesque", 800, "nadpisy"],
-  // Vyprávění v úvodu a v Pravidlech: psaná ruka. Jinde v appce není –
-  // tři písma na jedné obrazovce vypadala jako nepořádek, ne jako záměr.
-  // Architects Daughter nejde – nemá ť ani ď, a ty jsou v textech úkolů všude.
-  ["Gloria Hallelujah", 400, "psaci"],
+  // Psaná ruka v appce není vůbec. Byla v popisech úkolů, pak už jen ve
+  // vyprávění — a ani tam nesedí: appka má být čistá, ne pomalovaná.
   // Všechno ostatní: ovládání, popisy, čísla.
   ["Outfit", 400, "outfit-400"],
   ["Outfit", 500, "outfit-500"],

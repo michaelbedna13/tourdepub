@@ -10,6 +10,16 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tour de Pub">
+<!-- Hagrid z Adobe Fonts (kit thr1dyh). Načítá se stranou, ne jako blokující
+     styl: appka musí vykreslit tmavý podklad a logo hned, i kdyby Adobe
+     neodpovídalo. Když se kit nenačte (bez signálu, mimo povolenou doménu),
+     spadne písmo na Bricolage a Outfit uložené v appce — viz src/styles/app.css.
+     POZOR: v nastavení kitu na fonts.adobe.com musí být povolená doména
+     michaelbedna13.github.io, jinak Adobe nevydá nic. -->
+<link rel="preconnect" href="https://use.typekit.net" crossorigin>
+<link rel="stylesheet" href="https://use.typekit.net/thr1dyh.css"
+  media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://use.typekit.net/thr1dyh.css"></noscript>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/ikona.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/ikona-180.png">

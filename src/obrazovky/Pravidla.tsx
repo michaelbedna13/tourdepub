@@ -35,7 +35,7 @@ export function Pravidla() {
       <Hlava nadpis="Pravidla" />
 
       <div className="pravidla">
-        {/* jediné místo v Pravidlech, kde se vypráví – proto psaná ruka */}
+        {/* úvodní odstavec se čte jako text, ne jako seznam pravidel */}
         <div className="pravidla-uvod">
           <p>{vazat("Bacha, to není jenom takový to klasický večerní nasávání v Štatlu. Tady se jede betelná řežba přes brněnský špeluňky, kde čárky nemáš jenom za vyžahnutý pruty, ale hlavně za to, že máš koule, dobrej kšaft a v palici to nemáš vypatlaný.")}</p>
         </div>

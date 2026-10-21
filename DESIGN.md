@@ -81,27 +81,28 @@ Plochá tmavá barva bez něj působila jako plast.
 
 ## Písmo
 
-**Dvě rodiny na všechno a jedna navíc jen na vyprávění.** Logo je kresba, ne font.
+**Jedna rodina na všechno.** Logo je kresba, ne font.
 
-- **Bricolage Grotesque 800** — nadpisy, vždycky verzálkami.
-- **Outfit** — všechno ostatní: ovládání, popisy úkolů, čísla, nápovědy.
-  Řezy 400 / 500 / 600.
-- **Gloria Hallelujah** — **jen** úvod po spuštění a první odstavce Pravidel.
+- **Hagrid** (Cosimo Lorenzo Pancini, Zetafonts) — nadpisy i text.
+  Bere se z Adobe Fonts, kit je vložený v `index.html`.
+- **Bricolage Grotesque 800 + Outfit** — záloha uložená přímo v appce.
+  Když Adobe neodpoví, není signál nebo doména není v kitu povolená,
+  vysází se text jimi a nic se nerozsype.
+- **Psaná ruka v appce není.** Byla v popisech úkolů, pak už jen ve vyprávění.
+  Ani tam nesedí: appka má být čistá, ne pomalovaná, a v malém se hůř čte.
 
-Dřív se psaná ruka nacházela i v popisech úkolů, v nápovědách pod nadpisy,
-v oknech a v prázdných stavech. Na jedné obrazovce se pak potkala tři písma
-a bylo to cítit jako nepořádek, ne jako nálada — navíc se psaná ruka hůř čte
-v malém a v hospodě po pár pivech. Teď je to **jediný hlas navíc a jen tam,
-kde se vypráví**.
+Kit se načítá **stranou, ne jako blokující styl** (`media="print"` a `onload`).
+Appka musí vykreslit tmavý podklad a logo hned, i kdyby Adobe neodpovídalo —
+jinak se vrací přesně to bliknutí, co stálo takovou práci vymýtit.
 
-Nadpisové písmo se vybíralo podle toho, co appka opravdu sází: **názvy hospod
+Nadpisové písmo se vybírá podle toho, co appka opravdu sází: **názvy hospod
 v hero kartě**. Archivo Black i Unbounded lámaly „Lucky Bastard" i „Na dobré
-cestě" na dva řádky, Syne dokonce uprostřed slova („BLÁHOVK / A"). Bricolage
-se vejde na jeden řádek u všech devíti. Při výměně se to musí zkusit znovu,
-ne odhadovat z ukázky s latinkou.
+cestě" na dva řádky, Syne dokonce uprostřed slova („BLÁHOVK / A"). Při každé
+výměně se to musí zkusit znovu, ne odhadovat z ukázky s latinkou — a zkontrolovat
+`ť ď ě ů ř Ú Š Č Ž Ň`.
 
 Nepoužívej přejmenované řezy („Outfit UI" byla šestistovka tvářící se jako
-čtyřstovka). Vypadá to v kódu jako čtvrtá rodina a plete to.
+čtyřstovka). Vypadá to v kódu jako další rodina a plete to.
 
 ### Tři velikosti, nic mezi tím
 
@@ -276,8 +277,11 @@ Značka odejde, až platí všechno tohle naráz: **uběhlo 1700 ms od načtení
 Logo přijede z 90 % velikosti a zespodu, odchází lehkým zvětšením; obsah se pod
 ním zároveň zvedne o 8 px. Jeden pohyb, ne efekty.
 
-**2. Průprava.** Čtyři stránky: ikona, nadpis a jedna věta psanou rukou. **Žádná
-se nepřehodí sama** — dál se jde tlačítkem nebo švihem. Proužky dole říkají, kolik
+**2. Průprava.** Čtyři stránky: ikona, nadpis a jedna věta. **Žádná se nepřehodí
+sama** — dál se jde ťuknutím kamkoli na obrazovku, švihem do boku nebo popiskem
+*Dál* dole. Ten popisek **není tlačítko**: je to tichý text bez plochy, protože
+ťuknout jde stejně kamkoli a svítící pilulka dole by přetahovala pozornost
+z toho, co se má přečíst. Proužky dole říkají, kolik
 toho zbývá; úvod, u kterého není vidět konec, je otrava.
 
 Stránka přichází **jako jeden kus**, o 160 ms později, než začne odcházet značka.

@@ -247,10 +247,13 @@ hamburger se takhle poprvé slil do vlnovky, než se mu stáhlo kymácení.
 
 ## Písma
 
-Bricolage Grotesque 800 na nadpisy, Outfit na všechno ostatní a Gloria
-Hallelujah **jen** na vyprávění v úvodu a v Pravidlech — všechno SIL OFL
-a uložené v `src/assets/fonts/`. Proč tahle sestava a ne tři písma všude,
-je v `DESIGN.md`.
+**Hagrid** (Zetafonts) z Adobe Fonts na nadpisy i text — kit je vložený
+v `index.html`. Záloha uložená přímo v appce je **Bricolage Grotesque 800**
+na nadpisy a **Outfit** na text (obojí SIL OFL, v `src/assets/fonts/`);
+použije se, když Adobe neodpoví nebo doména není v kitu povolená.
+
+> **Pozor:** v nastavení kitu na fonts.adobe.com musí být povolená doména
+> `michaelbedna13.github.io`, jinak Adobe nevydá nic a appka poběží na záloze.
 Lokálně kvůli dvěma věcem: web funguje bez signálu a nenačítá se nic z Googlu.
 
 Stahuje je `scripts/stahni-pisma.mjs`. Subsety se poznávají podle `unicode-range`,
@@ -307,8 +310,9 @@ Běží **po každém spuštění** a vždycky jde přeskočit. Má dvě části
    (`document.fonts.load`), ne jen přes `document.fonts.ready` — obojí proto,
    aby to nikde neprobliklo. Podrobnosti jsou v `DESIGN.md`.
 2. **Průprava.** Čtyři stránky příběhu (`src/components/Uvod.tsx`).
-   **Žádná se nepřehodí sama** — dál se jde tlačítkem *Dál* nebo švihem do boku,
-   poslední má *Jedeme na to*. *Přeskočit* je pořád na očích.
+   **Žádná se nepřehodí sama** — dál se jde ťuknutím kamkoli na obrazovku,
+   švihem do boku nebo popiskem *Dál* dole (poslední *Jedeme na to*).
+   *Přeskočit* je pořád na očích.
 
 Časování a obsah jsou nahoře v `Uvod.tsx` (`ZNACKA_NEJMIN`, `PRUPRAVA`).
 Appka se pod úvodem už kreslí a připojuje k Supabase, takže po doběhnutí je hotová.

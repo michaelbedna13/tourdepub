@@ -56,9 +56,13 @@ function odklidStatickeLogo() {
  *  přeskočí do správného — a přesně to vypadá jako probliknutí. */
 function nactiPisma(): Promise<unknown> {
   const vzorek = "ŠČŘŽĚÚŮ příklad";
-  const chci = [`800 1rem "Nadpisy"`, `1rem "Psaci"`, `500 1rem "Outfit"`];
+  const chci = [
+    `800 1rem "hagrid"`, `400 1rem "hagrid-text"`,   // z Adobe Fonts, může chybět
+    `800 1rem "Nadpisy"`, `400 1rem "Outfit"`, `500 1rem "Outfit"`,
+  ];
   try {
-    return Promise.all(chci.map((f) => document.fonts.load(f, vzorek)))
+    // rodina, kterou prohlížeč nezná, skončí odmítnutím – na to se nečeká
+    return Promise.all(chci.map((f) => document.fonts.load(f, vzorek).catch(() => null)))
       .then(() => document.fonts.ready);
   } catch {
     return Promise.resolve(); // prohlížeč bez Font Loading API
@@ -110,8 +114,10 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
         svih.current = null;
         if (z === null || kde < 0) return;
         const dx = e.clientX - z;
+        // švih do boku listuje, ťuknutí kamkoli na obrazovku posune dál
         if (dx < -50) dal();
         else if (dx > 50) setKde(Math.max(0, kde - 1));
+        else dal();
       }}
     >
       <button className="uvod-preskocit" onClick={zavri}
@@ -129,7 +135,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
           <div className="uvod-stranka" key={kde}>
             <Ikona jmeno={s.ikona} px={84} trida="uvod-ikona" />
             <h1 className="uvod-nadpis">{vazat(s.nadpis)}</h1>
-            <p className="uvod-text psane">{vazat(s.text)}</p>
+            <p className="uvod-text">{vazat(s.text)}</p>
           </div>
 
           <div className="uvod-spodek">
@@ -139,8 +145,8 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
                 <span key={i} className={`uvod-tecka${i === kde ? " ted" : ""}${i < kde ? " bylo" : ""}`} />
               ))}
             </div>
-            <button className="tl hlavni" onClick={dal} onPointerUp={(e) => e.stopPropagation()}>
-              {posledni ? <><Ikona jmeno="piva" px={19} /> Jedeme na to</> : "Dál"}
+            <button className="uvod-dal" onClick={dal} onPointerUp={(e) => e.stopPropagation()}>
+              {posledni ? <><Ikona jmeno="piva" px={17} /> Jedeme na to</> : "Dál"}
             </button>
           </div>
         </div>

@@ -7,9 +7,8 @@
    Jsou to stejné tři odstíny, aby v appce nebyly dvě barevné soustavy.
    Proto se v seznamu úkolů barva kategorie neukazuje, jen tenká čára
    pod nadpisem; význam tam nesou půllitry.
-   Písma dvě: Bricolage Grotesque na nadpisy, Outfit na všechno ostatní.
-   Psaná ruka je jen tam, kde se vypráví (úvod, Pravidla) – jako třetí hlas
-   na každé obrazovce dělala nepořádek, ne náladu.
+   Písmo jedno: Hagrid (Adobe Fonts) na nadpisy i na text. Záložní dvojice
+   uložená v appce je Bricolage Grotesque a Outfit. Psaná ruka v appce není.
    Appka je jen tmavá. Hraje se v noci v hospodě, světlý režim nedává smysl.
    ============================================================ */
 
@@ -37,9 +36,11 @@
   --ob3:#F2765A;
   --spatne:#F2765A;
 
-  --pismo:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --nadpisy:"Nadpisy","Archivo Black","Arial Black",system-ui,sans-serif;
-  --psaci:"Psaci","Bradley Hand","Segoe Print",cursive;
+  /* Hagrid (Zetafonts) z Adobe Fonts, kit je v index.html. Za ním stojí
+     Bricolage a Outfit uložené přímo v appce: když Adobe neodpoví nebo
+     doména není v kitu povolená, text se vysází jimi a nic se nerozsype. */
+  --pismo:"hagrid-text","hagrid","Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --nadpisy:"hagrid","hagrid-text","Nadpisy","Archivo Black",system-ui,sans-serif;
 
   --r:24px;
   --r-sm:16px;
@@ -101,11 +102,9 @@ input,textarea,select{caret-color:var(--text)}
 .otocit{transform:scaleX(-1)}
 .spatne{color:var(--spatne)}
 .drobne{font-size:var(--t-drobne);color:var(--text-3);word-break:break-word}
-/* Psaná ruka má v appce jediné místo: vyprávění. Úvod a první odstavce
-   Pravidel. Dřív byla i v popisech úkolů, v nápovědách pod nadpisy, v oknech
-   a v prázdných stavech – na jedné obrazovce se pak potkala tři písma a bylo
-   to cítit jako nepořádek, ne jako nálada. */
-.psane{font-family:var(--psaci);line-height:1.62;letter-spacing:.005em}
+/* Delší odstavec k přečtení: úvod a první odstavec Pravidel. Jen volnější
+   proklad a o chlup větší písmo, žádná druhá rodina. */
+.odstavec{font-size:var(--t-hlavni);line-height:1.7;color:var(--text-2)}
 
 /* ---------- kostra ---------- */
 /* pás hero karet přetéká přes okraje obrazovky; na širší obrazovce by vykoukl
@@ -461,10 +460,8 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .pravidla ol{margin:0 0 14px;padding-left:22px;color:var(--text-2);line-height:1.65;font-size:var(--t-text)}
 .pravidla li{margin-bottom:12px}
 .pravidla b{color:var(--text);font-weight:600}
-/* jen úvodní vyprávění je psané rukou */
-.pravidla-uvod{font-family:var(--psaci);font-size:var(--t-hlavni);line-height:1.62;color:var(--text-2);
-  margin-bottom:22px}
-.pravidla-uvod p{font-family:inherit;font-size:inherit;line-height:inherit;margin-bottom:14px}
+.pravidla-uvod{margin-bottom:26px}
+.pravidla-uvod p{font-size:var(--t-hlavni);line-height:1.7;margin-bottom:14px}
 .legenda{display:flex;flex-direction:column;gap:12px}
 .legenda-radek{display:flex;align-items:center;gap:12px;font-size:var(--t-text);color:var(--text-2)}
 
@@ -526,6 +523,13 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .uvod-nadpis{margin-top:36px;font-size:clamp(29px,8.6vw,38px);line-height:1.02;
   letter-spacing:-.025em}
 .uvod-text{margin-top:20px;font-size:var(--t-hlavni);line-height:1.7;color:var(--text-2)}
+/* Dál / Jedeme: jen tichý popisek, ne svítící tlačítko. Ťuknout jde kamkoli
+   na obrazovku, tak ať to dole nepřetahuje pozornost z textu. */
+.uvod-dal{display:flex;align-items:center;justify-content:center;gap:9px;
+  min-height:44px;padding:0 18px;border-radius:var(--pilulka);
+  font-weight:500;font-size:var(--t-text);color:var(--text-2);
+  transition:color .16s}
+.uvod-dal:active{color:var(--text)}
 .uvod-spodek{display:flex;flex-direction:column;align-items:center;gap:26px;
   width:100%;max-width:320px;padding-bottom:8px}
 /* při přepnutí stránky se mění jen obsah, ne celá vrstva */
