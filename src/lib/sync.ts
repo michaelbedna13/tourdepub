@@ -142,9 +142,13 @@ function popisChyby(e: unknown): string {
   // čtení zakázané pravidly
   if (kod === "42501" || /row-level security|permission denied/i.test(zprava))
     return "Pravidla (RLS) nepouští ke čtení. Spusť v Supabase znovu část se zásadami z supabase/party.sql.";
-  // adresa projektu
-  if (/Failed to fetch|NetworkError|ERR_NAME_NOT_RESOLVED/i.test(zprava))
-    return "Nedá se spojit se Supabase. Zkontroluj SUPABASE_URL v src/lib/nastaveni.ts, nebo nemáš signál.";
+  // Spojení neprošlo. Tohle jediné nastane i během hry, a to u party v hospodě,
+  // ne u toho, kdo appku stavěl — proto se nikam neposílá do zdrojáků. Podrobnost
+  // (adresa projektu, DNS) je v konzoli, kdyby to byla opravdu špatná adresa.
+  if (/Failed to fetch|NetworkError|ERR_NAME_NOT_RESOLVED/i.test(zprava)) {
+    console.warn("Tour de Pub: spojení se serverem neprošlo.", e);
+    return "Není signál, nebo server neodpovídá. Zapisuje se dál do telefonu a srovná se to, až bude spojení.";
+  }
 
   const kusy: string[] = [];
   if (kod) kusy.push(kod);

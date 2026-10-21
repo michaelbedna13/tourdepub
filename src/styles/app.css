@@ -169,11 +169,10 @@ input,textarea,select{caret-color:var(--text)}
   margin:calc(-1 * (env(safe-area-inset-top) + 18px)) calc(-1 * var(--okraj)) 22px;
   padding:calc(env(safe-area-inset-top) + 18px) var(--okraj) 10px;
 }
-/* text nemá pod lištou mizet střihem, ale vyblednout */
-.hlava::after{
-  content:"";position:absolute;left:0;right:0;top:100%;height:16px;pointer-events:none;
-  background:linear-gradient(var(--podklad),transparent);
-}
+/* Pod lištou bylo prolnutí do ztracena. Vypadalo to jako chyba vykreslení:
+   podnadpis začíná přesně na její spodní hraně, takže v prolnutí ležel i
+   v klidu a při posunu se z řádky stal zpola průsvitný pruh. Lišta je
+   neprůhledná a obsah pod ni prostě zajede, jak je ve zvyku. */
 /* nadpis se smí zkrátit, ale nikdy nesmí zmizet úplně: do lišty se vedle sebe
    tlačí tři věci a dlouhé jméno týmu na úzkém telefonu ho jinak vytlačí na nulu */
 .hlava-text{flex:1 1 auto;min-width:86px}
@@ -270,7 +269,9 @@ input,textarea,select{caret-color:var(--text)}
    kartě tvář, ne se hlásit o slovo. */
 .hero-duch{
   position:absolute;left:-18px;top:6px;z-index:0;pointer-events:none;user-select:none;
-  font-family:var(--nadpisy);font-weight:400;font-size:228px;line-height:.74;
+  /* Pevných 228 px přerostlo úzký telefon: číslo přelezlo přes trasu až do
+     řádky s časem. Na 320 vyjde 198, na běžné šířce zůstává 228. */
+  font-family:var(--nadpisy);font-weight:400;font-size:min(228px,62vw);line-height:.74;
   letter-spacing:-.05em;opacity:.17;
   /* jen obrys: plné číslo udělá na tmavém podkladu desku, obrys zůstane kresbou */
   color:transparent;-webkit-text-stroke:2px var(--text);
@@ -315,7 +316,11 @@ input,textarea,select{caret-color:var(--text)}
 .hero-vrch{display:flex;align-items:center;justify-content:flex-end;gap:12px;
   min-height:36px;position:relative;z-index:1}
 .hero-sipky{display:flex;gap:6px}
-.hero-sipky .ikonove{width:36px;height:36px;background:transparent;color:var(--text-3)}
+/* Vzhledem drobné, ať nepřebíjejí kartu, ale ťukací plocha je plných 44 —
+   jinak se do nich v hospodě jednou rukou netrefíš. */
+.hero-sipky .ikonove{width:36px;height:36px;background:transparent;color:var(--text-3);
+  position:relative}
+.hero-sipky .ikonove::after{content:"";position:absolute;inset:-4px}
 
 /* název hospody je hlavní věc na obrazovce, tak ať to tak vypadá */
 /* Místo na dva řádky drží karta vždycky, i když se název vejde na jeden.
@@ -451,7 +456,8 @@ input,textarea,select{caret-color:var(--text)}
 .ukol.splneno .fajfka{background:var(--akce);box-shadow:none}
 .ukol.splneno .fajfka .ikona{opacity:1;transform:scale(1)}
 .pocitadlo{display:flex;align-items:center;gap:6px;flex:none}
-.pocitadlo button{width:34px;height:34px;border-radius:50%;background:var(--vrstva-2);
+/* 40 px: do těchhle dvou se ťuká opakovaně a 34 bylo na palec v hospodě málo */
+.pocitadlo button{width:40px;height:40px;border-radius:50%;background:var(--vrstva-2);
   display:grid;place-items:center;transition:transform .13s var(--krok),opacity .16s}
 .pocitadlo button:active{transform:scale(.88)}
 .pocitadlo button:disabled{opacity:.28}
@@ -459,7 +465,10 @@ input,textarea,select{caret-color:var(--text)}
 
 /* ---------- řádky seznamů ---------- */
 .radek{display:flex;align-items:center;gap:14px;padding:18px var(--vnitrek);width:100%;text-align:left}
-.radek-telo{flex:1;min-width:0;text-align:left}
+/* Vycpávka řádku patří .radku, takže tlačítko uvnitř bylo vysoké jen jako
+   text (29 px) a ťuknutí vedle jména spadlo do prázdna. Záporný okraj mu dá
+   celou výšku řádku, aniž by se cokoli posunulo. */
+.radek-telo{flex:1;min-width:0;text-align:left;padding:18px 0;margin:-18px 0}
 .radek-nazev{font-family:var(--pismo);font-weight:700;font-size:var(--t-hlavni);display:flex;align-items:center;gap:8px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .radek-pod{font-family:var(--pismo);font-weight:400;font-size:var(--t-drobne);color:var(--text-2);margin-top:3px}
