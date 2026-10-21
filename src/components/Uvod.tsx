@@ -125,8 +125,14 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
         else dal();
       }}
     >
-      <button className="uvod-preskocit" onClick={zavri}
-        onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
+      {/* Přeskočit naskočí až s průpravou. Ve fázi značky je to jediný text
+          na obrazovce a dokud se nenačte písmo, vysází se náhradním a po
+          chvilce přeskočí do správného — drobné, ale je to vidět. Značka
+          trvá necelé dvě vteřiny, takže není co zmeškat. */}
+      {kde >= 0 && (
+        <button className="uvod-preskocit" onClick={zavri}
+          onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
+      )}
 
       {/* značka zůstává vykreslená a jen se vytrácí, zatímco první stránka
           už přichází — jinak by mezi nimi blikl prázdný podklad */}
@@ -160,18 +166,19 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   );
 }
 
-/** Pět čárek pod značkou, co se dokreslí jedna po druhé — čtyři svislé
+/** Pět čárek za značkou, co se dokreslí jedna po druhé — čtyři svislé
  *  a pátá přes ně. Je to jediná ozdoba, co appka má, a nese téma hry:
- *  animace, která nic nepředstírá, jen počítá. */
+ *  animace, která nic nepředstírá, jen počítá. Leží za logem a potichu,
+ *  aby to byl podklad, ne druhý nápis. */
 function CarkyKreslene() {
   const tahy = [
     "M6 5 L4 33", "M16 4 L18 31", "M27 5 L25 32", "M37 4 L39 33", "M2 29 L42 7",
   ];
   return (
     <svg className="uvod-carky" viewBox="0 0 44 38" fill="none" stroke="currentColor"
-      strokeWidth={3.4} strokeLinecap="round" aria-hidden="true">
+      strokeWidth={0.9} strokeLinecap="round" aria-hidden="true">
       {tahy.map((d, i) => (
-        <path key={i} d={d} style={{ animationDelay: `${300 + i * 130}ms` }} />
+        <path key={i} d={d} style={{ animationDelay: `${260 + i * 150}ms` }} />
       ))}
     </svg>
   );

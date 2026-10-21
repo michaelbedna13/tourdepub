@@ -509,15 +509,30 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   width:var(--uvod-w,52vw);color:var(--text);
   transition:opacity .28s var(--krok),scale .4s var(--krok),translate .4s var(--krok);
 }
-.uvod-logo{display:block;width:100%;height:auto}
+/* Logo se po převzetí Reactem jednou nadechne. Nesmí nikam naskočit —
+   na obrazovce už stojí od prvního vykreslení, tak se jen rozhýbe
+   z klidu a do klidu se vrátí. */
+.uvod-logo{display:block;width:100%;height:auto;position:relative;z-index:1;
+  animation:logo-nadech 1.5s var(--krok) both}
+@keyframes logo-nadech{
+  0%{transform:none}
+  38%{transform:scale(1.035) rotate(-.9deg)}
+  70%{transform:scale(.995) rotate(.45deg)}
+  100%{transform:none}
+}
 .uvod-znacka.odchazi{opacity:0;scale:.96;translate:-50% calc(-50% - 16px)}
+.uvod-znacka.odchazi .uvod-logo{animation:none}
+
+/* Čárky leží za logem, ne pod ním: je to podklad, ne druhý nápis.
+   Proto velké, potichu a bez vlastního místa v rozvržení. */
 .uvod-carky{
-  position:absolute;left:50%;top:100%;translate:-50% 0;margin-top:26px;
-  width:76px;height:auto;overflow:visible;color:var(--text-3);
+  position:absolute;left:50%;top:50%;translate:-50% -50%;
+  width:128%;height:auto;overflow:visible;color:var(--text);
+  opacity:.12;z-index:0;
 }
 .uvod-carky path{
   stroke-dasharray:46;stroke-dashoffset:46;
-  animation:carka-kresli .42s var(--krok) both;
+  animation:carka-kresli .5s var(--krok) both;
 }
 @keyframes carka-kresli{to{stroke-dashoffset:0}}
 
