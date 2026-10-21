@@ -13,10 +13,13 @@ const CHCI = [
   ["Bricolage Grotesque", 800, "nadpisy"],
   // Psaná ruka v appce není vůbec. Byla v popisech úkolů, pak už jen ve
   // vyprávění — a ani tam nesedí: appka má být čistá, ne pomalovaná.
-  // Všechno ostatní: ovládání, popisy, čísla.
+  //
+  // Všechno ostatní. Dvě váhy, ne tři: kit s Hagridem má v textové rodině
+  // 300/400/700/800/900 a žádnou 500 ani 600. Požadavek na 500 by prohlížeč
+  // odbavil čtyřstovkou a 600 sedmistovkou, takže by byl v appce zmatek
+  // podle toho, které písmo se zrovna načetlo. Záloha drží stejné dvě váhy.
   ["Outfit", 400, "outfit-400"],
-  ["Outfit", 500, "outfit-500"],
-  ["Outfit", 600, "outfit-600"],
+  ["Outfit", 700, "outfit-700"],
 ];
 
 mkdirSync(new URL("../src/assets/fonts/", import.meta.url), { recursive: true });
