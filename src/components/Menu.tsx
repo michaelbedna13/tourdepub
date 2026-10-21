@@ -10,7 +10,7 @@ const POLOZKY: { kam: string; popis: string; ikona: JmenoIkony; sedi: (cesta: st
   { kam: "/ukoly", popis: "Úkoly", ikona: "hvezda", sedi: (c) => c.startsWith("/ukoly") },
   { kam: "/tymy", popis: "Týmy", ikona: "trofej", sedi: (c) => c.startsWith("/tymy") },
   { kam: "/hospody", popis: "Hospody", ikona: "hospoda", sedi: (c) => c.startsWith("/hospody") },
-  { kam: "/pravidla", popis: "Pravidla", ikona: "i-mrizka", sedi: (c) => c.startsWith("/pravidla") },
+  { kam: "/pravidla", popis: "Pravidla", ikona: "i-pravidla", sedi: (c) => c.startsWith("/pravidla") },
 ];
 
 /** Hamburger v horní liště a rozcestí pod ním.

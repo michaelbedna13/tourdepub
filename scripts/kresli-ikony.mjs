@@ -136,9 +136,16 @@ const IKONY = {
     I(cut([[50, 12], [92, 48], [82, 48], [82, 88], [18, 88], [18, 48], [8, 48]], { ...HRUBE, tension: 0.2 })),
     C(cut(rect(40, 60, 60, 88, 3), { ...ROUGH, amp: 1.4 })),
   ],
-  "i-mrizka": () => {
-    const b = (x, y) => I(cut(rect(x, y, x + 30, y + 30, 5), { ...ROUGH, amp: 1.9 }));
-    return [b(12, 12), b(58, 12), b(12, 58), b(58, 58)];
+  // Pravidla: popsaný papír. Čtyři čtverečky tu stály dřív a neříkaly nic –
+  // mřížka je „přehled všeho“, ne „přečti si, jak se to hraje“. Nahoře kratší
+  // tah jako nadpis, pod ním dva plné: ve dvaceti bodech je z toho na první
+  // pohled psaný text, ne mříž ani stoh.
+  "i-pravidla": () => {
+    const pruh = (x1, y1, x2, y2) => C(cut(rect(x1, y1, x2, y2, 3), { ...ROUGH, amp: 1, step: 14 }));
+    return [
+      I(cut(rect(16, 12, 84, 88, 6), { ...ROUGH, amp: 1.9 })),
+      pruh(27, 25, 57, 38), pruh(27, 48, 73, 58), pruh(27, 65, 73, 75),
+    ];
   },
   "i-zpet": () => [
     I(cut([[52, 14], [62, 24], [38, 48], [62, 72], [52, 84], [16, 48]], { ...ROUGH, amp: 1.8, tension: 0.25 })),
