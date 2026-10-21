@@ -48,6 +48,30 @@ function odklidStatickeLogo() {
   document.getElementById("uvod")?.remove();
 }
 
+/** Počká na kit z Adobe Fonts.
+ *
+ *  Kit se v index.html natahuje jako `media="print"` a na `all` se přepne až
+ *  po dotažení, aby neblokoval první vykreslení. Jenže dokud nedorazí, rodina
+ *  „hagrid" v dokumentu vůbec není — `document.fonts.load("…hagrid")` na ni
+ *  mlčky nic nenajde a `fonts.ready` doběhne s prázdnou rukou. Úvod se proto
+ *  tvářil, že je hotovo, pustil průpravu, a kit dorazil až na ni: text se
+ *  přesázel a bliklo to. Na mrtvé síti se čeká marně, od toho je PISMA_NEJVIC. */
+function pockejNaAdobe(): Promise<unknown> {
+  const l = document.getElementById("pismo-adobe") as HTMLLinkElement | null;
+  // sheet je k dispozici, jakmile je soubor v prohlížeči (i u media="print")
+  if (!l || l.sheet) return Promise.resolve();
+  // Požadavek mohl selhat dřív, než se sem React dostal — pak už žádná událost
+  // nepřijde a čekalo by se marně až do stropu. Záznam o přenosu je důkaz, že
+  // je po všem; že chybí sheet, znamená, že to nedopadlo.
+  try {
+    if (performance.getEntriesByName(l.href, "resource").length) return Promise.resolve();
+  } catch { /* prohlížeč bez Resource Timing: nevadí, od toho je strop */ }
+  return new Promise((h) => {
+    l.addEventListener("load", h, { once: true });
+    l.addEventListener("error", h, { once: true });
+  });
+}
+
 /** Načte přesně ta písma, kterými je průprava vysázená.
  *
  *  `document.fonts.ready` na tohle nestačí: slibuje jen, že doběhlo, co si
@@ -64,7 +88,8 @@ function nactiPisma(): Promise<unknown> {
   ];
   try {
     // rodina, kterou prohlížeč nezná, skončí odmítnutím – na to se nečeká
-    return Promise.all(chci.map((f) => document.fonts.load(f, vzorek).catch(() => null)))
+    return pockejNaAdobe()
+      .then(() => Promise.all(chci.map((f) => document.fonts.load(f, vzorek).catch(() => null))))
       .then(() => document.fonts.ready);
   } catch {
     return Promise.resolve(); // prohlížeč bez Font Loading API
