@@ -592,6 +592,9 @@ input,textarea,select{caret-color:var(--text)}
    a galerie za ní se rozostří. Ťuknutí vedle kartu zavře. */
 .detail{
   position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+  /* Celá plachta si bere dotyk: bez toho si tah vedle karty vezme prohlížeč
+     a scrolluje stránkou pod otevřeným detailem. */
+  touch-action:none;
   padding:calc(var(--vrch) + 8px) var(--okraj) calc(env(safe-area-inset-bottom) + 24px);
   background:rgba(10,13,17,.5);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
   animation:zjevit .18s var(--krok);

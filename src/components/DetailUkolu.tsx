@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { Kategorie, Ukol } from "../lib/data";
 import { sklonuj, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
@@ -82,7 +83,13 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
     else if (pridejUkol(u)) odmena("+" + u.body);
   }
 
-  return (
+  // Portál do <body>, ne na místo v galerii. `position:fixed` se drží okna
+  // jen do chvíle, než si kterýkoli předek vytvoří vlastní rámec (transform,
+  // will-change, filter) – a obrazovka ho má: přijíždí animací a při švihu
+  // se jí posouvá styl. Plachta pak jede s posunutou stránkou, vrch zmizí
+  // nad horní hranou a dole zpod ní čouhá galerie. Takhle na předcích
+  // nezáleží, stejně jako u Okna.
+  return createPortal(
     <div className="detail" onClick={zavri} role="presentation" ref={dolu.pozadi}>
       <div className={`detail-karta${splneno ? " splneno" : ""}`} ref={spojRefy} tabIndex={-1}
         role="dialog" aria-label={u.nazev}
@@ -155,6 +162,7 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
