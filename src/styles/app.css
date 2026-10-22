@@ -513,47 +513,54 @@ input,textarea,select{caret-color:var(--text)}
   overflow-wrap:anywhere}
 
 /* ---------- galerie úkolů ---------- */
-/* Tři ve sloupci. Na dlaždici je jen tolik, co se dá přečíst za vteřinu;
-   popis a odškrtnutí jsou v detailu. Dřív to byl seznam s celým popisem
-   u každého úkolu — osm úkolů dělalo přes dvě obrazovky textu a nešlo
-   přehlédnout, co kategorie nabízí. */
-.ukol-galerie{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-/* Na úzkém telefonu zbude na dlaždici kolem 65 px textu a delší jméno se
-   do něj nevejde ani celé slovo („Veršovane|j lokál“). Dva sloupce dají
-   dost místa a pořád je vidět celá kategorie najednou. */
-@media (max-width:359px){
-  .ukol-galerie{grid-template-columns:repeat(2,1fr)}
-}
+/* Karty po dvou: nahoře kresba, dole jméno a co za to padne. Dřív to byl
+   seznam s celým popisem u každého úkolu — osm úkolů dělalo přes dvě
+   obrazovky textu a nešlo přehlédnout, co kategorie nabízí. Tři ve sloupci
+   byly zase tak úzké, že se do nich nevešlo ani celé slovo. */
+.ukol-galerie{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .ukol-karta{
   position:relative;overflow:hidden;display:flex;flex-direction:column;
-  aspect-ratio:1;padding:11px 11px 12px;text-align:left;
+  min-height:204px;padding:16px 16px 14px;text-align:left;cursor:pointer;
   border-radius:var(--r-sm);background:var(--vrstva);color:var(--text);
-  transition:transform .14s var(--krok),background .2s var(--krok),filter .16s;
+  transition:transform .14s var(--krok),background .25s var(--krok);
 }
-.ukol-karta:active{transform:scale(.96)}
-/* rozdělaný opakovatelný úkol: ještě ne barva kategorie, ale už ne nic */
-.ukol-karta.rozdelane{background:var(--vrstva-2)}
-/* ikona kategorie (nebo vlastní ikona úkolu) jako vodoznak v rohu */
-.ukol-karta-vodoznak{position:absolute;right:-18px;bottom:-18px;opacity:.05;pointer-events:none}
-.ukol-karta.splneno .ukol-karta-vodoznak{opacity:.18}
-.ukol-karta-vrch{display:flex;align-items:center;gap:6px;position:relative;z-index:1}
-.ukol-karta-vrch .piva{display:flex;gap:1px}
-.ukol-karta-vrch .piva.o1{color:var(--ob1)}
-.ukol-karta-vrch .piva.o2{color:var(--ob2)}
-.ukol-karta-vrch .piva.o3{color:var(--ob3)}
-/* na vybarvené dlaždici by barva obtížnosti na barvě kategorie nefungovala */
-.ukol-karta.splneno .piva{color:currentColor;opacity:.7}
-.ukol-karta-pocet{margin-left:auto;font-family:var(--nadpisy);font-size:var(--t-drobne);
-  color:var(--text-3)}
-.ukol-karta-fajfka{margin-left:auto}
+.ukol-karta:active{transform:scale(.97)}
+/* Podklad lehce zabarvený podle obtížnosti: po galerii je pak vidět,
+   co je brnkačka a co makačka, aniž by se to muselo číst. */
+.ukol-karta.o1{background:color-mix(in srgb,var(--ob1) 12%,var(--vrstva))}
+.ukol-karta.o2{background:color-mix(in srgb,var(--ob2) 12%,var(--vrstva))}
+.ukol-karta.o3{background:color-mix(in srgb,var(--ob3) 12%,var(--vrstva))}
+.ukol-karta.splneno{background:var(--vrstva)}
+
+/* kresba nahoře, jako na kartách, odkud to je okoukané */
+.ukol-karta-kresba{margin-bottom:auto;opacity:.9}
+.ukol-karta.o1 .ukol-karta-kresba{color:var(--ob1)}
+.ukol-karta.o2 .ukol-karta-kresba{color:var(--ob2)}
+.ukol-karta.o3 .ukol-karta-kresba{color:var(--ob3)}
+.ukol-karta.splneno .ukol-karta-kresba{color:currentColor;opacity:.85}
+
 .ukol-karta-nazev{
-  position:relative;z-index:1;margin-top:auto;
-  font-family:var(--pismo);font-weight:700;font-size:var(--t-drobne);line-height:1.3;
-  /* break-word, ne anywhere: na úzkém telefonu se jinak dělila i slova, která
-     se na řádek vejdou („Veršovane|j lokál“). Takhle se zalomí jen to, co se
-     samo o sobě nevejde, a i to rozdělením podle slabik. */
-  overflow-wrap:break-word;hyphens:auto;
+  margin-top:14px;font-family:var(--pismo);font-weight:700;
+  font-size:var(--t-hlavni);line-height:1.25;letter-spacing:0;text-transform:none;
+  overflow-wrap:break-word;
 }
+.ukol-karta-spodek{display:flex;align-items:center;gap:8px;margin-top:10px}
+.ukol-karta-zaco{flex:1;min-width:0;font-family:var(--pismo);
+  font-size:var(--t-drobne);line-height:1.3;color:var(--text-3)}
+.ukol-karta.splneno .ukol-karta-zaco{color:currentColor;opacity:.7}
+/* Čtvereček zapisuje rovnou z galerie – to je ten obvyklý pohyb. Čtvercový,
+   ne kulatý: kolečka v appce odškrtávají, tohle přidává. */
+.ukol-karta-box{
+  flex:none;width:36px;height:36px;display:grid;place-items:center;
+  border-radius:9px;color:inherit;
+  box-shadow:inset 0 0 0 1.5px currentColor;opacity:.55;
+  transition:opacity .16s,transform .13s var(--krok),background .16s;
+}
+.ukol-karta-box:active{transform:scale(.88)}
+.ukol-karta-box:disabled{opacity:.2}
+.ukol-karta-box.hotovo{opacity:1;background:currentColor;box-shadow:none}
+.ukol-karta-box.hotovo .ikona{color:var(--vrstva)}
+.ukol-karta.splneno .ukol-karta-box.hotovo .ikona{color:inherit;filter:invert(1)}
 
 /* ---------- detail úkolu ---------- */
 /* Ne stránka a ne plachta přes celou obrazovku: ta samá karta, jen větší,
