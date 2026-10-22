@@ -3,6 +3,7 @@ import type { Kategorie, Ukol } from "../lib/data";
 import { sklonuj, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { jdePridat, kolikrat, pridejUkol, tipNaStaci, tym, uberUkol } from "../lib/stav";
+import { useSvihDolu } from "../lib/svih";
 import { Ikona } from "./Ikona";
 import { Kresba } from "./Kresba";
 import { KRESBY } from "../lib/kresby";
@@ -34,6 +35,10 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
   const kolik = kolikrat(u.id, t);
   const opakovatelny = u.max > 1;
   const splneno = kolik > 0 && (opakovatelny ? kolik >= u.max : true);
+
+  // Zavřít jde křížkem, ťuknutím vedle, Escapem – a švihem dolů, protože
+  // na křížek v pravém horním rohu se jednou rukou nedosáhne.
+  const dolu = useSvihDolu(zavri);
 
   const okno = useRef<HTMLDivElement>(null);
   const text = useRef<HTMLDivElement>(null);
@@ -76,8 +81,9 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
       <div className={`detail-karta${splneno ? " splneno" : ""}`} ref={okno} tabIndex={-1}
         role="dialog" aria-label={u.nazev}
         style={{ "--kat": k.barva,
+                 ...dolu.styl,
                  ...(splneno ? { background: k.barva, color: k.naBarve } : {}) } as React.CSSProperties}
-        onClick={(e) => e.stopPropagation()}>
+        onClick={(e) => e.stopPropagation()} {...dolu.obal}>
         <div className="detail-vrch">
           <Obtiznost piva={u.piva} />
           {/* Kolik za to padne, stojí tady. Na tlačítku to bylo podruhé
@@ -98,7 +104,7 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
         <h2 className="detail-nazev">{vazat(u.nazev)}</h2>
 
         <div className="detail-telo" ref={text}
-          onClick={() => stran > 1 && setKde((x) => (x + 1) % stran)}>
+          onClick={() => { if (!dolu.tahlSe.current && stran > 1) setKde((x) => (x + 1) % stran); }}>
           <div className="detail-posuv" style={{ transform: `translateY(${-kde * 100}%)` }}>
             {u.popis && <p className="detail-popis">{vazat(u.popis)}</p>}
             {u.pozn && <p className="detail-pozn">{vazat(u.pozn)}</p>}

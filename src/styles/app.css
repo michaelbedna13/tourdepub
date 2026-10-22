@@ -607,6 +607,10 @@ input,textarea,select{caret-color:var(--text)}
    skončila jinde. Volné místo si bere kresba. */
 .detail-karta{
   position:relative;overflow:hidden;width:100%;max-width:340px;
+  /* none, ne pan-y: karta se nescrolluje (text se listuje ťuknutím) a bez
+     tohohle si svislý tah zabere posun stránky, takže by se švih dolů
+     nikdy nechytil */
+  touch-action:none;
   height:min(620px,calc(100dvh - var(--vrch) - env(safe-area-inset-bottom) - 56px));
   display:flex;flex-direction:column;
   padding:20px 22px 18px;border-radius:var(--r);

@@ -87,3 +87,75 @@ export function useSvih(poradi: string[]) {
     prichod: prichod.current,
   };
 }
+
+/** Odkud je jasné, že se táhne dolů, a ne že se jen ťuklo. */
+const DOLU_PRAH = 8;
+/** Jak moc musí být tah svislejší než vodorovný, aby se chytil. */
+const DOLU_POMER = 1.2;
+/** Kolik se musí utáhnout, aby se zavřelo. */
+const DOLU_ZAVRIT = 110;
+/** Nahoru se táhne ztuha – karta nemá kam odjet. */
+const DOLU_ODPOR = 0.25;
+
+/** Švih dolů, kterým se zavírá karta vytažená přes obrazovku.
+ *
+ *  Karta pod prstem jede s ním a po puštění se buď vrátí, nebo zmizí.
+ *  `tahlSe` je pro ťukání uvnitř karty: po tahu nesmí doběhnout klik,
+ *  jinak by se detailu při každém zavření ještě přelistoval text. */
+export function useSvihDolu(zavri: () => void) {
+  const [posun, setPosun] = useState(0);
+  const [tahne, setTahne] = useState(false);
+  const [dotkl, setDotkl] = useState(false);
+  const zacatek = useRef<{ x: number; y: number; osa: null | "x" | "y" } | null>(null);
+  const tahlSe = useRef(false);
+
+  function konec() {
+    zacatek.current = null;
+    setTahne(false);
+    setPosun(0);
+  }
+
+  function naStisk(e: ReactPointerEvent) {
+    if (e.pointerType === "mouse") return;
+    tahlSe.current = false;
+    zacatek.current = { x: e.clientX, y: e.clientY, osa: null };
+  }
+
+  function naTah(e: ReactPointerEvent) {
+    const z = zacatek.current;
+    if (!z) return;
+    const dx = e.clientX - z.x;
+    const dy = e.clientY - z.y;
+
+    if (!z.osa) {
+      if (Math.abs(dx) < DOLU_PRAH && Math.abs(dy) < DOLU_PRAH) return;
+      z.osa = Math.abs(dy) > Math.abs(dx) * DOLU_POMER ? "y" : "x";
+      if (z.osa === "y") { setTahne(true); setDotkl(true); tahlSe.current = true; }
+    }
+    if (z.osa !== "y") return;
+
+    setPosun(dy < 0 ? dy * DOLU_ODPOR : dy);
+  }
+
+  function naPusteni() {
+    const z = zacatek.current;
+    if (z?.osa === "y" && posun > DOLU_ZAVRIT) { zavri(); return; }
+    konec();
+  }
+
+  return {
+    /** Patří na kartu, která se má táhnout. */
+    obal: {
+      onPointerDown: naStisk,
+      onPointerMove: naTah,
+      onPointerUp: naPusteni,
+      onPointerCancel: konec,
+    },
+    styl: dotkl
+      ? { transform: `translate3d(0,${Math.round(posun)}px,0)`,
+          transition: tahne ? "none" : "transform .22s var(--krok)" }
+      : undefined,
+    /** Táhlo se? Pak se nesmí brát klik, co po tahu doběhne. */
+    tahlSe,
+  };
+}
