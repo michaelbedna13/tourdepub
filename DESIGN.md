@@ -14,24 +14,26 @@ nic schovaného pod dlouhým stiskem a žádná obrazovka, kde by se dalo něco 
 
 ## Barvy
 
-Rozhraní stojí na dvou barvách: skoro černá zeleň a krémová z loga.
-**Akcentní barva žádná není.** Hlavní akce je světlá plocha s tmavým textem,
-stejně jako logo — černá na krémové.
+Paleta je retro: tlumený podklad do modra a na něm čtyři syté barvy, které
+si appka nevymýšlí — jsou z plakátové estetiky, ze které vychází celá hra.
+Text je krémový, stejný jako logo.
 
 | token | hodnota | kde |
 |---|---|---|
-| `--podklad` | `#070E0A` | pozadí appky, skoro černá zeleň |
-| `--vrstva` | `#0D1711` | plochy se seznamy |
-| `--vrstva-2` | `#152219` | tlačítka, pole, kulatá tlačítka |
-| `--text` | `#EFEBE0` | text, krémová z loga |
-| `--text-2` | 62 % textu | popisy |
-| `--text-3` | 38 % textu | drobnosti |
-| `--linka` | 10 % textu | vlasové předěly |
-| `--akce` | `#EFEBE0` | hlavní tlačítko, splněné odškrtávátko |
-| `--na-akci` | `#070E0A` | text na světlé ploše |
+| `--podklad` | `#151A20` | pozadí appky |
+| `--vrstva` | `#1C222A` | plochy se seznamy a karty |
+| `--vrstva-2` | `#242B34` | tlačítka, pole, kulatá tlačítka |
+| `--text` | `#F2E7CF` | text, krémová z loga |
+| `--text-2` | 66 % textu | popisy |
+| `--text-3` | 47 % textu | drobnosti |
+| `--linka` | 11 % textu | vlasové předěly |
+| `--akce` | `#F2E7CF` | hlavní tlačítko, splněné odškrtávátko |
+| `--na-akci` | `#151A20` | text na světlé ploše |
 
-Dřív tu byla limetka jako akcent. Vypadla — bez ní nese důraz jen světlost,
-což je přísnější a barvu to uvolní pro jedinou věc, která ji opravdu potřebuje.
+Podklad byl dřív skoro černý v jednom tónu (`#070E0A` až `#1C2D22`) a appka
+z toho vycházela ponurá — mezi vrstvami nebyl rozdíl, co by se dal vidět.
+Teď je základ znatelně světlejší a každá vrstva je o schod výš, takže je
+poznat, co na čem leží.
 
 Nižší úrovně textu jsou tónované do podkladu, ne do šedi.
 
@@ -41,37 +43,54 @@ První ze dvou míst, kde barva nese význam:
 
 | | barva | |
 |---|---|---|
-| 1 půllitr | `--ob1` `#7FD4C1` | Brnkačka |
-| 2 půllitry | `--ob2` `#F2C14E` | Větší haluz |
-| 3 půllitry | `--ob3` `#F2765A` | Betelná makačka |
+| 1 půllitr | `--ob1` `#45B877` | Brnkačka |
+| 2 půllitry | `--ob2` `#F9A204` | Větší haluz |
+| 3 půllitry | `--ob3` `#FF6D54` | Betelná makačka |
 
 Barva sama nikdy nestačí: vedle ní je vždycky **počet půllitrů i název**.
 Kdo barvy nerozliší, pozná obtížnost stejně dobře (HIG: inclusive color).
-Barvy týmů jsou zvlášť a schválně se s těmito třemi nepotkávají.
+
+Jsou to zesvětlené varianty barev kategorií — sytá zelená ani červená se na
+tmavém podkladu nepřečte. **Obtížnost nemá vlastní odstín navíc** a nikdy
+netónuje nic většího než svůj štítek: Mišák to výslovně nechtěl.
 
 Všechny mají na podkladu kontrast hluboko nad WCAG AA. Při změně to musí projít znovu.
 
-### Karty kategorií
+### Barva kategorie
 
-Druhé místo. Obrazovka Úkoly je rozcestí: tři velké karty, každá v plné barvě
-s tmavým textem (`--na-akci`, kontrast přes 10:1) a velkou ikonou jako vodoznakem.
+Druhé místo, a tady barva nedrží jen štítek — **prostupuje celou obrazovkou
+kategorie.**
 
-| kategorie | barva |
-|---|---|
-| Kecy a šméčka | `--ob1` `#7FD4C1` |
-| Tělo v luftě | `--ob2` `#F2C14E` |
-| Žranice a divadlo | `--ob3` `#F2765A` |
+| kategorie | barva | text na ní |
+|---|---|---|
+| Kecy a šméčka | `#006633` | `#F2E7CF` |
+| Tělo v luftě | `#F9A204` | `#151A20` |
+| Žranice a divadlo | `#E5331F` | `#F2E7CF` |
 
-**Jsou to schválně ty samé tři odstíny jako u obtížnosti.** Přidat další tři by
-znamenalo šest barev v appce, která žádnou akcentní nemá — a to by vzalo barvě
-všechnu váhu. Aby se dva významy nepletly, nestojí nikdy vedle sebe:
+Bydlí v `KATEGORIE` v `src/lib/data.ts` (`barva` a `naBarve`), ne v CSS:
+kategorie se dají měnit v appce, takže barva patří k datům. Obrazovka si ji
+vezme jako `--kat` a dál se z ní míchá všechno ostatní (`color-mix`):
 
-- na kartě kategorie není ani jeden štítek obtížnosti;
-- v seznamu úkolů zůstane z barvy kategorie jen **čtyřpixelová čárka nad nadpisem**,
-  nic dalšího se jí netónuje — význam tam nesou půllitry.
+- nasvícení pozadí shora (14 %, dolů se ztrácí),
+- dlaždice úkolů a karta detailu (18 % do vrstvy),
+- kresba na nich (55 % do textu),
+- tlačítko *Splněno* a počítadlo (36 %),
+- barevná plocha v průpravě (70 %).
+
+Barva textu nemůže být pro všechny tři stejná: zelená a červená jsou tmavé,
+žlutá světlá. Proto má každá kategorie u sebe i `naBarve`.
+
+Dvě barvy jsou v obou soustavách stejné (`#F9A204`). Aby se významy nepletly,
+nestojí nikdy vedle sebe: na kartě kategorie není ani jeden štítek obtížnosti.
 
 I tady platí, že barva sama nestačí: na kartě je vedle ní ikona kategorie,
 její jméno i počet splněných úkolů.
+
+### Barvy týmů
+
+Třetí soustava, `BARVY` v `src/lib/stav.ts`. Nese jediné: čí je který řádek
+v pořadí. Schválně se s předchozími dvěma nepotkává — pruh v pořadí je jediné
+místo, kde se kreslí.
 
 ### Zrno
 

@@ -67,7 +67,7 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
 
   const odznaky = [
     tipNaStaci(u),
-    u.exkluzivni ? "Bere jen jedna parta" : null,
+    u.exkluzivni ? "V jedné špeluňce jen jedna parta" : null,
     u.jednouZaHospodu && t?.hospoda && t.zlodej[t.hospoda] ? "Z týhle špeluňky už máte" : null,
   ].filter(Boolean) as string[];
 

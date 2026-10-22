@@ -233,9 +233,6 @@ export function prepniTym(id: string) {
 
 /* ---------- hospody ---------- */
 
-export const hospodaTed = (t = tym()): Hospoda | null =>
-  stav.hospody.find((h) => h.id === t?.hospoda) || stav.hospody[0] || null;
-
 export const indexHospody = (t = tym()): number => {
   const i = stav.hospody.findIndex((h) => h.id === t?.hospoda);
   return i < 0 ? 0 : i;

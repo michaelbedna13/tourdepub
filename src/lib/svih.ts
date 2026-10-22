@@ -61,7 +61,7 @@ function rychlost(t: Tah) {
   return (t.posun - t.vzorek) / Math.max(1, performance.now() - t.vzorekCas);
 }
 
-export type Doklouzani = "vraci" | "odchazi" | null;
+type Doklouzani = "vraci" | "odchazi" | null;
 
 /** Přepne třídu jen když se opravdu mění. Sahat na classList při každém
  *  pohybu prstu znamená pokaždé zneplatnit styl prvku – a to je přesně ta

@@ -20,7 +20,6 @@
   --podklad:#151A20;
   --vrstva:#1C222A;
   --vrstva-2:#242B34;
-  --vrstva-3:#2D3540;
 
   /* text: krémová */
   --text:#F2E7CF;
@@ -50,10 +49,6 @@
   --ob2:#F9A204;
   --ob3:#FF6D54;
   --spatne:#FF6D54;
-
-  /* Čtvrtá barva palety. Nenese význam, slouží jako chladný protiklad
-     teplého světla shora. */
-  --morska:#026C80;
 
   /* Hagrid (Zetafonts) z Adobe Fonts, kit thr1dyh je v index.html. Jsou to
      tři samostatné rodiny: hagrid (400/700), hagrid-black (900) a hagrid-text
@@ -681,20 +676,7 @@ input,textarea,select{caret-color:var(--text)}
 }
 .detail-karta.splneno .pocitadlo button{background:rgba(0,0,0,.14)}
 
-/* ---------- seznam úkolů ---------- */
-.ukol{display:block;width:100%;text-align:left;padding:22px var(--vnitrek);background:transparent;
-  transition:background .16s}
-.ukol[role=button]{cursor:pointer}
-.ukol[role=button]:active{background:var(--vrstva-2)}
-.ukol-hlava{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
-.ukol-nazev{font-family:var(--pismo);font-weight:700;font-size:var(--t-hlavni);line-height:1.3;flex:1;min-width:0;padding-top:4px}
-.ukol-popis{font-size:var(--t-text);color:var(--text-2);line-height:1.6;margin-top:9px}
-.ukol-pozn{font-size:var(--t-drobne);color:var(--text-3);line-height:1.55;margin-top:7px}
-.ukol-stav{display:flex;align-items:flex-start;gap:8px;margin-top:14px}
-.ukol-chipy{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0;padding-top:3px}
-.ukol.splneno .ukol-nazev{color:var(--text-2)}
-.ukol.splneno .ukol-popis,.ukol.splneno .ukol-pozn{color:var(--text-3)}
-
+/* ---------- štítky a odškrtávátka ---------- */
 /* obtížnost: barva + půllitry + text, nikdy jen barva */
 .obtiznost{display:inline-flex;align-items:center;gap:6px;flex:none;
   padding:4px 10px 4px 8px;border-radius:var(--pilulka);
@@ -714,8 +696,6 @@ input,textarea,select{caret-color:var(--text)}
   transition:background .18s var(--krok),box-shadow .18s}
 .fajfka .ikona{color:var(--na-akci);opacity:0;transform:scale(.4);
   transition:opacity .2s var(--krok),transform .2s var(--krok)}
-.ukol.splneno .fajfka{background:var(--akce);box-shadow:none}
-.ukol.splneno .fajfka .ikona{opacity:1;transform:scale(1)}
 .pocitadlo{display:flex;align-items:center;gap:6px;flex:none}
 /* 40 px: do těchhle dvou se ťuká opakovaně a 34 bylo na palec v hospodě málo */
 .pocitadlo button{width:40px;height:40px;border-radius:50%;background:var(--vrstva-2);

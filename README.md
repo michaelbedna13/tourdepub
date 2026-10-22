@@ -59,10 +59,9 @@ Je to zámek proti omylu, **ne bezpečnost**. Web je statický a veřejný, tak�
 se podívá do zdrojáku, kód si přečte. Brání tomu, aby někdo omylem přepsal úkoly
 uprostřed hry. Kdyby mělo jít o víc, musela by přibýt opravdová práva v databázi.
 
-Pod hamburgerem vpravo nahoře je pět obrazovek:
-
-Mezi obrazovkami se chodí **švihem do boku** nebo hamburgerem. Uvnitř
-kategorie vede švih na další kategorii, ne na jinou obrazovku.
+Mezi obrazovkami se chodí **švihem do boku** nebo hamburgerem vpravo nahoře.
+Uvnitř kategorie vede švih na další kategorii, ne na jinou obrazovku. Pět
+obrazovek:
 
 - **Hra** — hero karta štace: kolikátá je, jak se jmenuje, kde jste na trase
   a dvě odškrtávátka (*Jsme v špeluňce*, *Škopky jsme lupnuli*). **Karty se
@@ -70,8 +69,10 @@ kategorie vede švih na další kategorii, ne na jinou obrazovku.
   na šipku; šipky zůstaly pro myš a pro jistotu. Pod kartou vaše čárky a pořadí
   všech týmů s odstupem od vedoucího.
 - **Úkoly** — tři barevné karty kategorií (kolik je splněno a kolik je tady
-  na dosah). Ťuknutím se otevře seznam: jednorázové se odškrtávají ťuknutím na
-  řádek, opakovatelné mají − a +. V režimu správce je u každého tužka.
+  na dosah). Ťuknutím se otevře galerie dlaždic v barvě kategorie; ťuknutí na
+  dlaždici vytáhne detail úkolu s kresbou a zadáním. Jednorázový má tlačítko
+  *Splněno*, opakovatelný počítadlo s − a +. Detail se zavře křížkem, ťuknutím
+  vedle nebo švihem dolů. V režimu správce je u každého tužka.
 - **Týmy** — kdo vede a za koho zapisuješ. Ťuknutím na tým se přepneš, takže z jednoho
   telefonu jde vést i celou hru. Tužka tým přejmenuje, přebarví nebo smaže.
 
@@ -131,7 +132,7 @@ Dohromady se dá urvat nejvíc **74 čárek** (9 + 9 + 56 z úkolů).
 | `max` | kolikrát to jde opakovat |
 | `hospoda` | **tip**, kde se to hodí nejvíc (Bullseye ve 4. štaci) |
 | `mezi` | **tip** na cestu mezi dvěma štacemi (Srostlý budny 3–4) |
-| `exkluzivni` | čárku bere jen jedna parta (Hospodský Národní) |
+| `exkluzivni` | v jedné špeluňce to smí zahrát jen jedna parta (Hospodský Národní) |
 | `jednouZaHospodu` | z každé špeluňky jen jednou (Brněnskej zloděj) |
 
 Nový úkol se přidává tlačítkem dole na obrazovce Úkoly. Kdo chce připravit celou sadu
@@ -150,8 +151,9 @@ Tyhle tři věci nejsou v loňském PDF dořešené a web je zatím bere doslova
   víc než betelná makačka za 3.
 - **Brněnskej zloděj** má u sebe 3 půllitry, ale pravidla dávají čárku za každou
   věc. Web to počítá jako 1 čárku za kus, nejvýš 9, tedy devět čárek za celou hru.
-- **Hospodský Národní** bere jen jedna parta na hospodu. Web na to upozorní
-  odznakem, ale nehlídá to — kdo první, ten bere, domluvíte se na place.
+- **Hospodský Národní** smí v jedné špeluňce zahrát jen jedna parta; druhá ho
+  má v další. Čárku tedy nakonec urvou obě, jen každá jinde. Web na to upozorní
+  odznakem, ale nehlídá to — party chodí pohromadě a domluví se na place.
 
 Taky není rozstřel při remíze; v pořadí se při shodě čárek řadí výš parta
 s víc betelnejma makačkama.
