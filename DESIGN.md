@@ -106,6 +106,11 @@ Zrno leží ve **třech vrstvách** a bez nich appka vypadá jako vysázená z v
    (`.kat-karta::after`) a papír účtenky (zamíchaný rovnou do podkladu, ne
    vrstva nad textem, ta by rozmazala tisk). Plná barva přes celou kartu
    vypadala jako výplň z tiskárny, ne jako plakát.
+4. **Zmuchlání účtenky** (`papir-zmuchlany.svg`, `overlay`): nasvícený šum
+   (`feDiffuseLighting`) dá hřbety a stíny jako na papíru, co ležel v kapse.
+   Plocha bez hřbetu vychází na střední šedou (`diffuseConstant 0.5`), takže
+   `overlay` nechá barvu papíru být a ukáže jen přehyby — při plném nasvícení
+   se účtenka vybílí do skoro bílé.
 
 Žádná z vrstev nechytá dotyk a žádná nic neanimuje.
 

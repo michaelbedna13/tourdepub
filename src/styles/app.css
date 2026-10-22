@@ -689,10 +689,16 @@ input,textarea,select{caret-color:var(--text)}
   font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   font-size:14px;line-height:1.5;padding:22px 18px 24px;
   box-shadow:0 14px 34px rgba(0,0,0,.4);
-  /* Papír, ne plocha: zrno zamíchané rovnou do podkladu (ne vrstva nad
-     textem, ta by rozmazala tisk). Obě pseudotřídy drží roztržené okraje. */
-  background-image:url("../assets/zrno-tisk.svg");background-size:150px 150px;
-  background-blend-mode:multiply;
+  /* Papír, ne plocha. Dvě vrstvy zamíchané rovnou do podkladu, ne nad
+     textem — vrstva nad ním by rozmazala tisk a obě pseudotřídy navíc drží
+     roztržené okraje.
+     Nahoře zmuchlání: nasvícený šum (feDiffuseLighting) dá hřbety a stíny
+     jako na papíru, co ležel v kapse. Plocha bez hřbetu vychází na střední
+     šedou, takže overlay nechá barvu papíru být a ukáže jen přehyby — při
+     plném nasvícení by se účtenka vybílila. Pod tím obyčejné zrno. */
+  background-image:url("../assets/papir-zmuchlany.svg"),url("../assets/zrno-tisk.svg");
+  background-size:360px 360px,150px 150px;
+  background-blend-mode:overlay,multiply;
 }
 /* Roztržený okraj nahoře i dole: dva trojúhelníkové přechody vedle sebe. */
 .uctenka::before,.uctenka::after{
