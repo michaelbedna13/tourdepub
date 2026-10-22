@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { Carky } from "../components/Carky";
 import { Hlava } from "../components/Hlava";
 import { KartyKategorii } from "../components/KartyKategorii";
 import { Ikona } from "../components/Ikona";
 import { PruhSyncu } from "../components/PruhSyncu";
 import { ZAKLAD, type Hospoda } from "../lib/data";
-import { jakDlouho, sklonuj, sklonujTym, sklonujUkol, vazat } from "../lib/format";
+import { jakDlouho, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { RAZITKO } from "../lib/razitko";
 import {
-  body, indexHospody, jdePridat, nastavHospodu, poradiTymu, posunHospodu,
+  indexHospody, nastavHospodu, poradiTymu, posunHospodu,
   prepniZaklad, stav, tym, useStav, type Zaklad,
 } from "../lib/stav";
 
@@ -19,8 +18,6 @@ import {
 export function Hra() {
   useStav();
   const t = tym();
-  const celkem = body();
-  const zbyva = t ? stav.ukoly.filter((u) => jdePridat(u, t)).length : 0;
   const poradi = poradiTymu();
   const nejvic = poradi[0]?.body || 0;
 
@@ -32,27 +29,12 @@ export function Hra() {
       <PruhSyncu />
       <HeroPas />
 
-      <div className="sekce">
-        <div className="vrstva">
-          <div className="skore-velke">
-            <div className="skore-cislo cislo">{celkem}</div>
-            <div className="skore-vedle">
-              <Carky kolik={celkem} vyska={22} />
-              {/* Jen slovo. Za co ty čárky jsou, se dočte v tabulce týmů —
-                  tady vedle velkého čísla je rozpad spíš šum než údaj. */}
-              <div className="skore-popis cislo">{sklonuj(celkem)}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Úkoly stojí rovnou tady, pod skóre. Dřív se na ně muselo přes menu
-          a z Hry sem vedlo jen tlačítko „Zbývá 23 úkolů“ — to je teď zbytečné,
-          karty samy říkají totéž a navíc ukazují, kde co zbývá. */}
+      {/* Skóre tu stávalo jako velké číslo s čárkami. Vlastní čárky si parta
+          přečte v účtence na Týmech, kde je vedle ostatních — a na začátku
+          večera to byla velká nula přes půl obrazovky. */}
       <div className="sekce">
         <div className="sekce-hlava">
           <h2>CO SE DÁ URVAT</h2>
-          <span className="pocet">{zbyva ? `${zbyva} ${sklonujUkol(zbyva)}` : "nic nezbývá"}</span>
         </div>
         <KartyKategorii male />
       </div>
@@ -63,7 +45,6 @@ export function Hra() {
         <div className="sekce">
           <div className="sekce-hlava">
             <h2>JAK NA TOM JSOU</h2>
-            <span className="pocet">{poradi.length} {sklonujTym(poradi.length)}</span>
           </div>
           <div className="vrstva poradi">
             {poradi.map((p, i) => {

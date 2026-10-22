@@ -66,8 +66,9 @@ obrazovek:
 - **Hra** — hero karta štace: kolikátá je, jak se jmenuje, kde jste na trase
   a dvě odškrtávátka (*Jsme v špeluňce*, *Škopky jsme lupnuli*). **Karty se
   přepínají švihem do boku** — v hospodě jednou rukou je to rychlejší než mířit
-  na šipku; šipky zůstaly pro myš a pro jistotu. Pod kartou vaše čárky a pořadí
-  všech týmů s odstupem od vedoucího.
+  na šipku; šipky zůstaly pro myš a pro jistotu. Pod kartou karty kategorií
+  a pořadí všech týmů s odstupem od vedoucího. Vlastní čárky si parta přečte
+  v účtence na Týmech, na Hře se podruhé nevypisují.
 - **Úkoly** — tři barevné karty kategorií (kolik je splněno a kolik je tady
   na dosah). Ťuknutím se otevře galerie dlaždic v barvě kategorie; ťuknutí na
   dlaždici vytáhne detail úkolu s kresbou a zadáním. Jednorázový má tlačítko

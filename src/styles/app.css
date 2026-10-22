@@ -448,11 +448,6 @@ input,textarea,select{caret-color:var(--text)}
 .zaskrt.hotovo .zaskrt-hodnota{color:var(--text-2)}
 
 /* ---------- skóre a pořadí týmů na Hře ---------- */
-.skore-velke{display:flex;align-items:flex-end;gap:18px;padding:26px var(--vnitrek)}
-.skore-cislo{font-family:var(--nadpisy);font-size:52px;line-height:.78;letter-spacing:-.03em;flex:none}
-.skore-vedle{min-width:0;flex:1}
-.skore-vedle .carky{color:var(--text-3);margin-bottom:12px}
-.skore-popis{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3);line-height:1.62}
 .carky{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:flex-end}
 .carky svg{display:block;overflow:visible}
 
