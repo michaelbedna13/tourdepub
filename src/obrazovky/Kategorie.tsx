@@ -3,20 +3,26 @@ import { useParams } from "react-router-dom";
 import { Hlava } from "../components/Hlava";
 import { Ikona } from "../components/Ikona";
 import { OknoUkolu } from "../components/OknoUkolu";
-import { RadekUkolu } from "../components/RadekUkolu";
+import { DetailUkolu } from "../components/DetailUkolu";
+import { KartaUkolu } from "../components/KartaUkolu";
 import { KATEGORIE } from "../lib/data";
 import { sklonuj, vazat } from "../lib/format";
 import { kolikrat, stav, tym, ukolPodleId, useStav } from "../lib/stav";
 import { useSpravce } from "../lib/spravce";
 
-/** Úkoly jedné kategorie. Barva kategorie je tu jen jako čára nad nadpisem –
- *  v seznamu nesou význam barvy obtížnosti a dvě barevné soustavy vedle sebe
- *  by se pletly. */
+/** Úkoly jedné kategorie jako galerie dlaždic. Dřív to byl seznam, ve kterém
+ *  měl každý úkol celý popis — osm úkolů dělalo přes dvě obrazovky textu
+ *  a nedalo se přehlédnout, co kategorie vlastně nabízí. Na dlaždici jsou
+ *  jen půllitry a jméno, zbytek je v detailu.
+ *
+ *  Barva kategorie vybarvuje splněné dlaždice. Nepřibyl tím žádný význam
+ *  navíc: je to ta samá barva, co kategorii nese přes celou appku. */
 export function Kategorie() {
   useStav();
   const spravce = useSpravce();
   const { kat } = useParams();
   const [uprava, setUprava] = useState<string | null>(null);
+  const [detail, setDetail] = useState<string | null>(null);
   const [novy, setNovy] = useState(false);
   const k = KATEGORIE.find((x) => x.id === kat);
   const t = tym();
@@ -42,10 +48,8 @@ export function Kategorie() {
       <p className="podnadpis cislo">Splněno {hotovo} z {vse.length} · {zaNe} {sklonuj(zaNe)}</p>
 
       {vse.length ? (
-        <div className="vrstva radky">
-          {vse.map((u) => (
-            <RadekUkolu key={u.id} u={u} uprav={spravce ? () => setUprava(u.id) : undefined} />
-          ))}
+        <div className="ukol-galerie">
+          {vse.map((u) => <KartaUkolu key={u.id} u={u} k={k} otevri={() => setDetail(u.id)} />)}
         </div>
       ) : (
         <div className="prazdno"><Ikona jmeno="hvezda" px={40} /><p>{vazat("V týhle kategorii zatím nic není.")}</p></div>
@@ -55,6 +59,11 @@ export function Kategorie() {
         <div className="sekce">
           <button className="tl" onClick={() => setNovy(true)}><Ikona jmeno="plus" px={18} /> Přidat úkol</button>
         </div>
+      )}
+
+      {detail && ukolPodleId(detail) && (
+        <DetailUkolu u={ukolPodleId(detail)!} k={k} zavri={() => setDetail(null)}
+          uprav={spravce ? () => { setUprava(detail); setDetail(null); } : undefined} />
       )}
 
       {novy && <OknoUkolu kat={k.id} zavri={() => setNovy(false)} />}

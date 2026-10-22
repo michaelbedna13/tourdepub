@@ -199,15 +199,21 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
           třikrát – v kolečku, ve velkém za názvem a ještě jako 1/9 u trasy.
           Zůstalo to velké; drží roh karty samo a je to to první, co padne
           do oka při švihu. */}
+      {/* Razítko přes celou kartu, ne odznáček v rohu: hotová štace má být
+          vidět na první pohled při švihu pásem. Pod ním se horní půlka karty
+          rozostří — jméno a trasa jsou pořád poznat, ale už to není to, co
+          se čte. Odškrtávátka dole zůstanou ostrá, aby šel zápis vzít zpátky. */}
+      {hotova && (
+        <span className="hero-razitko" aria-hidden="true">
+          <svg className="razitko-ramecek" viewBox="0 0 172 60" preserveAspectRatio="none"
+            aria-hidden="true">
+            <path d={RAZITKO} fillRule="evenodd" />
+          </svg>
+          Hotovo
+        </span>
+      )}
+
       <div className="hero-vrch">
-        {hotova && (
-          <span className="hero-razitko" aria-hidden="true">
-            <svg className="razitko-ramecek" viewBox="0 0 172 60" aria-hidden="true">
-              <path d={RAZITKO} fillRule="evenodd" />
-            </svg>
-            Hotovo
-          </span>
-        )}
         <div className="hero-sipky">
           <button className="ikonove" onClick={() => posunHospodu(-1)} disabled={cislo === 1}
             aria-label="Předchozí špeluňka"><Ikona jmeno="i-zpet" px={16} /></button>

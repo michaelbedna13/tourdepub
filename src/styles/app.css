@@ -344,25 +344,36 @@ input,textarea,select{caret-color:var(--text)}
    koukátko, ne údaj, podle kterého se hraje. */
 .hero-cas{position:relative;z-index:1;margin:-10px 0 14px;min-height:1.6em;
   font-size:var(--t-drobne);color:var(--text-3)}
-/* Razítko za hotovou štaci: příchod i škopek zapsané. Klapne na kartu
-   a zůstane — při švihu pásem je pak na první pohled vidět, kde už
-   jste byli. */
+/* Razítko za hotovou štaci: příchod i škopek zapsané. Je přes celou kartu,
+   ne odznáček v rohu — při švihu pásem má být hotová štace vidět dřív, než
+   se stihne cokoli přečíst. Zelená je tu „hotovo“: na kartě štace žádná
+   barva obtížnosti ani kategorie není, takže se to nemá s čím plést. */
 .hero-razitko{
-  margin:0 4px 0 auto;align-self:center;pointer-events:none;
-  position:relative;padding:8px 17px 7px;
-  font-family:var(--nadpisy);font-weight:700;font-size:15px;
-  letter-spacing:.16em;text-transform:uppercase;color:var(--text);
-  opacity:.26;rotate:-9deg;
-  animation:razitko .4s var(--krok) both;
+  position:absolute;left:50%;top:38%;z-index:3;pointer-events:none;
+  translate:-50% -50%;rotate:-11deg;
+  padding:14px 26px 12px;white-space:nowrap;
+  font-family:var(--nadpisy);font-weight:700;font-size:clamp(28px,8vw,38px);
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ob1);
+  opacity:.9;
+  animation:razitko .45s var(--krok) both;
 }
 /* Rámeček je kresba od ruky, ne border: čistý obdélník vypadal jako štítek
    z laboratoře. Táhne se přes celý popisek a je mu jedno, jak je text široký. */
 .razitko-ramecek{position:absolute;inset:0;width:100%;height:100%;
   fill:currentColor;pointer-events:none}
 @keyframes razitko{
-  0%{opacity:0;scale:2}
-  55%{opacity:.34;scale:.93}
-  100%{opacity:.26;scale:1}
+  0%{opacity:0;scale:2.2}
+  55%{opacity:1;scale:.94}
+  100%{opacity:.9;scale:1}
+}
+/* Pod razítkem se karta rozostří. Jméno a trasa jsou pořád poznat, ale už
+   to není to, co se čte — štace je za vámi. Odškrtávátka zůstanou ostrá,
+   aby šel zápis vzít zpátky, a šipky taky, aby se dalo odjet dál. */
+.hero.hotova .hero-duch,
+.hero.hotova .hero-nazev,
+.hero.hotova .hero-cas,
+.hero.hotova .hero-trasa{
+  filter:blur(2.5px);opacity:.45;transition:filter .3s var(--krok),opacity .3s var(--krok);
 }
 /* Vodoznak z čárek v dolním rohu karty je pryč. Ležel přesně za texty
    odškrtávátek a na tmavém podkladu z něj byla šmouha, ne ozdoba —
@@ -500,6 +511,101 @@ input,textarea,select{caret-color:var(--text)}
 .kat-cara{height:4px;width:46px;border-radius:2px;margin-bottom:12px}
 .kat-hlavicka h1{font-size:clamp(26px,7.4vw,34px);line-height:var(--radky-nadpis);letter-spacing:-.02em;
   overflow-wrap:anywhere}
+
+/* ---------- galerie úkolů ---------- */
+/* Tři ve sloupci. Na dlaždici je jen tolik, co se dá přečíst za vteřinu;
+   popis a odškrtnutí jsou v detailu. Dřív to byl seznam s celým popisem
+   u každého úkolu — osm úkolů dělalo přes dvě obrazovky textu a nešlo
+   přehlédnout, co kategorie nabízí. */
+.ukol-galerie{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+/* Na úzkém telefonu zbude na dlaždici kolem 65 px textu a delší jméno se
+   do něj nevejde ani celé slovo („Veršovane|j lokál“). Dva sloupce dají
+   dost místa a pořád je vidět celá kategorie najednou. */
+@media (max-width:359px){
+  .ukol-galerie{grid-template-columns:repeat(2,1fr)}
+}
+.ukol-karta{
+  position:relative;overflow:hidden;display:flex;flex-direction:column;
+  aspect-ratio:1;padding:11px 11px 12px;text-align:left;
+  border-radius:var(--r-sm);background:var(--vrstva);color:var(--text);
+  transition:transform .14s var(--krok),background .2s var(--krok),filter .16s;
+}
+.ukol-karta:active{transform:scale(.96)}
+/* rozdělaný opakovatelný úkol: ještě ne barva kategorie, ale už ne nic */
+.ukol-karta.rozdelane{background:var(--vrstva-2)}
+/* ikona kategorie (nebo vlastní ikona úkolu) jako vodoznak v rohu */
+.ukol-karta-vodoznak{position:absolute;right:-18px;bottom:-18px;opacity:.05;pointer-events:none}
+.ukol-karta.splneno .ukol-karta-vodoznak{opacity:.18}
+.ukol-karta-vrch{display:flex;align-items:center;gap:6px;position:relative;z-index:1}
+.ukol-karta-vrch .piva{display:flex;gap:1px}
+.ukol-karta-vrch .piva.o1{color:var(--ob1)}
+.ukol-karta-vrch .piva.o2{color:var(--ob2)}
+.ukol-karta-vrch .piva.o3{color:var(--ob3)}
+/* na vybarvené dlaždici by barva obtížnosti na barvě kategorie nefungovala */
+.ukol-karta.splneno .piva{color:currentColor;opacity:.7}
+.ukol-karta-pocet{margin-left:auto;font-family:var(--nadpisy);font-size:var(--t-drobne);
+  color:var(--text-3)}
+.ukol-karta-fajfka{margin-left:auto}
+.ukol-karta-nazev{
+  position:relative;z-index:1;margin-top:auto;
+  font-family:var(--pismo);font-weight:700;font-size:var(--t-drobne);line-height:1.3;
+  /* break-word, ne anywhere: na úzkém telefonu se jinak dělila i slova, která
+     se na řádek vejdou („Veršovane|j lokál“). Takhle se zalomí jen to, co se
+     samo o sobě nevejde, a i to rozdělením podle slabik. */
+  overflow-wrap:break-word;hyphens:auto;
+}
+
+/* ---------- detail úkolu ---------- */
+/* Ne stránka a ne plachta přes celou obrazovku: ta samá karta, jen větší,
+   a galerie za ní se rozostří. Ťuknutí vedle kartu zavře. */
+.detail{
+  position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+  padding:calc(var(--vrch) + 8px) var(--okraj) calc(env(safe-area-inset-bottom) + 24px);
+  background:rgba(10,13,17,.5);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  animation:zjevit .18s var(--krok);
+}
+.detail-karta{
+  position:relative;overflow:hidden;width:100%;max-width:340px;
+  display:flex;flex-direction:column;
+  padding:20px 22px 18px;border-radius:var(--r);
+  background:var(--vrstva);color:var(--text);
+  box-shadow:0 18px 50px rgba(0,0,0,.45);
+  animation:detail-prijde .26s var(--krok);
+}
+@keyframes detail-prijde{from{opacity:0;transform:scale(.9)}}
+.detail-karta:focus{outline:none}
+.detail-vodoznak{position:absolute;right:-26px;bottom:-30px;opacity:.07;pointer-events:none}
+.detail-karta.splneno .detail-vodoznak{opacity:.14}
+.detail-vrch{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  position:relative;z-index:1}
+.detail-zavri{width:36px;height:36px;color:inherit;opacity:.6}
+.otocit-kriz{transform:rotate(45deg)}
+.detail-nazev{position:relative;z-index:1;margin-top:16px;
+  font-size:clamp(22px,6.4vw,27px);letter-spacing:-.01em}
+/* Text se nelistuje scrollem, ale po stránkách: v hospodě se ťuká líp, než
+   posouvá, a půlka věty useknutá okrajem vypadá jako chyba. Výška je pevná,
+   počet stránek si detail spočítá z toho, kolik se do ní text nevejde. */
+/* max-height, ne height: krátký popis má kartu nechat nízkou. Stránkuje se
+   až od chvíle, kdy se text nevejde — počet stránek vyjde z toho, kolikrát
+   je text vyšší než okénko. */
+.detail-telo{position:relative;z-index:1;margin-top:14px;max-height:11.5em;overflow:hidden}
+.detail-posuv{transition:transform .3s var(--krok)}
+.detail-popis{font-size:var(--t-text);line-height:1.6;color:var(--text-2)}
+.detail-karta.splneno .detail-popis{color:currentColor;opacity:.78}
+.detail-pozn{margin-top:10px;font-size:var(--t-drobne);line-height:1.55;color:var(--text-3)}
+.detail-karta.splneno .detail-pozn{color:currentColor;opacity:.6}
+.detail-odznaky{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.detail-tecky{display:flex;gap:6px;justify-content:center;margin-top:12px;position:relative;z-index:1}
+.detail-spodek{display:flex;align-items:center;gap:10px;margin-top:18px;position:relative;z-index:1}
+.detail-fajfka{
+  flex:1;display:flex;align-items:center;gap:11px;min-height:52px;padding:0 16px;
+  border-radius:var(--pilulka);background:var(--vrstva-2);
+  font-family:var(--pismo);font-weight:700;font-size:var(--t-text);color:inherit;
+  transition:background .16s,transform .14s var(--krok);
+}
+.detail-fajfka:active{transform:scale(.97)}
+.detail-fajfka.hotovo{background:rgba(255,255,255,.14)}
+.detail-karta.splneno .pocitadlo button{background:rgba(0,0,0,.14)}
 
 /* ---------- seznam úkolů ---------- */
 .ukol{display:block;width:100%;text-align:left;padding:22px var(--vnitrek);background:transparent;
