@@ -181,20 +181,8 @@ input,textarea,select{caret-color:var(--text)}
      nikdy nechytí. Takhle zůstane svislé posouvání prohlížeči a bok je náš.
      Vodorovné pásy uvnitř (hero) si pan-x vracejí u sebe. */
   touch-action:pan-y}
-/* ---------- zeď hospody: čárky za celou appkou ---------- */
-/* Leží pod obsahem a nad zrnem. Je tak slabá, že se dá přehlédnout – má
-   dávat večeru pocit, že se něco plní, ne se hlásit o slovo. */
-.zed{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
-  color:var(--text);opacity:.075}
-.zed-skupina{position:absolute;width:auto;overflow:visible;display:block}
-.zed-skupina path{
-  stroke-dasharray:44;stroke-dashoffset:44;
-  animation:zed-tah .55s var(--krok) both;
-}
-@keyframes zed-tah{to{stroke-dashoffset:0}}
-
 .obrazovka{
-  /* nad zdí */
+  /* nad zrnem a nad nasvícením kategorie */
   position:relative;z-index:1;
   display:block;
   padding:var(--vrch) var(--okraj) calc(env(safe-area-inset-bottom) + 48px);
@@ -528,8 +516,8 @@ input,textarea,select{caret-color:var(--text)}
    tam nesou půllitry obtížnosti a dvě barevné soustavy vedle sebe by se pletly.
    Nadpis stojí pod lištou, ne v ní – do lišty se vedle pilulky týmu nevešel
    a ořezával se na „Kecy a …“. */
-/* Nasvícení obrazovky kategorie její barvou. Leží pod obsahem, nad zdí
-   s čárkami, a dolů se ztrácí — nahoře, kde je nadpis, má být nejvíc. */
+/* Nasvícení obrazovky kategorie její barvou. Leží pod obsahem a dolů se
+   ztrácí — nahoře, kde je nadpis, má být nejvíc. */
 .kat-nasvit{
   position:fixed;inset:0;z-index:0;pointer-events:none;
   background:linear-gradient(to bottom,
@@ -972,7 +960,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important;transition-duration:.001ms !important}
   #uvod img{opacity:1}
-  .uvod-carky path,.zed-skupina path{stroke-dashoffset:0}
+  .uvod-carky path{stroke-dashoffset:0}
   .hero-pas{scroll-behavior:auto}
 }
 @media (min-width:600px){

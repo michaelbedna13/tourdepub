@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { HashRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { PotvrzeniHost } from "./components/Potvrzeni";
 import { Uvod } from "./components/Uvod";
-import { Zed } from "./components/Zed";
 import { KATEGORIE } from "./lib/data";
 import { useSvih } from "./lib/svih";
 import { spustSync } from "./lib/sync";
@@ -56,9 +55,6 @@ function Kostra() {
   useLayoutEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div className="app" {...svih.obal}>
-      {/* Zeď leží za obsahem a nepřekresluje se při přechodu mezi obrazovkami –
-          proto stojí tady, ne uvnitř <main>, které se podle adresy zahazuje. */}
-      <Zed />
       {/* klíč podle adresy: každá obrazovka přijede, ne střih */}
       <main className={`obrazovka${svih.prichod ? ` z-${svih.prichod}` : ""}`}
         key={pathname} ref={svih.vrstva}>
