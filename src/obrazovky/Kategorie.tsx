@@ -52,18 +52,10 @@ export function Kategorie() {
 
       <div className="kat-hlavicka">
         <h1 className="kat-titul">{vazat(k.nazev)}</h1>
-        <div className="kat-postup">
-          <div className="kat-postup-pruh" aria-hidden="true">
-            {vse.map((u) => (
-              <span key={u.id}
-                style={kolikrat(u.id, t) > 0 ? { background: k.barva } : undefined} />
-            ))}
-          </div>
-          {/* Jenom kolik je hotových. Čárky za kategorii se tu počítaly taky,
-              ale skóre má svoje místo na úvodní obrazovce a tady akorát
-              pletlo dvě čísla vedle sebe. */}
-          <span className="kat-postup-cisla cislo">Splněno {hotovo} z {vse.length}</span>
-        </div>
+        {/* Jedna řádka a nic víc. Byl tu i pruh s čárkou za každý úkol, ale
+            vedle dlaždic, které stav nesou samy (splněná je v barvě
+            kategorie), to bylo to samé dvakrát. */}
+        <p className="kat-postup cislo">Splněno {hotovo} z {vse.length}</p>
       </div>
 
       {vse.length ? (

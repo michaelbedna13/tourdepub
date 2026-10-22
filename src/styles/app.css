@@ -527,15 +527,7 @@ input,textarea,select{caret-color:var(--text)}
 .kat-hlavicka{position:relative;z-index:1;margin:6px 0 30px}
 .kat-titul{font-weight:700;font-size:clamp(30px,8.8vw,42px);
   letter-spacing:-.025em;overflow-wrap:break-word}
-.kat-postup{display:flex;align-items:center;gap:14px;margin-top:20px}
-/* Ne jeden plynulý pruh, ale čárka za každý úkol: appka se o čárkách celá
-   a prázdný pruh na 0 % vypadal jako načítání. Takhle je i bez čtení vidět,
-   kolik jich v kategorii je a kolik už padlo. */
-.kat-postup-pruh{flex:1;min-width:0;display:flex;gap:4px}
-.kat-postup-pruh span{flex:1;min-width:0;height:7px;border-radius:4px;
-  background:color-mix(in srgb,var(--text) 13%,transparent);
-  transition:background .3s var(--krok)}
-.kat-postup-cisla{flex:none;font-family:var(--pismo);font-size:var(--t-drobne);
+.kat-postup{margin-top:10px;font-family:var(--pismo);font-size:var(--t-text);
   color:var(--text-2)}
 
 /* ---------- galerie úkolů ---------- */
