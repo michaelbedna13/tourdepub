@@ -6,7 +6,7 @@ import { OknoUkolu } from "../components/OknoUkolu";
 import { DetailUkolu } from "../components/DetailUkolu";
 import { KartaUkolu } from "../components/KartaUkolu";
 import { KATEGORIE } from "../lib/data";
-import { sklonuj, vazat } from "../lib/format";
+import { vazat } from "../lib/format";
 import { kolikrat, stav, tym, ukolPodleId, useStav } from "../lib/stav";
 import { useSpravce } from "../lib/spravce";
 
@@ -36,7 +36,6 @@ export function Kategorie() {
 
   const vse = stav.ukoly.filter((u) => u.kat === k.id);
   const hotovo = vse.filter((u) => kolikrat(u.id, t) > 0).length;
-  const zaNe = vse.reduce((s, u) => s + Math.min(kolikrat(u.id, t), u.max) * u.body, 0);
 
   return (
     <>
@@ -60,9 +59,10 @@ export function Kategorie() {
                 style={kolikrat(u.id, t) > 0 ? { background: k.barva } : undefined} />
             ))}
           </div>
-          <span className="kat-postup-cisla cislo">
-            {hotovo} ze {vse.length} · {zaNe} {sklonuj(zaNe)}
-          </span>
+          {/* Jenom kolik je hotových. Čárky za kategorii se tu počítaly taky,
+              ale skóre má svoje místo na úvodní obrazovce a tady akorát
+              pletlo dvě čísla vedle sebe. */}
+          <span className="kat-postup-cisla cislo">Splněno {hotovo} z {vse.length}</span>
         </div>
       </div>
 
