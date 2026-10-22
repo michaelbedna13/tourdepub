@@ -63,7 +63,6 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
   const odznaky = [
     tipNaStaci(u),
     u.exkluzivni ? "Bere jen jedna parta" : null,
-    opakovatelny ? `${u.body} ${sklonuj(u.body)} za kus, až ${u.body * u.max}` : null,
     u.jednouZaHospodu && t?.hospoda && t.zlodej[t.hospoda] ? "Z týhle špeluňky už máte" : null,
   ].filter(Boolean) as string[];
 
@@ -74,12 +73,19 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
 
   return (
     <div className="detail" onClick={zavri} role="presentation">
-      <div className="detail-karta" ref={okno} tabIndex={-1} role="dialog" aria-label={u.nazev}
+      <div className={`detail-karta${splneno ? " splneno" : ""}`} ref={okno} tabIndex={-1}
+        role="dialog" aria-label={u.nazev}
         style={{ "--kat": k.barva,
                  ...(splneno ? { background: k.barva, color: k.naBarve } : {}) } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()}>
         <div className="detail-vrch">
           <Obtiznost piva={u.piva} />
+          {/* Kolik za to padne, stojí tady. Na tlačítku to bylo podruhé
+              a tlačítko má říkat, co udělá, ne kolik to vynese. */}
+          <span className="odznak cislo">
+            {opakovatelny ? `+${u.body} za kus, až ${u.body * u.max}`
+                          : `+${u.body} ${sklonuj(u.body)}`}
+          </span>
           <button className="ikonove holy detail-zavri" onClick={zavri} aria-label="Zavřít">
             <Ikona jmeno="plus" px={16} trida="otocit-kriz" />
           </button>
@@ -128,7 +134,7 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
             <button className={`detail-fajfka${splneno ? " hotovo" : ""}`} onClick={prepni}
               aria-pressed={splneno}>
               <span className="fajfka"><Ikona jmeno="check" px={15} /></span>
-              {splneno ? "Máte to" : `Zapsat +${u.body}`}
+              Splněno
             </button>
           )}
           {uprav && (

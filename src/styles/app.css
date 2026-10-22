@@ -608,9 +608,10 @@ input,textarea,select{caret-color:var(--text)}
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
 }
 .detail-karta.splneno .detail-kresba{color:currentColor;opacity:.9}
-.detail-vrch{display:flex;align-items:center;justify-content:space-between;gap:12px;
+/* Obtížnost a kolik za to padne drží spolu vlevo, křížek je vpravo. */
+.detail-vrch{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
   position:relative;z-index:1}
-.detail-zavri{width:36px;height:36px;color:inherit;opacity:.6}
+.detail-zavri{width:36px;height:36px;color:inherit;opacity:.6;margin-left:auto}
 .otocit-kriz{transform:rotate(45deg)}
 .detail-nazev{position:relative;z-index:1;flex:none;margin-top:14px;
   font-size:clamp(22px,6.4vw,27px);letter-spacing:-.01em}
@@ -637,7 +638,16 @@ input,textarea,select{caret-color:var(--text)}
   transition:background .16s,transform .14s var(--krok);
 }
 .detail-fajfka:active{transform:scale(.97)}
+/* splněno: kolečko se vybarví a fajfka se v něm objeví, stejně jako
+   u odškrtávátek na hero kartě */
 .detail-fajfka.hotovo{background:rgba(255,255,255,.14)}
+.detail-fajfka.hotovo .fajfka{background:var(--akce);box-shadow:none}
+.detail-fajfka.hotovo .fajfka .ikona{opacity:1;transform:scale(1)}
+/* Na vybarvené kartě by barevný štítek obtížnosti seděl na barvě kategorie
+   jako cizí prvek. Splněný úkol ho má tiše, barvou karty. */
+.detail-karta.splneno .obtiznost{
+  background:rgba(0,0,0,.14);color:inherit;opacity:.8;
+}
 .detail-karta.splneno .pocitadlo button{background:rgba(0,0,0,.14)}
 
 /* ---------- seznam úkolů ---------- */
