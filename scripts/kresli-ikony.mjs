@@ -122,8 +122,13 @@ const IKONY = {
     I(cut([[50, 10], [64, 28], [72, 24], [76, 44], [84, 56], [78, 76], [58, 90], [38, 89], [22, 76], [20, 54], [32, 38], [38, 44]], HRUBE)),
     C(cut([[50, 50], [60, 64], [58, 78], [48, 84], [38, 76], [40, 62]], { ...ROUGH, amp: 1.7 })),
   ],
+  // Jeden tah, ne dva pruty přes sebe. Složená ze dvou obdélníků měla fajfka
+  // v lokti ostruhu — roh spodního prutu koukal ven a v malém to vypadalo jako
+  // chyba vykreslení, ne jako kresba. Takhle je to jedna dráha, v lokti tlustá
+  // a ke špičce se ztenčuje, jak když se táhne perem.
   check: () => [
-    I(cut([...stroke(16, 54, 40, 76, 15), ...stroke(40, 76, 86, 22, 15)].slice(0), { ...ROUGH, amp: 1.6, tension: 0.25 })),
+    I(cut([[8, 48], [36, 86], [90, 18], [74, 12], [36, 60], [20, 38]],
+          { ...ROUGH, amp: 2.4, tension: 0.2 })),
   ],
   plus: () => [
     I(cut(rect(42, 14, 58, 86, 3), { ...ROUGH, amp: 1.8 })),
