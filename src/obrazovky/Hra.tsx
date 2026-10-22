@@ -5,12 +5,12 @@ import { KartyKategorii } from "../components/KartyKategorii";
 import { Ikona } from "../components/Ikona";
 import { PruhSyncu } from "../components/PruhSyncu";
 import { ZAKLAD, type Hospoda } from "../lib/data";
-import { jakDlouho, sklonujTym, sklonujUkol, vazat } from "../lib/format";
+import { jakDlouho, sklonuj, sklonujTym, sklonujUkol, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { RAZITKO } from "../lib/razitko";
 import {
   body, indexHospody, jdePridat, nastavHospodu, poradiTymu, posunHospodu,
-  prepniZaklad, rozpad, stav, tym, useStav, type Zaklad,
+  prepniZaklad, stav, tym, useStav, type Zaklad,
 } from "../lib/stav";
 
 /** Hlavní obrazovka. Hero karta nese celou štaci: kolikátá je, jak se jmenuje,
@@ -19,7 +19,6 @@ import {
 export function Hra() {
   useStav();
   const t = tym();
-  const r = rozpad();
   const celkem = body();
   const zbyva = t ? stav.ukoly.filter((u) => jdePridat(u, t)).length : 0;
   const poradi = poradiTymu();
@@ -39,9 +38,9 @@ export function Hra() {
             <div className="skore-cislo cislo">{celkem}</div>
             <div className="skore-vedle">
               <Carky kolik={celkem} vyska={22} />
-              <div className="skore-popis cislo">
-                {r.dochazka} za špeluňky · {r.skopky} za škopky · {r.ukoly} za srandy
-              </div>
+              {/* Jen slovo. Za co ty čárky jsou, se dočte v tabulce týmů —
+                  tady vedle velkého čísla je rozpad spíš šum než údaj. */}
+              <div className="skore-popis cislo">{sklonuj(celkem)}</div>
             </div>
           </div>
         </div>
