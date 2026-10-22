@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { Carky } from "../components/Carky";
 import { Hlava } from "../components/Hlava";
+import { KartyKategorii } from "../components/KartyKategorii";
 import { Ikona } from "../components/Ikona";
 import { PruhSyncu } from "../components/PruhSyncu";
 import { ZAKLAD, type Hospoda } from "../lib/data";
@@ -47,6 +47,17 @@ export function Hra() {
         </div>
       </div>
 
+      {/* Úkoly stojí rovnou tady, pod skóre. Dřív se na ně muselo přes menu
+          a z Hry sem vedlo jen tlačítko „Zbývá 23 úkolů“ — to je teď zbytečné,
+          karty samy říkají totéž a navíc ukazují, kde co zbývá. */}
+      <div className="sekce">
+        <div className="sekce-hlava">
+          <h2>CO SE DÁ URVAT</h2>
+          <span className="pocet">{zbyva ? `${zbyva} ${sklonujUkol(zbyva)}` : "nic nezbývá"}</span>
+        </div>
+        <KartyKategorii male />
+      </div>
+
       {/* Dokud hraje jedna parta, není co srovnávat – „vede, odstup 0" je
           jen řádek navíc. Naskočí to, jakmile přibude druhý tým. */}
       {poradi.length > 1 && (
@@ -55,28 +66,33 @@ export function Hra() {
             <h2>JAK NA TOM JSOU</h2>
             <span className="pocet">{poradi.length} {sklonujTym(poradi.length)}</span>
           </div>
-          <div className="vrstva radky">
-            {poradi.map((p) => {
+          <div className="vrstva poradi">
+            {poradi.map((p, i) => {
               const rozdil = p.body - nejvic;
               return (
-                <div key={p.id} className={`pruh-tymu${p.id === stav.tymId ? " ja" : ""}`}>
-                  <span className="tecka" style={{ background: p.barva }} />
-                  <span className="jmeno">{p.nazev}</span>
-                  <span className="odstup cislo">{rozdil === 0 ? "vede" : rozdil}</span>
-                  <span className="cifra cislo">{p.body}</span>
+                <div key={p.id} className={`poradi-radek${p.id === stav.tymId ? " ja" : ""}`}>
+                  <span className="poradi-misto cislo">{i + 1}</span>
+                  <div className="poradi-telo">
+                    <div className="poradi-vrch">
+                      <span className="poradi-jmeno">{p.nazev}</span>
+                      <span className="poradi-odstup cislo">{rozdil === 0 ? "vede" : rozdil}</span>
+                      <span className="poradi-body cislo">{p.body}</span>
+                    </div>
+                    {/* Pruh v barvě party. Je to jediné místo, kde barva týmu
+                        něco kreslí, a nese to skutečný údaj: jak daleko je
+                        parta od vedoucí. Rozdíl mezi prvním a posledním je
+                        tím vidět dřív, než se stihnou přečíst čísla. */}
+                    <div className="poradi-pruh">
+                      <span style={{ width: nejvic ? `${(p.body / nejvic) * 100}%` : 0,
+                                     background: p.barva }} />
+                    </div>
+                  </div>
                 </div>
               );
             })}
           </div>
         </div>
       )}
-
-      <div className="sekce">
-        <Link className="tl" to="/ukoly">
-          <Ikona jmeno="hvezda" px={18} />
-          {zbyva ? `Zbývá ${zbyva} ${sklonujUkol(zbyva)}` : "Projít úkoly"}
-        </Link>
-      </div>
     </>
   );
 }
