@@ -144,7 +144,9 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   const s = PRUPRAVA[Math.max(0, kde)];
 
   return (
-    <div className={`uvod${zavira ? " zavira" : ""}`} role="dialog" aria-label="Úvod"
+    <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " barevna" : ""}`}
+      style={{ "--kat": s.barva } as React.CSSProperties}
+      role="dialog" aria-label="Úvod"
       onPointerDown={(e) => { svih.current = e.clientX; }}
       onPointerUp={(e) => {
         const z = svih.current;
@@ -174,13 +176,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
       </div>
 
       {kde >= 0 && (
-        <div className="uvod-obsah" style={{ "--kat": s.barva } as React.CSSProperties}>
-          {/* Nasvícení stránky její barvou. Každá stránka průpravy má svoji,
-              takže je listování vidět i periferně. Je to jen nasvícení, ne
-              plná výplň — průprava zůstává tmavá a nenaráží do appky, co po
-              ní přijde. */}
-          <div className="uvod-nasvit" key={`n${kde}`} />
-
+        <div className="uvod-obsah">
           <div className="uvod-stranka" key={kde}>
             <div className="uvod-krok cislo">{kde + 1} ze {PRUPRAVA.length}</div>
             <h1 className="uvod-nadpis">{vazat(s.nadpis)}</h1>
