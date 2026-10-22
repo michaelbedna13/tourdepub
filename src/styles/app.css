@@ -108,7 +108,16 @@ body{
   margin:0;background:var(--podklad);color:var(--text);
   font-family:var(--pismo);font-size:16px;line-height:1.6;font-synthesis:none;
   -webkit-font-smoothing:antialiased;
+  /* Chová se jako appka, ne jako stránka: text se neoznačuje. Při rychlém
+     ťukání v hospodě se dvojťuk chytne jako označení slova a zůstane viset
+     modrý výběr i s lupou a nabídkou Kopírovat. Není co kopírovat – zadání
+     úkolů se čtou, nepřenášejí. Callout z dlouhého stisku jde pryč z toho
+     samého důvodu. */
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
 }
+/* Do polí se píše, tam označování musí zůstat – jinak nejde opravit překlep
+   uprostřed názvu týmu nebo zadání úkolu. */
+input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 /* Teplé světlo shora, chladnější odlesk zdola. Appka je skoro černá a bez
    tohohle vypadala jako terminál, ne jako večer v hospodě — je to jediný
    způsob, jak do ní dostat rozsah, aniž by se rozsvítila.
