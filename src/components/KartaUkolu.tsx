@@ -16,10 +16,10 @@ interface Props {
  *  padne. Víc se na kartu nevejde a víc tam ani nemá být — popis, poznámky
  *  a odznaky jsou v detailu, co se otevře ťuknutím.
  *
- *  Podklad karty je lehce zabarvený podle obtížnosti, takže je po galerii
- *  na první pohled vidět, co je brnkačka a co makačka. Splněná karta se
- *  zbarví naplno do barvy kategorie. Obě barvy už v appce něco znamenají,
- *  žádná nová soustava nepřibyla.
+ *  Celá galerie je v odstínech barvy kategorie — obrazovka Keců je zelená,
+ *  Těla žlutá, Žranic červená. Sytost odstínu drží obtížnost: čím těžší
+ *  úkol, tím víc barvy. Je to jedna barva ve třech silách, ne dvě soustavy
+ *  vedle sebe. Splněná karta se zbarví naplno.
  *
  *  Čtvereček v rohu zapisuje rovnou z galerie — to je ten obvyklý pohyb.
  *  Kdo si chce přečíst zadání, ťukne na kartu a otevře se detail. */
@@ -40,8 +40,10 @@ export function KartaUkolu({ u, k, otevri }: Props) {
 
   return (
     <div
-      className={`ukol-karta o${u.piva}${splneno ? " splneno" : ""}`}
-      style={splneno ? { background: k.barva, color: k.naBarve } : undefined}
+      className={`ukol-karta sila${u.piva}${splneno ? " splneno" : ""}`}
+      style={splneno
+        ? { background: k.barva, color: k.naBarve }
+        : { "--kat": k.barva } as React.CSSProperties}
       role="button" tabIndex={0}
       onClick={otevri}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); otevri(); } }}
@@ -54,22 +56,21 @@ export function KartaUkolu({ u, k, otevri }: Props) {
 
       <h3 className="ukol-karta-nazev">{vazat(u.nazev)}</h3>
 
-      <div className="ukol-karta-spodek">
-        <span className="ukol-karta-zaco cislo">
-          {opakovatelny && kolik > 0 && !splneno ? `${kolik}/${u.max} · ${zaCo}` : zaCo}
+      <span className="ukol-karta-zaco cislo">
+        {opakovatelny && kolik > 0 && !splneno ? `${kolik}/${u.max} · ${zaCo}` : zaCo}
+      </span>
+
+      {/* Hotový úkol už se zapsat nedá, tak z tlačítka zbude jen fajfka. */}
+      {splneno ? (
+        <span className="ukol-karta-box hotovo" aria-hidden="true">
+          <Ikona jmeno="check" px={16} />
         </span>
-        {/* Hotový úkol už se zapsat nedá, tak z tlačítka zbude jen fajfka. */}
-        {splneno ? (
-          <span className="ukol-karta-box hotovo" aria-hidden="true">
-            <Ikona jmeno="check" px={16} />
-          </span>
-        ) : (
-          <button className="ukol-karta-box" onClick={zapis} disabled={!jdePridat(u, t)}
-            aria-label={`Zapsat ${u.nazev}`}>
-            <Ikona jmeno="plus" px={16} />
-          </button>
-        )}
-      </div>
+      ) : (
+        <button className="ukol-karta-box" onClick={zapis} disabled={!jdePridat(u, t)}
+          aria-label={`Zapsat ${u.nazev}`}>
+          <Ikona jmeno="plus" px={16} />
+        </button>
+      )}
     </div>
   );
 }

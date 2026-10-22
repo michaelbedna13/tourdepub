@@ -40,15 +40,18 @@ export function Kategorie() {
 
   return (
     <>
+      {/* Celá obrazovka kategorie je v její barvě: nahoře se rozlije a dolů
+          se ztrácí. Dřív to byla jen čtyřpixelová čára nad nadpisem, kterou
+          člověk po dvou vteřinách přestal vnímat — a karty pod ní přitom
+          barvu nesly taky. Takhle je poznat, ve které kategorii jsem, dřív
+          než si přečtu nadpis. */}
+      <div className="kat-nasvit" style={{ "--kat": k.barva } as React.CSSProperties} />
       <Hlava nadpis="Úkoly" zpet="/ukoly" />
-      <div className="kat-hlavicka">
-        <div className="kat-cara" style={{ background: k.barva }} />
-        <h1>{vazat(k.nazev)}</h1>
-      </div>
+      <h1 className="kat-titul">{vazat(k.nazev)}</h1>
       <p className="podnadpis cislo">Splněno {hotovo} z {vse.length} · {zaNe} {sklonuj(zaNe)}</p>
 
       {vse.length ? (
-        <div className="ukol-galerie">
+        <div className="ukol-galerie" style={{ "--kat": k.barva } as React.CSSProperties}>
           {vse.map((u) => <KartaUkolu key={u.id} u={u} k={k} otevri={() => setDetail(u.id)} />)}
         </div>
       ) : (

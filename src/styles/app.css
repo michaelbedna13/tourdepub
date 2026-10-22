@@ -507,67 +507,78 @@ input,textarea,select{caret-color:var(--text)}
    tam nesou půllitry obtížnosti a dvě barevné soustavy vedle sebe by se pletly.
    Nadpis stojí pod lištou, ne v ní – do lišty se vedle pilulky týmu nevešel
    a ořezával se na „Kecy a …“. */
-.kat-hlavicka{margin:-6px 0 10px}
-.kat-cara{height:4px;width:46px;border-radius:2px;margin-bottom:12px}
-.kat-hlavicka h1{font-size:clamp(26px,7.4vw,34px);line-height:var(--radky-nadpis);letter-spacing:-.02em;
-  overflow-wrap:anywhere}
+/* Nasvícení obrazovky kategorie její barvou. Leží pod obsahem, nad zdí
+   s čárkami, a dolů se ztrácí — nahoře, kde je nadpis, má být nejvíc. */
+.kat-nasvit{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--kat) 14%,transparent),
+    color-mix(in srgb,var(--kat) 4%,transparent) 36%,
+    transparent 62%);
+}
+.kat-titul{position:relative;z-index:1;margin:-4px 0 0;
+  font-size:clamp(28px,8.2vw,38px);letter-spacing:-.02em;overflow-wrap:anywhere}
+.kat-titul + .podnadpis{margin-top:10px}
 
 /* ---------- galerie úkolů ---------- */
-/* Karty po dvou: nahoře kresba, dole jméno a co za to padne. Dřív to byl
-   seznam s celým popisem u každého úkolu — osm úkolů dělalo přes dvě
-   obrazovky textu a nešlo přehlédnout, co kategorie nabízí. Tři ve sloupci
-   byly zase tak úzké, že se do nich nevešlo ani celé slovo. */
-.ukol-galerie{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+/* Karty po dvou, na výšku: nahoře kresba, dole jméno a co za to padne.
+   Dřív to byl seznam s celým popisem u každého úkolu — osm úkolů dělalo
+   přes dvě obrazovky textu a nešlo přehlédnout, co kategorie nabízí. */
+.ukol-galerie{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .ukol-karta{
   position:relative;overflow:hidden;display:flex;flex-direction:column;
   /* Na výšku, v poměru 2:3. Kresba je na tomhle rozvržení to hlavní a na
      nízké kartě by na ni nezbylo místo; takhle jí patří horní polovina. */
-  aspect-ratio:2/3;padding:16px 16px 14px;text-align:left;cursor:pointer;
-  border-radius:var(--r-sm);background:var(--vrstva);color:var(--text);
+  aspect-ratio:2/3;padding:20px 18px 18px;text-align:left;cursor:pointer;
+  border-radius:var(--r);background:var(--vrstva);color:var(--text);
   transition:transform .14s var(--krok),background .25s var(--krok);
 }
 .ukol-karta:active{transform:scale(.97)}
-/* Podklad lehce zabarvený podle obtížnosti: po galerii je pak vidět,
-   co je brnkačka a co makačka, aniž by se to muselo číst. */
-.ukol-karta.o1{background:color-mix(in srgb,var(--ob1) 12%,var(--vrstva))}
-.ukol-karta.o2{background:color-mix(in srgb,var(--ob2) 12%,var(--vrstva))}
-.ukol-karta.o3{background:color-mix(in srgb,var(--ob3) 12%,var(--vrstva))}
-.ukol-karta.splneno{background:var(--vrstva)}
+/* Celá galerie je v odstínech barvy kategorie — Kecy zelené, Tělo žluté,
+   Žranice červené. Sytost drží obtížnost: čím těžší úkol, tím víc barvy.
+   Je to jedna barva ve třech silách, ne dvě soustavy vedle sebe; barva
+   obtížnosti zůstala na půllitrech v detailu. */
+.ukol-karta.sila1{background:color-mix(in srgb,var(--kat) 13%,var(--vrstva))}
+.ukol-karta.sila2{background:color-mix(in srgb,var(--kat) 18%,var(--vrstva))}
+.ukol-karta.sila3{background:color-mix(in srgb,var(--kat) 28%,var(--vrstva))}
 
-/* Kresba nahoře, jako na kartách, odkud to je okoukané. Výška je daná, ne
-   odvozená z obrázku: ať přijde kresba jakkoli vysoká, jméno pod ní zůstane
-   na stejném místě na všech kartách v galerii. */
+/* Kresba si vezme všechno volné místo nad textem a vycentruje se v něm.
+   Text je ukotvený dole, takže jméno je na stejné řádce na všech kartách
+   v galerii, ať je kresba jakkoli vysoká.
+   Barva je kategorie vytažená ke krémové: čistě krémová kresba na barevné
+   kartě přebíjela jméno, čistě kategorie splývala s podkladem. */
 .ukol-karta-kresba{
-  flex:none;margin-bottom:auto;opacity:.9;
-  width:100%;height:46%;object-fit:contain;object-position:left center;
+  flex:1;min-height:0;width:100%;
+  color:color-mix(in srgb,var(--kat) 55%,var(--text));
 }
-.ukol-karta.o1 .ukol-karta-kresba{color:var(--ob1)}
-.ukol-karta.o2 .ukol-karta-kresba{color:var(--ob2)}
-.ukol-karta.o3 .ukol-karta-kresba{color:var(--ob3)}
 .ukol-karta.splneno .ukol-karta-kresba{color:currentColor;opacity:.85}
 
 .ukol-karta-nazev{
-  margin-top:14px;font-family:var(--pismo);font-weight:700;
-  font-size:var(--t-hlavni);line-height:1.25;letter-spacing:0;text-transform:none;
+  margin-top:16px;font-family:var(--pismo);font-weight:700;
+  font-size:var(--t-hlavni);line-height:1.22;letter-spacing:0;text-transform:none;
   overflow-wrap:break-word;
 }
-.ukol-karta-spodek{display:flex;align-items:center;gap:8px;margin-top:10px}
-.ukol-karta-zaco{flex:1;min-width:0;font-family:var(--pismo);
+.ukol-karta-zaco{display:block;margin-top:7px;font-family:var(--pismo);
   font-size:var(--t-drobne);line-height:1.3;color:var(--text-3)}
-.ukol-karta.splneno .ukol-karta-zaco{color:currentColor;opacity:.7}
-/* Čtvereček zapisuje rovnou z galerie – to je ten obvyklý pohyb. Čtvercový,
-   ne kulatý: kolečka v appce odškrtávají, tohle přidává. */
+.ukol-karta.splneno .ukol-karta-zaco{color:currentColor;opacity:.72}
+/* Čtvereček zapisuje rovnou z galerie – to je ten obvyklý pohyb, kvůli
+   kterému se nemá otevírat detail. Sedí v horním rohu, kde je jen kresba:
+   dole si bral místo jménu a u jednořádkových jmen do nich vlezl.
+   Čtvercový je schválně — kolečka v appce odškrtávají, tohle přidává. */
 .ukol-karta-box{
-  flex:none;width:36px;height:36px;display:grid;place-items:center;
-  border-radius:9px;color:inherit;
-  box-shadow:inset 0 0 0 1.5px currentColor;opacity:.55;
+  position:absolute;right:12px;top:12px;z-index:1;
+  width:38px;height:38px;display:grid;place-items:center;
+  border-radius:11px;color:inherit;
+  box-shadow:inset 0 0 0 1.5px currentColor;opacity:.45;
   transition:opacity .16s,transform .13s var(--krok),background .16s;
 }
 .ukol-karta-box:active{transform:scale(.88)}
-.ukol-karta-box:disabled{opacity:.2}
+.ukol-karta-box:disabled{opacity:.18}
 .ukol-karta-box.hotovo{opacity:1;background:currentColor;box-shadow:none}
 .ukol-karta-box.hotovo .ikona{color:var(--vrstva)}
 .ukol-karta.splneno .ukol-karta-box.hotovo .ikona{color:inherit;filter:invert(1)}
+/* Kresba nesmí vlézt pod čtvereček v rohu. */
+.ukol-karta-kresba{padding:14px 34px 0 0}
 
 /* ---------- detail úkolu ---------- */
 /* Ne stránka a ne plachta přes celou obrazovku: ta samá karta, jen větší,
