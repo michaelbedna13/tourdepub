@@ -119,8 +119,13 @@ body{
    způsob, jak do ní dostat rozsah, aniž by se rozsvítila.
    Leží NAD lištou (z-index 25, pod oknem): kdyby bylo pod ní, lišta by si
    svůj kus světla zakryla vlastním podkladem a nahoře by vznikl šev.
-   Je to obyčejný přechod, žádné míchání barev – nic to nestojí. */
-body::after{
+   Je to obyčejný přechod, žádné míchání barev – nic to nestojí.
+
+   Patří appce, ne stránce. Když viselo na body, stihlo se při spuštění
+   vykreslit dřív než úvodní obrazovka a ta ho hned zakryla: na jeden snímek
+   nahoře blikla teplá záře a zmizela. Takhle je schované s celou appkou
+   (html.uvodni .app má visibility:hidden) a objeví se, až úvod odchází. */
+.app::after{
   content:"";position:fixed;inset:0;z-index:25;pointer-events:none;
   background:
     radial-gradient(130% 58% at 50% -6%, rgba(249,162,4,.10), transparent 64%),
@@ -516,9 +521,22 @@ input,textarea,select{caret-color:var(--text)}
     color-mix(in srgb,var(--kat) 4%,transparent) 36%,
     transparent 62%);
 }
-.kat-titul{position:relative;z-index:1;margin:-4px 0 0;
-  font-size:clamp(28px,8.2vw,38px);letter-spacing:-.02em;overflow-wrap:anywhere}
-.kat-titul + .podnadpis{margin-top:10px}
+/* Hlavička kategorie. Jméno je jediná hlavička obrazovky, tak ať to tak
+   vypadá: tučně, velké a s místem kolem sebe. Pod ním pruh, jak daleko
+   kategorie je — barva kategorie tu nese skutečný údaj, ne ozdobu. */
+.kat-hlavicka{position:relative;z-index:1;margin:6px 0 30px}
+.kat-titul{font-weight:700;font-size:clamp(30px,8.8vw,42px);
+  letter-spacing:-.025em;overflow-wrap:break-word}
+.kat-postup{display:flex;align-items:center;gap:14px;margin-top:20px}
+/* Ne jeden plynulý pruh, ale čárka za každý úkol: appka se o čárkách celá
+   a prázdný pruh na 0 % vypadal jako načítání. Takhle je i bez čtení vidět,
+   kolik jich v kategorii je a kolik už padlo. */
+.kat-postup-pruh{flex:1;min-width:0;display:flex;gap:4px}
+.kat-postup-pruh span{flex:1;min-width:0;height:7px;border-radius:4px;
+  background:color-mix(in srgb,var(--text) 13%,transparent);
+  transition:background .3s var(--krok)}
+.kat-postup-cisla{flex:none;font-family:var(--pismo);font-size:var(--t-drobne);
+  color:var(--text-2)}
 
 /* ---------- galerie úkolů ---------- */
 /* Karty po dvou, na výšku: nahoře kresba, dole jméno a co za to padne.

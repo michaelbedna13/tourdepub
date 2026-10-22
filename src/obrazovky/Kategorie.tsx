@@ -46,9 +46,25 @@ export function Kategorie() {
           barvu nesly taky. Takhle je poznat, ve které kategorii jsem, dřív
           než si přečtu nadpis. */}
       <div className="kat-nasvit" style={{ "--kat": k.barva } as React.CSSProperties} />
-      <Hlava nadpis="Úkoly" zpet="/ukoly" />
-      <h1 className="kat-titul">{vazat(k.nazev)}</h1>
-      <p className="podnadpis cislo">Splněno {hotovo} z {vse.length} · {zaNe} {sklonuj(zaNe)}</p>
+      {/* V liště nadpis není. Stálo tam „Úkoly“, tedy kam vede šipka zpátky —
+          dvě hlavičky nad sebou, z nichž ta horní nepatřila téhle obrazovce
+          a brala nejlepší řádku. Šipka sama stačí. */}
+      <Hlava zpet="/ukoly" />
+
+      <div className="kat-hlavicka">
+        <h1 className="kat-titul">{vazat(k.nazev)}</h1>
+        <div className="kat-postup">
+          <div className="kat-postup-pruh" aria-hidden="true">
+            {vse.map((u) => (
+              <span key={u.id}
+                style={kolikrat(u.id, t) > 0 ? { background: k.barva } : undefined} />
+            ))}
+          </div>
+          <span className="kat-postup-cisla cislo">
+            {hotovo} ze {vse.length} · {zaNe} {sklonuj(zaNe)}
+          </span>
+        </div>
+      </div>
 
       {vse.length ? (
         <div className="ukol-galerie" style={{ "--kat": k.barva } as React.CSSProperties}>
