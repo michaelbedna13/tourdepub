@@ -230,14 +230,19 @@ Kdyby něco spadlo, chytí to `<Zachrana>` a ukáže hlášku s tlačítkem *Na�
 ne černou plochu. Názvy souborů v `dist/` nesou otisk obsahu, takže stará stránka
 nemůže potkat nový skript.
 
-## Kresby úkolů
+## Kresby
 
-Každý úkol může mít v galerii vlastní kresbu. Dokud ji nemá, bere ikonu své
-kategorie — a osm stejných bublin vedle sebe je přesně to, co tím má přestat.
+Vlastní kresbu můžou mít **úkoly** v galerii a **stránky průpravy** v úvodu.
+Dokud ji nemají, drží místo ikona — kresba pak jen vskočí na její místo a nic
+se kolem toho nepřerovná.
 
 Kresba se dodává jako **obrázek**: tmavá kresba (fixa, pero, cokoli) na světlém
-podkladu, bez pozadí a bez stínů. Soubor se jmenuje podle **id úkolu** z
-`src/lib/data.ts` — například `caluje.png` pro „Borec, co to cáluje".
+podkladu, bez pozadí a bez stínů. Soubor se jmenuje podle toho, kam patří:
+
+```
+caluje.png        úkol s id „caluje" (id jsou v src/lib/data.ts)
+uvod-statl.png    stránka průpravy s id „statl" (src/components/Uvod.tsx)
+```
 
 ```bash
 mkdir -p kresby          # sem obrázky
@@ -249,8 +254,8 @@ Skript je obtáhne do drah a zapíše do `src/lib/kresby.ts`. Každou posadí do
 na výšku: v galerii mají všechny kresby stejně velké místo a jméno pod nimi
 zůstane na stejné řádce.
 
-U souboru, jehož jméno neodpovídá žádnému úkolu, to napíše — překlep v id se
-jinak pozná až tím, že se kresba neukáže.
+U souboru, jehož jméno neodpovídá žádnému úkolu ani stránce průpravy, to
+napíše — překlep v id se jinak pozná až tím, že se kresba neukáže.
 
 Kresba se kreslí barvou textu, takže se sama přizpůsobí obtížnosti i vybarvené
 kartě. Proto musí být **jednobarevná**: odstíny ani výplně se nepřenesou.

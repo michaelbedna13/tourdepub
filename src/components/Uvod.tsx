@@ -11,6 +11,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { vazat } from "../lib/format";
 import type { JmenoIkony } from "../lib/ikony";
 import { Ikona } from "./Ikona";
+import { Kresba } from "./Kresba";
+import { KRESBY } from "../lib/kresby";
 import { Logo } from "./Logo";
 
 /** Nejmíň takhle dlouho zůstane značka od načtení stránky. */
@@ -26,19 +28,24 @@ const PISMA_NEJVIC = 2500;
 const ZAVRENI = 300;
 
 interface Stranka {
+  /** Klíč kresby: soubor kresby/uvod-<id>.png, viz scripts/prevod-kreseb.py. */
+  id: string;
+  /** Záskok, dokud ke stránce není kresba. */
   ikona: JmenoIkony;
+  /** Barva stránky. Nasvítí podklad, nic víc — průprava zůstává tmavá. */
+  barva: string;
   nadpis: string;
   text: string;
 }
 
 const PRUPRAVA: Stranka[] = [
-  { ikona: "mista", nadpis: "Večer ve Štatlu",
+  { id: "statl", ikona: "mista", barva: "#F9A204", nadpis: "Večer ve Štatlu",
     text: "Devět brněnskejch špeluněk, jedna noc a partyje, co si nedá říct. Valí se to od šesti večer do dvou do rána." },
-  { ikona: "carka", nadpis: "Čárky nejsou za chlast",
+  { id: "carky", ikona: "carka", barva: "#006633", nadpis: "Čárky nejsou za chlast",
     text: "Za každou špeluňku, do který vlezete, čárka. Za škopek čárka. Ale ty tučný padajó za srandy — za koule, za dobrej kšaft a za to, že to v palici nemáš vypatlaný." },
-  { ikona: "hospoda", nadpis: "Kdo se loudá, ten nemá",
+  { id: "loudal", ikona: "hospoda", barva: "#026C80", nadpis: "Kdo se loudá, ten nemá",
     text: "Na každou štaci je tak 45 minut a pak se valí dál. Jak se nějaká partyja fest loudá a ostatní na ni čumijó, za srandy v tý špeluňce nemá ani čárku." },
-  { ikona: "koruna", nadpis: "Celej bank bere jedna",
+  { id: "bank", ikona: "koruna", barva: "#E5331F", nadpis: "Celej bank bere jedna",
     text: "Vlezné je kilo na palici a na konci to všecko shrábne ta parta, co nahrabala nejvíc čárek. Tak ať je to betelný." },
 ];
 
@@ -167,10 +174,26 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
       </div>
 
       {kde >= 0 && (
-        <div className="uvod-obsah">
+        <div className="uvod-obsah" style={{ "--kat": s.barva } as React.CSSProperties}>
+          {/* Nasvícení stránky její barvou. Každá stránka průpravy má svoji,
+              takže je listování vidět i periferně. Je to jen nasvícení, ne
+              plná výplň — průprava zůstává tmavá a nenaráží do appky, co po
+              ní přijde. */}
+          <div className="uvod-nasvit" key={`n${kde}`} />
+
           <div className="uvod-stranka" key={kde}>
-            <Ikona jmeno={s.ikona} px={84} trida="uvod-ikona" />
+            <div className="uvod-krok cislo">{kde + 1} ze {PRUPRAVA.length}</div>
             <h1 className="uvod-nadpis">{vazat(s.nadpis)}</h1>
+
+            {/* Místo pro kresbu stránky. Dokud není, drží ho ikona — ale
+                výšku si bere stejnou, takže se nadpis ani text nehnou,
+                až kresby přijdou. */}
+            <div className="uvod-kresba">
+              {KRESBY[`uvod-${s.id}`]
+                ? <Kresba id={`uvod-${s.id}`} />
+                : <Ikona jmeno={s.ikona} px={96} />}
+            </div>
+
             <p className="uvod-text">{vazat(s.text)}</p>
           </div>
 

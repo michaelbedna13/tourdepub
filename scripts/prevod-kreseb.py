@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Obtáhne kresby úkolů z rastrů do SVG drah (src/lib/kresby.ts).
+"""Obtáhne kresby z rastrů do SVG drah (src/lib/kresby.ts).
 
-Kresba patří k úkolu podle jména souboru: `caluje.png` je kresba úkolu s id
-„caluje" (id jsou v src/lib/data.ts). Obtažení funguje stejně jako u loga —
-kresba fixou nebo perem na světlém podkladu, bez pozadí a bez stínů.
+Kresba patří k místu v appce podle jména souboru:
+  caluje.png       kresba úkolu s id „caluje" (id jsou v src/lib/data.ts)
+  uvod-statl.png   kresba stránky průpravy s id „statl" (viz src/components/Uvod.tsx)
+
+Obtažení funguje stejně jako u loga — kresba fixou nebo perem na světlém
+podkladu, bez pozadí a bez stínů.
 
 Každá dráha se posadí do čtverce 0 0 100 100 a vycentruje, takže je jedno,
 jestli je původní obrázek na šířku nebo na výšku: v galerii mají všechny
@@ -78,10 +81,14 @@ def main(slozka):
     if not os.path.isdir(slozka):
         raise SystemExit("Složka %s není. Dej do ní obrázky pojmenované podle "
                          "id úkolů (např. caluje.png)." % slozka)
-    # id úkolů z dat, ať se dá upozornit na soubor, co k ničemu nepatří
+    # Id, která v appce něco znamenají, ať se dá upozornit na soubor, co
+    # k ničemu nepatří — překlep by se jinak poznal až tím, že se kresba
+    # neukáže, a to je zbytečně pozdě.
+    import re
     with open(os.path.join(KOREN, "src", "lib", "data.ts"), encoding="utf-8") as f:
-        zdroj = f.read()
-    znama = set(json.loads(x) for x in __import__("re").findall(r'\{ id: ("[^"]+")', zdroj))
+        znama = set(json.loads(x) for x in re.findall(r'\{ id: ("[^"]+")', f.read()))
+    with open(os.path.join(KOREN, "src", "components", "Uvod.tsx"), encoding="utf-8") as f:
+        znama |= set("uvod-" + x for x in re.findall(r'\{ id: "([^"]+)", ikona:', f.read()))
 
     ven, hlasky = [], []
     for jmeno in sorted(os.listdir(slozka)):

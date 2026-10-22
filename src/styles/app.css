@@ -850,14 +850,48 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
      nevznikne, ale ani se nepřekrývají tak, že by text ležel přes logo */
   padding:inherit;animation:uvod-prichod .34s .16s var(--krok) both;
 }
-.uvod-stranka{
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  max-width:380px;margin:auto 0;
+/* Nasvícení stránky její barvou. Leží pod obsahem a shora se rozlévá, stejně
+   jako na obrazovce kategorie — listování je tím vidět i periferně. Je to jen
+   nasvícení, ne plná výplň: průprava zůstává tmavá a nenaráží do appky,
+   co po ní přijde. */
+.uvod-nasvit{
+  position:absolute;inset:calc(-1 * var(--vrch)) calc(-1 * var(--okraj));
+  pointer-events:none;
+  background:linear-gradient(to bottom,
+    color-mix(in srgb,var(--kat) 20%,transparent),
+    color-mix(in srgb,var(--kat) 5%,transparent) 45%,
+    transparent 76%);
+  animation:nasvit-prijde .5s var(--krok) both;
 }
-.uvod-ikona{color:var(--text)}
-.uvod-nadpis{margin-top:36px;font-size:clamp(29px,8.6vw,38px);line-height:var(--radky-nadpis);
-  letter-spacing:-.025em}
-.uvod-text{margin-top:20px;font-size:var(--t-hlavni);line-height:1.7;color:var(--text-2)}
+@keyframes nasvit-prijde{from{opacity:0}}
+
+.uvod-stranka{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  max-width:380px;width:100%;flex:1;min-height:0;
+}
+/* pod řádkou s Přeskočit, ať se o ni neotírá */
+.uvod-krok{flex:none;font-family:var(--pismo);font-size:var(--t-drobne);
+  color:var(--text-3);letter-spacing:.09em;text-transform:uppercase;
+  margin-top:34px}
+.uvod-nadpis{flex:none;margin-top:12px;font-size:clamp(29px,8.6vw,38px);
+  line-height:var(--radky-nadpis);letter-spacing:-.025em}
+/* Místo pro kresbu si bere, co zbyde mezi nadpisem a textem. Výška je tím
+   daná rozvržením, ne obrázkem: až kresby přijdou, nadpis ani text se
+   nehnou. Dokud nejsou, drží místo ikona. */
+.uvod-kresba{
+  flex:1;min-height:90px;width:100%;
+  display:flex;align-items:center;justify-content:center;
+  margin:22px 0;color:color-mix(in srgb,var(--kat) 45%,var(--text));
+  animation:kresba-prijde .5s .1s var(--krok) both;
+}
+/* Kresba vyplní slot, ikona jen tak, aby nebyla obří — je to záskok,
+   ne obrázek stránky. */
+.uvod-kresba > *{width:auto;height:100%;max-width:100%}
+.uvod-kresba > .ikona{height:auto;width:min(44%,150px)}
+@keyframes kresba-prijde{from{opacity:0;transform:translateY(14px) scale(.96)}}
+.uvod-text{flex:none;margin-bottom:4px;font-size:var(--t-hlavni);
+  line-height:1.65;color:var(--text-2)}
 /* Dál / Jedeme: jen tichý popisek, ne svítící tlačítko. Ťuknout jde kamkoli
    na obrazovku, tak ať to dole nepřetahuje pozornost z textu. */
 .uvod-dal{display:flex;align-items:center;justify-content:center;gap:9px;
@@ -869,6 +903,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   width:100%;max-width:320px;padding-bottom:8px}
 /* při přepnutí stránky se mění jen obsah, ne celá vrstva */
 .uvod-stranka{animation:uvod-prichod .26s var(--krok) both}
+.uvod-obsah{position:absolute;overflow:hidden}
 .uvod-tecky{display:flex;gap:7px}
 .uvod-tecka{width:24px;height:3px;border-radius:2px;background:var(--linka);
   transition:background .25s var(--krok)}
