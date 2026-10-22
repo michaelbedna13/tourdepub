@@ -94,9 +94,20 @@ místo, kde se kreslí.
 
 ### Zrno
 
-Přes celou appku leží jemné zrno (`src/assets/zrno.svg`, 160 px, krytí 50 %, režim
-`soft-light`). Leží nad podkladem a pod obsahem a nereaguje na dotyk.
-Plochá tmavá barva bez něj působila jako plast.
+Zrno leží ve **třech vrstvách** a bez nich appka vypadá jako vysázená z vektorů.
+
+1. **Pod obsahem** (`body::before`, `zrno.svg`, 160 px, krytí 50 %, `soft-light`) —
+   oživí holý podklad. Plochá tmavá barva bez něj působila jako plast.
+2. **Nad vším, co appka nakreslí** (`.app::before`, to samé zrno, `soft-light`) —
+   karty, účtenka i barevné plochy by jinak zůstaly hladké, protože spodní
+   vrstva na ně nedosáhne. Leží uvnitř `.app`, takže na plachty v `<body>`
+   (detail úkolu, okna) nesahá — ty mají být čisté.
+3. **Tisk na barevných plochách** (`zrno-tisk.svg`, `multiply`): karty kategorií
+   (`.kat-karta::after`) a papír účtenky (zamíchaný rovnou do podkladu, ne
+   vrstva nad textem, ta by rozmazala tisk). Plná barva přes celou kartu
+   vypadala jako výplň z tiskárny, ne jako plakát.
+
+Žádná z vrstev nechytá dotyk a žádná nic neanimuje.
 
 ## Písmo
 
