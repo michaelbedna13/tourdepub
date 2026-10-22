@@ -61,7 +61,7 @@ function Kostra() {
       <Zed />
       {/* klíč podle adresy: každá obrazovka přijede, ne střih */}
       <main className={`obrazovka${svih.prichod ? ` z-${svih.prichod}` : ""}`}
-        key={pathname} style={svih.styl}>
+        key={pathname} ref={svih.vrstva}>
         <Outlet />
       </main>
     </div>

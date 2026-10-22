@@ -71,17 +71,22 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
     u.jednouZaHospodu && t?.hospoda && t.zlodej[t.hospoda] ? "Z týhle špeluňky už máte" : null,
   ].filter(Boolean) as string[];
 
+  /** Kartu drží dva: okno kvůli focusu a Escapu, švih kvůli posunu. */
+  function spojRefy(e: HTMLDivElement | null) {
+    okno.current = e;
+    dolu.karta.current = e;
+  }
+
   function prepni() {
     if (kolik > 0 && !opakovatelny) uberUkol(u);
     else if (pridejUkol(u)) odmena("+" + u.body);
   }
 
   return (
-    <div className="detail" onClick={zavri} role="presentation">
-      <div className={`detail-karta${splneno ? " splneno" : ""}`} ref={okno} tabIndex={-1}
+    <div className="detail" onClick={zavri} role="presentation" ref={dolu.pozadi}>
+      <div className={`detail-karta${splneno ? " splneno" : ""}`} ref={spojRefy} tabIndex={-1}
         role="dialog" aria-label={u.nazev}
         style={{ "--kat": k.barva,
-                 ...dolu.styl,
                  ...(splneno ? { background: k.barva, color: k.naBarve } : {}) } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()} {...dolu.obal}>
         <div className="detail-vrch">

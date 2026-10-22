@@ -217,17 +217,28 @@ input,textarea,select{caret-color:var(--text)}
   from{opacity:0;transform:translateY(8px)}
   to{opacity:1;transform:none}
 }
+/* Tah prstem obrazovkou nehýbe přes animaci, ale přes inline transform
+   (viz svih.ts). Tyhle dvě třídy jen říkají, jak doklouže po puštění:
+   .odchazi = dojede tam, kam se táhlo, a přehodí se adresa,
+   .vraci = švih se nedotáhl a obrazovka se vrátí na místo.
+   Časy se drží ODCHOD a NAVRAT v svih.ts. */
+.obrazovka.odchazi{animation:none;transition:transform .17s var(--krok),opacity .17s linear}
+.obrazovka.vraci{animation:none;transition:transform .22s var(--krok)}
 /* po švihu přijede obrazovka z té strany, odkud se táhlo */
 .obrazovka.z-vlevo{animation-name:prichod-zleva}
 .obrazovka.z-vpravo{animation-name:prichod-zprava}
+/* Dál než 34 px a svižněji než obsah-prichod: navazuje se na obrazovku,
+   která zrovna odjela, takže se to má číst jako jeden pohyb, ne jako
+   prolnutí. */
 @keyframes prichod-zleva{
-  from{opacity:0;transform:translateX(34px)}
+  from{opacity:0;transform:translateX(64px)}
   to{opacity:1;transform:none}
 }
 @keyframes prichod-zprava{
-  from{opacity:0;transform:translateX(-34px)}
+  from{opacity:0;transform:translateX(-64px)}
   to{opacity:1;transform:none}
 }
+.obrazovka.z-vlevo,.obrazovka.z-vpravo{animation-duration:.24s}
 
 /* ---------- horní lišta ---------- */
 /* Vlevo nadpis obrazovky, vpravo tým. Logo tu nebylo – trojřádková kresba
@@ -620,6 +631,13 @@ input,textarea,select{caret-color:var(--text)}
   animation:detail-prijde .26s var(--krok);
 }
 @keyframes detail-prijde{from{opacity:0;transform:scale(.9)}}
+/* Stejně jako u obrazovek: tahem hýbe svih.ts, tyhle třídy říkají, jak to
+   doklouže. Časy se drží DOLU_ODCHOD a NAVRAT v svih.ts. */
+.detail-karta.odchazi{animation:none;transition:transform .2s var(--krok)}
+.detail-karta.vraci{animation:none;transition:transform .22s var(--krok)}
+/* Pozadí slábne s kartou; během tahu ho svih.ts nastavuje rovnou, takže
+   přechod se zapíná až na odchod – jinak by stmívání couralo za prstem. */
+.detail.odchazi{transition:opacity .2s linear}
 .detail-karta:focus{outline:none}
 /* Kresba si bere všechno, co zbyde nad textem – stejně jako na dlaždici. */
 .detail-kresba{
