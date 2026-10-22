@@ -1,3 +1,6 @@
 node_modules
 dist
 *.tsbuildinfo
+
+# kresby úkolů: zdrojové obrázky zůstávají u tebe, do appky jde jen obtah
+kresby/

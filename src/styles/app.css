@@ -520,7 +520,9 @@ input,textarea,select{caret-color:var(--text)}
 .ukol-galerie{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .ukol-karta{
   position:relative;overflow:hidden;display:flex;flex-direction:column;
-  min-height:204px;padding:16px 16px 14px;text-align:left;cursor:pointer;
+  /* Na výšku, v poměru 2:3. Kresba je na tomhle rozvržení to hlavní a na
+     nízké kartě by na ni nezbylo místo; takhle jí patří horní polovina. */
+  aspect-ratio:2/3;padding:16px 16px 14px;text-align:left;cursor:pointer;
   border-radius:var(--r-sm);background:var(--vrstva);color:var(--text);
   transition:transform .14s var(--krok),background .25s var(--krok);
 }
@@ -532,8 +534,13 @@ input,textarea,select{caret-color:var(--text)}
 .ukol-karta.o3{background:color-mix(in srgb,var(--ob3) 12%,var(--vrstva))}
 .ukol-karta.splneno{background:var(--vrstva)}
 
-/* kresba nahoře, jako na kartách, odkud to je okoukané */
-.ukol-karta-kresba{margin-bottom:auto;opacity:.9}
+/* Kresba nahoře, jako na kartách, odkud to je okoukané. Výška je daná, ne
+   odvozená z obrázku: ať přijde kresba jakkoli vysoká, jméno pod ní zůstane
+   na stejném místě na všech kartách v galerii. */
+.ukol-karta-kresba{
+  flex:none;margin-bottom:auto;opacity:.9;
+  width:100%;height:46%;object-fit:contain;object-position:left center;
+}
 .ukol-karta.o1 .ukol-karta-kresba{color:var(--ob1)}
 .ukol-karta.o2 .ukol-karta-kresba{color:var(--ob2)}
 .ukol-karta.o3 .ukol-karta-kresba{color:var(--ob3)}
@@ -581,7 +588,8 @@ input,textarea,select{caret-color:var(--text)}
 }
 @keyframes detail-prijde{from{opacity:0;transform:scale(.9)}}
 .detail-karta:focus{outline:none}
-.detail-vodoznak{position:absolute;right:-26px;bottom:-30px;opacity:.07;pointer-events:none}
+.detail-vodoznak{position:absolute;right:-26px;bottom:-30px;width:132px;height:132px;
+  opacity:.07;pointer-events:none}
 .detail-karta.splneno .detail-vodoznak{opacity:.14}
 .detail-vrch{display:flex;align-items:center;justify-content:space-between;gap:12px;
   position:relative;z-index:1}

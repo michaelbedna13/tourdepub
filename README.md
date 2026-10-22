@@ -29,12 +29,13 @@ src/lib/nastaveni.ts    klíče k Supabase, název tabulky, název hry a kód sp
 src/lib/format.ts       skloňování a vázání krátkých slov
 src/lib/ikony.ts        ZÁSTUPNÉ — generuje scripts/kresli-ikony.mjs, needitovat ručně
 src/lib/logo.ts         ZÁSTUPNÉ — generuje scripts/prevod-loga.py, needitovat ručně
+src/lib/kresby.ts       ZÁSTUPNÉ — generuje scripts/prevod-kreseb.py, needitovat ručně
 src/styles/app.css      celý vzhled, jeden soubor
 src/styles/pisma.css    @font-face, rozsahy znaků
 src/assets/             písma, zrno a čárky (všechno, na co sahá CSS)
 public/                 ikony appky, logo a úvodní obrazovky pro iPhone
 DESIGN.md               barvy, písmo, rozměry a proč jsou takové
-scripts/                generátor ikon, stahovač písem, převod loga
+scripts/                generátor ikon, stahovač písem, převod loga a kreseb
 supabase/party.sql      struktura tabulky pro živé pořadí
 .claude/skills/         Apple HIG skilly (zdroj: raintree-technology/apple-hig-skills, MIT)
 ```
@@ -228,6 +229,31 @@ už otevřená; zápisy se drží v telefonu a pošlou se, až bude síť.
 Kdyby něco spadlo, chytí to `<Zachrana>` a ukáže hlášku s tlačítkem *Načíst znovu*,
 ne černou plochu. Názvy souborů v `dist/` nesou otisk obsahu, takže stará stránka
 nemůže potkat nový skript.
+
+## Kresby úkolů
+
+Každý úkol může mít v galerii vlastní kresbu. Dokud ji nemá, bere ikonu své
+kategorie — a osm stejných bublin vedle sebe je přesně to, co tím má přestat.
+
+Kresba se dodává jako **obrázek**: tmavá kresba (fixa, pero, cokoli) na světlém
+podkladu, bez pozadí a bez stínů. Soubor se jmenuje podle **id úkolu** z
+`src/lib/data.ts` — například `caluje.png` pro „Borec, co to cáluje".
+
+```bash
+mkdir -p kresby          # sem obrázky
+python3 scripts/prevod-kreseb.py
+```
+
+Skript je obtáhne do drah a zapíše do `src/lib/kresby.ts`. Každou posadí do
+čtverce a vycentruje, takže je jedno, jestli je původní obrázek na šířku nebo
+na výšku: v galerii mají všechny kresby stejně velké místo a jméno pod nimi
+zůstane na stejné řádce.
+
+U souboru, jehož jméno neodpovídá žádnému úkolu, to napíše — překlep v id se
+jinak pozná až tím, že se kresba neukáže.
+
+Kresba se kreslí barvou textu, takže se sama přizpůsobí obtížnosti i vybarvené
+kartě. Proto musí být **jednobarevná**: odstíny ani výplně se nepřenesou.
 
 ## Ikony
 

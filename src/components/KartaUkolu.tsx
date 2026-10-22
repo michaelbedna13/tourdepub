@@ -3,6 +3,8 @@ import { sklonuj, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { jdePridat, kolikrat, pridejUkol, tym } from "../lib/stav";
 import { Ikona } from "./Ikona";
+import { Kresba } from "./Kresba";
+import { KRESBY } from "../lib/kresby";
 
 interface Props {
   u: Ukol;
@@ -45,7 +47,10 @@ export function KartaUkolu({ u, k, otevri }: Props) {
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); otevri(); } }}
       aria-label={`${u.nazev}${splneno ? " (splněno)" : ""}`}>
 
-      <Ikona jmeno={u.ikona ?? k.ikona} px={76} trida="ukol-karta-kresba" />
+      {/* Vlastní kresba úkolu, když k němu je; jinak ikona kategorie.
+          Kresby dodává scripts/prevod-kreseb.py ze složky kresby/. */}
+      <Kresba id={u.id} trida="ukol-karta-kresba" />
+      {!KRESBY[u.id] && <Ikona jmeno={u.ikona ?? k.ikona} px={96} trida="ukol-karta-kresba" />}
 
       <h3 className="ukol-karta-nazev">{vazat(u.nazev)}</h3>
 

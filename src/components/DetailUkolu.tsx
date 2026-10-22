@@ -4,6 +4,8 @@ import { sklonuj, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { jdePridat, kolikrat, pridejUkol, tipNaStaci, tym, uberUkol } from "../lib/stav";
 import { Ikona } from "./Ikona";
+import { Kresba } from "./Kresba";
+import { KRESBY } from "../lib/kresby";
 import { Obtiznost } from "./Obtiznost";
 
 interface Props {
@@ -70,7 +72,9 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
       <div className="detail-karta" ref={okno} tabIndex={-1} role="dialog" aria-label={u.nazev}
         style={splneno ? { background: k.barva, color: k.naBarve } : undefined}
         onClick={(e) => e.stopPropagation()}>
-        <Ikona jmeno={u.ikona ?? k.ikona} px={132} trida="detail-vodoznak" />
+        {KRESBY[u.id]
+          ? <Kresba id={u.id} trida="detail-vodoznak" />
+          : <Ikona jmeno={u.ikona ?? k.ikona} px={132} trida="detail-vodoznak" />}
 
         <div className="detail-vrch">
           <Obtiznost piva={u.piva} />
