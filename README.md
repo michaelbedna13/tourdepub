@@ -75,7 +75,8 @@ obrazovek:
   vedle nebo švihem dolů. V režimu správce je u každého tužka.
 - **Týmy** — pořadí part jako **účtenka z hospody**: u každé party je rozepsané,
   kolik má za špeluňky, kolik za škopky a kolik za srandy, pod tím součet.
-  Vedoucí má razítko „VEDE“. Ťuknutím na tým se přepneš, za koho zapisuješ,
+  Vedoucí má razítko „VEDE“. Za koho se zapisuje, drží pilulka v liště nahoře,
+  na účtence se to neznačí. Ťuknutím na tým se přepneš, za koho zapisuješ,
   takže z jednoho telefonu jde vést i celou hru. Tužka tým přejmenuje,
   přebarví nebo smaže.
 

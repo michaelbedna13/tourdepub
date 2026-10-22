@@ -67,7 +67,6 @@ export function Uctenka({ poradi, tymId, hospod, ukolu, strop, prepni, uprav }: 
               <span className="uc-poradi cislo">#{i + 1}</span>
               <span className="uc-znak" style={{ background: p.barva }} />
               <span className="uc-text">{p.nazev}</span>
-              {p.id === tymId && <span className="uc-ja">zapisuju</span>}
             </button>
             <button className="uc-tuzka" onClick={() => uprav(p.id)} aria-label={`Upravit ${p.nazev}`}>
               <Ikona jmeno="i-tuzka" px={15} />
