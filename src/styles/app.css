@@ -13,31 +13,47 @@
    ============================================================ */
 
 :root{
-  /* podklad: skoro černá zeleň, vrstvy o stupínek výš */
-  --podklad:#070E0A;
-  --vrstva:#0D1711;
-  --vrstva-2:#152219;
-  --vrstva-3:#1C2D22;
+  /* Podklad a vrstvy nad ním. Bylo to skoro černé v jednom tónu (#070E0A až
+     #1C2D22) a appka z toho vycházela ponurá — mezi vrstvami nebyl rozdíl,
+     co by se dal vidět. Teď je základ znatelně světlejší a každá vrstva je
+     o schod výš, takže je poznat, co na čem leží. */
+  --podklad:#151A20;
+  --vrstva:#1C222A;
+  --vrstva-2:#242B34;
+  --vrstva-3:#2D3540;
 
-  /* text: krémová z loga */
-  --text:#EFEBE0;
-  --text-2:rgba(239,235,224,.66);
+  /* text: krémová */
+  --text:#F2E7CF;
+  --text-2:rgba(242,231,207,.66);
   /* Byla to osmatřicítka. V téhle vrstvě ale nejsou jen popisky — jsou tu
      i pravidla, podle kterých se hraje („Max. 5 různejch palic“). V šeru
      v hospodě a po pár pivech se to nedalo přečíst. */
-  --text-3:rgba(239,235,224,.47);
-  --linka:rgba(239,235,224,.10);
-  --linka-sl:rgba(239,235,224,.055);
+  --text-3:rgba(242,231,207,.47);
+  --linka:rgba(242,231,207,.11);
+  --linka-sl:rgba(242,231,207,.06);
 
-  /* hlavní akce je světlá plocha s tmavým textem — žádná akcentní barva */
-  --akce:#EFEBE0;
-  --na-akci:#070E0A;
+  /* Hlavní akce je pořád světlá plocha s tmavým textem, ne barva. Barvy
+     v téhle paletě nesou význam (obtížnost, kategorie) a kdyby jednu z nich
+     měla i tlačítka, přestalo by to platit. */
+  --akce:#F2E7CF;
+  --na-akci:#151A20;
 
-  /* obtížnost úkolu a karty kategorií – jediné tři barvy v appce */
-  --ob1:#7FD4C1;
-  --ob2:#F2C14E;
-  --ob3:#F2765A;
-  --spatne:#F2765A;
+  /* Obtížnost úkolu a kategorie: pořád tři barvy, aby v appce nebyly dvě
+     barevné soustavy. Nově zelená – žlutá – červená, jak to má být čitelné
+     i bez čtení (lehké → těžké).
+
+     Karty kategorií mají plnou, sytou barvu (viz KATEGORIE v data.ts),
+     tyhle tři jsou jejich zesvětlená varianta na text v tmavém: sytá zelená
+     ani červená se na tmavém podkladu nepřečte. Je to stejný odstín, jen
+     vytažený nahoru. */
+  --ob1:#45B877;
+  --ob2:#F9A204;
+  --ob3:#FF6D54;
+  --spatne:#FF6D54;
+
+  /* Čtvrtá barva palety. Nenese význam, slouží jako chladný protiklad
+     teplého světla shora. */
+  --morska:#026C80;
 
   /* Hagrid (Zetafonts) z Adobe Fonts, kit thr1dyh je v index.html. Jsou to
      tři samostatné rodiny: hagrid (400/700), hagrid-black (900) a hagrid-text
@@ -107,8 +123,8 @@ body{
 body::after{
   content:"";position:fixed;inset:0;z-index:25;pointer-events:none;
   background:
-    radial-gradient(130% 58% at 50% -6%, rgba(242,193,78,.11), transparent 64%),
-    radial-gradient(120% 40% at 50% 106%, rgba(127,212,193,.06), transparent 62%);
+    radial-gradient(130% 58% at 50% -6%, rgba(249,162,4,.10), transparent 64%),
+    radial-gradient(120% 38% at 50% 108%, rgba(2,108,128,.07), transparent 60%);
 }
 
 /* Zrno přes celou appku. Leží nad podkladem, ale pod obsahem, a nereaguje na dotyk.
@@ -212,10 +228,15 @@ input,textarea,select{caret-color:var(--text)}
      přepínač týmu i menu jinak až někde nad obrazovkou. Táhne se přes
      okraje obrazovky, aby pod ní nic neprobleskovalo, takže co byl
      u .obrazovka odsazením, je tady vycpávkou. */
-  position:sticky;top:0;z-index:20;background:var(--podklad);
+  position:sticky;top:0;z-index:20;
   margin:calc(-1 * var(--vrch)) calc(-1 * var(--okraj)) 22px;
   padding:var(--vrch) var(--okraj) 10px;
+  /* Nahoře je pod lištou prázdno, tak ať tam žádný pruh není — jen nadpis
+     na podkladu. Výplň si vezme, teprve až se přilepí a začne obsahu
+     opravdu překážet. */
+  background:transparent;transition:background-color .16s linear;
 }
+.hlava.prilepena{background:var(--podklad)}
 /* Pod lištou bylo prolnutí do ztracena. Vypadalo to jako chyba vykreslení:
    podnadpis začíná přesně na její spodní hraně, takže v prolnutí ležel i
    v klidu a při posunu se z řádky stal zpola průsvitný pruh. Lišta je
@@ -274,7 +295,7 @@ input,textarea,select{caret-color:var(--text)}
 .tl.hotovo .ikona{color:var(--text-2)}
 /* 3. vedlejší – bez plochy */
 .tl.tise{background:transparent;color:var(--text-2);min-height:46px;font-size:var(--t-text);font-weight:400}
-.tl.nebezpecne{background:transparent;color:var(--spatne);box-shadow:inset 0 0 0 1px rgba(242,118,90,.28)}
+.tl.nebezpecne{background:transparent;color:var(--spatne);box-shadow:inset 0 0 0 1px rgba(255,109,84,.3)}
 .tl:disabled{opacity:.3}
 .tl.maly{min-height:40px;font-size:var(--t-text);padding:9px 15px;width:auto}
 
@@ -443,6 +464,8 @@ input,textarea,select{caret-color:var(--text)}
 .kat-karta{
   display:block;position:relative;overflow:hidden;
   border-radius:var(--r);padding:22px 24px;min-height:152px;
+  /* barvu textu dává kategorie sama (zelená a červená jsou tmavé, žlutá
+     světlá); tady je jen záloha, kdyby chyběla */
   color:var(--na-akci);
   transition:transform .14s var(--krok),filter .16s;
 }
@@ -452,7 +475,10 @@ input,textarea,select{caret-color:var(--text)}
 .kat-vrch{display:flex;align-items:center;justify-content:space-between;gap:10px;
   position:relative;z-index:1}
 .kat-pocet{font-family:var(--nadpisy);font-size:var(--t-text);line-height:1;
-  padding:6px 11px;border-radius:var(--pilulka);background:rgba(7,14,10,.13)}
+  padding:6px 11px;border-radius:var(--pilulka);
+  /* pilulka i vodoznak jdou z barvy textu karty, ne z napevno dané tmavé —
+     na zelené a červené kartě je ten text krémový */
+  background:rgba(0,0,0,.14);background:color-mix(in srgb,currentColor 15%,transparent)}
 .kat-sipka{opacity:.6}
 .kat-nazev{position:relative;z-index:1;margin-top:32px;padding-right:64px;
   font-size:25px;line-height:var(--radky-nadpis);letter-spacing:-.02em;overflow-wrap:anywhere}
@@ -486,9 +512,9 @@ input,textarea,select{caret-color:var(--text)}
   padding:4px 10px 4px 8px;border-radius:var(--pilulka);
   font-family:var(--pismo);font-size:var(--t-drobne);line-height:1.2}
 .obtiznost .piva{display:flex;gap:2px}
-.obtiznost.o1{background:rgba(127,212,193,.13);color:var(--ob1)}
-.obtiznost.o2{background:rgba(242,193,78,.13);color:var(--ob2)}
-.obtiznost.o3{background:rgba(242,118,90,.13);color:var(--ob3)}
+.obtiznost.o1{background:rgba(69,184,119,.14);color:var(--ob1)}
+.obtiznost.o2{background:rgba(249,162,4,.14);color:var(--ob2)}
+.obtiznost.o3{background:rgba(255,109,84,.14);color:var(--ob3)}
 
 .znacka-text{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3)}
 .odznak{font-family:var(--pismo);font-size:var(--t-drobne);padding:4px 10px;border-radius:var(--pilulka);
@@ -546,9 +572,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   display:grid;place-items:center;gap:3px;padding:8px 4px;
   font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-2);transition:background .16s}
 .volba-ob button .piva{display:flex;gap:2px}
-.volba-ob button[aria-pressed=true].v1{background:rgba(127,212,193,.17);color:var(--ob1)}
-.volba-ob button[aria-pressed=true].v2{background:rgba(242,193,78,.17);color:var(--ob2)}
-.volba-ob button[aria-pressed=true].v3{background:rgba(242,118,90,.17);color:var(--ob3)}
+.volba-ob button[aria-pressed=true].v1{background:rgba(69,184,119,.18);color:var(--ob1)}
+.volba-ob button[aria-pressed=true].v2{background:rgba(249,162,4,.18);color:var(--ob2)}
+.volba-ob button[aria-pressed=true].v3{background:rgba(255,109,84,.18);color:var(--ob3)}
 
 /* ---------- menu ---------- */
 /* Hamburger stojí v horní liště vedle pilulky týmu; rozcestí pod ním vyjíždí
@@ -583,7 +609,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .rezim{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;border-radius:var(--r-sm);
   background:var(--vrstva);font-size:var(--t-drobne);color:var(--text-2);margin-bottom:22px;line-height:1.55}
 .rezim .ikona{color:var(--text-3);margin-top:2px}
-.rezim.chybny{background:rgba(242,118,90,.09);color:#F5A491}
+.rezim.chybny{background:rgba(255,109,84,.1);color:#FFAD9B}
 .rezim.chybny .ikona{color:var(--spatne)}
 .rezim.zivy .ikona{color:var(--text)}
 .rezim .drobne{opacity:.9}
@@ -712,7 +738,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   .hero-pas{scroll-behavior:auto}
 }
 @media (min-width:600px){
-  body{background:#040806}
+  body{background:#0B0F13}
   .app{min-height:100dvh;box-shadow:0 0 0 1px rgba(239,235,224,.05)}
   /* na širší obrazovce se vejde celá karta i náhled další */
   .hero{flex-basis:calc(100% - 56px)}

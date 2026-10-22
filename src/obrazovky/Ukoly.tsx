@@ -30,7 +30,7 @@ export function Ukoly() {
           const hotovo = vse.filter((u) => kolikrat(u.id, t) > 0).length;
           const naDosah = t ? vse.filter((u) => jdePridat(u, t)).length : 0;
           return (
-            <Link key={k.id} to={`/ukoly/${k.id}`} className="kat-karta" style={{ background: k.barva }}>
+            <Link key={k.id} to={`/ukoly/${k.id}`} className="kat-karta" style={{ background: k.barva, color: k.naBarve }}>
               <Ikona jmeno={k.ikona} px={116} trida="kat-vodoznak" />
               <div className="kat-vrch">
                 <span className="kat-pocet cislo">{hotovo}/{vse.length}</span>

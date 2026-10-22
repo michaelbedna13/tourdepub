@@ -14,6 +14,9 @@ export interface Kategorie {
   ikona: JmenoIkony;
   /** Barva karty kategorie na obrazovce Úkoly. */
   barva: string;
+  /** Barva textu na té kartě. Zelená a červená jsou tmavé, žlutá světlá,
+   *  takže jedna barva textu pro všechny tři nestačí. */
+  naBarve: string;
 }
 
 export interface Ukol {
@@ -47,9 +50,9 @@ export interface Hospoda {
 }
 
 export const KATEGORIE: Kategorie[] = [
-  { id: "kecy", nazev: "Kecy a šméčka", ikona: "kecy", barva: "#7FD4C1" },
-  { id: "telo", nazev: "Tělo v luftě", ikona: "telo", barva: "#F2C14E" },
-  { id: "zranice", nazev: "Žranice a divadlo", ikona: "zranice", barva: "#F2765A" },
+  { id: "kecy", nazev: "Kecy a šméčka", ikona: "kecy", barva: "#006633", naBarve: "#F2E7CF" },
+  { id: "telo", nazev: "Tělo v luftě", ikona: "telo", barva: "#F9A204", naBarve: "#151A20" },
+  { id: "zranice", nazev: "Žranice a divadlo", ikona: "zranice", barva: "#E5331F", naBarve: "#F2E7CF" },
 ];
 
 export const VYCHOZI_HOSPODY: Hospoda[] = [

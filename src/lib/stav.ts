@@ -73,7 +73,9 @@ export type Zaklad = "prichod" | "skopek";
 
 // Barvy týmů. Vybrané tak, aby se na skoro černé zeleni nepletly mezi sebou
 // ani s barvami obtížnosti úkolu (mint, zlatá, korál).
-export const BARVY = ["#E0A33A", "#D96A52", "#5BA8D4", "#B07CC6", "#6FB58F", "#D4A5A5"];
+/** Barvy part. Drží se stejné palety jako zbytek appky, jen vytažené tak,
+ *  aby se každá poznala jako tečka o devíti pixelech i na tmavém podkladu. */
+export const BARVY = ["#F9A204", "#E5331F", "#45B877", "#2E9BB5", "#E8C170", "#C77DBB"];
 
 const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 

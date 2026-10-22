@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { body, prepniTym, stav, tym, useStav } from "../lib/stav";
 import { Ikona } from "./Ikona";
@@ -24,9 +24,23 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
   const [okno, setOkno] = useState<"zadne" | "prepinac" | "novy">("zadne");
   const t = tym();
 
+  // Podklad lišta dostane, až když je opravdu přilepená. Nahoře pod ní nic
+  // není, takže by plná výplň jen dělala pruh přes celou šířku a na obsah
+  // dole navazovala viditelným švem. Jakmile se posune, podklad musí být —
+  // bez něj by se text obsahu kreslil přes text v liště.
+  const [prilepena, setPrilepena] = useState(false);
+  useEffect(() => {
+    const zmer = () => setPrilepena(window.scrollY > 2);
+    zmer();
+    // pasivní posluchač a stav se mění jen při překlopení, takže React
+    // překresluje nanejvýš dvakrát za posun
+    window.addEventListener("scroll", zmer, { passive: true });
+    return () => window.removeEventListener("scroll", zmer);
+  }, []);
+
   return (
     <>
-      <div className="hlava">
+      <div className={`hlava${prilepena ? " prilepena" : ""}`}>
         {zpet && (
           <Link className="ikonove" to={zpet} aria-label="Zpátky na úkoly">
             <Ikona jmeno="i-zpet" px={16} />

@@ -92,7 +92,7 @@ def main(cesta):
     with open(html, encoding="utf-8") as f:
         stranka = f.read()
     vlozene = (
-        '<svg class="logo" viewBox="0 0 %s %s" fill="#EFEBE0" fill-rule="evenodd" '
+        '<svg class="logo" viewBox="0 0 %s %s" fill="#F2E7CF" fill-rule="evenodd" '
         'role="img" aria-label="Tour de Pub"><path d="%s"/></svg>' % (n(sirka), n(vyska), d)
     )
     nova = re.sub(r"(<!-- logo:start -->).*?(<!-- logo:end -->)",

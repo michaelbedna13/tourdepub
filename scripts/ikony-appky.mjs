@@ -5,8 +5,8 @@
 import { chromium } from "playwright";
 import { readFileSync, writeFileSync } from "node:fs";
 
-const PODKLAD = "#070E0A";
-const KRESBA = "#EFEBE0";
+const PODKLAD = "#151A20";
+const KRESBA = "#F2E7CF";
 const pullitr = process.argv.includes("--pullitr");
 
 const logo = readFileSync(new URL("../public/logo.svg", import.meta.url), "utf8");

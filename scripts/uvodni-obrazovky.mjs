@@ -5,7 +5,7 @@
 import { chromium } from "playwright";
 import { readFileSync, mkdirSync } from "node:fs";
 
-const PODKLAD = "#070E0A";
+const PODKLAD = "#151A20";
 const logo = readFileSync(new URL("../public/logo.svg", import.meta.url), "utf8");
 
 // šířka × výška v bodech displeje a poměr pixelů; pokrývá iPhony od SE po 16 Pro Max
@@ -23,7 +23,7 @@ for (const [w, h, r] of ZARIZENI) {
   const p = await b.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: r });
   await p.setContent(`<html><body style="margin:0;height:100vh;background:${PODKLAD};
     display:grid;place-items:center">
-    <div style="width:${Math.round(w * 0.52)}px;color:#EFEBE0">${logo}</div></body></html>`);
+    <div style="width:${Math.round(w * 0.52)}px;color:#F2E7CF">${logo}</div></body></html>`);
   const soubor = `uvodni/${w}x${h}@${r}x.png`;
   await p.screenshot({ path: new URL("../public/" + soubor, import.meta.url).pathname });
   await p.close();
