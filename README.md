@@ -73,8 +73,11 @@ obrazovek:
   dlaždici vytáhne detail úkolu s kresbou a zadáním. Jednorázový má tlačítko
   *Splněno*, opakovatelný počítadlo s − a +. Detail se zavře křížkem, ťuknutím
   vedle nebo švihem dolů. V režimu správce je u každého tužka.
-- **Týmy** — kdo vede a za koho zapisuješ. Ťuknutím na tým se přepneš, takže z jednoho
-  telefonu jde vést i celou hru. Tužka tým přejmenuje, přebarví nebo smaže.
+- **Týmy** — pořadí part jako **účtenka z hospody**: u každé party je rozepsané,
+  kolik má za špeluňky, kolik za škopky a kolik za srandy, pod tím součet.
+  Vedoucí má razítko „VEDE“. Ťuknutím na tým se přepneš, za koho zapisuješ,
+  takže z jednoho telefonu jde vést i celou hru. Tužka tým přejmenuje,
+  přebarví nebo smaže.
 
   **Tým jde upravovat z kteréhokoli telefonu**, ne jen z toho, kde vznikl.
   Na server se posílá celý jeho stav, ne jen výsledné skóre, takže ho každé

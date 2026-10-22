@@ -109,6 +109,9 @@ Plochá tmavá barva bez něj působila jako plast.
   vysází se text jimi a nic se nerozsype.
 - **Psaná ruka v appce není.** Byla v popisech úkolů, pak už jen ve vyprávění.
   Ani tam nesedí: appka má být čistá, ne pomalovaná, a v malém se hůř čte.
+- **Strojopis jen na účtence** (`ui-monospace`, písmo systému, nic se nestahuje).
+  Je to jediná výjimka z jedné rodiny a je vědomá: účtenka bez strojopisu není
+  účtenka, je to tabulka. Nikde jinde v appce se neobjeví.
 
 Kit se načítá **stranou, ne jako blokující styl** (`media="print"` a `onload`).
 Appka musí vykreslit tmavý podklad a logo hned, i kdyby Adobe neodpovídalo —
@@ -366,6 +369,23 @@ Skóre se vedle číslice kreslí i jako **čárky, jak se počítaly v hospodě
 svislé a pátá přes ně. Každá je jinak nakloněná a jinak dlouhá, ať to vypadá psané
 rukou, ne vysázené. Je to jediný dekorativní prvek v appce a nese celé téma,
 proto jinde žádná hospodská ozdoba není.
+
+## Účtenka
+
+Pořadí part na obrazovce Týmy je **účtenka z hospody**: světlý papír, tmavý
+inkoust, roztržený okraj nahoře i dole, tečkované vodiče mezi položkou a
+číslem, tučný součet a dole čárky místo čárového kódu. Je to **jediné místo
+v appce, kde se kreslí světlý podklad** — papír je `--text` a inkoust
+`--podklad`, takže z palety neutíká, jen si ji prohodí.
+
+Proč zrovna účtenka: rozpad čárek (za špeluňky, za škopky, za srandy) stával
+u skóre na Hře, kde se nedal s nikým srovnat a vedle velkého čísla byl spíš
+šum. Tady dává smysl, protože party stojí pod sebou. A účtenka je jediná
+tabulka, co v hospodě nikoho nepřekvapí.
+
+Vedoucí parta dostane **razítko „VEDE“** — ten samý rámeček od ruky jako
+„HOTOVO“ na hero kartě. Leží přes tečkované vodiče, ne přes čísla, takže
+nic nezakryje, a naskočí až od první čárky: na začátku večera nikdo nevede.
 
 ## Plochy, které jsme nekreslili
 
