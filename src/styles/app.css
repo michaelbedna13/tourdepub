@@ -175,7 +175,12 @@ input,textarea,select{caret-color:var(--text)}
    i ven ze sloupce appky, tak se tady ořízne (clip, ne hidden – ten by udělal
    z appky posuvnou plochu a rozbil plovoucí lištu) */
 .app{position:relative;z-index:1;max-width:var(--sirka);margin:0 auto;min-height:100dvh;
-  overflow-x:clip}
+  overflow-x:clip;
+  /* pan-y, ne auto: při výchozím nastavení si vodorovný tah zabere posun
+     stránky a prohlížeč přestane posílat pointermove – švih do boku se pak
+     nikdy nechytí. Takhle zůstane svislé posouvání prohlížeči a bok je náš.
+     Vodorovné pásy uvnitř (hero) si pan-x vracejí u sebe. */
+  touch-action:pan-y}
 /* ---------- zeď hospody: čárky za celou appkou ---------- */
 /* Leží pod obsahem a nad zrnem. Je tak slabá, že se dá přehlédnout – má
    dávat večeru pocit, že se něco plní, ne se hlásit o slovo. */
