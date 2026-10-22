@@ -649,12 +649,18 @@ input,textarea,select{caret-color:var(--text)}
 .detail-odznaky{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
 .detail-tecky{display:flex;gap:6px;justify-content:center;margin-top:12px;position:relative;z-index:1}
 .detail-spodek{display:flex;align-items:center;gap:10px;margin-top:18px;position:relative;z-index:1}
+/* Taky v barvě kategorie, jen o stupeň výš než karta. Šedá vrstva pod ním
+   vedle zelené nebo žluté karty vypadala do modra a tahala pozornost
+   k sobě — karta má být z jednoho kusu. */
 .detail-fajfka{
   flex:1;display:flex;align-items:center;gap:11px;min-height:52px;padding:0 16px;
-  border-radius:var(--pilulka);background:var(--vrstva-2);
+  border-radius:var(--pilulka);
+  background:color-mix(in srgb,var(--kat) 36%,var(--vrstva-2));
   font-family:var(--pismo);font-weight:700;font-size:var(--t-text);color:inherit;
   transition:background .16s,transform .14s var(--krok);
 }
+/* plus a minus u opakovatelných úkolů patří ke stejnému řádku */
+.detail .pocitadlo button{background:color-mix(in srgb,var(--kat) 36%,var(--vrstva-2))}
 .detail-fajfka:active{transform:scale(.97)}
 /* splněno: kolečko se vybarví a fajfka se v něm objeví, stejně jako
    u odškrtávátek na hero kartě */
