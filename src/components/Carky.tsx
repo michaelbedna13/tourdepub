@@ -30,7 +30,9 @@ function skupina(n: number, prect: boolean, vyska: number, klic: number) {
 
 /** Čárky, jak se počítaly v hospodě: čtyři svislé a pátá přes ně. */
 export function Carky({ kolik, vyska = 26 }: Props) {
-  if (kolik <= 0) return <span className="znacka-text">zatím nic</span>;
+  // Na nule se nekreslí nic. „Zatím nic“ je informace, kterou vedle
+  // velké nuly nikdo nepotřebuje.
+  if (kolik <= 0) return null;
   const skupin = Math.floor(kolik / 5);
   const zbytek = kolik % 5;
   return (
