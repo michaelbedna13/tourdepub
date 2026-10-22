@@ -97,6 +97,17 @@ export function Hra() {
   );
 }
 
+/** Číslice nejsou stejně široké. Jednička má proti dvojce nebo osmičce
+ *  zlomek plochy, takže první karta vypadala vedle ostatních prázdná.
+ *  Zvětšit ji nejde — vyrostla by přes trasu a řádku s časem. Dostane tedy
+ *  silnější obrys a nezajíždí tolik za levý okraj; plochy je pak na kartě
+ *  vidět podobně jako u ostatních. Sedmička je na tom o něco lépe než
+ *  jednička, ale pořád hubená. */
+const UZKA_CISLICE: Record<string, { tah: string; vlevo: string }> = {
+  "1": { tah: "3.2px", vlevo: "16px" },
+  "7": { tah: "2.5px", vlevo: "-2px" },
+};
+
 /* ---------- hero karty štací ---------- */
 
 /** Karty štací vedle sebe, přepínají se švihem do boku i šipkami.
@@ -172,13 +183,15 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   // zápis má být vidět i na kartě, ne jen na odškrtávátku: velké číslo
   // štace krátce zesílí. Klíč se mění se zápisem, čímž se animace spustí znovu.
   const [puls, setPuls] = useState(0);
+  const uzka = UZKA_CISLICE[String(cislo)];
 
   return (
     <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
       aria-label={`${cislo}. štace: ${h.nazev}${hotova ? " (hotová)" : ""}`}>
       {/* číslo štace ještě jednou, ve velkém a potichu: karty jsou jinak k
           nerozeznání a tohle jim dá tvář, aniž by to něco přidalo na čtení */}
-      <span className={`hero-duch cislo${puls ? " zabliklo" : ""}`} key={puls} aria-hidden="true">
+      <span className={`hero-duch cislo${puls ? " zabliklo" : ""}`} key={puls} aria-hidden="true"
+        style={uzka && { WebkitTextStrokeWidth: uzka.tah, left: uzka.vlevo }}>
         {cislo}
       </span>
 
