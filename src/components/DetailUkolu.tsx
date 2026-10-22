@@ -20,6 +20,11 @@ interface Props {
  *  ta samá karta, jen větší, a zbytek galerie se za ní rozostří. Ťuknutí
  *  vedle kartu zavře.
  *
+ *  Skladba je stejná jako na dlaždici, jen v klidu: nahoře kresba, pod ní
+ *  jméno a text. Výška je daná, ne odvozená z délky popisu — karta s dvěma
+ *  větami a karta s pěti pak nevypadají jako dva různé druhy okna a kresba
+ *  má vždycky stejné místo.
+ *
  *  Text se nescrolluje, ale listuje po stránkách: u dlouhého popisu se
  *  v hospodě posouvá hůř, než se ťuká, a půlka věty useknutá okrajem
  *  vypadá jako chyba. Kolik stránek to má, se zjistí z výšky textu —
@@ -70,18 +75,19 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
   return (
     <div className="detail" onClick={zavri} role="presentation">
       <div className="detail-karta" ref={okno} tabIndex={-1} role="dialog" aria-label={u.nazev}
-        style={splneno ? { background: k.barva, color: k.naBarve } : undefined}
+        style={{ "--kat": k.barva,
+                 ...(splneno ? { background: k.barva, color: k.naBarve } : {}) } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()}>
-        {KRESBY[u.id]
-          ? <Kresba id={u.id} trida="detail-vodoznak" />
-          : <Ikona jmeno={u.ikona ?? k.ikona} px={132} trida="detail-vodoznak" />}
-
         <div className="detail-vrch">
           <Obtiznost piva={u.piva} />
           <button className="ikonove holy detail-zavri" onClick={zavri} aria-label="Zavřít">
             <Ikona jmeno="plus" px={16} trida="otocit-kriz" />
           </button>
         </div>
+
+        {KRESBY[u.id]
+          ? <Kresba id={u.id} trida="detail-kresba" />
+          : <Ikona jmeno={u.ikona ?? k.ikona} px={132} trida="detail-kresba" />}
 
         <h2 className="detail-nazev">{vazat(u.nazev)}</h2>
 

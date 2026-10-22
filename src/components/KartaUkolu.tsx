@@ -16,10 +16,10 @@ interface Props {
  *  padne. Víc se na kartu nevejde a víc tam ani nemá být — popis, poznámky
  *  a odznaky jsou v detailu, co se otevře ťuknutím.
  *
- *  Celá galerie je v odstínech barvy kategorie — obrazovka Keců je zelená,
- *  Těla žlutá, Žranic červená. Sytost odstínu drží obtížnost: čím těžší
- *  úkol, tím víc barvy. Je to jedna barva ve třech silách, ne dvě soustavy
- *  vedle sebe. Splněná karta se zbarví naplno.
+ *  Celá galerie je v barvě kategorie — obrazovka Keců je zelená, Těla žlutá,
+ *  Žranic červená. Všechny karty mají stejný odstín: obtížnost se dá přečíst
+ *  z toho, kolik za úkol padne čárek, a z půllitrů v detailu, takže ji nemusí
+ *  nést ještě podklad. Splněná karta se zbarví naplno.
  *
  *  Čtvereček v rohu zapisuje rovnou z galerie — to je ten obvyklý pohyb.
  *  Kdo si chce přečíst zadání, ťukne na kartu a otevře se detail. */
@@ -40,7 +40,7 @@ export function KartaUkolu({ u, k, otevri }: Props) {
 
   return (
     <div
-      className={`ukol-karta sila${u.piva}${splneno ? " splneno" : ""}`}
+      className={`ukol-karta${splneno ? " splneno" : ""}`}
       style={splneno
         ? { background: k.barva, color: k.naBarve }
         : { "--kat": k.barva } as React.CSSProperties}

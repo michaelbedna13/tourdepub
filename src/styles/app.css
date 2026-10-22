@@ -534,13 +534,11 @@ input,textarea,select{caret-color:var(--text)}
   transition:transform .14s var(--krok),background .25s var(--krok);
 }
 .ukol-karta:active{transform:scale(.97)}
-/* Celá galerie je v odstínech barvy kategorie — Kecy zelené, Tělo žluté,
-   Žranice červené. Sytost drží obtížnost: čím těžší úkol, tím víc barvy.
-   Je to jedna barva ve třech silách, ne dvě soustavy vedle sebe; barva
-   obtížnosti zůstala na půllitrech v detailu. */
-.ukol-karta.sila1{background:color-mix(in srgb,var(--kat) 13%,var(--vrstva))}
-.ukol-karta.sila2{background:color-mix(in srgb,var(--kat) 18%,var(--vrstva))}
-.ukol-karta.sila3{background:color-mix(in srgb,var(--kat) 28%,var(--vrstva))}
+/* Celá galerie je v barvě kategorie — Kecy zelené, Tělo žluté, Žranice
+   červené. Všechny karty mají stejný odstín. Odstupňovat ho podle obtížnosti
+   šlo, ale dělalo to z galerie pruhy a obtížnost se stejně dá přečíst z toho,
+   kolik za úkol padne čárek. */
+.ukol-karta{background:color-mix(in srgb,var(--kat) 18%,var(--vrstva))}
 
 /* Kresba si vezme všechno volné místo nad textem a vycentruje se v něm.
    Text je ukotvený dole, takže jméno je na stejné řádce na všech kartách
@@ -589,24 +587,32 @@ input,textarea,select{caret-color:var(--text)}
   background:rgba(10,13,17,.5);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
   animation:zjevit .18s var(--krok);
 }
+/* Výška je daná, ne odvozená z délky popisu: karta s dvěma větami a karta
+   s pěti by jinak vypadaly jako dva různé druhy okna a kresba by pokaždé
+   skončila jinde. Volné místo si bere kresba. */
 .detail-karta{
   position:relative;overflow:hidden;width:100%;max-width:340px;
+  height:min(620px,calc(100dvh - var(--vrch) - env(safe-area-inset-bottom) - 56px));
   display:flex;flex-direction:column;
   padding:20px 22px 18px;border-radius:var(--r);
-  background:var(--vrstva);color:var(--text);
+  /* stejný odstín jako dlaždice, ze které se karta otevřela */
+  background:color-mix(in srgb,var(--kat) 18%,var(--vrstva));color:var(--text);
   box-shadow:0 18px 50px rgba(0,0,0,.45);
   animation:detail-prijde .26s var(--krok);
 }
 @keyframes detail-prijde{from{opacity:0;transform:scale(.9)}}
 .detail-karta:focus{outline:none}
-.detail-vodoznak{position:absolute;right:-26px;bottom:-30px;width:132px;height:132px;
-  opacity:.07;pointer-events:none}
-.detail-karta.splneno .detail-vodoznak{opacity:.14}
+/* Kresba si bere všechno, co zbyde nad textem – stejně jako na dlaždici. */
+.detail-kresba{
+  flex:1;min-height:60px;width:100%;margin:10px 0 2px;
+  color:color-mix(in srgb,var(--kat) 55%,var(--text));
+}
+.detail-karta.splneno .detail-kresba{color:currentColor;opacity:.9}
 .detail-vrch{display:flex;align-items:center;justify-content:space-between;gap:12px;
   position:relative;z-index:1}
 .detail-zavri{width:36px;height:36px;color:inherit;opacity:.6}
 .otocit-kriz{transform:rotate(45deg)}
-.detail-nazev{position:relative;z-index:1;margin-top:16px;
+.detail-nazev{position:relative;z-index:1;flex:none;margin-top:14px;
   font-size:clamp(22px,6.4vw,27px);letter-spacing:-.01em}
 /* Text se nelistuje scrollem, ale po stránkách: v hospodě se ťuká líp, než
    posouvá, a půlka věty useknutá okrajem vypadá jako chyba. Výška je pevná,
@@ -614,7 +620,8 @@ input,textarea,select{caret-color:var(--text)}
 /* max-height, ne height: krátký popis má kartu nechat nízkou. Stránkuje se
    až od chvíle, kdy se text nevejde — počet stránek vyjde z toho, kolikrát
    je text vyšší než okénko. */
-.detail-telo{position:relative;z-index:1;margin-top:14px;max-height:11.5em;overflow:hidden}
+.detail-telo{position:relative;z-index:1;flex:none;margin-top:12px;
+  max-height:10.5em;overflow:hidden}
 .detail-posuv{transition:transform .3s var(--krok)}
 .detail-popis{font-size:var(--t-text);line-height:1.6;color:var(--text-2)}
 .detail-karta.splneno .detail-popis{color:currentColor;opacity:.78}
