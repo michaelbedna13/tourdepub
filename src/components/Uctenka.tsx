@@ -20,7 +20,8 @@ interface Props {
   ukolu: number;
   strop: number;
   prepni: (id: string) => void;
-  uprav: (id: string) => void;
+  /** Bez toho se tužka nekreslí – na Hře se party neupravují. */
+  uprav?: (id: string) => void;
 }
 
 /** Jedna položka účtenky: popis, tečky a číslo vpravo. */
@@ -68,9 +69,11 @@ export function Uctenka({ poradi, tymId, hospod, ukolu, strop, prepni, uprav }: 
               <span className="uc-znak" style={{ background: p.barva }} />
               <span className="uc-text">{p.nazev}</span>
             </button>
-            <button className="uc-tuzka" onClick={() => uprav(p.id)} aria-label={`Upravit ${p.nazev}`}>
-              <Ikona jmeno="i-tuzka" px={15} />
-            </button>
+            {uprav && (
+              <button className="uc-tuzka" onClick={() => uprav(p.id)} aria-label={`Upravit ${p.nazev}`}>
+                <Ikona jmeno="i-tuzka" px={15} />
+              </button>
+            )}
           </div>
           <Polozka nazev="špeluňky" kolik={p.rozpad.dochazka} />
           <Polozka nazev="škopky" kolik={p.rozpad.skopky} />

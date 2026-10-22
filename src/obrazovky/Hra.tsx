@@ -3,13 +3,14 @@ import { Hlava } from "../components/Hlava";
 import { KartyKategorii } from "../components/KartyKategorii";
 import { Ikona } from "../components/Ikona";
 import { PruhSyncu } from "../components/PruhSyncu";
+import { Uctenka } from "../components/Uctenka";
 import { ZAKLAD, type Hospoda } from "../lib/data";
 import { jakDlouho, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { RAZITKO } from "../lib/razitko";
 import {
-  indexHospody, nastavHospodu, poradiTymu, posunHospodu,
-  prepniZaklad, stav, tym, useStav, type Zaklad,
+  indexHospody, nastavHospodu, poradiTymu, posunHospodu, prepniTym,
+  prepniZaklad, stav, strop, tym, useStav, type Zaklad,
 } from "../lib/stav";
 
 /** Hlavní obrazovka. Hero karta nese celou štaci: kolikátá je, jak se jmenuje,
@@ -19,7 +20,6 @@ export function Hra() {
   useStav();
   const t = tym();
   const poradi = poradiTymu();
-  const nejvic = poradi[0]?.body || 0;
 
   if (!t) return <><Hlava nadpis="Hra" /><div className="prazdno">Nejdřív si založ tým.</div></>;
 
@@ -40,39 +40,24 @@ export function Hra() {
       </div>
 
       {/* Dokud hraje jedna parta, není co srovnávat – „vede, odstup 0" je
-          jen řádek navíc. Naskočí to, jakmile přibude druhý tým. */}
+          jen řádek navíc. Naskočí to, jakmile přibude druhý tým.
+
+          Je to ta samá účtenka jako na Týmech, protože tohle je obrazovka,
+          na kterou se za večer kouká nejvíc, a pořadí part se tam hledalo
+          přes menu. Tužka tu není: upravuje se na Týmech. */}
       {poradi.length > 1 && (
         <div className="sekce">
-          <div className="sekce-hlava">
-            <h2>JAK NA TOM JSOU</h2>
-          </div>
-          <div className="vrstva poradi">
-            {poradi.map((p, i) => {
-              const rozdil = p.body - nejvic;
-              return (
-                <div key={p.id} className={`poradi-radek${p.id === stav.tymId ? " ja" : ""}`}>
-                  <span className="poradi-misto cislo">{i + 1}</span>
-                  <div className="poradi-telo">
-                    <div className="poradi-vrch">
-                      <span className="poradi-jmeno">{p.nazev}</span>
-                      <span className="poradi-odstup cislo">{rozdil === 0 ? "vede" : rozdil}</span>
-                      <span className="poradi-body cislo">{p.body}</span>
-                    </div>
-                    {/* Pruh v barvě party. Je to jediné místo, kde barva týmu
-                        něco kreslí, a nese to skutečný údaj: jak daleko je
-                        parta od vedoucí. Rozdíl mezi prvním a posledním je
-                        tím vidět dřív, než se stihnou přečíst čísla. */}
-                    <div className="poradi-pruh">
-                      <span style={{ width: nejvic ? `${(p.body / nejvic) * 100}%` : 0,
-                                     background: p.barva }} />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <Uctenka
+            poradi={poradi}
+            tymId={stav.tymId}
+            hospod={stav.hospody.length}
+            ukolu={stav.ukoly.length}
+            strop={strop().celkem}
+            prepni={prepniTym}
+          />
         </div>
       )}
+
     </>
   );
 }

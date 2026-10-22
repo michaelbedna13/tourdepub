@@ -372,7 +372,10 @@ proto jinde žádná hospodská ozdoba není.
 
 ## Účtenka
 
-Pořadí part na obrazovce Týmy je **účtenka z hospody**: světlý papír, tmavý
+Pořadí part je **účtenka z hospody**. Stojí na dvou místech: na Týmech,
+kde se party přepínají a upravují, a na Hře pod kartami kategorií, protože
+tam se za večer kouká nejvíc a chodit si pro pořadí přes menu nikdo nebude.
+Na Hře je bez tužky — upravuje se na Týmech. Vypadá takhle: světlý papír, tmavý
 inkoust, roztržený okraj nahoře i dole, tečkované vodiče mezi položkou a
 číslem, tučný součet a dole čárky místo čárového kódu. Je to **jediné místo
 v appce, kde se kreslí světlý podklad** — papír je `--text` a inkoust

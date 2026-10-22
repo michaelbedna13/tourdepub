@@ -452,31 +452,6 @@ input,textarea,select{caret-color:var(--text)}
 .carky svg{display:block;overflow:visible}
 
 /* mini tabulka: jak si vedou týmy */
-/* Pořadí part. Byly to řádky s tečkou a číslem — čtyři party vypadaly
-   stejně a rozdíl mezi první a poslední se musel dopočítat z čísel. Teď
-   pod každým jménem leží pruh v barvě party, dlouhý podle toho, jak daleko
-   je od vedoucí. Je to jediné místo, kde barva týmu něco kreslí, a nese
-   skutečný údaj, ne ozdobu. Tečka tím ztratila smysl a je pryč. */
-/* zarovnat na první řádku, ne na střed řádku: pod jménem je ještě pruh,
-   takže střed vychází níž než jméno a pořadové číslo pak plave */
-.poradi-radek{display:flex;align-items:flex-start;gap:14px;padding:15px var(--vnitrek)}
-.poradi-radek + .poradi-radek{border-top:1px solid var(--linka-sl)}
-.poradi-radek.ja{background:rgba(242,231,207,.05)}
-.poradi-misto{width:15px;flex:none;text-align:center;padding-top:1px;
-  font-family:var(--nadpisy);font-size:var(--t-text);color:var(--text-3)}
-.poradi-radek.ja .poradi-misto{color:var(--text)}
-.poradi-telo{flex:1;min-width:0}
-.poradi-vrch{display:flex;align-items:baseline;gap:10px}
-.poradi-jmeno{flex:1;min-width:0;font-family:var(--pismo);font-size:var(--t-text);
-  color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.poradi-radek.ja .poradi-jmeno{color:var(--text);font-weight:700}
-.poradi-odstup{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3);flex:none}
-.poradi-body{font-family:var(--nadpisy);font-size:var(--t-hlavni);flex:none;
-  min-width:28px;text-align:right}
-.poradi-pruh{height:5px;margin-top:9px;border-radius:3px;background:var(--linka-sl);overflow:hidden}
-.poradi-pruh span{display:block;height:100%;border-radius:3px;
-  transition:width .45s var(--krok)}
-
 /* ---------- Úkoly: karty kategorií ---------- */
 /* Tři barevné karty místo jednoho seznamu dvaceti tří úkolů. Barva není
    ozdoba: drží kategorii pohromadě přes celou appku. Text je tmavý, protože
