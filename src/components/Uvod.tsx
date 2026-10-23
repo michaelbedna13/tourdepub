@@ -146,13 +146,26 @@ function nactiPisma(): Promise<unknown> {
 function useBarvaOkoli(barva: string | null) {
   useLayoutEffect(() => {
     if (!barva) return;
-    const m = document.querySelector('meta[name="theme-color"]');
-    const puvodni = m?.getAttribute("content") ?? null;
-    m?.setAttribute("content", barva);
+    const stary = document.querySelector('meta[name="theme-color"]');
+    const puvodni = stary?.getAttribute("content") ?? null;
+    // Přepsat obsah nestačilo: Safari si barvu přečte při načtení a změny
+    // atributu si nevšimne. Na výměnu celého prvku reaguje, takže se starý
+    // odklidí a nový se vloží.
+    stary?.remove();
+    const novy = document.createElement("meta");
+    novy.name = "theme-color";
+    novy.content = barva;
+    document.head.appendChild(novy);
     document.documentElement.style.backgroundColor = barva;
     document.body.style.backgroundColor = barva;
     return () => {
-      if (puvodni) m?.setAttribute("content", puvodni);
+      novy.remove();
+      if (puvodni) {
+        const zpet = document.createElement("meta");
+        zpet.name = "theme-color";
+        zpet.content = puvodni;
+        document.head.appendChild(zpet);
+      }
       document.documentElement.style.backgroundColor = "";
       document.body.style.backgroundColor = "";
     };

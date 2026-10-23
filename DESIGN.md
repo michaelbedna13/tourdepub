@@ -239,11 +239,18 @@ poznat pořád. Plochu je potřeba srovnat na obou stranách, ne jen hranu.
 Průprava si pruh **přebarvuje na barvu stránky** (`useBarvaOkoli`
 v `Uvod.tsx`) — nad červeným plakátem by jinak visel tmavý pruh.
 
-Mění se přitom **obojí: `theme-color` i podklad `<html>` a `<body>`**.
-Samotná `theme-color` nestačila: iOS Safari kreslí ten pruh z podkladu
-stránky, takže barva v hlavičce se dala přepsat, jak chtěla, a pruh zůstával
-tmavý. Plakát je `position:fixed` vrstva nad stránkou, takže podklad pod ním
-o jeho barvě neví a musí se mu to říct.
+Mění se přitom **obojí: `theme-color` i podklad `<html>` a `<body>`** —
+a `theme-color` se **nepřepisuje, ale vyměňuje celý prvek** (starý ven, nový
+dovnitř). Dvě slepé uličky, obě vyzkoušené na telefonu:
+
+- Přepsat `content` nestačí. Safari si barvu přečte při načtení a změny
+  atributu si nevšimne; pruh zůstal v barvě, která stála v `index.html`.
+- Přebarvit podklad `<html>` a `<body>` taky nestačí. Plakát je
+  `position:fixed` vrstva nad stránkou, takže podklad pod ním o jeho barvě
+  neví — jenže Safari si ten pruh stejně nebere odtud.
+
+Výměna celého prvku je to, na co Safari reaguje. Podklad se nastavuje
+s ním, protože nic nestojí a na jiných prohlížečích pomáhá.
 
 Je to `useLayoutEffect`, ne obyčejný efekt: ten běží až po vykreslení, takže
 by byl na každém přepnutí stránky jeden snímek se starou barvou pruhu.
