@@ -88,9 +88,25 @@ její jméno i počet splněných úkolů.
 
 ### Barvy týmů
 
-Třetí soustava, `BARVY` v `src/lib/stav.ts`. Nese jediné: čí je který řádek
-v pořadí. Schválně se s předchozími dvěma nepotkává — pruh v pořadí je jediné
-místo, kde se kreslí.
+Třetí soustava, `BARVY` v `src/lib/stav.ts`. Nese jediné: čí je která parta.
+Kreslí se jako tečka v liště a čtvereček na účtence, nikde jinde.
+
+| | barva | odkud |
+|---|---|---|
+| 1 | `#E5331F` | červená z kategorie Žranice |
+| 2 | `#F9A204` | žlutá z kategorie Tělo |
+| 3 | `#45B877` | zelená, zesvětlená `#006633` |
+| 4 | `#2E9BB5` | mořská, zesvětlená `#026C80` |
+| 5 | `#F2E7CF` | krémová z loga |
+| 6 | `#006633` | tmavá zeleň z loga |
+
+Všechny jsou z palety appky, ne vedle ní. Dvě zeleně vedle sebe vadit
+nemusí — liší se světlostí natolik, že se jako tečka o devíti pixelech
+nespletou; losos z obtížnosti (`#FF6D54`) by se naopak s červenou pral.
+
+Party založené dřív mají uloženou barvu z původní sady (písková, růžová).
+Ta se při načtení překlopí na nejbližší **volnou** z palety — bez ohlídání
+obsazených by obě skončily na krémové, protože k ní mají nejblíž obě.
 
 ### Zrno
 

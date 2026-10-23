@@ -71,11 +71,29 @@ export interface Rozpad {
 /** Druhy čárek, které se nabíhají v každé špeluňce. */
 export type Zaklad = "prichod" | "skopek";
 
-// Barvy týmů. Vybrané tak, aby se na skoro černé zeleni nepletly mezi sebou
-// ani s barvami obtížnosti úkolu (mint, zlatá, korál).
-/** Barvy part. Drží se stejné palety jako zbytek appky, jen vytažené tak,
- *  aby se každá poznala jako tečka o devíti pixelech i na tmavém podkladu. */
-export const BARVY = ["#F9A204", "#E5331F", "#45B877", "#2E9BB5", "#E8C170", "#C77DBB"];
+/** Barvy part. Všechny jsou z palety appky, ne vedle ní: červená a žlutá
+ *  z kategorií, zelená a mořská jako jejich zesvětlené varianty (sytá zeleň
+ *  se na tmavém nepřečte), krémová z loga a tmavá zeleň z loga jako šestá.
+ *  Dvě zeleně vedle sebe vadit nemusí — liší se světlostí natolik, že se
+ *  jako tečka o devíti pixelech nespletou; losos z obtížnosti by se naopak
+ *  s červenou pral. */
+export const BARVY = ["#E5331F", "#F9A204", "#45B877", "#2E9BB5", "#F2E7CF", "#006633"];
+
+/** Nejbližší barva z palety, ale ne ta, co už někdo má. Party založené dřív
+ *  mají uloženou barvu, co v paletě už není (písková, růžová) — ta by v appce
+ *  zůstala viset a v přepínači by se nedala znovu vybrat. Bez ohlídání
+ *  obsazených by navíc obě skončily na krémové, protože k ní mají nejblíž
+ *  obě, a dvě party se stejnou barvou jsou horší než barva mimo paletu. */
+function nejblizsiBarva(barva: string, obsazene: Set<string>): string {
+  const rgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const [r, g, b] = rgb(barva);
+  const podle = BARVY.map((x) => {
+    const [xr, xg, xb] = rgb(x);
+    return { x, d: (r - xr) ** 2 + (g - xg) ** 2 + (b - xb) ** 2 };
+  }).sort((a, b2) => a.d - b2.d);
+  // volná z palety; když jsou všechny zabrané, bere se prostě ta nejbližší
+  return (podle.find((k) => !obsazene.has(k.x)) ?? podle[0]).x;
+}
 
 const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 
@@ -145,9 +163,16 @@ function nacti(): Stav {
   srovnejStace(z);
   // starší uložené stavy příznak nemají; tým s vlastním jménem nebo s čárkami
   // je zjevně používaný
+  // barvy, co party už mají a v paletě jsou, si drží přednost
+  const obsazene = new Set(z.tymy.map((t) => t.barva).filter((b) => BARVY.includes(b)));
   for (const t of z.tymy) {
     // starší uložený stav časy příchodů nemá; karta si pak nemá co ukázat a je to v pořádku
     if (!t.prichodCas) t.prichodCas = {};
+    // barvy mimo paletu (z dřívější sady) se překlopí na nejbližší volnou z ní
+    if (t.barva && !BARVY.includes(t.barva)) {
+      t.barva = nejblizsiBarva(t.barva, obsazene);
+      obsazene.add(t.barva);
+    }
     if (t.vlastni === undefined) {
       t.vlastni = t.nazev !== "Naše parta"
         || Object.keys(t.prichod).length > 0
