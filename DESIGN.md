@@ -427,11 +427,21 @@ vypadalo by to, že mění barvu. Ze stejného důvodu leží `#uvod` **nad** vr
 Reactu (z-index 130 proti 120), ne pod ní: pod ní se díval na průhlednou
 vrstvu, která se zrovna přebarvovala.
 
-**Úvodní obrazovky a ikona mají v adrese `?v=`.** iOS si je uloží ve chvíli,
-kdy se appka přidává na plochu, a sám od sebe je nikdy nepřenačte — po změně
-palety proto na ploše pořád svítila stará tmavě modrá. Číslo se zvedá při
-každé změně barev, ale **appku je stejně potřeba z plochy smazat a přidat
-znovu**, jinak si iOS sáhne pro svou uloženou kopii.
+**Úvodní obrazovky mají číslo verze v názvu souboru** (`…@3x-2.png`), ne jako
+`?v=` za adresou. iOS si je uloží ve chvíli, kdy se appka přidává na plochu,
+a sám od sebe je nikdy nepřenačte — po změně palety proto na ploše pořád
+problikávala stará tmavě modrá. Dotaz za adresou je u
+`apple-touch-startup-image` riziko: iOS obrázek s dotazem nemusí s médiem
+spárovat vůbec a pak nenakreslí nic. Číslo se zvedá při každé změně barev,
+ale **appku je stejně potřeba z plochy smazat a přidat znovu**, jinak si iOS
+sáhne pro svou uloženou kopii.
+
+**Úplně na konci je záchytná obrazovka bez média.** iOS bere první odkaz,
+který sedí; když nesedí žádný — jiný iPhone, nebo jen jiný stav okna při
+startu — nakreslí si prázdnou plochu systémovou barvou, a ta je studená
+tmavá. Vypadá to přesně jako bliknutí staré tmavě modré palety, i když ji
+appka nikde nemá. Proto ten poslední odkaz: použije se jen tehdy, když nic
+jiného nesedlo.
 
 **2. Průprava.** Čtyři stránky a na nich **shrnutí pravidel**: co se hraje,
 za co jsou čárky, co se trestá a co se vyhrává. Delší verze je na obrazovce
