@@ -278,7 +278,12 @@ input,textarea,select{caret-color:var(--text)}
 .hlava{display:flex;align-items:center;gap:10px;min-height:44px;margin-bottom:32px}
 /* Značka v liště, jako v úvodu. Dřív se o místo prala s nadpisem; ten je teď
    pod lištou, takže tu značka stojí sama a má kolem sebe vzduch. */
-.hlava-znak{height:26px;width:auto;display:block;flex:none;color:var(--text);opacity:.92}
+.hlava-znak{height:26px;width:auto;display:block;color:var(--text);opacity:.92}
+/* Značka je odkaz domů. Sama je vysoká 26 px, takže ťukací plocha se
+   dorovná na plných 44 a záporným okrajem se vrátí do řádky. */
+.hlava-znak-odkaz{display:grid;place-items:center;flex:none;
+  min-height:44px;padding:0 6px;margin:0 -6px;transition:opacity .16s}
+.hlava-znak-odkaz:active{opacity:.55}
 .hlava-vypln{flex:1 1 auto}
 /* Nadpis obrazovky na vlastní řádce pod lištou. Má celou šířku, takže může
    být větší a nemusí se zkracovat třemi tečkami. */

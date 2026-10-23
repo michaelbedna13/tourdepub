@@ -39,7 +39,11 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
             <Ikona jmeno="i-zpet" px={16} />
           </Link>
         ) : (
-          <Logo trida="hlava-znak" />
+          /* Značka je zároveň cesta domů. Na Hře nikam nevede, ale je to to
+             první, kam člověk ťukne, když se chce vrátit — a nestojí to nic. */
+          <Link className="hlava-znak-odkaz" to="/" aria-label="Tour de Pub, zpátky na Hru">
+            <Logo trida="hlava-znak" />
+          </Link>
         )}
         <span className="hlava-vypln" />
         <button className="prepinac-tymu" onClick={() => setOkno("prepinac")} aria-label="Přepnout tým">

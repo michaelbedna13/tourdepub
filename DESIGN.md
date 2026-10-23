@@ -233,6 +233,10 @@ samý zámek jako v úvodu (značka vlevo, drobnost vpravo) a nadpis má celou
 Na podstránce je místo značky **kolečko zpátky**: dvě věci vlevo by se zase
 praly a cesta ven je tam potřebnější než logo.
 
+Značka je zároveň **odkaz na Hru**. Je to to první, kam člověk ťukne, když
+se chce vrátit, a nestojí to nic. Sama je vysoká 26 px, takže ťukací plocha
+se dorovná na plných 44 (50 × 44) a záporným okrajem se vrátí do řádky.
+
 ## Hero karta štace
 
 Obrazovka Hra stojí na jedné kartě, která nese **všechno o téhle štaci**:
