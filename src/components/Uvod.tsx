@@ -32,6 +32,12 @@ interface Stranka {
    *  obrazovka s podtónem. */
   barva: string;
   inkoust: string;
+  /** Kam na stránce padne text: pod kresbu, kolem ní, nebo nad ni.
+   *  Čtyři stejně poskládané stránky za sebou vypadají jako formulář —
+   *  plakáty se mají střídat. */
+  skladba?: "kolem" | "nahore";
+  /** Kam se kresba přitiskne. */
+  kotva?: "vlevo" | "vpravo";
   nadpis: string;
   text: string;
 }
@@ -45,11 +51,14 @@ const INKOUST = "#1A1A14";
 const PRUPRAVA: Stranka[] = [
   { id: "skopek", barva: "#E5331F", inkoust: KREM, nadpis: "Devět špeluněk, jedna noc",
     text: "Valí se to od šesti večer do dvou do rána, ve dvou až třech partách. Na jednu štaci je tak 45 minut a pak se jede dál." },
-  { id: "carky", barva: "#F9A204", inkoust: INKOUST, nadpis: "Čárky nejsou za chlast",
+  { id: "carky", barva: "#F9A204", inkoust: INKOUST, skladba: "kolem", kotva: "vlevo",
+    nadpis: "Čárky nejsou za chlast",
     text: "Čárka za každou špeluňku, do který vlezete. Čárka, když půlka partyje lupne škopek. A ty tučný padajó za srandy — podle toho, jaká je to haluz." },
-  { id: "snek", barva: "#006633", inkoust: KREM, nadpis: "Kdo se loudá, ten nemá",
+  { id: "snek", barva: "#006633", inkoust: KREM, skladba: "nahore", kotva: "vpravo",
+    nadpis: "Kdo se loudá, ten nemá",
     text: "Jak se nějaká partyja fest loudá a ostatní na ni čumijó, za srandy v tý špeluňce nemá ani čárku." },
-  { id: "koruna", barva: KREM, inkoust: INKOUST, nadpis: "Celej bank bere jedna",
+  { id: "koruna", barva: KREM, inkoust: INKOUST, kotva: "vlevo",
+    nadpis: "Celej bank bere jedna",
     text: "Vlezné je kilo na palici a na konci to všecko shrábne ta parta, co nahrabala nejvíc čárek. Tak ať je to betelný." },
 ];
 
@@ -181,8 +190,8 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
             <span className="uvod-krok cislo">Pravidla {kde + 1}/{PRUPRAVA.length}</span>
           </div>
 
-          <div className="uvod-stranka" key={kde}>
-            <div className="uvod-kresba"><Cmaranice id={s.id} /></div>
+          <div className={`uvod-stranka${s.skladba ? " " + s.skladba : ""}`} key={kde}>
+            <div className={`uvod-kresba${s.kotva ? " " + s.kotva : ""}`}><Cmaranice id={s.id} /></div>
             <h1 className="uvod-nadpis">{vazat(s.nadpis)}</h1>
             <p className="uvod-text">{vazat(s.text)}</p>
           </div>

@@ -1016,6 +1016,26 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .uvod-cmaranice{width:auto;height:100%;max-width:86%;max-height:300px}
 @keyframes kresba-prijde{from{opacity:0;transform:translateY(14px) scale(.96)}}
 
+/* Stránky se musí střídat, jinak jsou to čtyři stejné obrazovky za sebou
+   a vypadá to jako formulář, ne jako série plakátů. Tři skladby a tři
+   kotvy kresby stačí na to, aby žádné dvě nebyly stejné.
+   Výchozí (bez třídy): kresba nahoře, nadpis a věta pod ní. */
+/* nadpis nahoře, kresba uprostřed, věta dole */
+.uvod-stranka.kolem .uvod-nadpis{order:1;margin-top:6px}
+.uvod-stranka.kolem .uvod-kresba{order:2;margin:24px 0}
+.uvod-stranka.kolem .uvod-text{order:3;margin-top:0}
+/* nadpis i věta nahoře, kresba pod nimi */
+.uvod-stranka.nahore .uvod-nadpis{order:1;margin-top:6px}
+.uvod-stranka.nahore .uvod-text{order:2}
+.uvod-stranka.nahore .uvod-kresba{order:3;margin:24px 0 4px}
+/* kotva kresby: na střed, nebo přitisknutá ke kraji jako na plakátu.
+   Kresba se u kraje zúží — dokud zabírala celou šířku, nebylo poznat,
+   že je přitisknutá, a vypadalo to jen jako nepovedené vycentrování. */
+.uvod-kresba.vlevo{justify-content:flex-start}
+.uvod-kresba.vpravo{justify-content:flex-end}
+.uvod-kresba.vlevo .uvod-cmaranice,
+.uvod-kresba.vpravo .uvod-cmaranice{max-width:74%}
+
 .uvod-nadpis{flex:none;font-size:clamp(32px,9.4vw,44px);
   line-height:1.04;letter-spacing:-.025em;color:currentColor}
 .uvod-text{flex:none;margin-top:12px;font-size:var(--t-hlavni);

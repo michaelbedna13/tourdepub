@@ -443,6 +443,13 @@ drobná lišta se značkou a číslem stránky, dole nadpis s větou a pod tím 
 s ovládáním — to je zámek z tištěného plakátu: uprostřed obrázek, popisky
 potichu po okrajích.
 
+**Žádné dvě stránky nejsou poskládané stejně.** Čtyři stejné obrazovky za
+sebou vypadají jako formulář, ne jako série plakátů, takže se střídají tři
+skladby (text pod kresbou / nadpis nahoře a věta dole / text celý nahoře)
+a tři kotvy kresby (na střed, k levému kraji, k pravému). Kresba se u kraje
+zúží — dokud zabírala celou šířku, nebylo poznat, že je přitisknutá,
+a vypadalo to jen jako nepovedené vycentrování.
+
 Barvu i inkoust nese stránka sama (`--papir`, `--inkoust`, viz `PRUPRAVA`
 v `Uvod.tsx`): dvě stránky jsou tmavé s krémovým inkoustem, dvě světlé
 s černým. **Nic uvnitř se proto neodvozuje od `--text` ani od `--podklad`** —
