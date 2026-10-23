@@ -1,6 +1,6 @@
 import { Carky } from "./Carky";
 import { Ikona } from "./Ikona";
-import { sklonuj, sklonujUkol, vazat } from "../lib/format";
+import { sklonuj, sklonujTym, sklonujUkol, vazat } from "../lib/format";
 import { RAZITKO } from "../lib/razitko";
 import type { Rozpad } from "../lib/stav";
 
@@ -69,7 +69,7 @@ export function Uctenka({ poradi, tymId, hospod, ukolu, strop, prepni, uprav }: 
       </div>
       <div className="uc-heslo">
         /{hospod} {hospod === 1 ? "špeluňka" : hospod < 5 ? "špeluňky" : "špeluněk"}
-        {", "}{ukolu} {sklonujUkol(ukolu)}, jedna palice/
+        {", "}{ukolu} {sklonujUkol(ukolu)}, {poradi.length} {sklonujTym(poradi.length)}/
       </div>
 
       <div className="uc-cara" />
