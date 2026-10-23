@@ -363,16 +363,27 @@ Běží **po každém spuštění** a vždycky jde přeskočit. Je to Mišákovo
 appka se otvírá jednou za večer a úvod je kus té hry, ne překážka. *Přeskočit*
 je proto pořád na očích, od první vteřiny, a ťuknutí kamkoli posune dál.
 
-**Celý úvod je jedna neprůhledná vrstva** a uvnitř se jen přepíná obsah.
-Dřív to byly dvě vrstvy přes sebe — statické logo odcházelo prolnutím a průprava
-se zároveň zjevovala, takže mezi nimi na okamžik prosvítala appka.
-
 **1. Značka.** Při spuštění z plochy ukáže iOS obrázek z `public/uvodni/`, hned po
 něm naváže logo ve stránce (`#uvod` v `index.html`), aby bylo vidět dřív, než se
-stáhne a spustí skript. React pak vykreslí svoje logo na přesně stejné místo
-a statické odklidí v tom samém snímku. Proto se v `index.html` **nic neprolíná
-ani nemění velikost**: React může převzít kdykoli a uprostřed prolnutí by jasnost
-loga skočila z půlky na plnou.
+stáhne a spustí skript.
+
+Značka se **skládá písmeno po písmenu** a běží to celé v `index.html`, ne
+v Reactu. Logo svítí od prvního snímku; animace, která by se rozběhla až po
+načtení skriptu, by buď naskočila v půlce, nebo by písmena na okamžik zmizela
+a začala znova. **React proto značku vůbec nekreslí** — jeho vrstva (`.uvod`)
+je do příchodu průpravy průhledná (`.uvod.znacka`) a značka pod ní prosvítá.
+Teprve s první stránkou dostane `#uvod` třídu `odchazi`, vytratí se a odklidí.
+
+Logo je kvůli tomu rozdělené na **devět samostatných písmen**. Dráha vznikla
+obtažením obrázku a je to jediná cesta s pravidlem `evenodd`, takže počítadla
+(díry v O, U, D, P, B) jsou samostatné podcesty — rozdělit to podle „M" by je
+vybarvilo. Dělá to `scripts/pismena-loga.mjs`: podcesta, která leží uvnitř
+jiné, se přilepí k ní, zbytek se seřadí po řádcích shora a zleva. Zapisuje
+`LOGO_PISMENA` do `src/lib/logo.ts` i rozdělenou značku do `index.html`,
+a pouští se po každém `prevod-loga.py`.
+
+`transform-box: fill-box` je u písmen nutnost: bez něj se každé zmenšuje ke
+středu celé značky a místo složení se to rozletí do stran.
 
 Obě loga stojí na **pevných pixelech ze skriptu** (`--uvod-y`, `--uvod-w`),
 ne na procentech okna, a obě jsou `position: fixed`. Tři důvody, všechny
@@ -402,14 +413,20 @@ Značka odejde, až platí všechno tohle naráz: **uběhlo 1700 ms od načtení
 - bez toho minima by na rychlém telefonu jen bliklo;
 - bez minima od startu Reactu by se na pomalé síti (kde se stránka načítá dýl
   než 1700 ms) značka ukázala a ve stejném okamžiku zase odešla, takže by se
-  čárky nestihly dokreslit — záblesk;
+  písmena nestihla složit — záblesk;
 - `document.fonts.ready` na písma nestačí. Slibuje jen, že doběhlo, co si
   stránka **už vyžádala**, a dokud svítí logo, nic Bricolage ani psanou ruku
   nepoužívá. Proto se o ně musí říct ručně (`document.fonts.load`), jinak se
   průprava vysází náhradním písmem a po chvilce přeskočí do správného.
 
-Logo přijede z 90 % velikosti a zespodu, odchází lehkým zvětšením; obsah se pod
-ním zároveň zvedne o 8 px. Jeden pohyb, ne efekty.
+Odchází celá značka naráz: zmenší se o čtyři procenta a zvedne o 16 px.
+Jeden pohyb, ne efekty.
+
+**Úvodní obrazovky a ikona mají v adrese `?v=`.** iOS si je uloží ve chvíli,
+kdy se appka přidává na plochu, a sám od sebe je nikdy nepřenačte — po změně
+palety proto na ploše pořád svítila stará tmavě modrá. Číslo se zvedá při
+každé změně barev, ale **appku je stejně potřeba z plochy smazat a přidat
+znovu**, jinak si iOS sáhne pro svou uloženou kopii.
 
 **2. Průprava.** Čtyři stránky: ikona, nadpis a jedna věta. **Žádná se nepřehodí
 sama** — dál se jde ťuknutím kamkoli na obrazovku, švihem do boku nebo popiskem
@@ -473,8 +490,11 @@ Jméno musí mít celou šířku, jinak se láme uprostřed slova („Vyžebran 
 chudák"). Čtvereček je čtvercový schválně — kolečka v appce odškrtávají,
 tohle přidává.
 
-**Detail** (`DetailUkolu`): nahoře vlevo kresba, vpravo to, co se s úkolem
-dá udělat (čtvereček u jednorázového, počítadlo u opakovatelného). Pak vzduch
+**Detail** (`DetailUkolu`): nahoře vlevo kresba, vpravo nahoře v rohu to, co
+se s úkolem dá udělat (čtvereček u jednorázového, počítadlo u opakovatelného).
+Křížek na zavření je pryč a odškrtávátko si vzalo jeho místo: byly to dva
+terče vedle sebe a ten horní nic nedělal. Zavírá se ťuknutím vedle, švihem
+dolů a Escapem. Pak vzduch
 a dole všechen text: jméno, zadání, poznámka, pod tenkou linkou obtížnost
 a kolik za to padne. Dlouhé zadání se **posouvá** (`.detail-telo`, `data-posuv`).
 
@@ -484,8 +504,15 @@ to, že appka na ťuknutí nereaguje. Posouvání je to, co každý zkusí prvn�
 Tah, co začne v `[data-posuv]`, proto `useSvihDolu` ignoruje: jinak by se
 místo posunutí textu zavřel celý detail. Zavřít jde odkudkoli jinud.
 
-Kresba je v detailu schválně malá (124 px). Dokud si brala celou horní
+Kresba je v detailu schválně malá (136 px). Dokud si brala celou horní
 polovinu, byla z karty ilustrace s popiskem, ne zadání úkolu.
+
+Velikost a posun si **každá kresba může doladit** (`LADENI_KRESEB`
+v `src/lib/kresby-ladeni.ts`). Kresby se do čtverce ořezávají na obálku, takže
+ho všechny vyplní na doraz — jenže ne každá v něm má stejnou váhu: štíhlá
+postava se ve čtvercovém rámečku ztratí, rozmáchlá kresba se do něj tlačí.
+Srovnává se to okem, kresbu po kresbě; pravidlo na to není a co v tabulce
+není, kreslí se tak, jak přišlo.
 
 Výška karty jde podle obsahu, se spodní mezí 420 px. Napevno musela být,
 dokud byla kresba velká — jinak vypadala každá karta jinak. Teď je kresba

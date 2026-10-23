@@ -340,11 +340,11 @@ Běží **po každém spuštění** a vždycky jde přeskočit. Má dvě části
 1. **Značka.** `public/uvodni/` jsou obrázky, které ukáže iOS při spuštění appky
    z plochy — bez nich se objeví jen prázdná barva. Hned po nich naváže `#uvod`
    v `index.html`: je rovnou ve stránce, aby logo naskočilo dřív, než se stáhne
-   skript. React pak vykreslí svoje logo na přesně to samé místo a statické
-   odklidí, takže mezi nimi není vidět žádný střih. Pod značkou se dokreslí
-   pět čárek, jedna po druhé.
+   skript. Značka se **skládá písmeno po písmenu** a běží to celé v `index.html`
+   — React ji nepřekresluje, jen pod sebou nechá prosvítat, dokud nepřijde
+   průprava. Písmena rozděluje `scripts/pismena-loga.mjs`.
 
-   Celý úvod je **jedna neprůhledná vrstva** a písma se načítají ručně
+   Písma se načítají ručně
    (`document.fonts.load`), ne jen přes `document.fonts.ready` — obojí proto,
    aby to nikde neprobliklo. Podrobnosti jsou v `DESIGN.md`.
 2. **Průprava.** Čtyři stránky příběhu (`src/components/Uvod.tsx`).

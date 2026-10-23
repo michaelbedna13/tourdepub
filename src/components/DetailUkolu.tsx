@@ -81,14 +81,11 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
                  ...(splneno ? { background: k.barva, color: k.naBarve } : {}) } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()} {...dolu.obal}>
 
-        {/* Zavřít jde i ťuknutím vedle, Escapem a švihem dolů; křížek je tu
-            pro ty, co gesto nezkusí, proto je tichý a drží se v koutě. */}
-        <button className="ikonove holy detail-zavri" onClick={zavri} aria-label="Zavřít">
-          <Ikona jmeno="plus" px={15} trida="otocit-kriz" />
-        </button>
-
         {/* Kresba nahoře vlevo, ovládání vpravo — jako datum na kartě,
-            jen místo něj to, co se s úkolem dá udělat. */}
+            jen místo něj to, co se s úkolem dá udělat. Křížek v rohu je
+            pryč a odškrtávátko si vzalo jeho místo: byly to dva terče
+            vedle sebe a ten horní nic nedělal. Zavírá se ťuknutím vedle,
+            švihem dolů a Escapem. */}
         <div className="detail-vrch">
           <div className="detail-obraz">
             {KRESBY[u.id]

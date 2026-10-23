@@ -1,19 +1,18 @@
-// Úvod po každém spuštění: značka se dokreslí čárkami, pak průprava.
+// Úvod po každém spuštění: značka se složí písmeno po písmenu, pak průprava.
 // Vždycky jde přeskočit a žádná stránka se nepřehodí sama — Mišák chtěl mít
 // jistotu, že si to někdo opravdu přečetl, ne že mu to uteklo.
 //
-// Logo kreslí React, ne jen index.html. Dřív to bylo obojí: statické logo
-// odcházelo prolnutím a průprava se přes něj zároveň zjevovala, takže mezi
-// nimi na okamžik prosvítala appka. Teď je to jedna neprůhledná vrstva,
-// uvnitř které se jen přepíná obsah; statické logo z index.html se odklidí
-// hned, jak React vykreslí to svoje na stejné místo.
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+// Značku kreslí index.html, ne React, a React ji nepřekresluje. Logo svítí
+// od prvního snímku a skládá se po písmenech; kdyby se o něj React uprostřed
+// přihlásil, animace by buď naskočila v půlce, nebo by písmena zmizela
+// a začala znova. Tahle vrstva je proto do příchodu průpravy průhledná
+// a značka pod ní prosvítá — teprve s první stránkou se #uvod odklidí.
+import { useEffect, useRef, useState } from "react";
 import { vazat } from "../lib/format";
 import type { JmenoIkony } from "../lib/ikony";
 import { Ikona } from "./Ikona";
 import { Kresba } from "./Kresba";
 import { KRESBY } from "../lib/kresby";
-import { Logo } from "./Logo";
 
 /** Nejmíň takhle dlouho zůstane značka od načtení stránky. */
 const ZNACKA_NEJMIN = 1700;
@@ -49,10 +48,17 @@ const PRUPRAVA: Stranka[] = [
     text: "Vlezné je kilo na palici a na konci to všecko shrábne ta parta, co nahrabala nejvíc čárek. Tak ať je to betelný." },
 ];
 
-/** Odklidí úvodní obrazovku z index.html. Nechat ji tam by znamenalo
- *  krémové logo přes celou appku. */
-function odklidStatickeLogo() {
-  document.getElementById("uvod")?.remove();
+/** Jak dlouho se značka z index.html vytrácí, než se odklidí.
+ *  Drží se #uvod.odchazi v index.html. */
+const ZNACKA_ODCHOD = 340;
+
+/** Pošle značku z index.html pryč. Nechat ji tam by znamenalo krémové logo
+ *  přes celou appku. */
+function odklidZnacku() {
+  const u = document.getElementById("uvod");
+  if (!u) return;
+  u.classList.add("odchazi");
+  setTimeout(() => u.remove(), ZNACKA_ODCHOD);
 }
 
 /** Počká na kit z Adobe Fonts.
@@ -109,10 +115,6 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   const [zavira, setZavira] = useState(false);
   const svih = useRef<number | null>(null);
 
-  // Statické logo zmizí ve stejném snímku, ve kterém React vykreslí to svoje
-  // na to samé místo. Prolnutí mezi nimi by bylo vidět jako bliknutí.
-  useLayoutEffect(odklidStatickeLogo, []);
-
   // Značka odejde, až se čárky dokreslily a písma jsou opravdu načtená.
   // Značka a první stránka se prolnou přes sebe — kdyby jedna odešla dřív,
   // než druhá přijde, byl by mezi nimi prázdný snímek.
@@ -122,12 +124,15 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
     Promise.all([
       pockej(Math.max(ZNACKA_PO_STARTU, ZNACKA_NEJMIN - performance.now())),
       Promise.race([nactiPisma(), pockej(PISMA_NEJVIC)]),
-    ]).then(() => { if (platne) setKde(0); });
+    ]).then(() => { if (!platne) return; odklidZnacku(); setKde(0); });
     return () => { platne = false; };
   }, []);
 
   /** Úvod se nevypne střihem, ale vytratí se. */
   function zavri() {
+    // kdyby se zavíralo ještě ve fázi značky (třeba z klávesnice), nesmí
+    // zůstat viset nad appkou
+    odklidZnacku();
     // appka je pod úvodem schovaná (html.uvodni v index.html); odkryje se
     // teď, ať je vidět, jak se úvod vytrácí, a ne až po střihu
     document.documentElement.classList.remove("uvodni");
@@ -144,7 +149,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   const s = PRUPRAVA[Math.max(0, kde)];
 
   return (
-    <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " barevna" : ""}`}
+    <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " barevna" : " znacka"}`}
       style={{ "--kat": s.barva } as React.CSSProperties}
       role="dialog" aria-label="Úvod"
       onPointerDown={(e) => { svih.current = e.clientX; }}
@@ -167,13 +172,6 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
         <button className="uvod-preskocit" onClick={zavri}
           onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
       )}
-
-      {/* značka zůstává vykreslená a jen se vytrácí, zatímco první stránka
-          už přichází — jinak by mezi nimi blikl prázdný podklad */}
-      <div className={`uvod-znacka${kde >= 0 ? " odchazi" : ""}`} aria-hidden={kde >= 0}>
-        <Logo trida="uvod-logo" />
-        <CarkyKreslene />
-      </div>
 
       {kde >= 0 && (
         <div className="uvod-obsah">
@@ -210,20 +208,3 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   );
 }
 
-/** Pět čárek za značkou, co se dokreslí jedna po druhé — čtyři svislé
- *  a pátá přes ně. Je to jediná ozdoba, co appka má, a nese téma hry:
- *  animace, která nic nepředstírá, jen počítá. Leží za logem a potichu,
- *  aby to byl podklad, ne druhý nápis. */
-function CarkyKreslene() {
-  const tahy = [
-    "M6 5 L4 33", "M16 4 L18 31", "M27 5 L25 32", "M37 4 L39 33", "M2 29 L42 7",
-  ];
-  return (
-    <svg className="uvod-carky" viewBox="0 0 44 38" fill="none" stroke="currentColor"
-      strokeWidth={0.9} strokeLinecap="round" aria-hidden="true">
-      {tahy.map((d, i) => (
-        <path key={i} d={d} style={{ animationDelay: `${260 + i * 150}ms` }} />
-      ))}
-    </svg>
-  );
-}

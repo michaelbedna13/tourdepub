@@ -196,6 +196,9 @@ input,textarea,select{caret-color:var(--text)}
 ::-webkit-scrollbar-track{background:transparent}
 .cislo{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 .ikona{display:block;flex:none}
+/* Kresby si smí doladit velikost a posun (LADENI_KRESEB v kresby-ladeni.ts):
+   čtvercový rámeček sedí jedné, ale štíhlá postava se v něm ztratí. */
+.kresba{transform:translate(var(--kr-x,0),var(--kr-y,0)) scale(var(--kr-zvet,1))}
 .otocit{transform:scaleX(-1)}
 .spatne{color:var(--spatne)}
 .drobne{font-size:var(--t-drobne);color:var(--text-3);word-break:break-word}
@@ -679,25 +682,24 @@ input,textarea,select{caret-color:var(--text)}
 /* Nahoře kresba vlevo a ovládání vpravo, dole všechen text. Kresba je
    schválně malá: když si brala celou horní polovinu, byla z karty ilustrace
    s popiskem, ne zadání úkolu. */
+/* Odškrtávátko sedí v rohu, kde dřív býval křížek: byly to dva terče vedle
+   sebe a ten horní nic nedělal. Záporný okraj ho vytáhne nad obrázek, až
+   k hornímu okraji karty. */
 .detail-vrch{display:flex;align-items:flex-start;justify-content:space-between;
-  gap:12px;position:relative;z-index:1;margin-top:4px}
-.detail-obraz{width:124px;height:124px;display:grid;place-items:center;flex:none}
+  gap:12px;position:relative;z-index:1;margin-top:-6px}
+.detail-obraz{width:136px;height:136px;display:grid;place-items:center;flex:none;
+  /* kresba smí mírně přetéct, když si přidá na velikosti */
+  overflow:visible}
 .detail-kresba{
   max-width:100%;max-height:100%;width:auto;height:auto;
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
 }
 .detail-karta.splneno .detail-kresba{color:currentColor;opacity:.9}
 
-/* Křížek je tichý a drží se v koutě: zavřít jde i ťuknutím vedle, Escapem
-   a švihem dolů, tohle je jen pro ty, co gesto nezkusí. */
-.detail-zavri{position:absolute;top:10px;right:10px;width:34px;height:34px;
-  color:inherit;opacity:.38;z-index:2}
-.otocit-kriz{transform:rotate(45deg)}
-
 /* Čtvereček místo data na předloze: co se s úkolem dá udělat. Čtvercový je
    schválně, stejně jako na dlaždici — kolečka v appce odškrtávají. */
 .detail-check{
-  flex:none;width:52px;height:52px;margin-top:26px;display:grid;place-items:center;
+  flex:none;width:52px;height:52px;display:grid;place-items:center;
   border-radius:15px;color:inherit;
   box-shadow:inset 0 0 0 1.6px currentColor;opacity:.42;
   transition:opacity .16s,transform .13s var(--krok),background .16s;
@@ -706,7 +708,7 @@ input,textarea,select{caret-color:var(--text)}
 .detail-check.hotovo{opacity:1;background:currentColor;box-shadow:none}
 .detail-check.hotovo .ikona{color:var(--vrstva)}
 .detail-karta.splneno .detail-check.hotovo .ikona{color:inherit;filter:invert(1)}
-.detail-pocitadlo{flex:none;margin-top:30px}
+.detail-pocitadlo{flex:none}
 
 /* Text drží dole a nahoru mezi ním a kresbou je vzduch. */
 .detail-text{margin-top:auto;position:relative;z-index:1}
@@ -967,6 +969,11 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   background:var(--podklad);
   transition:opacity .3s var(--krok),background-color .45s var(--krok);
 }
+/* Dokud svítí značka, je tahle vrstva průhledná: značku kreslí #uvod
+   z index.html a React ji nepřekresluje, aby se skládání písmen nerozběhlo
+   podruhé. Pod průhlednou vrstvou je #uvod (z-index 100) a pod ním schovaná
+   appka, takže není co prosvítat. */
+.uvod.znacka{background:transparent}
 .uvod.barevna{background:color-mix(in srgb,var(--kat) 70%,var(--podklad))}
 /* na konci se úvod vytratí, nevypne se střihem */
 .uvod.zavira{opacity:0;pointer-events:none}
@@ -976,44 +983,6 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   min-height:44px;padding:0 16px;border-radius:var(--pilulka);
   font-size:var(--t-text);color:color-mix(in srgb,var(--text) 62%,transparent);
 }
-
-/* značka: logo sedí přesně tam, kde ho kreslí index.html, a čárky pod ním
-   se dokreslí jedna po druhé. Logo samo se nehýbe, jinak by proti statické
-   verzi poskočilo. */
-.uvod-znacka{
-  /* Přesně ta samá poloha i šířka jako u loga v index.html (--uvod-y, --uvod-w
-     nastaví skript tamtéž), aby při předání Reactu nebylo co poznat. Fixed,
-     ne absolute: odsazení .uvod by jinak posunulo počátek. */
-  position:fixed;left:50%;top:var(--uvod-y,50%);translate:-50% -50%;
-  width:var(--uvod-w,52vw);color:var(--text);
-  transition:opacity .28s var(--krok),scale .4s var(--krok),translate .4s var(--krok);
-}
-/* Logo se po převzetí Reactem jednou nadechne. Nesmí nikam naskočit —
-   na obrazovce už stojí od prvního vykreslení, tak se jen rozhýbe
-   z klidu a do klidu se vrátí. */
-.uvod-logo{display:block;width:100%;height:auto;position:relative;z-index:1;
-  animation:logo-nadech 1.5s var(--krok) both}
-@keyframes logo-nadech{
-  0%{transform:none}
-  38%{transform:scale(1.035) rotate(-.9deg)}
-  70%{transform:scale(.995) rotate(.45deg)}
-  100%{transform:none}
-}
-.uvod-znacka.odchazi{opacity:0;scale:.96;translate:-50% calc(-50% - 16px)}
-.uvod-znacka.odchazi .uvod-logo{animation:none}
-
-/* Čárky leží za logem, ne pod ním: je to podklad, ne druhý nápis.
-   Proto velké, potichu a bez vlastního místa v rozvržení. */
-.uvod-carky{
-  position:absolute;left:50%;top:50%;translate:-50% -50%;
-  width:128%;height:auto;overflow:visible;color:var(--text);
-  opacity:.12;z-index:0;
-}
-.uvod-carky path{
-  stroke-dasharray:46;stroke-dashoffset:46;
-  animation:carka-kresli .5s var(--krok) both;
-}
-@keyframes carka-kresli{to{stroke-dashoffset:0}}
 
 /* Průprava: čtyři stránky, dál se jde tlačítkem nebo švihem — nikdy sama.
    Celá stránka přichází jako jeden kus. Dřív měl každý kousek vlastní zpoždění
@@ -1099,7 +1068,6 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important;transition-duration:.001ms !important}
   #uvod img{opacity:1}
-  .uvod-carky path{stroke-dashoffset:0}
   .hero-pas{scroll-behavior:auto}
 }
 @media (min-width:600px){
