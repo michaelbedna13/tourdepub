@@ -613,8 +613,14 @@ input,textarea,select{caret-color:var(--text)}
    se čte odshora dolů jako jedna věc. */
 .ukol-karta-nazev{
   margin-top:14px;font-family:var(--pismo);font-weight:700;
-  font-size:18px;line-height:1.18;letter-spacing:-.01em;text-transform:none;
-  overflow-wrap:break-word;hyphens:auto;
+  font-size:17px;line-height:1.22;letter-spacing:-.012em;text-transform:none;
+  /* Žádné dělení slov. Safari umí česky a opravdu dělilo — „Balení starý-ho
+     kusu", „Tichá špeluň-ka", „Rada za vše-chny prachy" — a na dvouřádkovém
+     jménu na malé kartě to nevypadá jako sazba, ale jako chyba. Zlom se dělá
+     jen v mezerách; break-word zůstává jako poslední záchrana pro slovo,
+     které se na řádek nevejde ani samo.
+     balance vyrovná délku řádků, ať na druhém nezůstane viset jedno slovo. */
+  hyphens:manual;overflow-wrap:break-word;text-wrap:balance;
 }
 .ukol-karta-spodek{display:flex;align-items:center;justify-content:space-between;
   gap:8px;margin-top:8px}

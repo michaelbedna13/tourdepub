@@ -602,7 +602,15 @@ dole text, a to, co se dá udělat, je u textu — ne nad obrazem.
 **Dlaždice** (`KartaUkolu`): kresba si vezme volné místo nahoře, pod ní jméno
 přes celou šířku a úplně dole řádka s čárkami a čtverečkem, co zapisuje.
 Jméno musí mít celou šířku, jinak se láme uprostřed slova („Vyžebran / ej
-chudák"). Čtvereček je čtvercový schválně — kolečka v appce odškrtávají,
+chudák").
+
+**Dělení slov je vypnuté** (`hyphens: manual`). Safari umí česky a opravdu
+dělilo — „Balení starý-ho kusu", „Tichá špeluň-ka", „Rada za vše-chny
+prachy" — a na dvouřádkovém jménu na malé kartě to nevypadá jako sazba, ale
+jako chyba. Zlom se dělá jen v mezerách, `overflow-wrap: break-word` zůstává
+jako poslední záchrana pro slovo, které se na řádek nevejde ani samo (žádné
+takové mezi úkoly není: nejdelší je „Vyžebranej" a „hókuspókus", obě se
+vejdou). `text-wrap: balance` vyrovná délku řádků. Čtvereček je čtvercový schválně — kolečka v appce odškrtávají,
 tohle přidává.
 
 **Detail** (`DetailUkolu`): nahoře vlevo kresba, vpravo nahoře v rohu to, co
