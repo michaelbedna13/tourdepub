@@ -5,7 +5,7 @@ import { Ikona } from "../components/Ikona";
 import { PruhSyncu } from "../components/PruhSyncu";
 import { Uctenka } from "../components/Uctenka";
 import { ZAKLAD, type Hospoda } from "../lib/data";
-import { jakDlouho, vazat } from "../lib/format";
+import { vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { RAZITKO } from "../lib/razitko";
 import {
@@ -134,7 +134,6 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   const posledni = cislo === stav.hospody.length;
   // štace je hotová, když je zapsaný příchod i škopek – pak na kartu klapne razítko
   const hotova = !!t?.prichod[h.id] && !!t?.skopek[h.id];
-  const odKdy = t?.prichodCas[h.id];
   return (
     <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
       style={{ "--hosp": h.barva } as React.CSSProperties}
@@ -180,8 +179,6 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
         </div>
       </div>
 
-      <JakDlouho od={odKdy} />
-
       <div className="hero-zapis">
         {ZAKLAD.map((z) => {
           const hotovo = !!t?.[z.id as Zaklad][h.id];
@@ -199,15 +196,3 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   );
 }
 
-/** Jak dlouho parta v téhle špeluňce sedí. Přepočítá se jednou za půl minuty:
- *  na vteřiny to nikdo nekouká a častější překreslování by jen bralo baterku.
- *  Řádka drží místo i bez zapsaného příchodu — karty v pásu jsou stejně vysoké
- *  a bez toho by trasa pod názvem při švihu skákala nahoru a dolů. */
-function JakDlouho({ od }: { od?: number }) {
-  const [, tik] = useState(0);
-  useEffect(() => {
-    const i = window.setInterval(() => tik((x) => x + 1), 30000);
-    return () => window.clearInterval(i);
-  }, []);
-  return <div className="hero-cas">{od === undefined ? null : vazat(`Jste tady ${jakDlouho(od)}`)}</div>;
-}

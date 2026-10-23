@@ -356,10 +356,6 @@ input,textarea,select{caret-color:var(--text)}
   color:color-mix(in srgb,var(--hosp) 58%,var(--text));
 }
 
-/* Jak dlouho už parta ve špeluňce sedí. Tichá řádka pod názvem – je to
-   koukátko, ne údaj, podle kterého se hraje. */
-.hero-cas{position:relative;z-index:1;margin:-10px 0 14px;min-height:1.6em;
-  font-size:var(--t-drobne);color:var(--text-3)}
 /* Razítko za hotovou štaci: příchod i škopek zapsané. Je přes celou kartu,
    ne odznáček v rohu — při švihu pásem má být hotová štace vidět dřív, než
    se stihne cokoli přečíst. Zelená je tu „hotovo“: na kartě štace žádná
@@ -387,7 +383,6 @@ input,textarea,select{caret-color:var(--text)}
    aby šel zápis vzít zpátky, a šipky taky, aby se dalo odjet dál. */
 .hero.hotova .hero-nadocko,
 .hero.hotova .hero-nazev,
-.hero.hotova .hero-cas,
 .hero.hotova .hero-trasa{
   filter:blur(2.5px);opacity:.45;transition:filter .3s var(--krok),opacity .3s var(--krok);
 }
@@ -415,7 +410,9 @@ input,textarea,select{caret-color:var(--text)}
      slejvají do jednoho bloku. */
   font-weight:700;
   font-size:clamp(30px,8.6vw,42px);line-height:var(--radky-nadpis);letter-spacing:-.005em;
-  margin:10px 0 0;min-height:calc(2em * var(--radky-nadpis));
+  /* spodní okraj drží vzduch pod jménem i tehdy, když se roztáhne na dva
+     řádky a volné místo nad trasou se vyčerpá */
+  margin:10px 0 26px;min-height:calc(2em * var(--radky-nadpis));
   overflow-wrap:anywhere;position:relative;z-index:1;
 }
 
@@ -425,7 +422,7 @@ input,textarea,select{caret-color:var(--text)}
    Pozor na zkrácený zápis okraje — „auto" ve čtyřhodnotovém tvaru sedne
    i na levou stranu a celá řádka se smrskne a odjede doprava. */
 .hero-trasa{display:flex;align-items:center;gap:12px;position:relative;z-index:1;
-  margin-top:auto;margin-bottom:16px}
+  margin-top:auto;margin-bottom:22px}
 .trasa-body{display:flex;gap:3px;flex:1;min-width:0}
 /* Tenčí a tlumenější než dřív. Současná štace byla v plné barvě textu, tedy
    stejně výrazná jako jméno hospody nad ní, a pruh pak přebíjel kartu. */
