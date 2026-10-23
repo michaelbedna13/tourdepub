@@ -449,9 +449,16 @@ Pravidla, sem patří jen to, co musí vědět každý, než se vyrazí.
 
 Stránka je **plakát**, ne obrazovka s nádechem barvy. Plná barva přes celou
 plochu, jeden inkoust na všechno a jedna velká čmáranice uprostřed. Nahoře
-drobná lišta se značkou a číslem stránky, dole nadpis s větou a pod tím lišta
-s ovládáním — to je zámek z tištěného plakátu: uprostřed obrázek, popisky
-potichu po okrajích.
+značka a *Přeskočit*, dole proužky a *Dál* — **dvě řádky po dvou věcech**,
+každá drží obě hrany stránky. Dřív byly dole tři věci vedle sebe (proužky,
+Přeskočit, Dál) a číslo stránky nahoře; jenže proužky číslo stránky říkají
+taky, takže to bylo jednou navíc, a tři věci na jedné řádce se nedaly
+vyvážit. Pro čtečku zůstalo číslo v popisku proužků.
+
+**Nadpis se měří na telefonu, ne v testu.** Písmo z Adobe se do testovacího
+prohlížeče nedostane a náhradní je užší, takže se nadpis lámal na dva řádky
+a vypadal v pořádku — na telefonu, kde Hagrid naběhne, z toho byly tři řádky
+a vytlačily kresbu i větu. Velikost je proto 8,5 % šířky, ne deset.
 
 **Nadpis je těžký.** Globální `h1` má v appce čtyřstovku (velké nadpisy jsou
 schválně lehké), tady se váha vrací na sedmistovku a obtah

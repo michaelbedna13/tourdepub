@@ -185,9 +185,15 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
           věc, na kterou se kouká, a všechno ostatní potichu po okrajích. */}
       {kde >= 0 && (
         <div className="uvod-obsah">
+          {/* Nahoře značka a Přeskočit, dole proužky a Dál. Dvě řádky po dvou
+              věcech, každá drží obě hrany stránky. Dřív byly dole tři věci
+              vedle sebe (proužky, Přeskočit, Dál) a číslo stránky nahoře —
+              jenže proužky číslo stránky říkají taky, takže to bylo jednou
+              navíc, a tři věci na jedné řádce se nedaly vyvážit. */}
           <div className="uvod-hlava">
             <Logo trida="uvod-znak" />
-            <span className="uvod-krok cislo">Pravidla {kde + 1}/{PRUPRAVA.length}</span>
+            <button className="uvod-preskocit" onClick={zavri}
+              onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
           </div>
 
           <div className={`uvod-stranka${s.skladba ? " " + s.skladba : ""}`} key={kde}>
@@ -203,8 +209,6 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
                 <span key={i} className={`uvod-tecka${i === kde ? " ted" : ""}${i < kde ? " bylo" : ""}`} />
               ))}
             </div>
-            <button className="uvod-preskocit" onClick={zavri}
-              onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
             <button className="uvod-dal" onClick={dal} onPointerUp={(e) => e.stopPropagation()}>
               {posledni ? "Jedeme na to" : "Dál"}
               <svg className="uvod-sipka" viewBox="0 0 24 10" fill="none" stroke="currentColor"

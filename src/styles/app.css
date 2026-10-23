@@ -999,8 +999,6 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .uvod-hlava{flex:none;display:flex;align-items:center;justify-content:space-between;
   gap:16px;width:100%;max-width:420px;padding-bottom:var(--uvod-mezera)}
 .uvod-znak{height:30px;width:auto;display:block;color:currentColor}
-.uvod-krok{font-family:var(--pismo);font-weight:700;font-size:11px;
-  letter-spacing:.16em;text-transform:uppercase;opacity:.65}
 
 /* Stránka stojí na jednom pravidle: na plakátu jsou DVĚ skupiny u protilehlých
    okrajů a mezi nimi jedna velká mezera. Volné místo proto není rozeseté po
@@ -1055,28 +1053,33 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    Prokládání je stažené pod jedničku: velký blok verzálek drží pohromadě
    a tím působí těžší, aniž by se musel zvětšovat. */
 .uvod-nadpis{flex:none;font-weight:700;-webkit-text-stroke:.7px currentColor;
-  font-size:clamp(34px,10.2vw,50px);
+  /* Osm a půl procenta šířky, ne deset: v Hagridu se nadpis při desíti lámal
+     na tři řádky a vytlačil kresbu i větu. Náhradní písmo je užší, takže
+     v testech vycházely dva řádky a vypadalo to v pořádku — měřeno až na
+     telefonu, kde se písmo z Adobe opravdu načte. */
+  font-size:clamp(30px,8.5vw,44px);
   line-height:.98;letter-spacing:-.03em;color:currentColor;
   /* vyrovná délku řádků, ať nezůstane na druhém řádku jedno slovo */
   text-wrap:balance;}
 /* Věta pod nadpisem je výklad, ne druhý nadpis: tišší a s volnějším
    prokladem, aby mezi ní a nadpisem byl rozdíl ve váze, ne jen ve velikosti.
    Drží se nadpisu nablízku — spolu jsou to jedna skupina. */
-.uvod-text{flex:none;margin-top:14px;font-size:var(--t-hlavni);
-  line-height:1.62;opacity:.72;max-width:30em}
+.uvod-text{flex:none;margin-top:14px;font-size:var(--t-text);
+  line-height:1.6;opacity:.72;max-width:30em}
 
-.uvod-spodek{flex:none;display:flex;align-items:center;gap:14px;
-  width:100%;max-width:420px;padding-top:var(--uvod-mezera)}
+.uvod-spodek{flex:none;display:flex;align-items:center;justify-content:space-between;
+  gap:14px;width:100%;max-width:420px;padding-top:var(--uvod-mezera)}
 .uvod-tecky{display:flex;gap:6px;flex:none}
-.uvod-tecka{width:18px;height:3px;border-radius:2px;
+.uvod-tecka{width:22px;height:4px;border-radius:2px;
   background:color-mix(in srgb,currentColor 24%,transparent);
   transition:background .25s var(--krok)}
 .uvod-tecka.bylo{background:color-mix(in srgb,currentColor 48%,transparent)}
 .uvod-tecka.ted{background:currentColor}
-/* Přeskočit je tichý text, ne tlačítko: ťuknout jde stejně kamkoli. */
-.uvod-preskocit{margin-left:auto;min-height:44px;padding:0 4px;
+/* Přeskočit je tichý text, ne tlačítko: ťuknout jde stejně kamkoli.
+   Sedí nahoře naproti značce, ne dole mezi proužky a Dál. */
+.uvod-preskocit{min-height:44px;padding:0 2px;margin:-10px -2px;
   font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:currentColor;opacity:.5}
+  color:currentColor;opacity:.55}
 .uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
   min-height:44px;padding:0 2px;
   font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
