@@ -425,12 +425,19 @@ input,textarea,select{caret-color:var(--text)}
   overflow-wrap:anywhere;position:relative;z-index:1;
 }
 
-.hero-trasa{display:flex;align-items:center;gap:12px;margin:20px 0 18px;
-  position:relative;z-index:1}
+/* Trasa sedí dole u linky s odškrtávátky, ne uprostřed karty: je to údaj
+   na doplnění, ne to hlavní, a nahoře patří jméno štace. Volné místo si
+   dělí s odškrtávátky, která mají horní okraj taky auto.
+   Pozor na zkrácený zápis okraje — „auto" ve čtyřhodnotovém tvaru sedne
+   i na levou stranu a celá řádka se smrskne a odjede doprava. */
+.hero-trasa{display:flex;align-items:center;gap:12px;position:relative;z-index:1;
+  margin-top:auto;margin-bottom:16px}
 .trasa-body{display:flex;gap:3px;flex:1;min-width:0}
-.trasa-bod{flex:1;height:3px;border-radius:2px;background:var(--linka)}
-.trasa-bod.splneno{background:var(--text-3)}
-.trasa-bod.ted{background:var(--text)}
+/* Tenčí a tlumenější než dřív. Současná štace byla v plné barvě textu, tedy
+   stejně výrazná jako jméno hospody nad ní, a pruh pak přebíjel kartu. */
+.trasa-bod{flex:1;height:2px;border-radius:2px;background:rgba(242,231,207,.12)}
+.trasa-bod.splneno{background:rgba(242,231,207,.34)}
+.trasa-bod.ted{background:rgba(242,231,207,.72)}
 .hero-stace{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3);flex:none}
 
 /* dvě věci, co se v každé špeluňce zapisují – jako odškrtávátka, ne jako
