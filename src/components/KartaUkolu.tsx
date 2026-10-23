@@ -12,26 +12,27 @@ interface Props {
   otevri: () => void;
 }
 
-/** Jeden úkol jako karta v galerii: nahoře kresba, dole jméno a co za to
- *  padne. Víc se na kartu nevejde a víc tam ani nemá být — popis, poznámky
+/** Jeden úkol jako karta v galerii. Rozvržení je jednoduché a drží se na
+ *  všech kartách: kresba nahoře dostane všechno volné místo, text sedí dole
+ *  a vedle něj je čtvereček, co zapisuje.
+ *
+ *  Čtvereček je u textu, ne v rohu nad kresbou: ruka ho tam má blíž, kresba
+ *  nemusí uhýbat a karta se čte odshora dolů jako jedna věc. Popis, poznámky
  *  a odznaky jsou v detailu, co se otevře ťuknutím.
  *
  *  Celá galerie je v barvě kategorie — obrazovka Keců je zelená, Těla žlutá,
  *  Žranic červená. Všechny karty mají stejný odstín: obtížnost se dá přečíst
  *  z toho, kolik za úkol padne čárek, a z půllitrů v detailu, takže ji nemusí
- *  nést ještě podklad. Splněná karta se zbarví naplno.
- *
- *  Čtvereček v rohu zapisuje rovnou z galerie — to je ten obvyklý pohyb.
- *  Kdo si chce přečíst zadání, ťukne na kartu a otevře se detail. */
+ *  nést ještě podklad. Splněná karta se zbarví naplno. */
 export function KartaUkolu({ u, k, otevri }: Props) {
   const t = tym();
   const kolik = kolikrat(u.id, t);
   const opakovatelny = u.max > 1;
   const splneno = kolik > 0 && (opakovatelny ? kolik >= u.max : true);
 
-  const zaCo = opakovatelny
-    ? `+${u.body} za kus, až ${u.body * u.max}`
-    : `+${u.body} ${sklonuj(u.body)}`;
+  // Na dlaždici jen to nejkratší, co dává smysl. Strop („až 5") je v detailu;
+  // tady by se zalomil na tři řádky a ujedl místo jménu.
+  const zaCo = opakovatelny ? `+${u.body} za kus` : `+${u.body} ${sklonuj(u.body)}`;
 
   function zapis(e: React.MouseEvent) {
     e.stopPropagation();
@@ -51,26 +52,32 @@ export function KartaUkolu({ u, k, otevri }: Props) {
 
       {/* Vlastní kresba úkolu, když k němu je; jinak ikona kategorie.
           Kresby dodává scripts/prevod-kreseb.py ze složky kresby/. */}
-      <Kresba id={u.id} trida="ukol-karta-kresba" />
-      {!KRESBY[u.id] && <Ikona jmeno={u.ikona ?? k.ikona} px={96} trida="ukol-karta-kresba" />}
+      <div className="ukol-karta-obraz">
+        <Kresba id={u.id} trida="ukol-karta-kresba" />
+        {!KRESBY[u.id] && <Ikona jmeno={u.ikona ?? k.ikona} px={96} trida="ukol-karta-kresba" />}
+      </div>
 
+      {/* Jméno přes celou šířku, ať se neláme uprostřed slova; čtvereček až
+          u řádky s čárkami, jako na předloze. */}
       <h3 className="ukol-karta-nazev">{vazat(u.nazev)}</h3>
 
-      <span className="ukol-karta-zaco cislo">
-        {opakovatelny && kolik > 0 && !splneno ? `${kolik}/${u.max} · ${zaCo}` : zaCo}
-      </span>
-
-      {/* Hotový úkol už se zapsat nedá, tak z tlačítka zbude jen fajfka. */}
-      {splneno ? (
-        <span className="ukol-karta-box hotovo" aria-hidden="true">
-          <Ikona jmeno="check" px={16} />
+      <div className="ukol-karta-spodek">
+        <span className="ukol-karta-zaco cislo">
+          {opakovatelny && kolik > 0 && !splneno ? `${kolik}/${u.max} · ${zaCo}` : zaCo}
         </span>
-      ) : (
-        <button className="ukol-karta-box" onClick={zapis} disabled={!jdePridat(u, t)}
-          aria-label={`Zapsat ${u.nazev}`}>
-          <Ikona jmeno="plus" px={16} />
-        </button>
-      )}
+
+        {/* Hotový úkol už se zapsat nedá, tak z tlačítka zbude jen fajfka. */}
+        {splneno ? (
+          <span className="ukol-karta-box hotovo" aria-hidden="true">
+            <Ikona jmeno="check" px={17} />
+          </span>
+        ) : (
+          <button className="ukol-karta-box" onClick={zapis} disabled={!jdePridat(u, t)}
+            aria-label={`Zapsat ${u.nazev}`}>
+            <Ikona jmeno="plus" px={17} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }

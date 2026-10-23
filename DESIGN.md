@@ -402,6 +402,32 @@ svislé a pátá přes ně. Každá je jinak nakloněná a jinak dlouhá, ať to
 rukou, ne vysázené. Je to jediný dekorativní prvek v appce a nese celé téma,
 proto jinde žádná hospodská ozdoba není.
 
+## Karty úkolů
+
+Dlaždice v galerii a detail jsou **jedna a ta samá karta, jen větší**. Obě
+stojí na stejném rozvržení, převzatém z plakátových karet: nahoře obraz,
+dole text, a to, co se dá udělat, je u textu — ne nad obrazem.
+
+**Dlaždice** (`KartaUkolu`): kresba si vezme volné místo nahoře, pod ní jméno
+přes celou šířku a úplně dole řádka s čárkami a čtverečkem, co zapisuje.
+Jméno musí mít celou šířku, jinak se láme uprostřed slova („Vyžebran / ej
+chudák"). Čtvereček je čtvercový schválně — kolečka v appce odškrtávají,
+tohle přidává.
+
+**Detail** (`DetailUkolu`): nahoře vlevo kresba, vpravo to, co se s úkolem
+dá udělat (čtvereček u jednorázového, počítadlo u opakovatelného). Pak vzduch
+a dole všechen text: jméno, zadání, poznámka, pod tenkou linkou obtížnost
+a kolik za to padne. Vpravo dole je **decentní šipka**, když má zadání víc
+stránek; listuje se ťuknutím do textu, šipka jen říká, že je kam.
+
+Kresba je v detailu schválně malá (124 px). Dokud si brala celou horní
+polovinu, byla z karty ilustrace s popiskem, ne zadání úkolu.
+
+Výška karty jde podle obsahu, se spodní mezí 420 px. Napevno musela být,
+dokud byla kresba velká — jinak vypadala každá karta jinak. Teď je kresba
+ukotvená nahoře, takže krátkému zadání sluší nízká karta líp než půl
+obrazovky prázdna.
+
 ## Účtenka
 
 Pořadí part je **účtenka z hospody**. Stojí na dvou místech: na Týmech,

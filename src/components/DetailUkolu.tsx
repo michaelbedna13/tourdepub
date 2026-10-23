@@ -96,49 +96,24 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
         style={{ "--kat": k.barva,
                  ...(splneno ? { background: k.barva, color: k.naBarve } : {}) } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()} {...dolu.obal}>
+
+        {/* Zavřít jde i ťuknutím vedle, Escapem a švihem dolů; křížek je tu
+            pro ty, co gesto nezkusí, proto je tichý a drží se v koutě. */}
+        <button className="ikonove holy detail-zavri" onClick={zavri} aria-label="Zavřít">
+          <Ikona jmeno="plus" px={15} trida="otocit-kriz" />
+        </button>
+
+        {/* Kresba nahoře vlevo, ovládání vpravo — jako datum na kartě,
+            jen místo něj to, co se s úkolem dá udělat. */}
         <div className="detail-vrch">
-          <Obtiznost piva={u.piva} />
-          {/* Kolik za to padne, stojí tady. Na tlačítku to bylo podruhé
-              a tlačítko má říkat, co udělá, ne kolik to vynese. */}
-          <span className="odznak cislo">
-            {opakovatelny ? `+${u.body} za kus, až ${u.body * u.max}`
-                          : `+${u.body} ${sklonuj(u.body)}`}
-          </span>
-          <button className="ikonove holy detail-zavri" onClick={zavri} aria-label="Zavřít">
-            <Ikona jmeno="plus" px={16} trida="otocit-kriz" />
-          </button>
-        </div>
-
-        {KRESBY[u.id]
-          ? <Kresba id={u.id} trida="detail-kresba" />
-          : <Ikona jmeno={u.ikona ?? k.ikona} px={132} trida="detail-kresba" />}
-
-        <h2 className="detail-nazev">{vazat(u.nazev)}</h2>
-
-        <div className="detail-telo" ref={text}
-          onClick={() => { if (!dolu.tahlSe.current && stran > 1) setKde((x) => (x + 1) % stran); }}>
-          <div className="detail-posuv" style={{ transform: `translateY(${-kde * 100}%)` }}>
-            {u.popis && <p className="detail-popis">{vazat(u.popis)}</p>}
-            {u.pozn && <p className="detail-pozn">{vazat(u.pozn)}</p>}
-            {odznaky.length > 0 && (
-              <div className="detail-odznaky">
-                {odznaky.map((o) => <span key={o} className="odznak">{vazat(o)}</span>)}
-              </div>
-            )}
+          <div className="detail-obraz">
+            {KRESBY[u.id]
+              ? <Kresba id={u.id} trida="detail-kresba" />
+              : <Ikona jmeno={u.ikona ?? k.ikona} px={104} trida="detail-kresba" />}
           </div>
-        </div>
 
-        {stran > 1 && (
-          <div className="detail-tecky" role="img" aria-label={`Stránka ${kde + 1} z ${stran}`}>
-            {Array.from({ length: stran }, (_, i) => (
-              <span key={i} className={`uvod-tecka${i === kde ? " ted" : i < kde ? " bylo" : ""}`} />
-            ))}
-          </div>
-        )}
-
-        <div className="detail-spodek">
           {opakovatelny ? (
-            <div className="pocitadlo">
+            <div className="pocitadlo detail-pocitadlo">
               <button onClick={() => uberUkol(u)} disabled={kolik <= 0} aria-label={`Ubrat ${u.nazev}`}>
                 <Ikona jmeno="minus" px={14} />
               </button>
@@ -149,17 +124,48 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
               </button>
             </div>
           ) : (
-            <button className={`detail-fajfka${splneno ? " hotovo" : ""}`} onClick={prepni}
-              aria-pressed={splneno}>
-              <span className="fajfka"><Ikona jmeno="check" px={15} /></span>
-              Splněno
+            <button className={`detail-check${splneno ? " hotovo" : ""}`} onClick={prepni}
+              aria-pressed={splneno} aria-label={`Splněno: ${u.nazev}`}>
+              <Ikona jmeno="check" px={22} />
             </button>
           )}
-          {uprav && (
-            <button className="ikonove holy" aria-label={`Upravit ${u.nazev}`} onClick={uprav}>
-              <Ikona jmeno="i-tuzka" px={16} />
-            </button>
-          )}
+        </div>
+
+        {/* Všechen text drží dole, jako na kartě z plakátu. */}
+        <div className="detail-text">
+          <h2 className="detail-nazev">{vazat(u.nazev)}</h2>
+
+          <div className="detail-telo" ref={text}
+            onClick={() => { if (!dolu.tahlSe.current && stran > 1) setKde((x) => (x + 1) % stran); }}>
+            <div className="detail-posuv" style={{ transform: `translateY(${-kde * 100}%)` }}>
+              {u.popis && <p className="detail-popis">{vazat(u.popis)}</p>}
+              {u.pozn && <p className="detail-pozn">{vazat(u.pozn)}</p>}
+              {odznaky.length > 0 && (
+                <div className="detail-odznaky">
+                  {odznaky.map((o) => <span key={o} className="odznak">{vazat(o)}</span>)}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="detail-pata">
+            <Obtiznost piva={u.piva} />
+            <span className="detail-zaco cislo">
+              {opakovatelny ? `+${u.body} za kus, až ${u.body * u.max}`
+                            : `+${u.body} ${sklonuj(u.body)}`}
+            </span>
+            {uprav && (
+              <button className="ikonove holy detail-tuzka" aria-label={`Upravit ${u.nazev}`} onClick={uprav}>
+                <Ikona jmeno="i-tuzka" px={15} />
+              </button>
+            )}
+            {/* Decentní šipka: popis se listuje ťuknutím, tohle jen říká, že je kam. */}
+            {stran > 1 && (
+              <span className="detail-dal" role="img" aria-label={`Stránka ${kde + 1} z ${stran}`}>
+                <Ikona jmeno="i-zpet" px={14} trida="otocit" />
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>,

@@ -551,38 +551,38 @@ input,textarea,select{caret-color:var(--text)}
    v galerii, ať je kresba jakkoli vysoká.
    Barva je kategorie vytažená ke krémové: čistě krémová kresba na barevné
    kartě přebíjela jméno, čistě kategorie splývala s podkladem. */
+.ukol-karta-obraz{flex:1;min-height:0;display:grid;place-items:center;padding:6px 0 2px}
 .ukol-karta-kresba{
-  flex:1;min-height:0;width:100%;
+  max-width:100%;max-height:100%;width:auto;height:auto;
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
 }
 .ukol-karta.splneno .ukol-karta-kresba{color:currentColor;opacity:.85}
 
+/* Text a čtvereček drží spolu dole na jedné řádce. Čtvereček sedí u jména,
+   ne v rohu nad kresbou: ruka ho tam má blíž, kresba nemusí uhýbat a karta
+   se čte odshora dolů jako jedna věc. */
 .ukol-karta-nazev{
-  margin-top:16px;font-family:var(--pismo);font-weight:700;
-  font-size:var(--t-hlavni);line-height:1.22;letter-spacing:0;text-transform:none;
-  overflow-wrap:break-word;
+  margin-top:14px;font-family:var(--pismo);font-weight:700;
+  font-size:18px;line-height:1.18;letter-spacing:-.01em;text-transform:none;
+  overflow-wrap:break-word;hyphens:auto;
 }
-.ukol-karta-zaco{display:block;margin-top:7px;font-family:var(--pismo);
+.ukol-karta-spodek{display:flex;align-items:center;justify-content:space-between;
+  gap:8px;margin-top:8px}
+.ukol-karta-zaco{min-width:0;font-family:var(--pismo);
   font-size:var(--t-drobne);line-height:1.3;color:var(--text-3)}
 .ukol-karta.splneno .ukol-karta-zaco{color:currentColor;opacity:.72}
-/* Čtvereček zapisuje rovnou z galerie – to je ten obvyklý pohyb, kvůli
-   kterému se nemá otevírat detail. Sedí v horním rohu, kde je jen kresba:
-   dole si bral místo jménu a u jednořádkových jmen do nich vlezl.
-   Čtvercový je schválně — kolečka v appce odškrtávají, tohle přidává. */
+/* Čtvercový je schválně — kolečka v appce odškrtávají, tohle přidává. */
 .ukol-karta-box{
-  position:absolute;right:12px;top:12px;z-index:1;
-  width:38px;height:38px;display:grid;place-items:center;
-  border-radius:11px;color:inherit;
-  box-shadow:inset 0 0 0 1.5px currentColor;opacity:.45;
+  flex:none;width:40px;height:40px;display:grid;place-items:center;
+  border-radius:12px;color:inherit;
+  box-shadow:inset 0 0 0 1.5px currentColor;opacity:.42;
   transition:opacity .16s,transform .13s var(--krok),background .16s;
 }
 .ukol-karta-box:active{transform:scale(.88)}
-.ukol-karta-box:disabled{opacity:.18}
+.ukol-karta-box:disabled{opacity:.16}
 .ukol-karta-box.hotovo{opacity:1;background:currentColor;box-shadow:none}
 .ukol-karta-box.hotovo .ikona{color:var(--vrstva)}
 .ukol-karta.splneno .ukol-karta-box.hotovo .ikona{color:inherit;filter:invert(1)}
-/* Kresba nesmí vlézt pod čtvereček v rohu. */
-.ukol-karta-kresba{padding:14px 34px 0 0}
 
 /* ---------- detail úkolu ---------- */
 /* Ne stránka a ne plachta přes celou obrazovku: ta samá karta, jen větší,
@@ -605,7 +605,13 @@ input,textarea,select{caret-color:var(--text)}
      tohohle si svislý tah zabere posun stránky, takže by se švih dolů
      nikdy nechytil */
   touch-action:none;
-  height:min(620px,calc(100dvh - var(--vrch) - env(safe-area-inset-bottom) - 56px));
+  /* Výška podle obsahu, ne napevno. Dokud si kresba brala celou horní
+     polovinu, musela být pevná, jinak každá karta vypadala jinak; teď je
+     kresba malá a ukotvená nahoře, takže krátkému zadání sluší nízká karta
+     líp než půl obrazovky prázdna. Spodní mez drží karty v galerii podobné,
+     horní je strop obrazovky. */
+  min-height:420px;
+  max-height:min(620px,calc(100dvh - var(--vrch) - env(safe-area-inset-bottom) - 56px));
   display:flex;flex-direction:column;
   padding:20px 22px 18px;border-radius:var(--r);
   /* stejný odstín jako dlaždice, ze které se karta otevřela */
@@ -622,59 +628,68 @@ input,textarea,select{caret-color:var(--text)}
    přechod se zapíná až na odchod – jinak by stmívání couralo za prstem. */
 .detail.odchazi{transition:opacity .2s linear}
 .detail-karta:focus{outline:none}
-/* Kresba si bere všechno, co zbyde nad textem – stejně jako na dlaždici. */
+
+/* Nahoře kresba vlevo a ovládání vpravo, dole všechen text. Kresba je
+   schválně malá: když si brala celou horní polovinu, byla z karty ilustrace
+   s popiskem, ne zadání úkolu. */
+.detail-vrch{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;position:relative;z-index:1;margin-top:4px}
+.detail-obraz{width:124px;height:124px;display:grid;place-items:center;flex:none}
 .detail-kresba{
-  flex:1;min-height:60px;width:100%;margin:10px 0 2px;
+  max-width:100%;max-height:100%;width:auto;height:auto;
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
 }
 .detail-karta.splneno .detail-kresba{color:currentColor;opacity:.9}
-/* Obtížnost a kolik za to padne drží spolu vlevo, křížek je vpravo. */
-.detail-vrch{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  position:relative;z-index:1}
-.detail-zavri{width:36px;height:36px;color:inherit;opacity:.6;margin-left:auto}
+
+/* Křížek je tichý a drží se v koutě: zavřít jde i ťuknutím vedle, Escapem
+   a švihem dolů, tohle je jen pro ty, co gesto nezkusí. */
+.detail-zavri{position:absolute;top:10px;right:10px;width:34px;height:34px;
+  color:inherit;opacity:.38;z-index:2}
 .otocit-kriz{transform:rotate(45deg)}
-.detail-nazev{position:relative;z-index:1;flex:none;margin-top:14px;
-  font-size:clamp(22px,6.4vw,27px);letter-spacing:-.01em}
+
+/* Čtvereček místo data na předloze: co se s úkolem dá udělat. Čtvercový je
+   schválně, stejně jako na dlaždici — kolečka v appce odškrtávají. */
+.detail-check{
+  flex:none;width:52px;height:52px;margin-top:26px;display:grid;place-items:center;
+  border-radius:15px;color:inherit;
+  box-shadow:inset 0 0 0 1.6px currentColor;opacity:.42;
+  transition:opacity .16s,transform .13s var(--krok),background .16s;
+}
+.detail-check:active{transform:scale(.9)}
+.detail-check.hotovo{opacity:1;background:currentColor;box-shadow:none}
+.detail-check.hotovo .ikona{color:var(--vrstva)}
+.detail-karta.splneno .detail-check.hotovo .ikona{color:inherit;filter:invert(1)}
+.detail-pocitadlo{flex:none;margin-top:30px}
+
+/* Text drží dole a nahoru mezi ním a kresbou je vzduch. */
+.detail-text{margin-top:auto;position:relative;z-index:1}
+.detail-nazev{flex:none;font-family:var(--pismo);font-weight:700;text-transform:none;
+  font-size:clamp(23px,6.6vw,28px);line-height:1.14;letter-spacing:-.015em}
 /* Text se nelistuje scrollem, ale po stránkách: v hospodě se ťuká líp, než
    posouvá, a půlka věty useknutá okrajem vypadá jako chyba. Výška je pevná,
    počet stránek si detail spočítá z toho, kolik se do ní text nevejde. */
-/* max-height, ne height: krátký popis má kartu nechat nízkou. Stránkuje se
-   až od chvíle, kdy se text nevejde — počet stránek vyjde z toho, kolikrát
-   je text vyšší než okénko. */
-.detail-telo{position:relative;z-index:1;flex:none;margin-top:12px;
-  max-height:10.5em;overflow:hidden}
+.detail-telo{margin-top:12px;max-height:7.4em;overflow:hidden}
 .detail-posuv{transition:transform .3s var(--krok)}
 .detail-popis{font-size:var(--t-text);line-height:1.6;color:var(--text-2)}
 .detail-karta.splneno .detail-popis{color:currentColor;opacity:.78}
 .detail-pozn{margin-top:10px;font-size:var(--t-drobne);line-height:1.55;color:var(--text-3)}
 .detail-karta.splneno .detail-pozn{color:currentColor;opacity:.6}
-.detail-odznaky{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
-.detail-tecky{display:flex;gap:6px;justify-content:center;margin-top:12px;position:relative;z-index:1}
-.detail-spodek{display:flex;align-items:center;gap:10px;margin-top:18px;position:relative;z-index:1}
-/* Taky v barvě kategorie, jen o stupeň výš než karta. Šedá vrstva pod ním
-   vedle zelené nebo žluté karty vypadala do modra a tahala pozornost
-   k sobě — karta má být z jednoho kusu. */
-.detail-fajfka{
-  flex:1;display:flex;align-items:center;gap:11px;min-height:52px;padding:0 16px;
-  border-radius:var(--pilulka);
-  background:color-mix(in srgb,var(--kat) 36%,var(--vrstva-2));
-  font-family:var(--pismo);font-weight:700;font-size:var(--t-text);color:inherit;
-  transition:background .16s,transform .14s var(--krok);
-}
-/* plus a minus u opakovatelných úkolů patří ke stejnému řádku */
-.detail .pocitadlo button{background:color-mix(in srgb,var(--kat) 36%,var(--vrstva-2))}
-.detail-fajfka:active{transform:scale(.97)}
-/* splněno: kolečko se vybarví a fajfka se v něm objeví, stejně jako
-   u odškrtávátek na hero kartě */
-.detail-fajfka.hotovo{background:rgba(255,255,255,.14)}
-.detail-fajfka.hotovo .fajfka{background:var(--akce);box-shadow:none}
-.detail-fajfka.hotovo .fajfka .ikona{opacity:1;transform:scale(1)}
+.detail-odznaky{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+
+/* Spodní řádka: obtížnost, co za to padne, a vpravo tiché drobnosti. */
+.detail-pata{display:flex;align-items:center;gap:10px;margin-top:18px;
+  padding-top:14px;border-top:1px solid var(--linka)}
+.detail-karta.splneno .detail-pata{border-color:rgba(0,0,0,.16)}
+.detail-zaco{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3)}
+.detail-karta.splneno .detail-zaco{color:currentColor;opacity:.72}
+.detail-tuzka{margin-left:auto;width:34px;height:34px;color:inherit;opacity:.45}
+.detail-dal{margin-left:auto;opacity:.45;display:grid;place-items:center}
+.detail-tuzka + .detail-dal{margin-left:0}
 /* Na vybarvené kartě by barevný štítek obtížnosti seděl na barvě kategorie
    jako cizí prvek. Splněný úkol ho má tiše, barvou karty. */
-.detail-karta.splneno .obtiznost{
-  background:rgba(0,0,0,.14);color:inherit;opacity:.8;
-}
+.detail-karta.splneno .obtiznost{background:rgba(0,0,0,.14);color:inherit;opacity:.8}
 .detail-karta.splneno .pocitadlo button{background:rgba(0,0,0,.14)}
+.detail .pocitadlo button{background:color-mix(in srgb,var(--kat) 36%,var(--vrstva-2))}
 
 /* ---------- účtenka: pořadí part ---------- */
 /* Tabulka, co v hospodě nikoho nepřekvapí. Je to jediné místo v appce, kde
