@@ -45,14 +45,14 @@ kartu**: ta je v barvě štace od kraje ke kraji, s lehkým přechodem do tmava.
 Dřív to byla barva naředěná na devět procent do podkladu a devět štací
 vypadalo jako devět stejných karet.
 
-Paleta jde od tmavé rzi po světle růžovou, takže se na ni nedá psát jednou
-barvou textu. `tonHospody()` v `src/lib/barva.ts` proto k barvě **dopočítá
-inkoust**: na světlou se píše natmavo (`#2B2B23`, stejně jako na kartách
-kategorií), na tmavou krémem. A barvu k tomu inkoustu posune na mez, kde drží
-kontrast 4,5:1 — vždycky tím kratším směrem, aby zůstala sama sebou. Rez
-a chrpa jdou dolů do hloubky (rozsvícené by z nich byla lososová a bledý
-fialek), zbytek palety se jen rozsvítí. Odstín ani sytost se nemění, hospodu
-pořád poznáš podle barvy.
+Píše se na ni **krémem, na všech štacích stejně** — jméno hospody má vypadat
+pokaždé stejně. To znamená, že barva musí do tmy: `tonHospody()`
+v `src/lib/barva.ts` ji stáhne pod mez, kde krém drží kontrast 4,5:1.
+Nesráží je ale všechny na jednu světlost, jen je **přemapuje do pásma**
+(0,075–0,132) — kdyby skončily na jedné hodnotě, florida, zlatý samet
+a máslová by vyšly jako tři stejné hnědé. Takhle si pořadí i rozestupy
+nesou s sebou. Odstín zůstává, sytost se u kalných barev naopak přitáhne,
+protože tmavá a nesytá je šedivá.
 
 Uvnitř karty se pak **všechno kreslí z `currentColor`** — pruh trasy, linky,
 kolečka, nadočko. Krémové `--text*` by na pistáciové kartě zmizely.
@@ -226,6 +226,16 @@ Dřív to byly čtyři samostatné bloky se stejnou vahou — číslo, název, t
 a dvě obří tlačítka — takže nic nevedlo a hlavní informace zanikla.
 
 - **Číslo štace** je tiché nadočko nad jménem („4. štace z 9").
+- **Jméno hospody se vždycky zlomí na dva řádky**, i když by se vešlo na
+  jeden (`naDvaRadky()` ve `format.ts`, zlom v místě, po kterém jsou oba
+  řádky nejpodobnější). Karty v pásu jsou stejně vysoké a jméno na nich má
+  mít pokaždé stejný tvar; nechat to na prohlížeči znamená, že se jedno
+  jméno vejde na řádek a druhé ne, takže dvě sousední karty vypadají jako
+  dva různé návrhy. Výjimka: jednopísmenná předložka nesmí zůstat na řádku
+  sama, takže „U Ričího" se nezlomí. Jednořádkové jméno se v tom
+  dvouřádkovém místě vycentruje (`align-content:center`), aby neviselo
+  nahoře. Hagrid má jen čtyřstovku a sedmistovku, takže „ještě o kousek
+  tučnější" dělá obtah `-webkit-text-stroke:.8px`.
 - **Název hospody** je největší text na obrazovce (`clamp(27px, 7.8vw, 38px)`,
   verzálky, těsné prostrkání). Je to hlavní věc, kterou tam člověk hledá.
   Dlouhý název se zalomí do tří řádků a karta se roztáhne.
@@ -466,8 +476,13 @@ tohle přidává.
 **Detail** (`DetailUkolu`): nahoře vlevo kresba, vpravo to, co se s úkolem
 dá udělat (čtvereček u jednorázového, počítadlo u opakovatelného). Pak vzduch
 a dole všechen text: jméno, zadání, poznámka, pod tenkou linkou obtížnost
-a kolik za to padne. Vpravo dole je **decentní šipka**, když má zadání víc
-stránek; listuje se ťuknutím do textu, šipka jen říká, že je kam.
+a kolik za to padne. Dlouhé zadání se **posouvá** (`.detail-telo`, `data-posuv`).
+
+Dřív se listovalo po stránkách ťuknutím do textu a vpravo dole byla decentní
+šipka. Nebylo to na kartě poznat a ťuknutí si lidi vykládali jinak — vypadalo
+to, že appka na ťuknutí nereaguje. Posouvání je to, co každý zkusí první.
+Tah, co začne v `[data-posuv]`, proto `useSvihDolu` ignoruje: jinak by se
+místo posunutí textu zavřel celý detail. Zavřít jde odkudkoli jinud.
 
 Kresba je v detailu schválně malá (124 px). Dokud si brala celou horní
 polovinu, byla z karty ilustrace s popiskem, ne zadání úkolu.
@@ -494,8 +509,17 @@ u skóre na Hře, kde se nedal s nikým srovnat a vedle velkého čísla byl sp�
 tabulka, co v hospodě nikoho nepřekvapí.
 
 Vedoucí parta dostane **razítko „VEDE“** — ten samý rámeček od ruky jako
-„HOTOVO“ na hero kartě. Leží přes tečkované vodiče, ne přes čísla, takže
-nic nezakryje, a naskočí až od první čárky: na začátku večera nikdo nevede.
+„HOTOVO“ na hero kartě. Sedí v řádce se jménem party; přes tečkované vodiče
+vypadalo, že přebilo číslo, které k nim patří. Naskočí až od první čárky:
+na začátku večera nikdo nevede.
+
+Skladba je **převzatá z opravdové účtenky**: štítek a číslo dokladu nahoře,
+pod tím značka a město, heslo mezi lomítky, datum mezi přerušovanými čarami,
+položky s vodicími tečkami, tučný součet, čárky místo čárového kódu, červené
+„Díky!“ a dole patička. Číslo dokladu je **počet čárek na stole dohromady** —
+během večera naskakuje jako počítadlo na pokladně a je to pořád pravdivý údaj.
+Červená je `#E5331F` na velké texty; na drobné popisky by na krémovém papíru
+neudržela kontrast, tak je pro ně tmavší (`#B4220F`).
 
 ## Plochy, které jsme nekreslili
 

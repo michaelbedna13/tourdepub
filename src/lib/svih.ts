@@ -238,6 +238,10 @@ export function useSvihDolu(zavri: () => void) {
 
   function naStisk(e: ReactPointerEvent) {
     if (e.pointerType === "mouse" || odchazi.current) return;
+    // Tah, co začal v posouvatelném kusu karty (dlouhý popis úkolu), patří
+    // jemu. Jinak by se místo posunutí textu zavřel celý detail a dlouhé
+    // zadání by se nedalo dočíst. Zavřít jde odkudkoli jinud.
+    if ((e.target as HTMLElement | null)?.closest?.("[data-posuv]")) return;
     clearTimeout(cekani.current);
     tahlSe.current = false;
     tah.current = novyTah(e.clientX, e.clientY);

@@ -358,15 +358,15 @@ input,textarea,select{caret-color:var(--text)}
    (barva na devět procent do podkladu) byla k nerozeznání od ostatních
    karet v appce.
 
-   Barvy ani inkoust tu nejsou napsané: spočítá je tonHospody() v barva.ts
-   a karta je dostane jako --hosp-plna, --hosp-tma a --na-hosp. Paleta jde
-   od tmavé rzi po světle růžovou, takže na polovinu barev patří krém a na
-   druhou tmavý inkoust. Všechno vevnitř karty se proto kreslí z
-   currentColor, ne z krémových --text* — ty by na pistáciové kartě zmizely. */
+   Barvy tu nejsou napsané: spočítá je tonHospody() v barva.ts a karta je
+   dostane jako --hosp-plna a --hosp-tma. Píše se na ně krémem, na všech
+   štacích stejně, takže barva musí do tmy — paleta jde od tmavé rzi po
+   světle růžovou a jméno hospody má vypadat pokaždé stejně. Všechno
+   vevnitř karty se pak kreslí z currentColor. */
 .hero{
   flex:0 0 calc(100% - 34px);scroll-snap-align:start;
   background:linear-gradient(168deg,var(--hosp-plna),var(--hosp-tma));
-  color:var(--na-hosp);
+  color:var(--text);
   border-radius:var(--r);padding:20px 22px 18px;
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;
@@ -442,12 +442,21 @@ input,textarea,select{caret-color:var(--text)}
      takže stažení je menší než u ostatních nadpisů; jinak se verzálky
      slejvají do jednoho bloku. */
   font-weight:700;
+  /* Hagrid má jen čtyřstovku a sedmistovku, takže „ještě o kousek tučnější"
+     se dá udělat jen obtahem. Osm desetin pixelu je na třicetibodovém písmu
+     asi půl řezu navíc a tvary to ještě nezalepí. */
+  -webkit-text-stroke:.8px currentColor;
   font-size:clamp(30px,8.6vw,42px);line-height:var(--radky-nadpis);letter-spacing:-.005em;
   /* spodní okraj drží vzduch pod jménem i tehdy, když se roztáhne na dva
      řádky a volné místo nad trasou se vyčerpá */
   margin:10px 0 26px;min-height:calc(2em * var(--radky-nadpis));
   overflow-wrap:anywhere;position:relative;z-index:1;
+  /* Místo na dva řádky drží karta vždycky (viz min-height). Jednoslovné
+     jméno se v něm vycentruje, aby neviselo nahoře a sedělo tam, kde má
+     dvouřádkové jméno těžiště. */
+  display:grid;align-content:center;
 }
+.hero-radek{display:block}
 
 /* Trasa sedí dole u linky s odškrtávátky, ne uprostřed karty: je to údaj
    na doplnění, ne to hlavní, a nahoře patří jméno štace. Volné místo si
@@ -703,11 +712,13 @@ input,textarea,select{caret-color:var(--text)}
 .detail-text{margin-top:auto;position:relative;z-index:1}
 .detail-nazev{flex:none;font-family:var(--pismo);font-weight:700;text-transform:none;
   font-size:clamp(23px,6.6vw,28px);line-height:1.14;letter-spacing:-.015em}
-/* Text se nelistuje scrollem, ale po stránkách: v hospodě se ťuká líp, než
-   posouvá, a půlka věty useknutá okrajem vypadá jako chyba. Výška je pevná,
-   počet stránek si detail spočítá z toho, kolik se do ní text nevejde. */
-.detail-telo{margin-top:12px;max-height:7.4em;overflow:hidden}
-.detail-posuv{transition:transform .3s var(--krok)}
+/* Dlouhý popis se posouvá. Výška je pevná, aby karta s dvěma větami a karta
+   s pěti nevypadaly jako dvě různá okna.
+   pan-y vrací svislý tah prohlížeči; karta má touch-action:none kvůli švihu
+   dolů a bez tohohle by se text nedal posunout vůbec. */
+.detail-telo{margin-top:12px;max-height:9.4em;
+  overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;
+  -webkit-overflow-scrolling:touch}
 .detail-popis{font-size:var(--t-text);line-height:1.6;color:var(--text-2)}
 .detail-karta.splneno .detail-popis{color:currentColor;opacity:.78}
 .detail-pozn{margin-top:10px;font-size:var(--t-drobne);line-height:1.55;color:var(--text-3)}
@@ -721,8 +732,6 @@ input,textarea,select{caret-color:var(--text)}
 .detail-zaco{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3)}
 .detail-karta.splneno .detail-zaco{color:currentColor;opacity:.72}
 .detail-tuzka{margin-left:auto;width:34px;height:34px;color:inherit;opacity:.45}
-.detail-dal{margin-left:auto;opacity:.45;display:grid;place-items:center}
-.detail-tuzka + .detail-dal{margin-left:0}
 /* Na vybarvené kartě by barevný štítek obtížnosti seděl na barvě kategorie
    jako cizí prvek. Splněný úkol ho má tiše, barvou karty. */
 .detail-karta.splneno .obtiznost{background:rgba(0,0,0,.14);color:inherit;opacity:.8}
@@ -737,6 +746,10 @@ input,textarea,select{caret-color:var(--text)}
 .uctenka{
   --papir:var(--text);
   --inkoust:var(--podklad);
+  /* Červená z plakátu. Jasná je na velké texty (značka, DÍKY), na drobné
+     popisky by na krémovém papíru nedržela kontrast, tak je pro ně tmavší. */
+  --tisk-cervena:#E5331F;
+  --tisk-cervena-drobne:#B4220F;
   position:relative;margin:4px 0 2px;
   background:var(--papir);color:var(--inkoust);
   font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
@@ -763,13 +776,24 @@ input,textarea,select{caret-color:var(--text)}
 .uctenka::before{top:-8px;transform:scaleY(-1)}
 .uctenka::after{bottom:-8px}
 
-.uc-hlava{text-align:center;padding-bottom:12px}
-.uc-znacka{font-family:var(--nadpisy);font-size:22px;letter-spacing:.04em;line-height:1.1}
-.uc-pod{font-size:11px;letter-spacing:.09em;text-transform:uppercase;opacity:.62;margin-top:5px}
+/* Horní řádka dokladu: co to je a pod jakým číslem. Číslo je počet čárek
+   na stole, takže během večera naskakuje jako počítadlo na pokladně. */
+.uc-vrch{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-size:13px;font-weight:700;letter-spacing:.06em}
+.uc-stitek{color:var(--tisk-cervena-drobne)}
+.uc-cislo{font-family:inherit;font-variant-numeric:tabular-nums}
+
+.uc-hlava{text-align:center;padding:14px 0 0}
+.uc-znacka{font-family:var(--nadpisy);font-size:30px;letter-spacing:.02em;line-height:1.05;
+  color:var(--tisk-cervena)}
+.uc-mesto{font-family:var(--nadpisy);font-size:12px;letter-spacing:.34em;margin:2px 0 0 .34em;
+  color:var(--tisk-cervena)}
+/* Heslo mezi lomítky, jak to tiskne pokladna pod hlavičkou. */
+.uc-heslo{text-align:center;font-size:11.5px;letter-spacing:.02em;margin-top:12px;opacity:.78}
+.uc-datum{text-align:center;font-size:13px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase}
 
 .uc-cara{border-top:1px dashed rgba(21,26,32,.42);margin:12px 0}
-.uc-cara.tlusta{border-top:2px solid rgba(21,26,32,.75);border-bottom:2px solid rgba(21,26,32,.75);
-  height:3px;margin:14px 0}
 
 .uc-parta{position:relative;padding:2px 0}
 .uc-nazev{display:flex;align-items:center;gap:6px}
@@ -794,16 +818,23 @@ input,textarea,select{caret-color:var(--text)}
 .uc-soucet .uc-tecky{border-bottom:1px solid rgba(21,26,32,.5)}
 .uc-kus{flex:none;font-family:inherit;font-variant-numeric:tabular-nums}
 
-/* Razítko leží přes tečky položek, ne přes čísla – nic nezakryje. */
-.uc-razitko{position:absolute;right:50px;top:28px;width:96px;height:34px;z-index:1;
-  display:grid;place-items:center;color:#E5331F;rotate:-9deg;opacity:.92;pointer-events:none}
+/* Razítko sedí v řádce se jménem party. Přes položky leželo na vodicích
+   tečkách a vypadalo, že přebilo číslo, které k nim patří. */
+.uc-razitko{position:relative;flex:none;width:76px;height:27px;
+  display:grid;place-items:center;color:var(--tisk-cervena);rotate:-7deg;
+  opacity:.92;pointer-events:none}
 .uc-razitko svg{position:absolute;inset:0;width:100%;height:100%;fill:currentColor}
-.uc-razitko span{font-family:var(--nadpisy);font-size:13px;letter-spacing:.08em}
+.uc-razitko span{font-family:var(--nadpisy);font-size:11px;letter-spacing:.08em}
 
 .uc-paticka{text-align:center}
-.uc-carky{display:flex;justify-content:center;flex-wrap:wrap;gap:3px 7px;margin:2px 0 10px;
+/* Na opravdové účtence je tu čárový kód. Tady jsou to čárky party, za kterou
+   zapisuješ — a je to ten samý pruh svislých čar. */
+.uc-carky{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 9px;margin:16px 0 12px;
   color:var(--inkoust)}
-.uc-dik{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.6}
+.uc-diky{font-family:var(--nadpisy);font-size:26px;letter-spacing:.01em;line-height:1;
+  color:var(--tisk-cervena)}
+.uc-pata{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  margin-top:18px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.62}
 
 /* ---------- štítky a odškrtávátka ---------- */
 /* obtížnost: barva + půllitry + text, nikdy jen barva */

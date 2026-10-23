@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import type { Kategorie, Ukol } from "../lib/data";
 import { sklonuj, vazat } from "../lib/format";
@@ -27,10 +27,10 @@ interface Props {
  *  větami a karta s pěti pak nevypadají jako dva různé druhy okna a kresba
  *  má vždycky stejné místo.
  *
- *  Text se nescrolluje, ale listuje po stránkách: u dlouhého popisu se
- *  v hospodě posouvá hůř, než se ťuká, a půlka věty useknutá okrajem
- *  vypadá jako chyba. Kolik stránek to má, se zjistí z výšky textu —
- *  dělit to ručně by znamenalo hlídat to u každého úkolu zvlášť. */
+ *  Dlouhý popis se posouvá. Dřív se listoval po stránkách ťuknutím, jenže
+ *  to nebylo na kartě nijak poznat a ťuknutí do textu si lidi vykládali
+ *  jinak — vypadalo to, že appka na ťuknutí nereaguje. Posouvání je to,
+ *  co každý zkusí první. */
 export function DetailUkolu({ u, k, zavri, uprav }: Props) {
   const t = tym();
   const kolik = kolikrat(u.id, t);
@@ -42,22 +42,6 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
   const dolu = useSvihDolu(zavri);
 
   const okno = useRef<HTMLDivElement>(null);
-  const text = useRef<HTMLDivElement>(null);
-  const [stran, setStran] = useState(1);
-  const [kde, setKde] = useState(0);
-
-  // kolik stránek text zabere; měří se po vykreslení a znovu při změně velikosti
-  useLayoutEffect(() => {
-    const spocti = () => {
-      const e = text.current;
-      if (!e) return;
-      const vyska = e.clientHeight || 1;
-      setStran(Math.max(1, Math.ceil(e.scrollHeight / vyska)));
-    };
-    spocti();
-    window.addEventListener("resize", spocti);
-    return () => window.removeEventListener("resize", spocti);
-  }, [u.id]);
 
   useEffect(() => {
     const klavesa = (e: KeyboardEvent) => { if (e.key === "Escape") zavri(); };
@@ -135,17 +119,16 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
         <div className="detail-text">
           <h2 className="detail-nazev">{vazat(u.nazev)}</h2>
 
-          <div className="detail-telo" ref={text}
-            onClick={() => { if (!dolu.tahlSe.current && stran > 1) setKde((x) => (x + 1) % stran); }}>
-            <div className="detail-posuv" style={{ transform: `translateY(${-kde * 100}%)` }}>
-              {u.popis && <p className="detail-popis">{vazat(u.popis)}</p>}
-              {u.pozn && <p className="detail-pozn">{vazat(u.pozn)}</p>}
-              {odznaky.length > 0 && (
-                <div className="detail-odznaky">
-                  {odznaky.map((o) => <span key={o} className="odznak">{vazat(o)}</span>)}
-                </div>
-              )}
-            </div>
+          {/* data-posuv: švih dolů tenhle kus karty nebere, jinak by se
+              místo posunutí textu zavřel detail. Zavírá se odkudkoli jinud. */}
+          <div className="detail-telo" data-posuv>
+            {u.popis && <p className="detail-popis">{vazat(u.popis)}</p>}
+            {u.pozn && <p className="detail-pozn">{vazat(u.pozn)}</p>}
+            {odznaky.length > 0 && (
+              <div className="detail-odznaky">
+                {odznaky.map((o) => <span key={o} className="odznak">{vazat(o)}</span>)}
+              </div>
+            )}
           </div>
 
           <div className="detail-pata">
@@ -158,12 +141,6 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
               <button className="ikonove holy detail-tuzka" aria-label={`Upravit ${u.nazev}`} onClick={uprav}>
                 <Ikona jmeno="i-tuzka" px={15} />
               </button>
-            )}
-            {/* Decentní šipka: popis se listuje ťuknutím, tohle jen říká, že je kam. */}
-            {stran > 1 && (
-              <span className="detail-dal" role="img" aria-label={`Stránka ${kde + 1} z ${stran}`}>
-                <Ikona jmeno="i-zpet" px={14} trida="otocit" />
-              </span>
             )}
           </div>
         </div>

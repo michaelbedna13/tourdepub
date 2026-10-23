@@ -35,40 +35,64 @@ function Polozka({ nazev, kolik }: { nazev: string; kolik: number }) {
   );
 }
 
+/** Datum ve tvaru, v jakém ho tiskne pokladna. */
+function datum(d = new Date()): string {
+  const dva = (x: number) => String(x).padStart(2, "0");
+  return `${dva(d.getDate())}/${dva(d.getMonth() + 1)} ${d.getFullYear()}`;
+}
+
 /** Pořadí part jako účtenka z hospody.
  *
  *  Rozpad čárek (za špeluňky, za škopky, za srandy) stával u skóre na Hře,
  *  kde se nedal s nikým srovnat. Tady má smysl: party jsou pod sebou a je
  *  vidět, kdo nahrál kde. A účtenka je jediná tabulka, co v hospodě nikoho
- *  nepřekvapí — proto vypadá jako účtenka, ne jako tabulka z appky. */
+ *  nepřekvapí — proto vypadá jako účtenka, ne jako tabulka z appky.
+ *
+ *  Skladba je převzatá z opravdové účtenky: štítek a číslo dokladu nahoře,
+ *  pod tím značka, heslo mezi lomítky, datum mezi přerušovanými čarami,
+ *  položky s vodicími tečkami, tlustý součet, čárkový kód a poděkování. */
 export function Uctenka({ poradi, tymId, hospod, ukolu, strop, prepni, uprav }: Props) {
   const muj = poradi.find((p) => p.id === tymId);
+  // Číslo dokladu: kolik čárek je za večer na stole dohromady. Během večera
+  // naskakuje jako počítadlo na pokladně — a je to pořád pravdivý údaj.
+  const cislo = String(poradi.reduce((a, p) => a + p.body, 0)).padStart(6, "0");
   return (
     <div className="uctenka">
+      <div className="uc-vrch">
+        <span className="uc-stitek">ÚČTENKA</span>
+        <span className="uc-cislo cislo">No. {cislo}</span>
+      </div>
+
       <div className="uc-hlava">
         <div className="uc-znacka">TOUR DE PUB</div>
-        <div className="uc-pod">
-          Brno · {hospod} {hospod === 1 ? "špeluňka" : hospod < 5 ? "špeluňky" : "špeluněk"}
-          {" · "}{ukolu} {sklonujUkol(ukolu)}
-        </div>
+        <div className="uc-mesto">BRNO</div>
       </div>
-      <div className="uc-cara tlusta" />
+      <div className="uc-heslo">
+        /{hospod} {hospod === 1 ? "špeluňka" : hospod < 5 ? "špeluňky" : "špeluněk"}
+        {", "}{ukolu} {sklonujUkol(ukolu)}, jedna palice/
+      </div>
+
+      <div className="uc-cara" />
+      <div className="uc-datum">DATUM: {datum()}</div>
+      <div className="uc-cara" />
 
       {poradi.map((p, i) => (
         <div key={p.id} className="uc-parta">
-          {/* Razítko až od první čárky – na začátku večera nikdo nevede. */}
-          {i === 0 && p.body > 0 && (
-            <div className="uc-razitko" aria-hidden="true">
-              <svg viewBox="0 0 172 60"><path d={RAZITKO} fillRule="evenodd" /></svg>
-              <span>VEDE</span>
-            </div>
-          )}
           <div className="uc-nazev">
             <button className="uc-jmeno" onClick={() => prepni(p.id)}>
               <span className="uc-poradi cislo">#{i + 1}</span>
               <span className="uc-znak" style={{ background: p.barva }} />
               <span className="uc-text">{p.nazev}</span>
             </button>
+            {/* Razítko až od první čárky – na začátku večera nikdo nevede.
+                Sedí v řádce se jménem, ne přes položky: přes vodicí tečky
+                vypadalo, jako by přebilo číslo, které k nim patří. */}
+            {i === 0 && p.body > 0 && (
+              <span className="uc-razitko" aria-hidden="true">
+                <svg viewBox="0 0 172 60"><path d={RAZITKO} fillRule="evenodd" /></svg>
+                <span>VEDE</span>
+              </span>
+            )}
             {uprav && (
               <button className="uc-tuzka" onClick={() => uprav(p.id)} aria-label={`Upravit ${p.nazev}`}>
                 <Ikona jmeno="i-tuzka" px={15} />
@@ -87,11 +111,16 @@ export function Uctenka({ poradi, tymId, hospod, ukolu, strop, prepni, uprav }: 
         </div>
       ))}
 
-      <div className="uc-cara tlusta" />
+      <div className="uc-cara" />
       <div className="uc-paticka">
-        {/* Čárkový kód: skutečné čárky party, za kterou zapisuješ. */}
-        {muj && muj.body > 0 && <div className="uc-carky"><Carky kolik={muj.body} vyska={18} /></div>}
-        <div className="uc-dik">{vazat(`Dá se urvat nejvíc ${strop} ${sklonuj(strop)}`)}</div>
+        {/* Čárkový kód: na opravdové účtence je tu čárový kód, tady jsou to
+            skutečné čárky party, za kterou na tomhle telefonu zapisuješ. */}
+        {muj && muj.body > 0 && <div className="uc-carky"><Carky kolik={muj.body} vyska={26} /></div>}
+        <div className="uc-diky">Díky!</div>
+        <div className="uc-pata">
+          <span>{vazat(`max ${strop} ${sklonuj(strop)}`)}</span>
+          <span>TOURDEPUB</span>
+        </div>
       </div>
     </div>
   );

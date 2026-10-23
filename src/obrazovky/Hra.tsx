@@ -6,7 +6,7 @@ import { PruhSyncu } from "../components/PruhSyncu";
 import { Uctenka } from "../components/Uctenka";
 import { ZAKLAD, type Hospoda } from "../lib/data";
 import { tonHospody } from "../lib/barva";
-import { vazat } from "../lib/format";
+import { naDvaRadky, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { RAZITKO } from "../lib/razitko";
 import {
@@ -135,14 +135,13 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   const posledni = cislo === stav.hospody.length;
   // štace je hotová, když je zapsaný příchod i škopek – pak na kartu klapne razítko
   const hotova = !!t?.prichod[h.id] && !!t?.skopek[h.id];
-  // Karta je celá v barvě štace, takže se podle barvy musí vybrat i inkoust:
-  // na pastel se píše natmavo, na sytou barvu krémem. Vevnitř už se pak
-  // všechno kreslí z currentColor, aby to platilo pro oba případy.
+  // Karta je celá v barvě štace; tonHospody() z barvy udělá plochu, na které
+  // drží krémový text. Vevnitř karty se pak všechno kreslí z currentColor.
   const ton = tonHospody(h.barva);
   return (
     <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
       style={{
-        "--hosp-plna": ton.plna, "--hosp-tma": ton.tma, "--na-hosp": ton.inkoust,
+        "--hosp-plna": ton.plna, "--hosp-tma": ton.tma,
       } as React.CSSProperties}
       aria-label={`${cislo}. štace: ${h.nazev}${hotova ? " (hotová)" : ""}`}>
       {/* Razítko přes celou kartu, ne odznáček v rohu: hotová štace má být
@@ -174,7 +173,13 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
           Tady nese tu samou informaci a nic nepřekrývá. */}
       <div className="hero-nadocko">{cislo}. štace z {stav.hospody.length}</div>
 
-      <h1 className="hero-nazev">{h.nazev}</h1>
+      {/* Vícedílné jméno se zlomí vždycky, i když by se vešlo na řádek:
+          karty v pásu jsou stejně vysoké a jméno na nich má mít pokaždé
+          stejný tvar. Jednoslovné jméno se pak v tom dvouřádkovém místě
+          vycentruje, aby neviselo nahoře. */}
+      <h1 className="hero-nazev">
+        {naDvaRadky(h.nazev).map((r) => <span key={r} className="hero-radek">{r}</span>)}
+      </h1>
 
       <div className="hero-trasa">
         <div className="trasa-body" role="img" aria-label={`Štace ${cislo} z ${stav.hospody.length}`}>

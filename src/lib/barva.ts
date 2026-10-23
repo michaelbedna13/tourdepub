@@ -52,70 +52,41 @@ function svetlost({ h, s, l }: Hsl): number {
   return .2126 * kanaly[0] + .7152 * kanaly[1] + .0722 * kanaly[2];
 }
 
-/** Zvedne světlost, dokud barva nemá zadanou relativní světlost. */
-function naSvetlostNahoru(z: Hsl, cil: number): Hsl {
-  let dolu = z.l, nahoru = 1;
-  if (svetlost(z) >= cil) return z;
-  for (let i = 0; i < 18; i++) {
+/** Posune světlost tak, aby barva měla zadanou relativní světlost. */
+function naSvetlost(z: Hsl, cil: number): Hsl {
+  let dolu = 0, nahoru = 1;
+  for (let i = 0; i < 20; i++) {
     const stred = (dolu + nahoru) / 2;
     if (svetlost({ ...z, l: stred }) < cil) dolu = stred; else nahoru = stred;
   }
   return { ...z, l: (dolu + nahoru) / 2 };
 }
 
-/** Stáhne světlost, dokud barva nemá zadanou relativní světlost. */
-function naSvetlostDolu(z: Hsl, cil: number): Hsl {
-  let dolu = 0, nahoru = z.l;
-  if (svetlost(z) <= cil) return z;
-  for (let i = 0; i < 18; i++) {
-    const stred = (dolu + nahoru) / 2;
-    if (svetlost({ ...z, l: stred }) > cil) nahoru = stred; else dolu = stred;
-  }
-  return { ...z, l: (dolu + nahoru) / 2 };
-}
+// Na kartě štace se píše krémem, na všech štacích stejně. Barva se tedy musí
+// vejít pod mez, kde krém drží kontrast 4,5:1 (relativní světlost 0,139).
+const PASMO_OD = .075, PASMO_DO = .132;
+// Spodek přechodu je o tenhle díl tmavší než vršek.
+const TMAVSI = .55;
+// Světlost nejtmavší a nejsvětlejší barvy v paletě hospod. Barva se do pásma
+// nesráží na jednu hodnotu, ale přemapuje: kdyby všechny skončily na stejné
+// světlosti, florida, zlatý samet a máslová by vyšly jako tři stejné hnědé.
+// Takhle si pořadí i rozestupy nesou s sebou.
+const PALETA_OD = .19, PALETA_DO = .66;
 
-// Dva inkousty, mezi kterými se vybírá — tytéž dvě barvy, kterými jsou
-// popsané karty kategorií.
-const TMAVY = "#2B2B23";
-const KREM = "#F2E7CF";
-// Meze, kde inkoust drží kontrast 4,5:1: pod tmavým se barva musí dostat
-// nad DNO, pod krémem pod STROP. Druhá hodnota je spodek přechodu, aby text
-// neslábnul ani v dolním rohu karty.
-const DNO = .34, DNO_TMA = .285;
-const STROP = .105, STROP_TMA = .05;
-// Kolik světlosti se barvě ještě smí přidat, než se místo rozsvícení raději
-// stáhne do hloubky. Rez a chrpa jsou tmavé barvy; rozsvícené na mez pro
-// tmavý inkoust z nich je lososová a bledý fialek, zatímco stažené do tmy
-// zůstanou rzí a chrpou.
-const JESTE_ROZSVITIT = .075;
-const TMAVSI = .84;
-
-/** Barva štace rozepsaná na kartu Hry: plná barva nahoře, stejná barva
- *  o kus tmavší dole a inkoust, kterým se na ni píše.
+/** Barva štace rozepsaná na kartu Hry: plná barva nahoře a stejná barva
+ *  stažená do tmy dole.
  *
  *  Karta štace byla dřív barva naředěná na devět procent do podkladu, takže
- *  devět hospod vypadalo jako devět stejných karet. Teď je v barvě celá,
- *  jako karty kategorií. Paleta hospod jde od tmavé rzi po světle růžovou,
- *  takže jedna pevná barva textu nemůže fungovat: podle barvy se vybere
- *  inkoust a barva se k němu posune na mez čitelnosti. Posouvá se vždycky
- *  tím kratším směrem, aby zůstala sama sebou — odstín i sytost se nemění. */
-export function tonHospody(barva: string): { plna: string; tma: string; inkoust: string } {
+ *  devět hospod vypadalo jako devět stejných karet. Teď je v barvě celá.
+ *  Píše se na ni krémem — na všech štacích stejně, protože jméno hospody má
+ *  vypadat pokaždé stejně — a to znamená, že barva musí do tmy. Odstín
+ *  i sytost zůstávají, takže hospodu pořád poznáš podle barvy; sytost se
+ *  u kalných barev naopak přitáhne, protože tmavá a nesytá je šedivá. */
+export function tonHospody(barva: string): { plna: string; tma: string } {
   const z = naHsl(barva);
-  const naTmavy = DNO - svetlost(z);
-
-  if (naTmavy <= JESTE_ROZSVITIT) {
-    // světlá barva (nebo skoro): necháme ji svítit a píšeme na ni natmavo
-    const plna = naSvetlostNahoru(z, DNO);
-    let dno = { ...plna, l: plna.l * TMAVSI };
-    if (svetlost(dno) < DNO_TMA) dno = naSvetlostNahoru(dno, DNO_TMA);
-    return { plna: zHsl(plna), tma: zHsl(dno), inkoust: TMAVY };
-  }
-
-  // tmavá barva: stáhne se do hloubky a píše se na ni krémem. Sytost se
-  // přitom přitáhne, protože tmavá barva o sobě vypadá šedivě.
-  const syta = { ...z, s: Math.min(.92, Math.max(z.s * 1.1, .26)) };
-  const plna = naSvetlostDolu(syta, STROP);
-  let dno = { ...plna, l: plna.l * TMAVSI };
-  if (svetlost(dno) < STROP_TMA) dno = naSvetlostNahoru(dno, STROP_TMA);
-  return { plna: zHsl(plna), tma: zHsl(dno), inkoust: KREM };
+  const dil = Math.min(1, Math.max(0, (svetlost(z) - PALETA_OD) / (PALETA_DO - PALETA_OD)));
+  const cil = PASMO_OD + (PASMO_DO - PASMO_OD) * dil;
+  const syta = { ...z, s: Math.min(.92, Math.max(z.s * 1.15, .18)) };
+  const plna = naSvetlost(syta, cil);
+  return { plna: zHsl(plna), tma: zHsl({ ...plna, l: plna.l * TMAVSI }) };
 }
