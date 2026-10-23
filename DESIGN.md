@@ -619,8 +619,16 @@ to, že appka na ťuknutí nereaguje. Posouvání je to, co každý zkusí prvn�
 Tah, co začne v `[data-posuv]`, proto `useSvihDolu` ignoruje: jinak by se
 místo posunutí textu zavřel celý detail. Zavřít jde odkudkoli jinud.
 
-Kresba je v detailu schválně malá (136 px). Dokud si brala celou horní
-polovinu, byla z karty ilustrace s popiskem, ne zadání úkolu.
+Kresba je v detailu 152 px. Velká na půl karty z ní dělala ilustraci
+s popiskem, ne zadání úkolu; malá v rohu zase plavala v prázdnu, protože
+karta měla spodní mez 420 px a text se tlačil k dolní hraně
+(`margin-top: auto`). Mezera mezi kresbou a nadpisem tím vycházela na každém
+úkolu jinak. **Mezera je proto pevná (24 px) a spodní mez karty nižší
+(300 px)** — karta sedne na obsah.
+
+**Náhradní ikona vyplní rámeček stejně jako kresba.** Dřív byla o třetinu
+menší (104 proti 136), takže úkol s kresbou a úkol bez ní vypadaly jako dvě
+různě velké karty.
 
 Velikost a posun si **každá kresba může doladit** (`LADENI_KRESEB`
 v `src/lib/kresby-ladeni.ts`). Kresby se do čtverce ořezávají na obálku, takže

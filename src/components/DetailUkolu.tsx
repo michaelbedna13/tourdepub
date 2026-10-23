@@ -87,10 +87,13 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
             vedle sebe a ten horní nic nedělal. Zavírá se ťuknutím vedle,
             švihem dolů a Escapem. */}
         <div className="detail-vrch">
+          {/* Kresba i náhradní ikona vyplní rámeček stejně. Ikona bývala
+              o třetinu menší, takže úkol s kresbou a úkol bez ní vypadaly
+              jako dvě různě velké karty. */}
           <div className="detail-obraz">
             {KRESBY[u.id]
               ? <Kresba id={u.id} trida="detail-kresba" />
-              : <Ikona jmeno={u.ikona ?? k.ikona} px={104} trida="detail-kresba" />}
+              : <Ikona jmeno={u.ikona ?? k.ikona} px={152} trida="detail-kresba" />}
           </div>
 
           {opakovatelny ? (

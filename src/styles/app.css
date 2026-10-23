@@ -655,12 +655,12 @@ input,textarea,select{caret-color:var(--text)}
      tohohle si svislý tah zabere posun stránky, takže by se švih dolů
      nikdy nechytil */
   touch-action:none;
-  /* Výška podle obsahu, ne napevno. Dokud si kresba brala celou horní
-     polovinu, musela být pevná, jinak každá karta vypadala jinak; teď je
-     kresba malá a ukotvená nahoře, takže krátkému zadání sluší nízká karta
-     líp než půl obrazovky prázdna. Spodní mez drží karty v galerii podobné,
-     horní je strop obrazovky. */
-  min-height:420px;
+  /* Výška podle obsahu. Spodní mez byla 420 px a к tomu se text tlačil dolů
+     (margin-top:auto), takže mezi kresbou a nadpisem zůstávala díra, která
+     byla na každém úkolu jinak velká — kresba v ní pak plavala někde nahoře
+     v prázdnu. Teď je mez nižší a mezera pod kresbou pevná, takže karta sedne
+     na obsah. Horní mez je strop obrazovky. */
+  min-height:300px;
   max-height:min(620px,calc(100dvh - var(--vrch) - env(safe-area-inset-bottom) - 56px));
   display:flex;flex-direction:column;
   padding:20px 22px 18px;border-radius:var(--r);
@@ -687,7 +687,7 @@ input,textarea,select{caret-color:var(--text)}
    k hornímu okraji karty. */
 .detail-vrch{display:flex;align-items:flex-start;justify-content:space-between;
   gap:12px;position:relative;z-index:1;margin-top:-6px}
-.detail-obraz{width:136px;height:136px;display:grid;place-items:center;flex:none;
+.detail-obraz{width:152px;height:152px;display:grid;place-items:center;flex:none;
   /* kresba smí mírně přetéct, když si přidá na velikosti */
   overflow:visible}
 .detail-kresba{
@@ -710,8 +710,9 @@ input,textarea,select{caret-color:var(--text)}
 .detail-karta.splneno .detail-check.hotovo .ikona{color:inherit;filter:invert(1)}
 .detail-pocitadlo{flex:none}
 
-/* Text drží dole a nahoru mezi ním a kresbou je vzduch. */
-.detail-text{margin-top:auto;position:relative;z-index:1}
+/* Pevná mezera pod kresbou, ne „co zbyde". Dokud se text tlačil k dolní
+   hraně, byla mezera na každém úkolu jinak velká. */
+.detail-text{margin-top:24px;position:relative;z-index:1}
 .detail-nazev{flex:none;font-family:var(--pismo);font-weight:700;text-transform:none;
   font-size:clamp(23px,6.6vw,28px);line-height:1.14;letter-spacing:-.015em}
 /* Dlouhý popis se posouvá. Výška je pevná, aby karta s dvěma větami a karta
