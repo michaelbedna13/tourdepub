@@ -964,7 +964,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .uvod{
   /* Jedna mezera na celou průpravu. Rozestupy po stránce se tím drží
      jednoho rytmu, místo aby si každý kus vymýšlel svoje číslo. */
-  --uvod-mezera:26px;
+  --uvod-mezera:30px;
   position:fixed;inset:0;z-index:120;
   padding:calc(env(safe-area-inset-top) + 22px) 24px calc(env(safe-area-inset-bottom) + 20px);
   background:var(--podklad);color:var(--inkoust,var(--text));
@@ -1000,48 +1000,45 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   gap:16px;width:100%;max-width:420px;padding-bottom:var(--uvod-mezera)}
 .uvod-znak{height:30px;width:auto;display:block;color:currentColor}
 
-/* Stránka stojí na jednom pravidle: na plakátu jsou DVĚ skupiny u protilehlých
-   okrajů a mezi nimi jedna velká mezera. Volné místo proto není rozeseté po
-   stránce, ale celé v jednom bloku — v tom s kresbou, který jediný roste.
-   Dřív se kresba v tom bloku ještě centrovala, takže plavala někde uprostřed
-   zbytku a na každé stránce jinde: mezery vycházely náhodně a vypadalo to
-   jako chyba sazby, ne jako kompozice. */
+/* Kresba, nadpis a věta jsou JEDEN blok a ten je vycentrovaný mezi hlavičkou
+   a lištou. Volné místo se tím rozdělí nad něj a pod něj stejným dílem,
+   takže každá stránka dýchá stejně, ať je text nahoře, uprostřed nebo dole.
+   Dřív rostla jen kresba, takže na stránkách, kde text vede, se slepil nadpis
+   rovnou pod značku a všechen vzduch zůstal dole u kresby. */
 .uvod-stranka{
   position:relative;z-index:1;
-  display:flex;flex-direction:column;align-items:stretch;text-align:left;
+  display:flex;flex-direction:column;align-items:stretch;justify-content:center;
+  text-align:left;
   max-width:420px;width:100%;flex:1;min-height:0;
   animation:uvod-prichod .26s var(--krok) both;
 }
-/* Kresba je jediný kus, který roste — volné místo je tím vždycky kolem ní,
-   ne rozeseté po stránce. */
+/* Kresba nesmí růst — smrsknout se smí, když se blok nevejde. Kdyby rostla,
+   přetáhla by si volné místo zpátky k sobě a vycentrování by nebylo k ničemu. */
 .uvod-kresba{
-  flex:1 1 auto;min-height:0;width:100%;
+  flex:0 1 auto;min-height:0;width:100%;
   display:flex;align-items:center;justify-content:center;
   color:currentColor;
   animation:kresba-prijde .5s .1s var(--krok) both;
 }
-/* Roste do volného místa, ale jen po strop. Dvě věci naráz: bez stropu byla
-   kresba na každé stránce jinak velká (podle toho, kolik zbylo textu) a čtyři
-   plakáty vedle sebe nevypadaly jako série; a s pevnou velikostí zas zůstala
-   uprostřed stránky díra, protože volné místo se nemělo kam podít. Takhle je
-   kresba na všech stránkách stejně velká a zbytek se rozdělí na dvě souměrné
-   mezery nad ní a pod ní. */
-.uvod-cmaranice{height:100%;max-height:clamp(190px,38vh,340px);
+/* Pevná výška podle displeje, ne podle toho, kolik zbylo textu: čtyři plakáty
+   vedle sebe mají mít kresbu stejně velkou. max-height je tu kvůli malým
+   displejům, kde se blok musí vejít. */
+.uvod-cmaranice{height:clamp(190px,38vh,320px);max-height:100%;
   width:auto;max-width:100%}
 @keyframes kresba-prijde{from{opacity:0;transform:translateY(14px) scale(.96)}}
 
 /* Tři skladby. Liší se tím, kde leží text a ke kterému okraji se kresba
    tiskne — mezera je vždycky jen jedna a vždycky mezi skupinami. */
 /* výchozí: kresba nahoře, text dole */
-.uvod-stranka .uvod-kresba{padding-bottom:var(--uvod-mezera)}
+.uvod-stranka .uvod-kresba{margin-bottom:var(--uvod-mezera)}
 /* nadpis nahoře, kresba uprostřed, věta dole */
 .uvod-stranka.kolem .uvod-nadpis{order:1}
-.uvod-stranka.kolem .uvod-kresba{order:2;padding:var(--uvod-mezera) 0}
+.uvod-stranka.kolem .uvod-kresba{order:2;margin:var(--uvod-mezera) 0}
 .uvod-stranka.kolem .uvod-text{order:3;margin-top:0}
 /* nadpis i věta nahoře, kresba pod nimi */
 .uvod-stranka.nahore .uvod-nadpis{order:1}
 .uvod-stranka.nahore .uvod-text{order:2}
-.uvod-stranka.nahore .uvod-kresba{order:3;padding:var(--uvod-mezera) 0 0}
+.uvod-stranka.nahore .uvod-kresba{order:3;margin:var(--uvod-mezera) 0 0}
 /* kotva kresby: na střed, nebo přitisknutá ke kraji jako na plakátu */
 .uvod-kresba.vlevo{justify-content:flex-start}
 .uvod-kresba.vpravo{justify-content:flex-end}

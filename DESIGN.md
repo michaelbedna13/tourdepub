@@ -471,20 +471,29 @@ viset jedno slovo.
 Věta pod nadpisem je výklad, ne druhý nadpis: tišší a s volnějším prokladem,
 aby mezi ní a nadpisem byl rozdíl **ve váze, ne jen ve velikosti**.
 
-**Volné místo je celé kolem kresby, ne rozeseté po stránce.** Stránka má
-jednu mezeru (`--uvod-mezera`) a jediný kus, který roste — blok s kresbou.
-Kresba v něm roste do volného místa, ale **jen po strop**
-(`clamp(190px, 38vh, 340px)`), a to řeší dvě věci naráz:
+**Kresba, nadpis a věta jsou jeden blok a ten je vycentrovaný** mezi
+hlavičkou a lištou. Volné místo se tím rozdělí nad něj a pod něj stejným
+dílem, takže každá stránka dýchá stejně, ať je text nahoře, uprostřed nebo
+dole.
 
-- Bez stropu byla kresba na každé stránce jinak velká — podle toho, kolik
-  zbylo textu — a čtyři plakáty vedle sebe nevypadaly jako série.
-- S pevnou velikostí zas uprostřed stránky zůstala díra, protože volné
-  místo se nemělo kam podít.
+Napoprvé rostla jen kresba a zbytek byl pevný. Na stránkách, kde vede text,
+se tím nadpis slepil rovnou pod značku a všechen vzduch zůstal dole u kresby
+— vypadalo to, že se text o hlavičku opírá. Kresba proto **nesmí růst**
+(`flex: 0 1 auto`): kdyby rostla, přetáhne si volné místo zpátky k sobě
+a vycentrování je k ničemu. Výšku má podle displeje
+(`clamp(190px, 38vh, 320px)`), ne podle toho, kolik zbylo textu — čtyři
+plakáty vedle sebe mají mít kresbu stejně velkou. Smrsknout se smí, když se
+blok nevejde.
 
-Takhle je kresba na všech stránkách stejná a zbytek se rozdělí na dvě
-souměrné mezery nad ní a pod ní. Na malém telefonu (375 × 667) vychází
-253 px kresby a mezery 24 a 50, na velkém (430 × 932) 340 px a mezery
-108 a 134.
+Naměřený vzduch nad blokem a pod ním (čtyři stránky za sebou):
+
+| displej | kresba | nad / pod |
+|---|---|---|
+| 375 × 667 | 253 px | 42/42 · 22/22 · 30/29 · 43/42 |
+| 393 × 852 | 320 px | 99/99 · 79/79 · 87/87 · 100/99 |
+| 430 × 932 | 320 px | 136/136 · 116/116 · 136/136 · 137/136 |
+
+Rozdíl mezi stránkami je jen délkou textu, souměrnost drží všude.
 
 **Žádné dvě stránky nejsou poskládané stejně.** Čtyři stejné obrazovky za
 sebou vypadají jako formulář, ne jako série plakátů, takže se střídají tři
