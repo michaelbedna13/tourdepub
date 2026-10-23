@@ -7,7 +7,7 @@
 //
 // Spuštění: node scripts/kresli-uvod.mjs (bez závislostí; náhodnost je pevná)
 import { writeFileSync } from "node:fs";
-import { nasad, cut, ell, rect, stroke } from "./cary.mjs";
+import { nasad, cut, ell, rect, srpek as usmev, stroke } from "./cary.mjs";
 
 const I = (d) => ["i", d], C = (d) => ["c", d];
 // Mírnější kymácení než u ikon. Amplituda je v souřadnicích čtverce, takže
@@ -16,18 +16,6 @@ const I = (d) => ["i", d], C = (d) => ["c", d];
 // jen se ztiší.
 const ROUGH = { amp: 1.3, step: 7, tension: 0.42 };
 const HRUBE = { amp: 1.7, step: 6, tension: 0.4, nicks: 1 };
-
-/** Úsměv jako vystřižený srpek: vnější oblouk tam, vnitřní zpátky. */
-function usmev(cx, cy, r, w, od = 25, do_ = 155) {
-  const rad = (d) => (d * Math.PI) / 180;
-  const ven = [], zpet = [];
-  for (let i = 0; i <= 10; i++) {
-    const a = rad(od + ((do_ - od) * i) / 10);
-    ven.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
-    zpet.push([cx + Math.cos(a) * (r - w), cy + Math.sin(a) * (r - w)]);
-  }
-  return [...ven, ...zpet.reverse()];
-}
 
 const KRESBY = {
   // Škopek, co si to šlape po štacích.

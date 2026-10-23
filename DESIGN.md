@@ -626,6 +626,18 @@ karta měla spodní mez 420 px a text se tlačil k dolní hraně
 úkolu jinak. **Mezera je proto pevná (24 px) a spodní mez karty nižší
 (300 px)** — karta sedne na obsah.
 
+**Kresbu má každý úkol.** Buď obtaženou od ruky (`kresby.ts`), nebo
+kreslenou (`ukol-kresby.ts`, generuje `scripts/kresli-ukoly.mjs` — ta samá
+ruka jako ikony, jen velká). Obtažená má vždycky přednost; kreslená je
+výplň, dokud k úkolu žádná od ruky není, a sama ustoupí, jakmile přibude.
+
+Co se při kreslení ukázalo — na čtvercové ploše o sto bodech je
+**rozpoznatelnost věc jednoho nápadu, ne detailu**. Mince nad nastavenou
+dlaní vyšla jako hlava nad trupem (busta, ne žebrák), růže se soustřednými
+kroužky jako terč a se dvěma oblouky uvnitř jako obličej, dvě postavičky nad
+sebou jako jeden flíček. Pokaždé pomohlo vyměnit nápad, ne doladit tvary:
+z růže srdce, z nošení na ramenou bota nad čárou země.
+
 **Náhradní ikona vyplní rámeček stejně jako kresba.** Dřív byla o třetinu
 menší (104 proti 136), takže úkol s kresbou a úkol bez ní vypadaly jako dvě
 různě velké karty.

@@ -6,8 +6,7 @@ import { odmena } from "../lib/odmena";
 import { jdePridat, kolikrat, pridejUkol, tipNaStaci, tym, uberUkol } from "../lib/stav";
 import { useSvihDolu } from "../lib/svih";
 import { Ikona } from "./Ikona";
-import { Kresba } from "./Kresba";
-import { KRESBY } from "../lib/kresby";
+import { Kresba, maKresbu } from "./Kresba";
 import { Obtiznost } from "./Obtiznost";
 
 interface Props {
@@ -91,7 +90,7 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
               o třetinu menší, takže úkol s kresbou a úkol bez ní vypadaly
               jako dvě různě velké karty. */}
           <div className="detail-obraz">
-            {KRESBY[u.id]
+            {maKresbu(u.id)
               ? <Kresba id={u.id} trida="detail-kresba" />
               : <Ikona jmeno={u.ikona ?? k.ikona} px={152} trida="detail-kresba" />}
           </div>

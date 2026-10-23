@@ -3,8 +3,7 @@ import { sklonuj, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { jdePridat, kolikrat, pridejUkol, tym } from "../lib/stav";
 import { Ikona } from "./Ikona";
-import { Kresba } from "./Kresba";
-import { KRESBY } from "../lib/kresby";
+import { Kresba, maKresbu } from "./Kresba";
 
 interface Props {
   u: Ukol;
@@ -54,7 +53,7 @@ export function KartaUkolu({ u, k, otevri }: Props) {
           Kresby dodává scripts/prevod-kreseb.py ze složky kresby/. */}
       <div className="ukol-karta-obraz">
         <Kresba id={u.id} trida="ukol-karta-kresba" />
-        {!KRESBY[u.id] && <Ikona jmeno={u.ikona ?? k.ikona} px={96} trida="ukol-karta-kresba" />}
+        {!maKresbu(u.id) && <Ikona jmeno={u.ikona ?? k.ikona} px={96} trida="ukol-karta-kresba" />}
       </div>
 
       {/* Jméno přes celou šířku, ať se neláme uprostřed slova; čtvereček až

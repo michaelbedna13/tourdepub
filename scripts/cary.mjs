@@ -61,3 +61,16 @@ export const stroke = (x1, y1, x2, y2, w) => {
   const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, nx = (-dy / len) * w / 2, ny = (dx / len) * w / 2;
   return [[x1 + nx, y1 + ny], [x2 + nx, y2 + ny], [x2 - nx, y2 - ny], [x1 - nx, y1 - ny]];
 };
+
+/** Srpek — úsměv, oblouk zvuku, cokoli, co je „oblouk o nějaké tloušťce".
+ *  Vnější oblouk tam, vnitřní zpátky; úhly ve stupních, nula je vpravo. */
+export function srpek(cx, cy, r, w, od = 25, do_ = 155, kroku = 10) {
+  const rad = (d) => (d * Math.PI) / 180;
+  const ven = [], zpet = [];
+  for (let i = 0; i <= kroku; i++) {
+    const a = rad(od + ((do_ - od) * i) / kroku);
+    ven.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+    zpet.push([cx + Math.cos(a) * (r - w), cy + Math.sin(a) * (r - w)]);
+  }
+  return [...ven, ...zpet.reverse()];
+}

@@ -239,8 +239,16 @@ nemůže potkat nový skript.
 
 ## Kresby
 
-Vlastní kresbu můžou mít **úkoly** v galerii. Dokud ji nemají, drží místo
-ikona — kresba pak jen vskočí na její místo a nic se kolem toho nepřerovná.
+Kresbu má **každý úkol**. Berou se ze dvou zdrojů, v tomhle pořadí:
+
+1. **Obtažená od ruky** (`src/lib/kresby.ts`) — z obrázku, viz níž. Má vždycky
+   přednost: ruka je ruka.
+2. **Kreslená** (`src/lib/ukol-kresby.ts`, generuje `scripts/kresli-ukoly.mjs`)
+   — ta samá ruka jako ikony, jen velká. Je to výplň pro úkoly, ke kterým
+   ještě žádná kresba od ruky není.
+
+Když přibude obtažená kresba, kreslená se sama přestane používat a nic se
+kolem toho nepřerovná.
 
 Stránky průpravy v úvodu mají vlastní **čmáranice**. Ty se nekreslí z obrázku,
 ale generují se stejně jako ikony (`scripts/kresli-uvod.mjs` →
