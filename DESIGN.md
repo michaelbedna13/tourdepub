@@ -443,6 +443,17 @@ drobná lišta se značkou a číslem stránky, dole nadpis s větou a pod tím 
 s ovládáním — to je zámek z tištěného plakátu: uprostřed obrázek, popisky
 potichu po okrajích.
 
+**Nadpis je těžký.** Globální `h1` má v appce čtyřstovku (velké nadpisy jsou
+schválně lehké), tady se váha vrací na sedmistovku a obtah
+(`-webkit-text-stroke: .7px`) přidá ten kousek navíc, co Hagrid nemá — stejný
+trik jako u jména hospody na hero kartě. Prokládání je stažené pod jedničku:
+velký blok verzálek drží pohromadě a tím působí těžší, aniž by se musel
+zvětšovat. `text-wrap: balance` vyrovná délku řádků, ať na druhém nezůstane
+viset jedno slovo.
+
+Věta pod nadpisem je výklad, ne druhý nadpis: tišší a s volnějším prokladem,
+aby mezi ní a nadpisem byl rozdíl **ve váze, ne jen ve velikosti**.
+
 **Žádné dvě stránky nejsou poskládané stejně.** Čtyři stejné obrazovky za
 sebou vypadají jako formulář, ne jako série plakátů, takže se střídají tři
 skladby (text pod kresbou / nadpis nahoře a věta dole / text celý nahoře)

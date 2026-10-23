@@ -994,7 +994,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 /* Horní lišta: značka vlevo, číslo stránky vpravo. Je to ten samý zámek
    jako na tištěném plakátu — drobné popisky po okrajích, uprostřed obrázek. */
 .uvod-hlava{flex:none;display:flex;align-items:center;justify-content:space-between;
-  gap:16px;width:100%;max-width:420px}
+  gap:16px;width:100%;max-width:420px;padding-bottom:6px}
 .uvod-znak{height:30px;width:auto;display:block;color:currentColor}
 .uvod-krok{font-family:var(--pismo);font-weight:700;font-size:11px;
   letter-spacing:.16em;text-transform:uppercase;opacity:.65}
@@ -1010,7 +1010,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .uvod-kresba{
   flex:1;min-height:120px;width:100%;
   display:flex;align-items:center;justify-content:center;
-  margin:14px 0 26px;color:currentColor;
+  margin:18px 0 38px;color:currentColor;
   animation:kresba-prijde .5s .1s var(--krok) both;
 }
 .uvod-cmaranice{width:auto;height:100%;max-width:86%;max-height:300px}
@@ -1021,13 +1021,13 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    kotvy kresby stačí na to, aby žádné dvě nebyly stejné.
    Výchozí (bez třídy): kresba nahoře, nadpis a věta pod ní. */
 /* nadpis nahoře, kresba uprostřed, věta dole */
-.uvod-stranka.kolem .uvod-nadpis{order:1;margin-top:6px}
-.uvod-stranka.kolem .uvod-kresba{order:2;margin:24px 0}
+.uvod-stranka.kolem .uvod-nadpis{order:1;margin-top:10px}
+.uvod-stranka.kolem .uvod-kresba{order:2;margin:30px 0}
 .uvod-stranka.kolem .uvod-text{order:3;margin-top:0}
 /* nadpis i věta nahoře, kresba pod nimi */
-.uvod-stranka.nahore .uvod-nadpis{order:1;margin-top:6px}
+.uvod-stranka.nahore .uvod-nadpis{order:1;margin-top:10px}
 .uvod-stranka.nahore .uvod-text{order:2}
-.uvod-stranka.nahore .uvod-kresba{order:3;margin:24px 0 4px}
+.uvod-stranka.nahore .uvod-kresba{order:3;margin:30px 0 6px}
 /* kotva kresby: na střed, nebo přitisknutá ke kraji jako na plakátu.
    Kresba se u kraje zúží — dokud zabírala celou šířku, nebylo poznat,
    že je přitisknutá, a vypadalo to jen jako nepovedené vycentrování. */
@@ -1036,15 +1036,26 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .uvod-kresba.vlevo .uvod-cmaranice,
 .uvod-kresba.vpravo .uvod-cmaranice{max-width:74%}
 
-.uvod-nadpis{flex:none;font-size:clamp(32px,9.4vw,44px);
-  line-height:1.04;letter-spacing:-.025em;color:currentColor}
-.uvod-text{flex:none;margin-top:12px;font-size:var(--t-hlavni);
-  line-height:1.55;opacity:.78;max-width:34em}
+/* Nadpis je na plakátu to druhé, co oko chytne po kresbě, takže musí mít
+   váhu. Globální h1 má čtyřstovku (velké nadpisy v appce jsou lehké), tady
+   se proto váha vrací na sedmistovku a obtah přidá ten kousek navíc, co
+   Hagrid nemá — stejný trik jako u jména hospody na hero kartě.
+   Prokládání je stažené pod jedničku: velký blok verzálek drží pohromadě
+   a tím působí těžší, aniž by se musel zvětšovat. */
+.uvod-nadpis{flex:none;font-weight:700;-webkit-text-stroke:.7px currentColor;
+  font-size:clamp(34px,10.2vw,50px);
+  line-height:.98;letter-spacing:-.03em;color:currentColor;
+  /* vyrovná délku řádků, ať nezůstane na druhém řádku jedno slovo */
+  text-wrap:balance;}
+/* Věta pod nadpisem je výklad, ne druhý nadpis: tišší a s volnějším
+   prokladem, aby mezi ní a nadpisem byl rozdíl ve váze, ne jen ve velikosti. */
+.uvod-text{flex:none;margin-top:18px;font-size:var(--t-hlavni);
+  line-height:1.62;opacity:.72;max-width:30em}
 
 /* Spodní lišta: tečky, Přeskočit a Dál. Tři drobnosti na jedné řádce po
    okrajích — zase ten plakátový zámek, ne tlačítková lišta. */
 .uvod-spodek{flex:none;display:flex;align-items:center;gap:14px;
-  width:100%;max-width:420px;padding-top:20px}
+  width:100%;max-width:420px;padding-top:30px}
 .uvod-tecky{display:flex;gap:6px;flex:none}
 .uvod-tecka{width:18px;height:3px;border-radius:2px;
   background:color-mix(in srgb,currentColor 24%,transparent);
