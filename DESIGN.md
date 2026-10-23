@@ -218,6 +218,21 @@ při přepočítání neposkakovalo.
 Prohlížeč je dosadí z náhradního písma a je to v řádku poznat. Při výměně
 psacího fontu zkontroluj `ť ď ě ů ř Ú Š Č Ž Ň`; dělá to `scripts/stahni-pisma.mjs`.
 
+## Horní lišta
+
+Vlevo **značka**, vpravo za koho se zapisuje. Nadpis obrazovky stojí **pod
+lištou**, na vlastní řádce.
+
+Dřív byl nadpis v liště a značka nikde — v jedné řádce se tlačily tři věci
+(nadpis, pilulka týmu, menu) a na značku nezbylo místo; nadpis se navíc musel
+zkracovat třemi tečkami, aby se dlouhé jméno party vešlo. Takhle je to ten
+samý zámek jako v úvodu (značka vlevo, drobnost vpravo) a nadpis má celou
+šířku pro sebe, takže může být větší (`clamp(26px, 8vw, 34px)` místo
+`clamp(22px, 7vw, 27px)`) a nekrátí se.
+
+Na podstránce je místo značky **kolečko zpátky**: dvě věci vlevo by se zase
+praly a cesta ven je tam potřebnější než logo.
+
 ## Hero karta štace
 
 Obrazovka Hra stojí na jedné kartě, která nese **všechno o téhle štaci**:

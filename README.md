@@ -333,7 +333,9 @@ Kreslí se barvou textu (`currentColor`), takže funguje na světlém i tmavém 
 `src/lib/logo.ts` je ten samý tvar jako dráha pro komponentu `<Logo>`, aby se vkládal
 rovnou do stránky bez dalšího požadavku. Oba soubory jsou generované, needitovat ručně.
 
-V rozhraní logo není — nese ho ikona appky, úvodní obrazovka a patička Pravidel.
+Logo stojí **vlevo v horní liště** na každé hlavní obrazovce (na podstránce je
+tam místo něj kolečko zpátky), dál ho nese ikona appky, úvodní obrazovka
+a patička Pravidel.
 Proč, je v `DESIGN.md`.
 
 ## Úvod po spuštění

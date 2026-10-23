@@ -276,30 +276,30 @@ input,textarea,select{caret-color:var(--text)}
    teď rovnou na Hře, takže se do menu chodí jednou za večer. Zůstal po tom
    jen pruh přes celou šířku, který nikdy nebyl pěkný a zakrýval obsah. */
 .hlava{display:flex;align-items:center;gap:10px;min-height:44px;margin-bottom:32px}
-/* nadpis se smí zkrátit, ale nikdy nesmí zmizet úplně: do lišty se vedle sebe
-   tlačí tři věci a dlouhé jméno týmu na úzkém telefonu ho jinak vytlačí na nulu */
-.hlava-text{flex:1 1 auto;min-width:86px}
-.hlava-text h1{font-size:clamp(22px,7vw,27px);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* na Hře nadpis není, tak ať si místo nebere */
-.hlava-text:empty{flex:1 1 0;min-width:0}
+/* Značka v liště, jako v úvodu. Dřív se o místo prala s nadpisem; ten je teď
+   pod lištou, takže tu značka stojí sama a má kolem sebe vzduch. */
+.hlava-znak{height:26px;width:auto;display:block;flex:none;color:var(--text);opacity:.92}
+.hlava-vypln{flex:1 1 auto}
+/* Nadpis obrazovky na vlastní řádce pod lištou. Má celou šířku, takže může
+   být větší a nemusí se zkracovat třemi tečkami. */
+.hlava-text{margin-bottom:30px}
+.hlava:has(+ .hlava-text){margin-bottom:18px}
+.hlava-text h1{font-size:clamp(26px,8vw,34px)}
 .hlava-drobne{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3);
-  letter-spacing:.07em}
+  letter-spacing:.07em;margin-bottom:2px}
 /* Podnadpis patří k tomu, co je nad ním, ne doprostřed. Záporný okraj
    byl dřív napevno v podnadpisu a na obrazovce kategorie, kde nad ním
    stojí nadpis s barevnou čárou, si ukousl i jeho mezeru. */
 .podnadpis{color:var(--text-2);font-size:var(--t-text);margin:0 0 32px}
-.hlava + .podnadpis{margin-top:-22px}
-/* patička Pravidel – jediné místo v rozhraní, kde se značka ukáže */
+.hlava-text + .podnadpis{margin-top:-22px}
+/* patička Pravidel – značka potichu na konci, větší než ta v liště */
 .paticka{display:flex;flex-direction:column;align-items:center;gap:10px;
   margin-top:40px;padding-bottom:6px;color:var(--text-3)}
 .logo-paticka{display:block;width:84px;height:auto;opacity:.3}
 .paticka span:last-child{font-family:var(--pismo);font-size:var(--t-drobne)}
 .prepinac-tymu{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 13px;
   border-radius:var(--pilulka);background:var(--vrstva-2);
-  font-family:var(--pismo);font-size:var(--t-text);min-width:0;flex:0 1 auto;max-width:50%}
-/* na Hře žádný nadpis není, tak si jméno týmu může vzít, kolik potřebuje */
-.hlava-text:empty + .prepinac-tymu{max-width:74%}
+  font-family:var(--pismo);font-size:var(--t-text);min-width:0;flex:0 1 auto;max-width:62%}
 .prepinac-tymu b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prepinac-tymu .ikona{color:var(--text-3)}
 .tecka{width:9px;height:9px;border-radius:50%;flex:none}

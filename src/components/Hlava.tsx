@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { body, prepniTym, stav, tym, useStav } from "../lib/stav";
 import { Ikona } from "./Ikona";
+import { Logo } from "./Logo";
 import { Menu } from "./Menu";
 import { Okno } from "./Okno";
 import { OknoTymu } from "./OknoTymu";
@@ -15,10 +16,16 @@ interface Props {
   zpet?: string;
 }
 
-/** Horní lišta: vlevo nadpis obrazovky, vpravo za koho se zapisuje.
- *  Logo tu není — pralo se o místo s nadpisem a jeho rozervaný okraj neměl
- *  vedle úhledné pilulky co zarovnat. Značku nese ikona appky,
- *  úvodní obrazovka a patička Pravidel. */
+/** Horní lišta: vlevo značka, vpravo za koho se zapisuje. Nadpis obrazovky
+ *  stojí pod ní, na vlastní řádce.
+ *
+ *  Dřív byl nadpis v liště a značka nikde — jenže pak se v jedné řádce tlačily
+ *  tři věci a na značku nezbylo místo. Takhle je to ten samý zámek jako
+ *  v úvodu (značka vlevo, drobnost vpravo) a nadpis má celou šířku pro sebe,
+ *  takže může být větší.
+ *
+ *  Na podstránce je místo značky kolečko zpátky: dvě věci vlevo by se zase
+ *  praly a cesta ven je tam potřebnější než logo. */
 export function Hlava({ nadpis, drobne, zpet }: Props) {
   useStav();
   const [okno, setOkno] = useState<"zadne" | "prepinac" | "novy">("zadne");
@@ -27,15 +34,14 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
   return (
     <>
       <div className="hlava">
-        {zpet && (
+        {zpet ? (
           <Link className="ikonove" to={zpet} aria-label="Zpátky na úkoly">
             <Ikona jmeno="i-zpet" px={16} />
           </Link>
+        ) : (
+          <Logo trida="hlava-znak" />
         )}
-        <div className="hlava-text">
-          {drobne && <div className="hlava-drobne cislo">{drobne}</div>}
-          {nadpis && <h1>{nadpis}</h1>}
-        </div>
+        <span className="hlava-vypln" />
         <button className="prepinac-tymu" onClick={() => setOkno("prepinac")} aria-label="Přepnout tým">
           <span className="tecka" style={{ background: t?.barva }} />
           <b>{t?.nazev || "Bez týmu"}</b>
@@ -43,6 +49,13 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
         </button>
         <Menu />
       </div>
+
+      {(nadpis || drobne) && (
+        <div className="hlava-text">
+          {drobne && <div className="hlava-drobne cislo">{drobne}</div>}
+          {nadpis && <h1>{nadpis}</h1>}
+        </div>
+      )}
 
       {okno === "prepinac" && (
         <Okno nadpis="Za koho zapisuju" pod="Ťukni na tým. Můžeš zapisovat komukoliv." zavri={() => setOkno("zadne")}>
