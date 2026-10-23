@@ -218,6 +218,26 @@ při přepočítání neposkakovalo.
 Prohlížeč je dosadí z náhradního písma a je to v řádku poznat. Při výměně
 psacího fontu zkontroluj `ť ď ě ů ř Ú Š Č Ž Ň`; dělá to `scripts/stahni-pisma.mjs`.
 
+## Pruh nad stránkou v prohlížeči
+
+`theme-color` **není barva podkladu, ale barva prvního řádku stránky**
+(`#3A3421`). Přes podklad leží teplá záře (`.app::after`) a ta je nahoře
+nejsilnější, takže čistý `#2B2B23` v liště nad stránkou vycházel jako
+studený šedý pruh přilepený k teplé appce — šev byl vidět přesně na hraně.
+
+Jde to spočítat: záře je `rgba(249,162,4,.11)` se středem nad oknem, u horní
+hrany má krytí kolem devíti procent, a to z `#2B2B23` udělá `#3A3421`.
+Naměřeno vychází rozdíl pod jednu hodnotu z 255. Záře je `position:fixed`,
+takže se ten řádek posouváním nemění a jedna hodnota sedí pořád.
+
+Průprava si lištu **přebarvuje na barvu stránky** (`useBarvaListy`
+v `Uvod.tsx`) — nad červeným plakátem by jinak visel tmavý pruh. Po konci
+se vrátí to, co stojí v `index.html`.
+
+V appce z plochy na tom nezáleží: tam je lišta průhledná
+(`apple-mobile-web-app-status-bar-style: black-translucent`) a obsah jde
+pod ni.
+
 ## Horní lišta
 
 Vlevo **značka**, vpravo za koho se zapisuje. Nadpis obrazovky stojí **pod

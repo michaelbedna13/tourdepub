@@ -129,6 +129,19 @@ function nactiPisma(): Promise<unknown> {
   }
 }
 
+/** Přebarví pruh nad stránkou (v prohlížeči) na barvu stránky průpravy.
+ *  Bez toho visí nad barevným plakátem tmavý pruh v barvě appky. Po konci
+ *  se vrátí to, co stálo v index.html. */
+function useBarvaListy(barva: string | null) {
+  useEffect(() => {
+    const m = document.querySelector('meta[name="theme-color"]');
+    if (!m) return;
+    const puvodni = m.getAttribute("content");
+    if (barva) m.setAttribute("content", barva);
+    return () => { if (puvodni) m.setAttribute("content", puvodni); };
+  }, [barva]);
+}
+
 export function Uvod({ hotovo }: { hotovo: () => void }) {
   // -1 = značka, 0+ = stránka průpravy
   const [kde, setKde] = useState(-1);
@@ -167,6 +180,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
 
   const posledni = kde + 1 === PRUPRAVA.length;
   const s = PRUPRAVA[Math.max(0, kde)];
+  useBarvaListy(kde >= 0 && !zavira ? s.barva : null);
 
   return (
     <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " barevna" : " znacka"}`}
