@@ -7,7 +7,7 @@
 // přihlásil, animace by buď naskočila v půlce, nebo by písmena zmizela
 // a začala znova. Tahle vrstva je proto do příchodu průpravy průhledná
 // a značka pod ní prosvítá — teprve s první stránkou se #uvod odklidí.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { vazat } from "../lib/format";
 import { UVOD_KRESBY } from "../lib/uvod-kresby";
 import { Logo } from "./Logo";
@@ -26,7 +26,7 @@ const ZAVRENI = 300;
 
 interface Stranka {
   /** Klíč kresby v UVOD_KRESBY. */
-  id: string;
+  id: keyof typeof UVOD_KRESBY;
   /** Plná barva celé stránky a inkoust, kterým se na ni kreslí i píše.
    *  Není to nádech barvy jako dřív — stránka je plakát, ne tmavá
    *  obrazovka s podtónem. */
@@ -210,15 +210,22 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   );
 }
 
-/** Čmáranice stránky. Kreslí se tahem, ne výplní — jeden rukopis v každé
- *  velikosti a na plakátu je to to jediné, na co se kouká. */
-function Cmaranice({ id }: { id: string }) {
-  const tahy = UVOD_KRESBY[id];
-  if (!tahy) return null;
+/** Čmáranice stránky: ta samá ruka jako ikony, jen velká. Plocha je v barvě
+ *  inkoustu, výstřižky jsou průhledné a prosvítá jimi barva stránky —
+ *  proto maska, ne dvě barvy (viz Ikona). */
+function Cmaranice({ id }: { id: keyof typeof UVOD_KRESBY }) {
+  // useId vrací dvojtečky, které v url(#…) nefungují všude
+  const maska = `uk${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  const vrstvy = UVOD_KRESBY[id];
+  if (!vrstvy) return null;
   return (
-    <svg className="uvod-cmaranice" viewBox="0 0 100 100" fill="none" stroke="currentColor"
-      strokeWidth={4.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {tahy.map((d) => <path key={d} d={d} />)}
+    <svg className="uvod-cmaranice" viewBox="0 0 100 100" aria-hidden="true">
+      <mask id={maska} maskUnits="userSpaceOnUse" x="-10" y="-10" width="120" height="120">
+        {vrstvy.map(([druh, d], i) => (
+          <path key={i} d={d} fill={druh === "i" ? "#FFFFFF" : "#000000"} />
+        ))}
+      </mask>
+      <rect x="-10" y="-10" width="120" height="120" fill="currentColor" mask={`url(#${maska})`} />
     </svg>
   );
 }

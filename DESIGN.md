@@ -448,10 +448,22 @@ v `Uvod.tsx`): dvě stránky jsou tmavé s krémovým inkoustem, dvě světlé
 s černým. **Nic uvnitř se proto neodvozuje od `--text` ani od `--podklad`** —
 všechno je `currentColor`, jinak by polovina stránek zmizela.
 
-Čmáranice jsou v `src/lib/uvod-kresby.ts` a kreslí se **tahem, ne výplní**
-(na rozdíl od kreseb úkolů). Tloušťka čáry je v souřadnicích čtverce
-`0 0 100 100`, takže roste s obrázkem a rukopis zůstává stejný v každé
-velikosti.
+Čmáranice kreslí `scripts/kresli-uvod.mjs` **tou samou rukou jako ikony**:
+tlusté siluety s výstřižky, obrys křivý jako stříhaný tupýma nůžkama, a
+stejná maska při vykreslení (plocha v barvě inkoustu, výstřižky průhledné).
+Nejdřív to byly obrysové tahy a vedle zbytku appky to byl cizí rukopis.
+
+Dva rozdíly proti ikonám, oba kvůli velikosti:
+
+- **Kymácení je mírnější** (`amp` 1,3 místo 2,2). Amplituda je v souřadnicích
+  čtverce, takže se s velikostí nemění — co v dvaadvaceti bodech vypadá jako
+  střih nůžkami, je na plakátu přes půl obrazovky rozmáčklý tvar.
+- **Kolečka mají hodně bodů a skoro žádnou výchylku.** Na malé ploše je
+  kymácení vidět nejvíc a z očí byly kosočtverce.
+
+Co se při kreslení ukázalo: odlesky skla ve škopku vedly přesně přes oči
+a pusu, takže buď sklo, nebo tvář — ne obojí. A oči vystřižené do koruny
+z ní udělaly kočku, takže koruna má místo obličeje kámen a čelenku.
 
 **Žádná stránka se nepřehodí sama** — dál se jde ťuknutím kamkoli na
 obrazovku, švihem do boku nebo popiskem *Dál* dole. Ten popisek **není

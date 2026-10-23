@@ -242,9 +242,9 @@ nemůže potkat nový skript.
 Vlastní kresbu můžou mít **úkoly** v galerii. Dokud ji nemají, drží místo
 ikona — kresba pak jen vskočí na její místo a nic se kolem toho nepřerovná.
 
-Stránky průpravy v úvodu mají vlastní **čmáranice** v `src/lib/uvod-kresby.ts`.
-Ty se nekreslí z obrázku, ale rovnou jako tahy v SVG: je to plakátová čára
-s kulatými konci, ne obtažená kresba.
+Stránky průpravy v úvodu mají vlastní **čmáranice**. Ty se nekreslí z obrázku,
+ale generují se stejně jako ikony (`scripts/kresli-uvod.mjs` →
+`src/lib/uvod-kresby.ts`) — ta samá ruka, jen velká.
 
 Kresba se dodává jako **obrázek**: tmavá kresba (fixa, pero, cokoli) na světlém
 podkladu, bez pozadí a bez stínů. Soubor se jmenuje podle toho, kam patří:
