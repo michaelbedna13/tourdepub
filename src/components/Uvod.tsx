@@ -48,9 +48,10 @@ const PRUPRAVA: Stranka[] = [
     text: "Vlezné je kilo na palici a na konci to všecko shrábne ta parta, co nahrabala nejvíc čárek. Tak ať je to betelný." },
 ];
 
-/** Jak dlouho se značka z index.html vytrácí, než se odklidí.
+/** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
+ *  nadvakrát (nejdřív logo, pak podklad), tohle je obojí dohromady.
  *  Drží se #uvod.odchazi v index.html. */
-const ZNACKA_ODCHOD = 340;
+const ZNACKA_ODCHOD = 600;
 
 /** Pošle značku z index.html pryč. Nechat ji tam by znamenalo krémové logo
  *  přes celou appku. */

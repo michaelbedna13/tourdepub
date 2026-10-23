@@ -80,7 +80,12 @@
      Žádné prolnutí ani změna velikosti: React převezme logo kdykoli během
      načítání, a kdyby se tu zrovna prolínalo, skočila by jeho jasnost z půlky
      na plnou. Buď obrázek ještě není, nebo je — nic mezi tím. */
-  #uvod{position:fixed;inset:0;z-index:100;background:#2B2B23}
+  /* Nad vrstvou Reactu (.uvod má 120), ne pod ní. Pod ní se značka při
+     odchodu dívala skrz průhlednou vrstvu, která se zrovna přebarvovala na
+     barvu první stránky — logo tím na okamžik zoranžovělo. Takhle značka
+     odejde na svém vlastním tmavém podkladu a barevná stránka se vynoří pod
+     ní. Dotek nebere: ve fázi značky se stejně nic neťuká. */
+  #uvod{position:fixed;inset:0;z-index:130;background:#2B2B23;pointer-events:none}
   /* Logo je tu jako kresba, ne jako <img>: samostatný soubor dorazí až po
      prvním vykreslení stránky, takže mezi úvodní obrazovkou iOS (na které logo
      je) a naším logem bliklo černo. Takhle se vykreslí s první stránkou
@@ -112,11 +117,16 @@
     58%{opacity:1;transform:translateY(0) scale(1.07) rotate(1.6deg)}
     100%{opacity:1;transform:none}
   }
-  /* Značka odchází, až když si průpravu vyžádá React. */
-  #uvod{transition:opacity .3s cubic-bezier(.2,.8,.3,1)}
+  /* Značka odchází, až když si průpravu vyžádá React, a odchází nadvakrát:
+     nejdřív se vytratí samo logo na svém tmavém podkladu, teprve potom
+     zmizí podklad a objeví se barevná stránka. Kdyby se prolínalo obojí
+     naráz, prosvítala by barva první stránky skrz logo a to by na okamžik
+     zežloutlo — vypadalo by to, že značka mění barvu. */
+  #uvod{transition:opacity .26s cubic-bezier(.2,.8,.3,1) .3s}
   #uvod.odchazi{opacity:0}
-  #uvod.odchazi .logo{transition:scale .34s cubic-bezier(.2,.8,.3,1),
-    translate .34s cubic-bezier(.2,.8,.3,1);scale:.96;translate:-50% calc(-50% - 16px)}
+  #uvod.odchazi .logo{transition:opacity .28s cubic-bezier(.2,.8,.3,1),
+    scale .3s cubic-bezier(.2,.8,.3,1),translate .3s cubic-bezier(.2,.8,.3,1);
+    opacity:0;scale:.96;translate:-50% calc(-50% - 16px)}
   @media (prefers-reduced-motion:reduce){
     #uvod .logo path{animation-duration:.001ms;animation-delay:0ms}
   }

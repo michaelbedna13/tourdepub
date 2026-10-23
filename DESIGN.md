@@ -419,8 +419,13 @@ Značka odejde, až platí všechno tohle naráz: **uběhlo 1700 ms od načtení
   nepoužívá. Proto se o ně musí říct ručně (`document.fonts.load`), jinak se
   průprava vysází náhradním písmem a po chvilce přeskočí do správného.
 
-Odchází celá značka naráz: zmenší se o čtyři procenta a zvedne o 16 px.
-Jeden pohyb, ne efekty.
+**Značka odchází nadvakrát.** Nejdřív se vytratí samo logo (zmenší se o čtyři
+procenta a zvedne o 16 px) na svém vlastním tmavém podkladu, a teprve potom
+zmizí podklad a objeví se barevná stránka. Kdyby se prolínalo obojí naráz,
+prosvítala by skrz logo barva první stránky a značka by na okamžik zežloutla —
+vypadalo by to, že mění barvu. Ze stejného důvodu leží `#uvod` **nad** vrstvou
+Reactu (z-index 130 proti 120), ne pod ní: pod ní se díval na průhlednou
+vrstvu, která se zrovna přebarvovala.
 
 **Úvodní obrazovky a ikona mají v adrese `?v=`.** iOS si je uloží ve chvíli,
 kdy se appka přidává na plochu, a sám od sebe je nikdy nepřenačte — po změně
