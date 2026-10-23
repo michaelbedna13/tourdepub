@@ -47,24 +47,43 @@ export interface Ukol {
 export interface Hospoda {
   id: string;
   nazev: string;
+  /** Barva štace. Prostupuje hero kartou a značí ji v pruhu trasy. */
+  barva: string;
 }
+
+/** Barvy štací. Devět hospod, devět barev, a pár navíc pro ty, co si kdo
+ *  přidá. Jsou z plakátové palety jako zbytek appky a schválně se vyhýbají
+ *  barvám kategorií (#006633, #F9A204, #E5331F) — ty znamenají něco jiného. */
+export const BARVY_HOSPOD = [
+  "#D8560E", // poppy
+  "#849E15", // jarní listí
+  "#6777B6", // chrpa
+  "#E1903E", // florida
+  "#D17089", // ostružina
+  "#92A2A6", // příboj
+  "#B28622", // zlatý samet
+  "#CBD183", // pistácie
+  "#D3C2CD", // šeříková šeď
+  "#EFCE7B", // máslová
+  "#F8CABA", // nádech růžové
+];
 
 export const KATEGORIE: Kategorie[] = [
   { id: "kecy", nazev: "Kecy a šméčka", ikona: "kecy", barva: "#006633", naBarve: "#F2E7CF" },
-  { id: "telo", nazev: "Tělo v luftě", ikona: "telo", barva: "#F9A204", naBarve: "#151A20" },
+  { id: "telo", nazev: "Tělo v luftě", ikona: "telo", barva: "#F9A204", naBarve: "#2B2B23" },
   { id: "zranice", nazev: "Žranice a divadlo", ikona: "zranice", barva: "#E5331F", naBarve: "#F2E7CF" },
 ];
 
 export const VYCHOZI_HOSPODY: Hospoda[] = [
-  { id: "h1", nazev: "Lucky Bastard" },
-  { id: "h2", nazev: "Bláhovka" },
-  { id: "h3", nazev: "Zastávka" },
-  { id: "h4", nazev: "U Ričího" },
-  { id: "h5", nazev: "Na dobré cestě" },
-  { id: "h6", nazev: "U Seminárů" },
-  { id: "h7", nazev: "U Cajpla" },
-  { id: "h8", nazev: "Trojka" },
-  { id: "h9", nazev: "Music Lab / Desert" },
+  { id: "h1", nazev: "Lucky Bastard", barva: BARVY_HOSPOD[0] },
+  { id: "h2", nazev: "Bláhovka", barva: BARVY_HOSPOD[1] },
+  { id: "h3", nazev: "Zastávka", barva: BARVY_HOSPOD[2] },
+  { id: "h4", nazev: "U Ričího", barva: BARVY_HOSPOD[3] },
+  { id: "h5", nazev: "Na dobré cestě", barva: BARVY_HOSPOD[4] },
+  { id: "h6", nazev: "U Seminárů", barva: BARVY_HOSPOD[5] },
+  { id: "h7", nazev: "U Cajpla", barva: BARVY_HOSPOD[6] },
+  { id: "h8", nazev: "Trojka", barva: BARVY_HOSPOD[7] },
+  { id: "h9", nazev: "Music Lab / Desert", barva: BARVY_HOSPOD[8] },
 ];
 
 // Dvě čárky, které se nabíhají v každé špeluňce. Nejsou to úkoly, patří k docházce.

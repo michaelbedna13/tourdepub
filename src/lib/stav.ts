@@ -8,7 +8,7 @@
 // (z obrazovek, ze synchronizace, z posluchače „online") a obrazovky se na něj
 // přihlásí přes useStav(). Kopírovat při každé čárce celý stav by tu bylo k ničemu.
 import { useSyncExternalStore } from "react";
-import { VYCHOZI_HOSPODY, VYCHOZI_UKOLY, type Hospoda, type Ukol } from "./data";
+import { BARVY_HOSPOD, VYCHOZI_HOSPODY, VYCHOZI_UKOLY, type Hospoda, type Ukol } from "./data";
 
 const KLIC = "tourdepub";
 const VERZE = 2;
@@ -160,6 +160,8 @@ function nacti(): Stav {
     z.tymId = t.id;
   }
   if (!z.tymy.some((t) => t.id === z.tymId)) z.tymId = z.tymy[0].id;
+  // starší uložený stav barvy štací nemá; doplní se po řadě z palety
+  z.hospody.forEach((h, i) => { if (!h.barva) h.barva = BARVY_HOSPOD[i % BARVY_HOSPOD.length]; });
   srovnejStace(z);
   // starší uložené stavy příznak nemají; tým s vlastním jménem nebo s čárkami
   // je zjevně používaný
@@ -276,16 +278,29 @@ export function posunHospodu(o: number) {
   if (cil) nastavHospodu(cil.id);
 }
 
-export function pridejHospodu(nazev: string) {
-  stav.hospody.push({ id: noveId(), nazev: nazev.trim().slice(0, 60) || "Nová špeluňka" });
+/** První barva, kterou ještě žádná štace nemá. Když dojdou, bere se po řadě
+ *  dokola — dvě stejné barvy na trase jsou pořád lepší než žádná. */
+export function volnaBarvaHospody(): string {
+  const zabrane = new Set(stav.hospody.map((h) => h.barva));
+  return BARVY_HOSPOD.find((b) => !zabrane.has(b))
+    ?? BARVY_HOSPOD[stav.hospody.length % BARVY_HOSPOD.length];
+}
+
+export function pridejHospodu(nazev: string, barva?: string) {
+  stav.hospody.push({
+    id: noveId(),
+    nazev: nazev.trim().slice(0, 60) || "Nová špeluňka",
+    barva: barva || volnaBarvaHospody(),
+  });
   srovnejStace(stav);
   uloz();
 }
 
-export function upravHospodu(id: string, nazev: string) {
+export function upravHospodu(id: string, nazev: string, barva?: string) {
   const h = stav.hospody.find((x) => x.id === id);
   if (!h) return;
   h.nazev = nazev.trim().slice(0, 60) || h.nazev;
+  if (barva) h.barva = barva;
   uloz();
 }
 

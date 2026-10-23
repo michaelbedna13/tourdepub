@@ -20,20 +20,33 @@ Text je krémový, stejný jako logo.
 
 | token | hodnota | kde |
 |---|---|---|
-| `--podklad` | `#151A20` | pozadí appky |
-| `--vrstva` | `#1C222A` | plochy se seznamy a karty |
-| `--vrstva-2` | `#242B34` | tlačítka, pole, kulatá tlačítka |
+| `--podklad` | `#2B2B23` | pozadí appky, „night forest" |
+| `--vrstva` | `#33332B` | plochy se seznamy a karty |
+| `--vrstva-2` | `#3C3C33` | tlačítka, pole, kulatá tlačítka |
 | `--text` | `#F2E7CF` | text, krémová z loga |
 | `--text-2` | 66 % textu | popisy |
 | `--text-3` | 47 % textu | drobnosti |
 | `--linka` | 11 % textu | vlasové předěly |
 | `--akce` | `#F2E7CF` | hlavní tlačítko, splněné odškrtávátko |
-| `--na-akci` | `#151A20` | text na světlé ploše |
+| `--na-akci` | `#2B2B23` | text na světlé ploše |
 
 Podklad byl dřív skoro černý v jednom tónu (`#070E0A` až `#1C2D22`) a appka
 z toho vycházela ponurá — mezi vrstvami nebyl rozdíl, co by se dal vidět.
-Teď je základ znatelně světlejší a každá vrstva je o schod výš, takže je
-poznat, co na čem leží.
+Pak byla modrošedá `#151A20`, a to byla jediná studená barva v celé paletě:
+retro karty na ní vypadaly jako nálepky nalepené na moderní appku. Teď je
+to **tmavá olivová**, jediná teplá tmavá, co s plakátovými barvami drží.
+Každá vrstva je o schod výš, takže je poznat, co na čem leží.
+
+### Barva štace
+
+Čtvrtá soustava, `BARVY_HOSPOD` v `src/lib/data.ts`. Každá hospoda má svou
+barvu, vybírá se při zakládání a dá se změnit tužkou. Kreslí dvě věci:
+**hero kartu** zabarví na 9 % (devět štací se jinak lišilo pouze jménem) a
+**pruh trasy** — projité štace svojí barvou potichu, současná naplno, před
+váma bezbarvo. Nadočko „4. štace z 9" je v té samé barvě vytažené ke krémové.
+
+Devět barev z palety a dvě navíc pro přidané hospody. Schválně se vyhýbají
+barvám kategorií (`#006633`, `#F9A204`, `#E5331F`) — ty znamenají něco jiného.
 
 Nižší úrovně textu jsou tónované do podkladu, ne do šedi.
 

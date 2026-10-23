@@ -17,9 +17,9 @@
      #1C2D22) a appka z toho vycházela ponurá — mezi vrstvami nebyl rozdíl,
      co by se dal vidět. Teď je základ znatelně světlejší a každá vrstva je
      o schod výš, takže je poznat, co na čem leží. */
-  --podklad:#151A20;
-  --vrstva:#1C222A;
-  --vrstva-2:#242B34;
+  --podklad:#2B2B23;
+  --vrstva:#33332B;
+  --vrstva-2:#3C3C33;
 
   /* text: krémová */
   --text:#F2E7CF;
@@ -35,7 +35,7 @@
      v téhle paletě nesou význam (obtížnost, kategorie) a kdyby jednu z nich
      měla i tlačítka, přestalo by to platit. */
   --akce:#F2E7CF;
-  --na-akci:#151A20;
+  --na-akci:#2B2B23;
 
   /* Obtížnost úkolu a kategorie: pořád tři barvy, aby v appce nebyly dvě
      barevné soustavy. Nově zelená – žlutá – červená, jak to má být čitelné
@@ -132,8 +132,8 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 .app::after{
   content:"";position:fixed;inset:0;z-index:25;pointer-events:none;
   background:
-    radial-gradient(130% 58% at 50% -6%, rgba(249,162,4,.10), transparent 64%),
-    radial-gradient(120% 38% at 50% 108%, rgba(2,108,128,.07), transparent 60%);
+    radial-gradient(130% 58% at 50% -6%, rgba(249,162,4,.11), transparent 64%),
+    radial-gradient(120% 38% at 50% 108%, rgba(216,86,14,.06), transparent 60%);
 }
 
 /* Zrno přes celou appku. Leží nad podkladem, ale pod obsahem, a nereaguje na dotyk.
@@ -330,9 +330,13 @@ input,textarea,select{caret-color:var(--text)}
   touch-action:pan-x pan-y;
 }
 .hero-pas::-webkit-scrollbar{display:none}
+/* Každá štace má svou barvu (viz BARVY_HOSPOD v data.ts). Karta si ji vezme
+   jako --hosp a jen se do ní zabarví — devět hospod se jinak lišilo pouze
+   jménem. Je to tón, ne plocha: jméno musí zůstat tím hlavním. */
 .hero{
   flex:0 0 calc(100% - 34px);scroll-snap-align:start;
-  background:var(--vrstva);border-radius:var(--r);padding:20px 22px 18px;
+  background:color-mix(in srgb,var(--hosp) 9%,var(--vrstva));
+  border-radius:var(--r);padding:20px 22px 18px;
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;
   transition:opacity .12s linear;
@@ -347,7 +351,9 @@ input,textarea,select{caret-color:var(--text)}
 .hero-nadocko{
   position:relative;z-index:1;font-family:var(--pismo);
   font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(242,231,207,.42);
+  /* barva štace vytažená ke krémové: syté barvy z palety jsou na drobném
+     písmu tmavé a nepřečtou se */
+  color:color-mix(in srgb,var(--hosp) 58%,var(--text));
 }
 
 /* Jak dlouho už parta ve špeluňce sedí. Tichá řádka pod názvem – je to
@@ -423,9 +429,11 @@ input,textarea,select{caret-color:var(--text)}
 .trasa-body{display:flex;gap:3px;flex:1;min-width:0}
 /* Tenčí a tlumenější než dřív. Současná štace byla v plné barvě textu, tedy
    stejně výrazná jako jméno hospody nad ní, a pruh pak přebíjel kartu. */
+/* Pruh trasy nese barvy štací: projité svojí barvou potichu, současná
+   naplno. Co je před váma, zůstává bezbarvé — ještě tam nic není. */
 .trasa-bod{flex:1;height:1px;border-radius:0;background:rgba(242,231,207,.13)}
-.trasa-bod.splneno{background:rgba(242,231,207,.3)}
-.trasa-bod.ted{background:rgba(242,231,207,.66)}
+.trasa-bod.splneno{background:color-mix(in srgb,var(--hosp) 55%,transparent)}
+.trasa-bod.ted{height:3px;margin-top:-1px;border-radius:2px;background:var(--hosp)}
 
 /* dvě věci, co se v každé špeluňce zapisují – jako odškrtávátka, ne jako
    dvě obří tlačítka, která přebila zbytek obrazovky */
@@ -587,7 +595,7 @@ input,textarea,select{caret-color:var(--text)}
      a scrolluje stránkou pod otevřeným detailem. */
   touch-action:none;
   padding:calc(var(--vrch) + 8px) var(--okraj) calc(env(safe-area-inset-bottom) + 24px);
-  background:rgba(10,13,17,.5);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  background:rgba(22,22,18,.52);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
   animation:zjevit .18s var(--krok);
 }
 /* Výška je daná, ne odvozená z délky popisu: karta s dvěma větami a karta
@@ -1028,7 +1036,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   .hero-pas{scroll-behavior:auto}
 }
 @media (min-width:600px){
-  body{background:#0B0F13}
+  body{background:#1F1F19}
   .app{min-height:100dvh;box-shadow:0 0 0 1px rgba(239,235,224,.05)}
   /* na širší obrazovce se vejde celá karta i náhled další */
   .hero{flex-basis:calc(100% - 56px)}

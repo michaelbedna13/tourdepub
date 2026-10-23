@@ -5,7 +5,7 @@
 import { chromium } from "playwright";
 import { readFileSync, mkdirSync } from "node:fs";
 
-const PODKLAD = "#151A20";
+const PODKLAD = "#2B2B23";
 const logo = readFileSync(new URL("../public/logo.svg", import.meta.url), "utf8");
 
 // šířka × výška v bodech displeje a poměr pixelů; pokrývá iPhony od SE po 16 Pro Max

@@ -137,6 +137,7 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   const odKdy = t?.prichodCas[h.id];
   return (
     <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
+      style={{ "--hosp": h.barva } as React.CSSProperties}
       aria-label={`${cislo}. štace: ${h.nazev}${hotova ? " (hotová)" : ""}`}>
       {/* Razítko přes celou kartu, ne odznáček v rohu: hotová štace má být
           vidět na první pohled při švihu pásem. Pod ním se horní půlka karty
@@ -173,6 +174,7 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
         <div className="trasa-body" role="img" aria-label={`Štace ${cislo} z ${stav.hospody.length}`}>
           {stav.hospody.map((x, j) => (
             <div key={x.id} className={`trasa-bod${x.id === h.id ? " ted" : t?.prichod[x.id] ? " splneno" : ""}`}
+              style={{ "--hosp": x.barva } as React.CSSProperties}
               title={`${j + 1}. ${x.nazev}`} />
           ))}
         </div>

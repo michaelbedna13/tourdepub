@@ -11,7 +11,7 @@
      vykreslení — a Safari v prohlížeči do té doby obarví lištu nad stránkou
      výchozí černou místo podkladem appky. -->
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#151A20">
+<meta name="theme-color" content="#2B2B23">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -58,7 +58,7 @@
 <style>
   /* Rovnou v hlavičce, ne ve stylu: než se stáhne app.css, kreslí prohlížeč
      bílou a na tmavé appce to zabliká. Tohle platí od prvního vykreslení. */
-  html,body{background:#151A20;margin:0}
+  html,body{background:#2B2B23;margin:0}
   /* Pod úvodem se appka už vykresluje a načítá, jen je skrytá. Na iOS umí
      jinak skleněné plochy (backdrop-filter) na okamžik probliknout přes
      překryv — tohle je ta samá pojistka, co má osobní appka.
@@ -75,7 +75,7 @@
      Žádné prolnutí ani změna velikosti: React převezme logo kdykoli během
      načítání, a kdyby se tu zrovna prolínalo, skočila by jeho jasnost z půlky
      na plnou. Buď obrázek ještě není, nebo je — nic mezi tím. */
-  #uvod{position:fixed;inset:0;z-index:100;background:#151A20}
+  #uvod{position:fixed;inset:0;z-index:100;background:#2B2B23}
   /* Logo je tu jako kresba, ne jako <img>: samostatný soubor dorazí až po
      prvním vykreslení stránky, takže mezi úvodní obrazovkou iOS (na které logo
      je) a naším logem bliklo černo. Takhle se vykreslí s první stránkou

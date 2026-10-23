@@ -5,7 +5,7 @@
 import { chromium } from "playwright";
 import { readFileSync, writeFileSync } from "node:fs";
 
-const PODKLAD = "#151A20";
+const PODKLAD = "#2B2B23";
 const KRESBA = "#F2E7CF";
 const pullitr = process.argv.includes("--pullitr");
 
