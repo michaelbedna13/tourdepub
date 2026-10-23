@@ -1055,13 +1055,19 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
      v testech vycházely dva řádky a vypadalo to v pořádku — měřeno až na
      telefonu, kde se písmo z Adobe opravdu načte. */
   font-size:clamp(30px,8.5vw,44px);
-  line-height:.98;letter-spacing:-.03em;color:currentColor;
+  /* Nad jedničku, i když je to verzálkový blok. Stažený proklad sice drží
+     nadpis pohromadě, jenže české háčky a čárky vystupují nad verzálky —
+     „DEVĚT ŠPELUNĚK" pak sedí druhému řádku skoro na hlavě. */
+  line-height:1.1;letter-spacing:-.03em;color:currentColor;
   /* vyrovná délku řádků, ať nezůstane na druhém řádku jedno slovo */
   text-wrap:balance;}
 /* Věta pod nadpisem je výklad, ne druhý nadpis: tišší a s volnějším
    prokladem, aby mezi ní a nadpisem byl rozdíl ve váze, ne jen ve velikosti.
    Drží se nadpisu nablízku — spolu jsou to jedna skupina. */
-.uvod-text{flex:none;margin-top:14px;font-size:var(--t-text);
+/* O kousek dál od nadpisu, než byl: s volnějším prokladem nadpisu vypadá
+   stejná mezera menší, protože poslední řádek nadpisu má pod sebou vzduch
+   už sám o sobě. */
+.uvod-text{flex:none;margin-top:16px;font-size:var(--t-text);
   line-height:1.6;opacity:.72;max-width:30em}
 
 .uvod-spodek{flex:none;display:flex;align-items:center;justify-content:space-between;
