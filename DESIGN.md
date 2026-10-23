@@ -464,6 +464,21 @@ viset jedno slovo.
 Věta pod nadpisem je výklad, ne druhý nadpis: tišší a s volnějším prokladem,
 aby mezi ní a nadpisem byl rozdíl **ve váze, ne jen ve velikosti**.
 
+**Volné místo je celé kolem kresby, ne rozeseté po stránce.** Stránka má
+jednu mezeru (`--uvod-mezera`) a jediný kus, který roste — blok s kresbou.
+Kresba v něm roste do volného místa, ale **jen po strop**
+(`clamp(190px, 38vh, 340px)`), a to řeší dvě věci naráz:
+
+- Bez stropu byla kresba na každé stránce jinak velká — podle toho, kolik
+  zbylo textu — a čtyři plakáty vedle sebe nevypadaly jako série.
+- S pevnou velikostí zas uprostřed stránky zůstala díra, protože volné
+  místo se nemělo kam podít.
+
+Takhle je kresba na všech stránkách stejná a zbytek se rozdělí na dvě
+souměrné mezery nad ní a pod ní. Na malém telefonu (375 × 667) vychází
+253 px kresby a mezery 24 a 50, na velkém (430 × 932) 340 px a mezery
+108 a 134.
+
 **Žádné dvě stránky nejsou poskládané stejně.** Čtyři stejné obrazovky za
 sebou vypadají jako formulář, ne jako série plakátů, takže se střídají tři
 skladby (text pod kresbou / nadpis nahoře a věta dole / text celý nahoře)

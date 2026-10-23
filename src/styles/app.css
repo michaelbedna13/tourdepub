@@ -962,6 +962,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    s krémovým inkoustem, půlka světlá s černým. Nic uvnitř se proto neodvozuje
    od --text ani od --podklad, všechno je currentColor. */
 .uvod{
+  /* Jedna mezera na celou průpravu. Rozestupy po stránce se tím drží
+     jednoho rytmu, místo aby si každý kus vymýšlel svoje číslo. */
+  --uvod-mezera:26px;
   position:fixed;inset:0;z-index:120;
   padding:calc(env(safe-area-inset-top) + 22px) 24px calc(env(safe-area-inset-bottom) + 20px);
   background:var(--podklad);color:var(--inkoust,var(--text));
@@ -994,47 +997,56 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 /* Horní lišta: značka vlevo, číslo stránky vpravo. Je to ten samý zámek
    jako na tištěném plakátu — drobné popisky po okrajích, uprostřed obrázek. */
 .uvod-hlava{flex:none;display:flex;align-items:center;justify-content:space-between;
-  gap:16px;width:100%;max-width:420px;padding-bottom:6px}
+  gap:16px;width:100%;max-width:420px;padding-bottom:var(--uvod-mezera)}
 .uvod-znak{height:30px;width:auto;display:block;color:currentColor}
 .uvod-krok{font-family:var(--pismo);font-weight:700;font-size:11px;
   letter-spacing:.16em;text-transform:uppercase;opacity:.65}
 
+/* Stránka stojí na jednom pravidle: na plakátu jsou DVĚ skupiny u protilehlých
+   okrajů a mezi nimi jedna velká mezera. Volné místo proto není rozeseté po
+   stránce, ale celé v jednom bloku — v tom s kresbou, který jediný roste.
+   Dřív se kresba v tom bloku ještě centrovala, takže plavala někde uprostřed
+   zbytku a na každé stránce jinde: mezery vycházely náhodně a vypadalo to
+   jako chyba sazby, ne jako kompozice. */
 .uvod-stranka{
   position:relative;z-index:1;
   display:flex;flex-direction:column;align-items:stretch;text-align:left;
   max-width:420px;width:100%;flex:1;min-height:0;
   animation:uvod-prichod .26s var(--krok) both;
 }
-/* Čmáranice si bere, co zbyde nad textem — je to hlavní věc na stránce,
-   tak ať má místo. */
+/* Kresba je jediný kus, který roste — volné místo je tím vždycky kolem ní,
+   ne rozeseté po stránce. */
 .uvod-kresba{
-  flex:1;min-height:120px;width:100%;
+  flex:1 1 auto;min-height:0;width:100%;
   display:flex;align-items:center;justify-content:center;
-  margin:18px 0 38px;color:currentColor;
+  color:currentColor;
   animation:kresba-prijde .5s .1s var(--krok) both;
 }
-.uvod-cmaranice{width:auto;height:100%;max-width:86%;max-height:300px}
+/* Roste do volného místa, ale jen po strop. Dvě věci naráz: bez stropu byla
+   kresba na každé stránce jinak velká (podle toho, kolik zbylo textu) a čtyři
+   plakáty vedle sebe nevypadaly jako série; a s pevnou velikostí zas zůstala
+   uprostřed stránky díra, protože volné místo se nemělo kam podít. Takhle je
+   kresba na všech stránkách stejně velká a zbytek se rozdělí na dvě souměrné
+   mezery nad ní a pod ní. */
+.uvod-cmaranice{height:100%;max-height:clamp(190px,38vh,340px);
+  width:auto;max-width:100%}
 @keyframes kresba-prijde{from{opacity:0;transform:translateY(14px) scale(.96)}}
 
-/* Stránky se musí střídat, jinak jsou to čtyři stejné obrazovky za sebou
-   a vypadá to jako formulář, ne jako série plakátů. Tři skladby a tři
-   kotvy kresby stačí na to, aby žádné dvě nebyly stejné.
-   Výchozí (bez třídy): kresba nahoře, nadpis a věta pod ní. */
+/* Tři skladby. Liší se tím, kde leží text a ke kterému okraji se kresba
+   tiskne — mezera je vždycky jen jedna a vždycky mezi skupinami. */
+/* výchozí: kresba nahoře, text dole */
+.uvod-stranka .uvod-kresba{padding-bottom:var(--uvod-mezera)}
 /* nadpis nahoře, kresba uprostřed, věta dole */
-.uvod-stranka.kolem .uvod-nadpis{order:1;margin-top:10px}
-.uvod-stranka.kolem .uvod-kresba{order:2;margin:30px 0}
+.uvod-stranka.kolem .uvod-nadpis{order:1}
+.uvod-stranka.kolem .uvod-kresba{order:2;padding:var(--uvod-mezera) 0}
 .uvod-stranka.kolem .uvod-text{order:3;margin-top:0}
 /* nadpis i věta nahoře, kresba pod nimi */
-.uvod-stranka.nahore .uvod-nadpis{order:1;margin-top:10px}
+.uvod-stranka.nahore .uvod-nadpis{order:1}
 .uvod-stranka.nahore .uvod-text{order:2}
-.uvod-stranka.nahore .uvod-kresba{order:3;margin:30px 0 6px}
-/* kotva kresby: na střed, nebo přitisknutá ke kraji jako na plakátu.
-   Kresba se u kraje zúží — dokud zabírala celou šířku, nebylo poznat,
-   že je přitisknutá, a vypadalo to jen jako nepovedené vycentrování. */
+.uvod-stranka.nahore .uvod-kresba{order:3;padding:var(--uvod-mezera) 0 0}
+/* kotva kresby: na střed, nebo přitisknutá ke kraji jako na plakátu */
 .uvod-kresba.vlevo{justify-content:flex-start}
 .uvod-kresba.vpravo{justify-content:flex-end}
-.uvod-kresba.vlevo .uvod-cmaranice,
-.uvod-kresba.vpravo .uvod-cmaranice{max-width:74%}
 
 /* Nadpis je na plakátu to druhé, co oko chytne po kresbě, takže musí mít
    váhu. Globální h1 má čtyřstovku (velké nadpisy v appce jsou lehké), tady
@@ -1048,14 +1060,13 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   /* vyrovná délku řádků, ať nezůstane na druhém řádku jedno slovo */
   text-wrap:balance;}
 /* Věta pod nadpisem je výklad, ne druhý nadpis: tišší a s volnějším
-   prokladem, aby mezi ní a nadpisem byl rozdíl ve váze, ne jen ve velikosti. */
-.uvod-text{flex:none;margin-top:18px;font-size:var(--t-hlavni);
+   prokladem, aby mezi ní a nadpisem byl rozdíl ve váze, ne jen ve velikosti.
+   Drží se nadpisu nablízku — spolu jsou to jedna skupina. */
+.uvod-text{flex:none;margin-top:14px;font-size:var(--t-hlavni);
   line-height:1.62;opacity:.72;max-width:30em}
 
-/* Spodní lišta: tečky, Přeskočit a Dál. Tři drobnosti na jedné řádce po
-   okrajích — zase ten plakátový zámek, ne tlačítková lišta. */
 .uvod-spodek{flex:none;display:flex;align-items:center;gap:14px;
-  width:100%;max-width:420px;padding-top:30px}
+  width:100%;max-width:420px;padding-top:var(--uvod-mezera)}
 .uvod-tecky{display:flex;gap:6px;flex:none}
 .uvod-tecka{width:18px;height:3px;border-radius:2px;
   background:color-mix(in srgb,currentColor 24%,transparent);
