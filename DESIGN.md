@@ -40,10 +40,22 @@ Každá vrstva je o schod výš, takže je poznat, co na čem leží.
 ### Barva štace
 
 Čtvrtá soustava, `BARVY_HOSPOD` v `src/lib/data.ts`. Každá hospoda má svou
-barvu, vybírá se při zakládání a dá se změnit tužkou. Kreslí dvě věci:
-**hero kartu** zabarví na 9 % (devět štací se jinak lišilo pouze jménem) a
-**pruh trasy** — projité štace svojí barvou potichu, současná naplno, před
-váma bezbarvo. Nadočko „4. štace z 9" je v té samé barvě vytažené ke krémové.
+barvu, vybírá se při zakládání a dá se změnit tužkou. Kreslí **celou hero
+kartu**: ta je v barvě štace od kraje ke kraji, s lehkým přechodem do tmava.
+Dřív to byla barva naředěná na devět procent do podkladu a devět štací
+vypadalo jako devět stejných karet.
+
+Paleta jde od tmavé rzi po světle růžovou, takže se na ni nedá psát jednou
+barvou textu. `tonHospody()` v `src/lib/barva.ts` proto k barvě **dopočítá
+inkoust**: na světlou se píše natmavo (`#2B2B23`, stejně jako na kartách
+kategorií), na tmavou krémem. A barvu k tomu inkoustu posune na mez, kde drží
+kontrast 4,5:1 — vždycky tím kratším směrem, aby zůstala sama sebou. Rez
+a chrpa jdou dolů do hloubky (rozsvícené by z nich byla lososová a bledý
+fialek), zbytek palety se jen rozsvítí. Odstín ani sytost se nemění, hospodu
+pořád poznáš podle barvy.
+
+Uvnitř karty se pak **všechno kreslí z `currentColor`** — pruh trasy, linky,
+kolečka, nadočko. Krémové `--text*` by na pistáciové kartě zmizely.
 
 Devět barev z palety a dvě navíc pro přidané hospody. Schválně se vyhýbají
 barvám kategorií (`#006633`, `#F9A204`, `#E5331F`) — ty znamenají něco jiného.
@@ -123,19 +135,31 @@ obsazených by obě skončily na krémové, protože k ní mají nejblíž obě.
 
 ### Zrno
 
-Zrno leží ve **třech vrstvách** a bez nich appka vypadá jako vysázená z vektorů.
+Zrno leží ve **dvou vrstvách** a bez nich appka vypadá jako vysázená z vektorů.
 
-1. **Pod obsahem** (`body::before`, `zrno.svg`, 160 px, krytí 50 %, `soft-light`) —
-   oživí holý podklad. Plochá tmavá barva bez něj působila jako plast.
-2. **Nad vším, co appka nakreslí** (`.app::before`, to samé zrno, `soft-light`) —
-   karty, účtenka i barevné plochy by jinak zůstaly hladké, protože spodní
-   vrstva na ně nedosáhne. Leží uvnitř `.app`, takže na plachty v `<body>`
-   (detail úkolu, okna) nesahá — ty mají být čisté.
-3. **Tisk na barevných plochách** (`zrno-tisk.svg`, `multiply`): karty kategorií
+1. **Filmové zrno nad vším, co appka nakreslí** (`.app::before`,
+   `zrno-film.png`, `overlay`). Dlaždice je hotový obrázek: 192 × 192 px
+   gaussovského šumu s průměrem přesně 128, takže střední šedá nemění nic
+   a zrno jen rozkmitá to, co je pod ní — podklad zůstane `#2B2B23`.
+   `background-size` se podle hustoty displeje přepíná na 192 / 96 / 64 px,
+   aby **jeden pixel obrázku padl na jeden pixel displeje**. Když se měřítko
+   netrefí, prohlížeč obrázek převáží a ze zrna je rozmazaná kaše.
+
+   Dvě věci se tím opravily. Dřív to byla dlaždice z `feTurbulence` se čtyřmi
+   oktávami, takže kromě zrna dělala i mraky — světlé a tmavé fleky přes půl
+   obrazovky. A hlavně: `.app` je vlastní vrstvicí kontext (`position` +
+   `z-index`) a ten je pro míchání izolovaný, takže se zrno uvnitř nemíchalo
+   s ničím a ze `soft-light` zbyla půlprůhledná šedá přes celou appku.
+   Podklad `#2B2B23` se tím na obrazovce zvedl na `#444440`: appka nebyla
+   tmavá, byla šedivá. Proto `.app` teď kreslí svůj podklad sám.
+
+   Leží uvnitř `.app`, takže na plachty v `<body>` (detail úkolu, okna)
+   nesahá — ty mají být čisté.
+2. **Tisk na barevných plochách** (`zrno-tisk.svg`, `multiply`): karty kategorií
    (`.kat-karta::after`) a papír účtenky (zamíchaný rovnou do podkladu, ne
    vrstva nad textem, ta by rozmazala tisk). Plná barva přes celou kartu
    vypadala jako výplň z tiskárny, ne jako plakát.
-4. **Zmuchlání účtenky** (`papir-zmuchlany.svg`, `overlay`): nasvícený šum
+3. **Zmuchlání účtenky** (`papir-zmuchlany.svg`, `overlay`): nasvícený šum
    (`feDiffuseLighting`) dá hřbety a stíny jako na papíru, co ležel v kapse.
    Plocha bez hřbetu vychází na střední šedou (`diffuseConstant 0.5`), takže
    `overlay` nechá barvu papíru být a ukáže jen přehyby — při plném nasvícení
@@ -201,7 +225,7 @@ kolikátá je, jak se jmenuje, kde jsme na trase a co se tu dá zapsat.
 Dřív to byly čtyři samostatné bloky se stejnou vahou — číslo, název, trasa
 a dvě obří tlačítka — takže nic nevedlo a hlavní informace zanikla.
 
-- **Číslo štace** je kolečko v krémové, jediný plný prvek nahoře.
+- **Číslo štace** je tiché nadočko nad jménem („4. štace z 9").
 - **Název hospody** je největší text na obrazovce (`clamp(27px, 7.8vw, 38px)`,
   verzálky, těsné prostrkání). Je to hlavní věc, kterou tam člověk hledá.
   Dlouhý název se zalomí do tří řádků a karta se roztáhne.

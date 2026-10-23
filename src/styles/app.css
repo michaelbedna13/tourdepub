@@ -136,21 +136,41 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
     radial-gradient(120% 38% at 50% 108%, rgba(216,86,14,.06), transparent 60%);
 }
 
-/* Zrno přes celou appku. Leží nad podkladem, ale pod obsahem, a nereaguje na dotyk.
-   Režim soft-light podklad oživí, aniž by ho zašpinil. */
-body::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:url("../assets/zrno.svg");background-size:160px 160px;
-  opacity:.5;mix-blend-mode:soft-light;
-}
-/* A ještě jednou nad vším, co appka nakreslí. Zrno vespod totiž svítilo jen
-   na holém podkladu — karty, účtenka a barevné plochy nad ním zůstávaly
-   hladké a appka z toho vycházela jako vysázená z vektorů. Tahle vrstva leží
-   nad obsahem, nechytá dotyk a soft-light nechá barvy barvami. */
+/* Filmové zrno přes celou appku. Leží nad vším, co appka nakreslí, nechytá
+   dotyk a v režimu overlay je to opravdu zrno: střední šedá nemění nic,
+   odchylky nahoru a dolů jen rozkmitají to, co je pod ní. Průměr dlaždice
+   je přesně 128, takže podklad zůstane tou barvou, kterou má být.
+
+   Dřív to byla dlaždice z feTurbulence a vypadalo to levně hned dvakrát.
+   Jednak má turbulence čtyři oktávy, takže kromě zrna dělala i mraky —
+   velké světlé a tmavé fleky přes půl obrazovky. A hlavně se míchala
+   s ničím: .app je vlastní vrstvicí kontext (position + z-index) a ten
+   je pro míchání izolovaný, takže zrno uvnitř nevidělo podklad stránky
+   pod sebou a z „soft-light" zbyla půlprůhledná šedá. Podklad #2B2B23 se
+   tím na obrazovce zvedl na #444440 — appka nebyla tmavá, byla šedivá.
+   Proto .app teď kreslí svůj podklad sám (viz .app níž).
+
+   Dlaždice je hotový obrázek, ne filtr, a je 192 px velká: 192 se dělí
+   dvěma i třemi, takže na každé hustotě displeje padne jeden pixel
+   obrázku přesně na jeden pixel displeje. Zrno je pak ostré a jemné jako
+   na filmu. Když se měřítko netrefí, prohlížeč obrázek převáží a vznikne
+   přesně ta rozmazaná kaše, co na zrnu vypadá lacině. */
 .app::before{
-  content:"";position:fixed;inset:0;z-index:60;pointer-events:none;
-  background-image:url("../assets/zrno.svg");background-size:160px 160px;
-  opacity:.5;mix-blend-mode:soft-light;
+  content:"";position:fixed;top:0;bottom:0;z-index:60;pointer-events:none;
+  /* Jen přes sloupec appky, ne přes celou obrazovku: míchá se s tím, co
+     nakreslí .app, a vedle sloupce (na monitoru) by nemělo s čím — z overlay
+     by tam zbyla půlprůhledná šedá dlaždice. Na telefonu je sloupec celá
+     obrazovka, takže je to totéž. */
+  left:50%;width:min(100%,var(--sirka));translate:-50% 0;
+  background-image:url("../assets/zrno-film.png");
+  background-size:192px 192px;
+  mix-blend-mode:overlay;
+}
+@media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
+  .app::before{background-size:96px 96px}
+}
+@media (-webkit-min-device-pixel-ratio:3),(min-resolution:288dpi){
+  .app::before{background-size:64px 64px}
 }
 
 h1,h2,h3{margin:0;font-family:var(--nadpisy);line-height:var(--radky-nadpis);
@@ -189,6 +209,9 @@ input,textarea,select{caret-color:var(--text)}
    z appky posuvnou plochu a rozbil plovoucí lištu) */
 .app{position:relative;z-index:1;max-width:var(--sirka);margin:0 auto;min-height:100dvh;
   overflow-x:clip;
+  /* Podklad kreslí appka, ne jen stránka pod ní: zrno v .app::before se
+     míchá jenom s tím, co je uvnitř .app, a bez tohohle by nemělo s čím. */
+  background:var(--podklad);
   /* pan-y, ne auto: při výchozím nastavení si vodorovný tah zabere posun
      stránky a prohlížeč přestane posílat pointermove – švih do boku se pak
      nikdy nechytí. Takhle zůstane svislé posouvání prohlížeči a bok je náš.
@@ -330,12 +353,20 @@ input,textarea,select{caret-color:var(--text)}
   touch-action:pan-x pan-y;
 }
 .hero-pas::-webkit-scrollbar{display:none}
-/* Každá štace má svou barvu (viz BARVY_HOSPOD v data.ts). Karta si ji vezme
-   jako --hosp a jen se do ní zabarví — devět hospod se jinak lišilo pouze
-   jménem. Je to tón, ne plocha: jméno musí zůstat tím hlavním. */
+/* Každá štace má svou barvu (viz BARVY_HOSPOD v data.ts) a karta je v ní
+   celá — devět hospod se jinak lišilo pouze jménem. Zabarvená plocha
+   (barva na devět procent do podkladu) byla k nerozeznání od ostatních
+   karet v appce.
+
+   Barvy ani inkoust tu nejsou napsané: spočítá je tonHospody() v barva.ts
+   a karta je dostane jako --hosp-plna, --hosp-tma a --na-hosp. Paleta jde
+   od tmavé rzi po světle růžovou, takže na polovinu barev patří krém a na
+   druhou tmavý inkoust. Všechno vevnitř karty se proto kreslí z
+   currentColor, ne z krémových --text* — ty by na pistáciové kartě zmizely. */
 .hero{
   flex:0 0 calc(100% - 34px);scroll-snap-align:start;
-  background:color-mix(in srgb,var(--hosp) 9%,var(--vrstva));
+  background:linear-gradient(168deg,var(--hosp-plna),var(--hosp-tma));
+  color:var(--na-hosp);
   border-radius:var(--r);padding:20px 22px 18px;
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;
@@ -351,9 +382,9 @@ input,textarea,select{caret-color:var(--text)}
 .hero-nadocko{
   position:relative;z-index:1;font-family:var(--pismo);
   font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-  /* barva štace vytažená ke krémové: syté barvy z palety jsou na drobném
-     písmu tmavé a nepřečtou se */
-  color:color-mix(in srgb,var(--hosp) 58%,var(--text));
+  /* inkoust karty ztlumený do plochy pod sebou, ne krémová s pevnou
+     průhledností: na pastelové kartě je inkoust tmavý a krém by nebyl vidět */
+  color:color-mix(in srgb,currentColor 64%,transparent);
 }
 
 /* Razítko za hotovou štaci: příchod i škopek zapsané. Je přes celou kartu,
@@ -365,8 +396,10 @@ input,textarea,select{caret-color:var(--text)}
   translate:-50% -50%;rotate:-11deg;
   padding:14px 26px 12px;white-space:nowrap;
   font-family:var(--nadpisy);font-weight:700;font-size:clamp(28px,8vw,38px);
-  letter-spacing:.1em;text-transform:uppercase;color:var(--ob1);
-  opacity:.9;
+  /* Inkoustem karty, ne zelenou: zelené „hotovo" by se na zelené štaci
+     (jarní listí) rozplynulo a na pastelech by bylo na hranici čitelnosti. */
+  letter-spacing:.1em;text-transform:uppercase;color:currentColor;
+  opacity:.85;
   animation:razitko .45s var(--krok) both;
 }
 /* Rámeček je kresba od ruky, ne border: čistý obdélník vypadal jako štítek
@@ -395,7 +428,7 @@ input,textarea,select{caret-color:var(--text)}
 .hero-sipky{display:flex;gap:6px}
 /* Vzhledem drobné, ať nepřebíjejí kartu, ale ťukací plocha je plných 44 —
    jinak se do nich v hospodě jednou rukou netrefíš. */
-.hero-sipky .ikonove{width:36px;height:36px;background:transparent;color:var(--text-3);
+.hero-sipky .ikonove{width:36px;height:36px;background:transparent;color:currentColor;
   opacity:.5;position:relative}
 .hero-sipky .ikonove::after{content:"";position:absolute;inset:-4px}
 
@@ -428,32 +461,38 @@ input,textarea,select{caret-color:var(--text)}
    stejně výrazná jako jméno hospody nad ní, a pruh pak přebíjel kartu. */
 /* Pruh trasy nese barvy štací: projité svojí barvou potichu, současná
    naplno. Co je před váma, zůstává bezbarvé — ještě tam nic není. */
-.trasa-bod{flex:1;height:1px;border-radius:0;background:rgba(242,231,207,.13)}
-.trasa-bod.splneno{background:color-mix(in srgb,var(--hosp) 55%,transparent)}
-.trasa-bod.ted{height:3px;margin-top:-1px;border-radius:2px;background:var(--hosp)}
+.trasa-bod{flex:1;height:1px;border-radius:0;
+  background:color-mix(in srgb,currentColor 24%,transparent)}
+.trasa-bod.splneno{background:color-mix(in srgb,currentColor 52%,transparent)}
+.trasa-bod.ted{height:3px;margin-top:-1px;border-radius:2px;background:currentColor}
 
 /* dvě věci, co se v každé špeluňce zapisují – jako odškrtávátka, ne jako
    dvě obří tlačítka, která přebila zbytek obrazovky */
 /* odškrtávátka drží dolní hranu karty */
+/* Linky a plošky uvnitř karty jsou z inkoustu karty, ne z krémových --linka*:
+   na světlé štaci by krémová linka na barvě zmizela. */
 .hero-zapis{position:relative;z-index:1;margin:auto -22px -18px;
-  border-top:1px solid var(--linka-sl)}
+  border-top:1px solid color-mix(in srgb,currentColor 16%,transparent)}
 .zaskrt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
   padding:18px 22px;min-height:66px;transition:background .16s}
-.zaskrt + .zaskrt{border-top:1px solid var(--linka-sl)}
-.zaskrt:active{background:var(--vrstva-2)}
+.zaskrt + .zaskrt{border-top:1px solid color-mix(in srgb,currentColor 16%,transparent)}
+.zaskrt:active{background:color-mix(in srgb,currentColor 9%,transparent)}
 .zaskrt-kolecko{
   width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;
-  box-shadow:inset 0 0 0 1.5px var(--linka);
+  box-shadow:inset 0 0 0 1.5px color-mix(in srgb,currentColor 34%,transparent);
   transition:background .18s var(--krok),box-shadow .18s;
 }
-.zaskrt-kolecko .ikona{color:var(--na-akci);opacity:0;transform:scale(.4);
+/* Fajfka je v barvě karty, kolečko v inkoustu — obráceně než zbytek karty,
+   takže zapsaná čárka drží i na pastelu a nepotřebuje k tomu žlutou. */
+.zaskrt-kolecko .ikona{color:var(--hosp-plna);opacity:0;transform:scale(.4);
   transition:opacity .2s var(--krok),transform .2s var(--krok)}
-.zaskrt.hotovo .zaskrt-kolecko{background:var(--akce);box-shadow:none}
+.zaskrt.hotovo .zaskrt-kolecko{background:currentColor;box-shadow:none}
 .zaskrt.hotovo .zaskrt-kolecko .ikona{opacity:1;transform:scale(1)}
 .zaskrt-text{flex:1;min-width:0;font-family:var(--pismo);font-weight:700;font-size:var(--t-hlavni)}
-.zaskrt.hotovo .zaskrt-text{color:var(--text-2)}
-.zaskrt-hodnota{font-family:var(--nadpisy);font-size:var(--t-text);color:var(--text-3);flex:none}
-.zaskrt.hotovo .zaskrt-hodnota{color:var(--text-2)}
+.zaskrt.hotovo .zaskrt-text{color:color-mix(in srgb,currentColor 62%,transparent)}
+.zaskrt-hodnota{font-family:var(--nadpisy);font-size:var(--t-text);flex:none;
+  color:color-mix(in srgb,currentColor 52%,transparent)}
+.zaskrt.hotovo .zaskrt-hodnota{color:color-mix(in srgb,currentColor 52%,transparent)}
 
 /* ---------- skóre a pořadí týmů na Hře ---------- */
 .carky{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:flex-end}

@@ -5,6 +5,7 @@ import { Ikona } from "../components/Ikona";
 import { PruhSyncu } from "../components/PruhSyncu";
 import { Uctenka } from "../components/Uctenka";
 import { ZAKLAD, type Hospoda } from "../lib/data";
+import { tonHospody } from "../lib/barva";
 import { vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { RAZITKO } from "../lib/razitko";
@@ -134,9 +135,15 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   const posledni = cislo === stav.hospody.length;
   // štace je hotová, když je zapsaný příchod i škopek – pak na kartu klapne razítko
   const hotova = !!t?.prichod[h.id] && !!t?.skopek[h.id];
+  // Karta je celá v barvě štace, takže se podle barvy musí vybrat i inkoust:
+  // na pastel se píše natmavo, na sytou barvu krémem. Vevnitř už se pak
+  // všechno kreslí z currentColor, aby to platilo pro oba případy.
+  const ton = tonHospody(h.barva);
   return (
     <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
-      style={{ "--hosp": h.barva } as React.CSSProperties}
+      style={{
+        "--hosp-plna": ton.plna, "--hosp-tma": ton.tma, "--na-hosp": ton.inkoust,
+      } as React.CSSProperties}
       aria-label={`${cislo}. štace: ${h.nazev}${hotova ? " (hotová)" : ""}`}>
       {/* Razítko přes celou kartu, ne odznáček v rohu: hotová štace má být
           vidět na první pohled při švihu pásem. Pod ním se horní půlka karty
@@ -173,7 +180,6 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
         <div className="trasa-body" role="img" aria-label={`Štace ${cislo} z ${stav.hospody.length}`}>
           {stav.hospody.map((x, j) => (
             <div key={x.id} className={`trasa-bod${x.id === h.id ? " ted" : t?.prichod[x.id] ? " splneno" : ""}`}
-              style={{ "--hosp": x.barva } as React.CSSProperties}
               title={`${j + 1}. ${x.nazev}`} />
           ))}
         </div>
