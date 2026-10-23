@@ -239,9 +239,12 @@ nemůže potkat nový skript.
 
 ## Kresby
 
-Vlastní kresbu můžou mít **úkoly** v galerii a **stránky průpravy** v úvodu.
-Dokud ji nemají, drží místo ikona — kresba pak jen vskočí na její místo a nic
-se kolem toho nepřerovná.
+Vlastní kresbu můžou mít **úkoly** v galerii. Dokud ji nemají, drží místo
+ikona — kresba pak jen vskočí na její místo a nic se kolem toho nepřerovná.
+
+Stránky průpravy v úvodu mají vlastní **čmáranice** v `src/lib/uvod-kresby.ts`.
+Ty se nekreslí z obrázku, ale rovnou jako tahy v SVG: je to plakátová čára
+s kulatými konci, ne obtažená kresba.
 
 Kresba se dodává jako **obrázek**: tmavá kresba (fixa, pero, cokoli) na světlém
 podkladu, bez pozadí a bez stínů. Soubor se jmenuje podle toho, kam patří:

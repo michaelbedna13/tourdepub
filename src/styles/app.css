@@ -955,102 +955,92 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .legenda-radek{display:flex;align-items:center;gap:12px;font-size:var(--t-text);color:var(--text-2)}
 
 /* ---------- úvod po spuštění ---------- */
-/* Jedna neprůhledná vrstva od prvního snímku až do konce; uvnitř se jen
-   přepíná obsah. Dřív to byly dvě vrstvy přes sebe – statické logo z
-   index.html odcházelo prolnutím a průprava se zároveň zjevovala, takže
-   mezi nimi na okamžik prosvítala appka. To bylo to bliknutí. */
-/* Průprava je barevná plocha, ne tmavá obrazovka s nádechem barvy. Každá
-   stránka svoje: listuje se tím, že se celá obrazovka přebarví. Odstín je
-   hluboký, ne pastelový — hraje se v noci v hospodě a plná barva z plakátu
-   by na konci intra narazila do tmavé appky. */
+/* Průprava je plakát, ne obrazovka s nádechem barvy. Plná barva přes celou
+   plochu, jeden inkoust na všechno (čmáranice, nadpis, text i lišta dole)
+   a jedna velká čmáranice uprostřed. Barvu i inkoust nese stránka v
+   --papir a --inkoust (viz PRUPRAVA v Uvod.tsx): půlka stránek je tmavá
+   s krémovým inkoustem, půlka světlá s černým. Nic uvnitř se proto neodvozuje
+   od --text ani od --podklad, všechno je currentColor. */
 .uvod{
   position:fixed;inset:0;z-index:120;
-  padding:calc(env(safe-area-inset-top) + 24px) 26px calc(env(safe-area-inset-bottom) + 24px);
-  background:var(--podklad);
+  padding:calc(env(safe-area-inset-top) + 22px) 24px calc(env(safe-area-inset-bottom) + 20px);
+  background:var(--podklad);color:var(--inkoust,var(--text));
+  /* Švih do boku listuje stránkami a musí být náš. Při výchozím nastavení
+     si vodorovný tah vezme prohlížeč, pointerup se změní na pointercancel
+     a listování se nikdy nechytne. */
+  touch-action:none;
   transition:opacity .3s var(--krok),background-color .45s var(--krok);
 }
 /* Dokud svítí značka, je tahle vrstva průhledná: značku kreslí #uvod
    z index.html a React ji nepřekresluje, aby se skládání písmen nerozběhlo
-   podruhé. Pod průhlednou vrstvou je #uvod (z-index 100) a pod ním schovaná
-   appka, takže není co prosvítat. */
+   podruhé. #uvod leží nad ní a odejde sám. */
 .uvod.znacka{background:transparent}
-.uvod.barevna{background:color-mix(in srgb,var(--kat) 70%,var(--podklad))}
+.uvod.barevna{background:var(--papir)}
 /* na konci se úvod vytratí, nevypne se střihem */
 .uvod.zavira{opacity:0;pointer-events:none}
-/* nad obsahem průpravy, jinak by do něj ťuknutí na Přeskočit spadlo */
-.uvod-preskocit{
-  position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + 14px);right:12px;
-  min-height:44px;padding:0 16px;border-radius:var(--pilulka);
-  font-size:var(--t-text);color:color-mix(in srgb,var(--text) 62%,transparent);
-}
 
 /* Průprava: čtyři stránky, dál se jde tlačítkem nebo švihem — nikdy sama.
    Celá stránka přichází jako jeden kus. Dřív měl každý kousek vlastní zpoždění
    a tlačítko naskočilo rovnou na plno, takže byl snímek, kde svítilo tlačítko
    nad skoro prázdnou obrazovkou. */
 .uvod-obsah{
-  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  position:absolute;inset:0;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;
   /* o chvilku později než začne odcházet značka: prázdný snímek mezi nimi
      nevznikne, ale ani se nepřekrývají tak, že by text ležel přes logo */
   padding:inherit;animation:uvod-prichod .34s .16s var(--krok) both;
 }
-/* Vlevo, ne na střed. Vycentrovaný sloupec textu vypadá jako hláška, ne jako
-   stránka — a u víceřádkového nadpisu nemá oko kde začít, protože každý řádek
-   začíná jinde. */
+
+/* Horní lišta: značka vlevo, číslo stránky vpravo. Je to ten samý zámek
+   jako na tištěném plakátu — drobné popisky po okrajích, uprostřed obrázek. */
+.uvod-hlava{flex:none;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;width:100%;max-width:420px}
+.uvod-znak{height:30px;width:auto;display:block;color:currentColor}
+.uvod-krok{font-family:var(--pismo);font-weight:700;font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;opacity:.65}
+
 .uvod-stranka{
   position:relative;z-index:1;
   display:flex;flex-direction:column;align-items:stretch;text-align:left;
   max-width:420px;width:100%;flex:1;min-height:0;
+  animation:uvod-prichod .26s var(--krok) both;
 }
-/* Na barevné ploše nestačí příšeří, které funguje na skoro černé: text-3
-   je na ní sotva vidět. Průprava má proto vlastní dvě úrovně, odvozené
-   od krémové, ne od podkladu. */
-.uvod-krok{flex:none;font-family:var(--pismo);font-size:var(--t-drobne);
-  color:color-mix(in srgb,var(--text) 62%,transparent);
-  letter-spacing:.1em;text-transform:uppercase;margin-top:30px}
-.uvod-nadpis{flex:none;margin-top:10px;font-size:clamp(32px,9.4vw,44px);
-  line-height:1.08;letter-spacing:-.025em}
-/* Místo pro kresbu si bere, co zbyde mezi nadpisem a textem. Výška je tím
-   daná rozvržením, ne obrázkem: až kresby přijdou, nadpis ani text se
-   nehnou. Dokud nejsou, drží místo ikona. */
+/* Čmáranice si bere, co zbyde nad textem — je to hlavní věc na stránce,
+   tak ať má místo. */
 .uvod-kresba{
-  flex:1;min-height:90px;width:100%;
+  flex:1;min-height:120px;width:100%;
   display:flex;align-items:center;justify-content:center;
-  /* Kresba táhne ke krémové, ne k barvě: na vlastní barevné ploše by
-     v barvě splynula. Zůstane v ní jen tolik, aby byla v tónu stránky. */
-  margin:20px 0;color:color-mix(in srgb,var(--kat) 22%,var(--text));
+  margin:14px 0 26px;color:currentColor;
   animation:kresba-prijde .5s .1s var(--krok) both;
 }
-/* Kresba vyplní slot, ikona jen tak, aby nebyla obří — je to záskok,
-   ne obrázek stránky. */
-.uvod-kresba > *{width:auto;height:100%;max-width:100%}
-.uvod-kresba > .ikona{height:auto;width:min(44%,150px)}
+.uvod-cmaranice{width:auto;height:100%;max-width:86%;max-height:300px}
 @keyframes kresba-prijde{from{opacity:0;transform:translateY(14px) scale(.96)}}
-.uvod-text{flex:none;margin-bottom:2px;font-size:var(--t-hlavni);
-  line-height:1.6;color:color-mix(in srgb,var(--text) 88%,transparent);max-width:34em}
-/* Dál / Jedeme: jen tichý popisek, ne svítící tlačítko. Ťuknout jde kamkoli
-   na obrazovku, tak ať to dole nepřetahuje pozornost z textu. */
-/* Dál / Jedeme: jen tichý popisek, ne svítící tlačítko. Ťuknout jde kamkoli
-   na obrazovku, tak ať to dole nepřetahuje pozornost z textu. */
-.uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
-  min-height:44px;padding:0 4px;
-  font-size:var(--t-text);color:color-mix(in srgb,var(--text) 82%,transparent);
-  transition:color .16s}
-.uvod-dal:active{color:var(--text)}
-/* Tečky vlevo, Dál vpravo — spodní řádka drží obě hrany stránky, stejně
-   jako nadpis nahoře drží levou. Vycentrované pod sebou to byl sloupeček
-   uprostřed prázdna. */
-.uvod-spodek{display:flex;align-items:center;justify-content:space-between;
-  gap:16px;width:100%;max-width:420px;padding-top:18px}
-/* při přepnutí stránky se mění jen obsah, ne celá vrstva */
-.uvod-stranka{animation:uvod-prichod .26s var(--krok) both}
-.uvod-obsah{position:absolute;overflow:hidden}
-.uvod-tecky{display:flex;gap:7px}
-.uvod-tecka{width:24px;height:3px;border-radius:2px;
-  background:color-mix(in srgb,var(--text) 22%,transparent);
+
+.uvod-nadpis{flex:none;font-size:clamp(32px,9.4vw,44px);
+  line-height:1.04;letter-spacing:-.025em;color:currentColor}
+.uvod-text{flex:none;margin-top:12px;font-size:var(--t-hlavni);
+  line-height:1.55;opacity:.78;max-width:34em}
+
+/* Spodní lišta: tečky, Přeskočit a Dál. Tři drobnosti na jedné řádce po
+   okrajích — zase ten plakátový zámek, ne tlačítková lišta. */
+.uvod-spodek{flex:none;display:flex;align-items:center;gap:14px;
+  width:100%;max-width:420px;padding-top:20px}
+.uvod-tecky{display:flex;gap:6px;flex:none}
+.uvod-tecka{width:18px;height:3px;border-radius:2px;
+  background:color-mix(in srgb,currentColor 24%,transparent);
   transition:background .25s var(--krok)}
-.uvod-tecka.bylo{background:color-mix(in srgb,var(--text) 45%,transparent)}
-.uvod-tecka.ted{background:var(--text)}
+.uvod-tecka.bylo{background:color-mix(in srgb,currentColor 48%,transparent)}
+.uvod-tecka.ted{background:currentColor}
+/* Přeskočit je tichý text, ne tlačítko: ťuknout jde stejně kamkoli. */
+.uvod-preskocit{margin-left:auto;min-height:44px;padding:0 4px;
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:currentColor;opacity:.5}
+.uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
+  min-height:44px;padding:0 2px;
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:currentColor;transition:opacity .16s}
+.uvod-dal:active{opacity:.6}
+.uvod-sipka{width:24px;height:10px;flex:none}
 @keyframes uvod-prichod{
   from{opacity:0;transform:translateY(12px)}
   to{opacity:1;transform:none}

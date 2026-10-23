@@ -9,10 +9,8 @@
 // a značka pod ní prosvítá — teprve s první stránkou se #uvod odklidí.
 import { useEffect, useRef, useState } from "react";
 import { vazat } from "../lib/format";
-import type { JmenoIkony } from "../lib/ikony";
-import { Ikona } from "./Ikona";
-import { Kresba } from "./Kresba";
-import { KRESBY } from "../lib/kresby";
+import { UVOD_KRESBY } from "../lib/uvod-kresby";
+import { Logo } from "./Logo";
 
 /** Nejmíň takhle dlouho zůstane značka od načtení stránky. */
 const ZNACKA_NEJMIN = 1700;
@@ -27,24 +25,31 @@ const PISMA_NEJVIC = 2500;
 const ZAVRENI = 300;
 
 interface Stranka {
-  /** Klíč kresby: soubor kresby/uvod-<id>.png, viz scripts/prevod-kreseb.py. */
+  /** Klíč kresby v UVOD_KRESBY. */
   id: string;
-  /** Záskok, dokud ke stránce není kresba. */
-  ikona: JmenoIkony;
-  /** Barva stránky. Nasvítí podklad, nic víc — průprava zůstává tmavá. */
+  /** Plná barva celé stránky a inkoust, kterým se na ni kreslí i píše.
+   *  Není to nádech barvy jako dřív — stránka je plakát, ne tmavá
+   *  obrazovka s podtónem. */
   barva: string;
+  inkoust: string;
   nadpis: string;
   text: string;
 }
 
+const KREM = "#F2E7CF";
+const INKOUST = "#1A1A14";
+
+/** Shrnutí pravidel na čtyři plakáty. Je to výtah z obrazovky Pravidla —
+ *  co se hraje, za co jsou čárky, co se trestá a co se vyhrává. Delší verze
+ *  je v Pravidlech, sem patří jen to, co musí vědět každý, než se vyrazí. */
 const PRUPRAVA: Stranka[] = [
-  { id: "statl", ikona: "mista", barva: "#F9A204", nadpis: "Večer ve Štatlu",
-    text: "Devět brněnskejch špeluněk, jedna noc a partyje, co si nedá říct. Valí se to od šesti večer do dvou do rána." },
-  { id: "carky", ikona: "carka", barva: "#006633", nadpis: "Čárky nejsou za chlast",
-    text: "Za každou špeluňku, do který vlezete, čárka. Za škopek čárka. Ale ty tučný padajó za srandy — za koule, za dobrej kšaft a za to, že to v palici nemáš vypatlaný." },
-  { id: "loudal", ikona: "hospoda", barva: "#026C80", nadpis: "Kdo se loudá, ten nemá",
-    text: "Na každou štaci je tak 45 minut a pak se valí dál. Jak se nějaká partyja fest loudá a ostatní na ni čumijó, za srandy v tý špeluňce nemá ani čárku." },
-  { id: "bank", ikona: "koruna", barva: "#E5331F", nadpis: "Celej bank bere jedna",
+  { id: "skopek", barva: "#E5331F", inkoust: KREM, nadpis: "Devět špeluněk, jedna noc",
+    text: "Valí se to od šesti večer do dvou do rána, ve dvou až třech partách. Na jednu štaci je tak 45 minut a pak se jede dál." },
+  { id: "carky", barva: "#F9A204", inkoust: INKOUST, nadpis: "Čárky nejsou za chlast",
+    text: "Čárka za každou špeluňku, do který vlezete. Čárka, když půlka partyje lupne škopek. A ty tučný padajó za srandy — podle toho, jaká je to haluz." },
+  { id: "snek", barva: "#006633", inkoust: KREM, nadpis: "Kdo se loudá, ten nemá",
+    text: "Jak se nějaká partyja fest loudá a ostatní na ni čumijó, za srandy v tý špeluňce nemá ani čárku." },
+  { id: "koruna", barva: KREM, inkoust: INKOUST, nadpis: "Celej bank bere jedna",
     text: "Vlezné je kilo na palici a na konci to všecko shrábne ta parta, co nahrabala nejvíc čárek. Tak ať je to betelný." },
 ];
 
@@ -151,7 +156,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
 
   return (
     <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " barevna" : " znacka"}`}
-      style={{ "--kat": s.barva } as React.CSSProperties}
+      style={{ "--papir": s.barva, "--inkoust": s.inkoust } as React.CSSProperties}
       role="dialog" aria-label="Úvod"
       onPointerDown={(e) => { svih.current = e.clientX; }}
       onPointerUp={(e) => {
@@ -165,30 +170,20 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
         else dal();
       }}
     >
-      {/* Přeskočit naskočí až s průpravou. Ve fázi značky je to jediný text
-          na obrazovce a dokud se nenačte písmo, vysází se náhradním a po
-          chvilce přeskočí do správného — drobné, ale je to vidět. Značka
-          trvá necelé dvě vteřiny, takže není co zmeškat. */}
-      {kde >= 0 && (
-        <button className="uvod-preskocit" onClick={zavri}
-          onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
-      )}
-
+      {/* Plakát: značka a číslo nahoře, čmáranice přes půl obrazovky,
+          dole nadpis s větou a úplně na spodku lišta s ovládáním. Je to
+          skladba z tiskového plakátu, ne z formuláře — stránka má mít jednu
+          věc, na kterou se kouká, a všechno ostatní potichu po okrajích. */}
       {kde >= 0 && (
         <div className="uvod-obsah">
+          <div className="uvod-hlava">
+            <Logo trida="uvod-znak" />
+            <span className="uvod-krok cislo">Pravidla {kde + 1}/{PRUPRAVA.length}</span>
+          </div>
+
           <div className="uvod-stranka" key={kde}>
-            <div className="uvod-krok cislo">{kde + 1} ze {PRUPRAVA.length}</div>
+            <div className="uvod-kresba"><Cmaranice id={s.id} /></div>
             <h1 className="uvod-nadpis">{vazat(s.nadpis)}</h1>
-
-            {/* Místo pro kresbu stránky. Dokud není, drží ho ikona — ale
-                výšku si bere stejnou, takže se nadpis ani text nehnou,
-                až kresby přijdou. */}
-            <div className="uvod-kresba">
-              {KRESBY[`uvod-${s.id}`]
-                ? <Kresba id={`uvod-${s.id}`} />
-                : <Ikona jmeno={s.ikona} px={96} />}
-            </div>
-
             <p className="uvod-text">{vazat(s.text)}</p>
           </div>
 
@@ -199,8 +194,14 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
                 <span key={i} className={`uvod-tecka${i === kde ? " ted" : ""}${i < kde ? " bylo" : ""}`} />
               ))}
             </div>
+            <button className="uvod-preskocit" onClick={zavri}
+              onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
             <button className="uvod-dal" onClick={dal} onPointerUp={(e) => e.stopPropagation()}>
-              {posledni ? <><Ikona jmeno="piva" px={17} /> Jedeme na to</> : "Dál"}
+              {posledni ? "Jedeme na to" : "Dál"}
+              <svg className="uvod-sipka" viewBox="0 0 24 10" fill="none" stroke="currentColor"
+                strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M1 5h21M17 1l5 4-5 4" />
+              </svg>
             </button>
           </div>
         </div>
@@ -209,3 +210,15 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   );
 }
 
+/** Čmáranice stránky. Kreslí se tahem, ne výplní — jeden rukopis v každé
+ *  velikosti a na plakátu je to to jediné, na co se kouká. */
+function Cmaranice({ id }: { id: string }) {
+  const tahy = UVOD_KRESBY[id];
+  if (!tahy) return null;
+  return (
+    <svg className="uvod-cmaranice" viewBox="0 0 100 100" fill="none" stroke="currentColor"
+      strokeWidth={4.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {tahy.map((d) => <path key={d} d={d} />)}
+    </svg>
+  );
+}

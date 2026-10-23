@@ -433,12 +433,36 @@ palety proto na ploše pořád svítila stará tmavě modrá. Číslo se zvedá 
 každé změně barev, ale **appku je stejně potřeba z plochy smazat a přidat
 znovu**, jinak si iOS sáhne pro svou uloženou kopii.
 
-**2. Průprava.** Čtyři stránky: ikona, nadpis a jedna věta. **Žádná se nepřehodí
-sama** — dál se jde ťuknutím kamkoli na obrazovku, švihem do boku nebo popiskem
-*Dál* dole. Ten popisek **není tlačítko**: je to tichý text bez plochy, protože
-ťuknout jde stejně kamkoli a svítící pilulka dole by přetahovala pozornost
-z toho, co se má přečíst. Proužky dole říkají, kolik
-toho zbývá; úvod, u kterého není vidět konec, je otrava.
+**2. Průprava.** Čtyři stránky a na nich **shrnutí pravidel**: co se hraje,
+za co jsou čárky, co se trestá a co se vyhrává. Delší verze je na obrazovce
+Pravidla, sem patří jen to, co musí vědět každý, než se vyrazí.
+
+Stránka je **plakát**, ne obrazovka s nádechem barvy. Plná barva přes celou
+plochu, jeden inkoust na všechno a jedna velká čmáranice uprostřed. Nahoře
+drobná lišta se značkou a číslem stránky, dole nadpis s větou a pod tím lišta
+s ovládáním — to je zámek z tištěného plakátu: uprostřed obrázek, popisky
+potichu po okrajích.
+
+Barvu i inkoust nese stránka sama (`--papir`, `--inkoust`, viz `PRUPRAVA`
+v `Uvod.tsx`): dvě stránky jsou tmavé s krémovým inkoustem, dvě světlé
+s černým. **Nic uvnitř se proto neodvozuje od `--text` ani od `--podklad`** —
+všechno je `currentColor`, jinak by polovina stránek zmizela.
+
+Čmáranice jsou v `src/lib/uvod-kresby.ts` a kreslí se **tahem, ne výplní**
+(na rozdíl od kreseb úkolů). Tloušťka čáry je v souřadnicích čtverce
+`0 0 100 100`, takže roste s obrázkem a rukopis zůstává stejný v každé
+velikosti.
+
+**Žádná stránka se nepřehodí sama** — dál se jde ťuknutím kamkoli na
+obrazovku, švihem do boku nebo popiskem *Dál* dole. Ten popisek **není
+tlačítko**: je to tichý text bez plochy, protože ťuknout jde stejně kamkoli
+a svítící pilulka dole by přetahovala pozornost z toho, co se má přečíst.
+Proužky dole říkají, kolik toho zbývá; úvod, u kterého není vidět konec,
+je otrava.
+
+`.uvod` má **`touch-action: none`**. Bez toho si vodorovný tah vezme
+prohlížeč, `pointerup` se změní na `pointercancel` a švih mezi stránkami se
+nikdy nechytne — přesně ta samá past jako u pásu hero karet.
 
 Stránka přichází **jako jeden kus**, o 160 ms později, než začne odcházet značka.
 Dřív měl každý kousek vlastní zpoždění a tlačítko naskočilo rovnou na plno, takže
