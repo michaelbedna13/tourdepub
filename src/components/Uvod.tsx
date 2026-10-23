@@ -46,20 +46,25 @@ const KREM = "#F2E7CF";
 const INKOUST = "#1A1A14";
 
 /** Shrnutí pravidel na čtyři plakáty. Je to výtah z obrazovky Pravidla —
- *  co se hraje, za co jsou čárky, co se trestá a co se vyhrává. Delší verze
- *  je v Pravidlech, sem patří jen to, co musí vědět každý, než se vyrazí. */
+ *  co se hraje, za co jsou čárky, co se trestá a co se vyhrává.
+ *
+ *  Mluví to hantecem z Pravidel, ne návodem. Přepsat to do spisovného
+ *  („Valí se to od šesti večer do dvou do rána, ve dvou až třech partách")
+ *  bylo věcně správně a znělo to jako příbalový leták — v appce, kde se
+ *  jinde píše o betelný řežbě a vypatlaný palici, je to cizí hlas. Krátké
+ *  věty, dvě na stránku, ať to je k přečtení na jeden pohled. */
 const PRUPRAVA: Stranka[] = [
   { id: "skopek", barva: "#E5331F", inkoust: KREM, nadpis: "Devět špeluněk, jedna noc",
-    text: "Valí se to od šesti večer do dvou do rána, ve dvou až třech partách. Na jednu štaci je tak 45 minut a pak se jede dál." },
+    text: "Devět brněnskejch špeluněk a partyje, co si nedá říct. Valí se to od šesti večer do dvou do rána." },
   { id: "carky", barva: "#F9A204", inkoust: INKOUST, skladba: "kolem", kotva: "vlevo",
     nadpis: "Čárky nejsou za chlast",
-    text: "Čárka za každou špeluňku, do který vlezete. Čárka, když půlka partyje lupne škopek. A ty tučný padajó za srandy — podle toho, jaká je to haluz." },
+    text: "Za každou špeluňku čárka, za škopek čárka. Ale ty tučný padajó za srandy — za koule a za to, že to v palici nemáš vypatlaný." },
   { id: "snek", barva: "#006633", inkoust: KREM, skladba: "nahore", kotva: "vpravo",
     nadpis: "Kdo se loudá, ten nemá",
-    text: "Jak se nějaká partyja fest loudá a ostatní na ni čumijó, za srandy v tý špeluňce nemá ani čárku." },
+    text: "Na štaci je tak 45 minut. Kdo se fest loudá a ostatní na něj čumijó, za srandy v tý špeluňce nemá ani čárku." },
   { id: "koruna", barva: KREM, inkoust: INKOUST, kotva: "vlevo",
     nadpis: "Celej bank bere jedna",
-    text: "Vlezné je kilo na palici a na konci to všecko shrábne ta parta, co nahrabala nejvíc čárek. Tak ať je to betelný." },
+    text: "Vlezné je kilo na palici a celej bank shrábne parta s nejvíc čárkama. Tak ať je to betelný." },
 ];
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
