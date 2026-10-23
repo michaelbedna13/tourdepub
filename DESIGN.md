@@ -236,9 +236,19 @@ prvního řádku (`#3A3421`, sedí na jednu hodnotu z 255). Šev to odstranilo,
 ale nad gradientem pak visel pruh jedné ploché barvy a jako pás to bylo
 poznat pořád. Plochu je potřeba srovnat na obou stranách, ne jen hranu.
 
-Průprava si lištu **přebarvuje na barvu stránky** (`useBarvaListy`
-v `Uvod.tsx`) — nad červeným plakátem by jinak visel tmavý pruh. Po konci
-se vrátí to, co stojí v `index.html`.
+Průprava si pruh **přebarvuje na barvu stránky** (`useBarvaOkoli`
+v `Uvod.tsx`) — nad červeným plakátem by jinak visel tmavý pruh.
+
+Mění se přitom **obojí: `theme-color` i podklad `<html>` a `<body>`**.
+Samotná `theme-color` nestačila: iOS Safari kreslí ten pruh z podkladu
+stránky, takže barva v hlavičce se dala přepsat, jak chtěla, a pruh zůstával
+tmavý. Plakát je `position:fixed` vrstva nad stránkou, takže podklad pod ním
+o jeho barvě neví a musí se mu to říct.
+
+Je to `useLayoutEffect`, ne obyčejný efekt: ten běží až po vykreslení, takže
+by byl na každém přepnutí stránky jeden snímek se starou barvou pruhu.
+A vrací se **prázdný řetězec**, ne pevná barva, aby po konci zase platilo
+i pravidlo pro širokou obrazovku (`#1F1F19`).
 
 V appce z plochy na tom nezáleží: tam je lišta průhledná
 (`apple-mobile-web-app-status-bar-style: black-translucent`) a obsah jde

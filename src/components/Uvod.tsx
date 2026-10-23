@@ -7,7 +7,7 @@
 // přihlásil, animace by buď naskočila v půlce, nebo by písmena zmizela
 // a začala znova. Tahle vrstva je proto do příchodu průpravy průhledná
 // a značka pod ní prosvítá — teprve s první stránkou se #uvod odklidí.
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { vazat } from "../lib/format";
 import { UVOD_KRESBY } from "../lib/uvod-kresby";
 import { Logo } from "./Logo";
@@ -130,15 +130,32 @@ function nactiPisma(): Promise<unknown> {
 }
 
 /** Přebarví pruh nad stránkou (v prohlížeči) na barvu stránky průpravy.
- *  Bez toho visí nad barevným plakátem tmavý pruh v barvě appky. Po konci
- *  se vrátí to, co stálo v index.html. */
-function useBarvaListy(barva: string | null) {
-  useEffect(() => {
+ *  Bez toho visí nad barevným plakátem tmavý pruh v barvě appky.
+ *
+ *  Mění se obojí: `theme-color` i podklad `<html>` a `<body>`. Samotná
+ *  `theme-color` nestačila — iOS Safari kreslí ten pruh z podkladu stránky,
+ *  takže barva v hlavičce se dala přepsat, jak chtěla, a pruh zůstával
+ *  tmavý. Plakát je `position:fixed` vrstva nad stránkou, takže podklad pod
+ *  ním o jeho barvě neví a musí se mu říct.
+ *
+ *  Layout, ne obyčejný efekt: obyčejný běží až po vykreslení, takže by byl
+ *  na každém přepnutí stránky jeden snímek se starou barvou pruhu.
+ *
+ *  Po konci se vrátí to, co stálo ve stylu — prázdný řetězec, ne pevná
+ *  barva, aby platilo i pravidlo pro širokou obrazovku. */
+function useBarvaOkoli(barva: string | null) {
+  useLayoutEffect(() => {
+    if (!barva) return;
     const m = document.querySelector('meta[name="theme-color"]');
-    if (!m) return;
-    const puvodni = m.getAttribute("content");
-    if (barva) m.setAttribute("content", barva);
-    return () => { if (puvodni) m.setAttribute("content", puvodni); };
+    const puvodni = m?.getAttribute("content") ?? null;
+    m?.setAttribute("content", barva);
+    document.documentElement.style.backgroundColor = barva;
+    document.body.style.backgroundColor = barva;
+    return () => {
+      if (puvodni) m?.setAttribute("content", puvodni);
+      document.documentElement.style.backgroundColor = "";
+      document.body.style.backgroundColor = "";
+    };
   }, [barva]);
 }
 
@@ -180,7 +197,9 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
 
   const posledni = kde + 1 === PRUPRAVA.length;
   const s = PRUPRAVA[Math.max(0, kde)];
-  useBarvaListy(kde >= 0 && !zavira ? s.barva : null);
+  // Drží se i při zavírání: plakát se vytrácí a pruh nad ním nemá skočit
+  // dřív než on. Vrátí se to, až úvod zmizí úplně.
+  useBarvaOkoli(kde >= 0 ? s.barva : null);
 
   return (
     <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " barevna" : " znacka"}`}
