@@ -220,15 +220,21 @@ psacího fontu zkontroluj `ť ď ě ů ř Ú Š Č Ž Ň`; dělá to `scripts/st
 
 ## Pruh nad stránkou v prohlížeči
 
-`theme-color` **není barva podkladu, ale barva prvního řádku stránky**
-(`#3A3421`). Přes podklad leží teplá záře (`.app::after`) a ta je nahoře
-nejsilnější, takže čistý `#2B2B23` v liště nad stránkou vycházel jako
-studený šedý pruh přilepený k teplé appce — šev byl vidět přesně na hraně.
+Pruh nad stránkou kreslí Safari samo, **plnou barvou z `theme-color`** —
+obsah pod něj nejde, na rozdíl od appky z plochy. Teplá záře (`.app::after`)
+přitom byla u horní hrany nejsilnější, takže nad teplou appkou visel studený
+pruh a šev byl vidět přesně na hraně.
 
-Jde to spočítat: záře je `rgba(249,162,4,.11)` se středem nad oknem, u horní
-hrany má krytí kolem devíti procent, a to z `#2B2B23` udělá `#3A3421`.
-Naměřeno vychází rozdíl pod jednu hodnotu z 255. Záře je `position:fixed`,
-takže se ten řádek posouváním nemění a jedna hodnota sedí pořád.
+Řeší to **maska na záři**: horní kus se vytratí do ztracena
+(`mask-image: linear-gradient(to bottom, transparent 0, #000
+calc(env(safe-area-inset-top) + 110px))`). První řádek stránky je tím čistý
+podklad, `theme-color` je ten samý `#2B2B23` a šev není kde vidět. Záře
+naskočí až pod lištou, takže „teplé světlo shora" zůstává.
+
+Zkoušelo se i opačně — nechat záři a dát do `theme-color` spočítanou barvu
+prvního řádku (`#3A3421`, sedí na jednu hodnotu z 255). Šev to odstranilo,
+ale nad gradientem pak visel pruh jedné ploché barvy a jako pás to bylo
+poznat pořád. Plochu je potřeba srovnat na obou stranách, ne jen hranu.
 
 Průprava si lištu **přebarvuje na barvu stránky** (`useBarvaListy`
 v `Uvod.tsx`) — nad červeným plakátem by jinak visel tmavý pruh. Po konci

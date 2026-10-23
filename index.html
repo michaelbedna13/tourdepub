@@ -11,13 +11,13 @@
      vykreslení — a Safari v prohlížeči do té doby obarví lištu nad stránkou
      výchozí černou místo podkladem appky. -->
 <meta name="color-scheme" content="dark">
-<!-- Barva pruhu nad stránkou v prohlížeči. Není to podklad appky, ale barva
-     jejího PRVNÍHO ŘÁDKU: přes podklad leží teplá záře (.app::after) a ta je
-     nahoře nejsilnější, takže čistý #2B2B23 v liště nad stránkou vycházel
-     jako studený šedý pruh přilepený k teplé appce. Záře je position:fixed,
-     takže se ten řádek posouváním nemění a jedna hodnota sedí pořád.
+<!-- Barva pruhu nad stránkou v prohlížeči. Je to čistý podklad a sedí přesně:
+     teplá záře (.app::after) se nahoře vytrácí do ztracena, takže první řádek
+     stránky je taky čistý podklad a šev není kde vidět. Zkoušelo se i opačně
+     (nechat záři a dát sem barvu prvního řádku), jenže pak nad gradientem
+     visel pruh jedné ploché barvy a jako pás to bylo poznat pořád.
      Průprava si pruh přebarvuje na barvu stránky, viz Uvod.tsx. -->
-<meta name="theme-color" content="#3A3421">
+<meta name="theme-color" content="#2B2B23">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
