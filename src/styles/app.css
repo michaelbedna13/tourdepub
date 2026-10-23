@@ -340,26 +340,14 @@ input,textarea,select{caret-color:var(--text)}
 /* karta, co jen vykukuje, nemá přetahovat pozornost */
 .hero:not(.ted){opacity:.45}
 
-/* Velké číslo štace jako podklad karty. Devět karet se lišilo jenom jménem
-   a při švihu nebylo poznat, že se vůbec něco stalo. Leží u levého okraje,
-   kam se text nedostane, a je tak slabé, že se dá přehlédnout — má dávat
-   kartě tvář, ne se hlásit o slovo. */
-.hero-duch{
-  position:absolute;left:-18px;top:6px;z-index:0;pointer-events:none;user-select:none;
-  /* Pevných 228 px přerostlo úzký telefon: číslo přelezlo přes trasu až do
-     řádky s časem. Na 320 vyjde 198, na běžné šířce zůstává 228. */
-  font-family:var(--nadpisy);font-weight:400;font-size:min(228px,62vw);line-height:.74;
-  letter-spacing:-.05em;opacity:.17;
-  /* jen obrys: plné číslo udělá na tmavém podkladu desku, obrys zůstane kresbou */
-  color:transparent;-webkit-text-stroke:2px var(--text);
-}
-/* Zápis má být vidět i na kartě, ne jen na odškrtávátku. „+1“ vyletí mimo
-   kartu, tak ať se ozve i ona: číslo štace krátce zesílí a zase ztichne. */
-.hero-duch.zabliklo{animation:duch-zablikni .7s var(--krok)}
-@keyframes duch-zablikni{
-  0%{opacity:.17}
-  16%{opacity:.5}
-  100%{opacity:.17}
+/* Číslo štace jako tiché nadočko nad jménem. Dřív to byl obrovský obrys
+   za nadpisem, co lezl přes jméno i přes pruh trasy — karta z toho byla
+   přeplácaná a nedalo se poznat, co je na ní hlavní. Tohle nese tu samou
+   informaci, nic nepřekrývá a řádka s „4/9" u trasy tím odpadla. */
+.hero-nadocko{
+  position:relative;z-index:1;font-family:var(--pismo);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(242,231,207,.42);
 }
 
 /* Jak dlouho už parta ve špeluňce sedí. Tichá řádka pod názvem – je to
@@ -391,7 +379,7 @@ input,textarea,select{caret-color:var(--text)}
 /* Pod razítkem se karta rozostří. Jméno a trasa jsou pořád poznat, ale už
    to není to, co se čte — štace je za vámi. Odškrtávátka zůstanou ostrá,
    aby šel zápis vzít zpátky, a šipky taky, aby se dalo odjet dál. */
-.hero.hotova .hero-duch,
+.hero.hotova .hero-nadocko,
 .hero.hotova .hero-nazev,
 .hero.hotova .hero-cas,
 .hero.hotova .hero-trasa{
@@ -407,7 +395,7 @@ input,textarea,select{caret-color:var(--text)}
 /* Vzhledem drobné, ať nepřebíjejí kartu, ale ťukací plocha je plných 44 —
    jinak se do nich v hospodě jednou rukou netrefíš. */
 .hero-sipky .ikonove{width:36px;height:36px;background:transparent;color:var(--text-3);
-  position:relative}
+  opacity:.5;position:relative}
 .hero-sipky .ikonove::after{content:"";position:absolute;inset:-4px}
 
 /* název hospody je hlavní věc na obrazovce, tak ať to tak vypadá */
@@ -421,7 +409,7 @@ input,textarea,select{caret-color:var(--text)}
      slejvají do jednoho bloku. */
   font-weight:700;
   font-size:clamp(30px,8.6vw,42px);line-height:var(--radky-nadpis);letter-spacing:-.005em;
-  margin:18px 0 0;min-height:calc(2em * var(--radky-nadpis));
+  margin:10px 0 0;min-height:calc(2em * var(--radky-nadpis));
   overflow-wrap:anywhere;position:relative;z-index:1;
 }
 
@@ -435,10 +423,9 @@ input,textarea,select{caret-color:var(--text)}
 .trasa-body{display:flex;gap:3px;flex:1;min-width:0}
 /* Tenčí a tlumenější než dřív. Současná štace byla v plné barvě textu, tedy
    stejně výrazná jako jméno hospody nad ní, a pruh pak přebíjel kartu. */
-.trasa-bod{flex:1;height:2px;border-radius:2px;background:rgba(242,231,207,.12)}
-.trasa-bod.splneno{background:rgba(242,231,207,.34)}
-.trasa-bod.ted{background:rgba(242,231,207,.72)}
-.hero-stace{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3);flex:none}
+.trasa-bod{flex:1;height:1px;border-radius:0;background:rgba(242,231,207,.13)}
+.trasa-bod.splneno{background:rgba(242,231,207,.3)}
+.trasa-bod.ted{background:rgba(242,231,207,.66)}
 
 /* dvě věci, co se v každé špeluňce zapisují – jako odškrtávátka, ne jako
    dvě obří tlačítka, která přebila zbytek obrazovky */

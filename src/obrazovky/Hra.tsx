@@ -62,16 +62,6 @@ export function Hra() {
   );
 }
 
-/** Číslice nejsou stejně široké. Jednička má proti dvojce nebo osmičce
- *  zlomek plochy, takže první karta vypadala vedle ostatních prázdná.
- *  Zvětšit ji nejde — vyrostla by přes trasu a řádku s časem. Dostane tedy
- *  silnější obrys a nezajíždí tolik za levý okraj; plochy je pak na kartě
- *  vidět podobně jako u ostatních. Sedmička je na tom o něco lépe než
- *  jednička, ale pořád hubená. */
-const UZKA_CISLICE: Record<string, { tah: string; vlevo: string }> = {
-  "1": { tah: "3.2px", vlevo: "16px" },
-  "7": { tah: "2.5px", vlevo: "-2px" },
-};
 
 /* ---------- hero karty štací ---------- */
 
@@ -145,25 +135,9 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   // štace je hotová, když je zapsaný příchod i škopek – pak na kartu klapne razítko
   const hotova = !!t?.prichod[h.id] && !!t?.skopek[h.id];
   const odKdy = t?.prichodCas[h.id];
-  // zápis má být vidět i na kartě, ne jen na odškrtávátku: velké číslo
-  // štace krátce zesílí. Klíč se mění se zápisem, čímž se animace spustí znovu.
-  const [puls, setPuls] = useState(0);
-  const uzka = UZKA_CISLICE[String(cislo)];
-
   return (
     <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
       aria-label={`${cislo}. štace: ${h.nazev}${hotova ? " (hotová)" : ""}`}>
-      {/* číslo štace ještě jednou, ve velkém a potichu: karty jsou jinak k
-          nerozeznání a tohle jim dá tvář, aniž by to něco přidalo na čtení */}
-      <span className={`hero-duch cislo${puls ? " zabliklo" : ""}`} key={puls} aria-hidden="true"
-        style={uzka && { WebkitTextStrokeWidth: uzka.tah, left: uzka.vlevo }}>
-        {cislo}
-      </span>
-
-      {/* Kolečko s číslem štace tu bývalo taky, ale číslo pak stálo na kartě
-          třikrát – v kolečku, ve velkém za názvem a ještě jako 1/9 u trasy.
-          Zůstalo to velké; drží roh karty samo a je to to první, co padne
-          do oka při švihu. */}
       {/* Razítko přes celou kartu, ne odznáček v rohu: hotová štace má být
           vidět na první pohled při švihu pásem. Pod ním se horní půlka karty
           rozostří — jméno a trasa jsou pořád poznat, ale už to není to, co
@@ -187,6 +161,12 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
         </div>
       </div>
 
+      {/* Číslo štace jako tiché nadočko nad jménem. Dřív leželo za nadpisem
+          jako obrovský obrys a lezlo přes jméno i přes pruh trasy — karta
+          z toho byla přeplácaná a nedalo se poznat, co je na ní hlavní.
+          Tady nese tu samou informaci a nic nepřekrývá. */}
+      <div className="hero-nadocko">{cislo}. štace z {stav.hospody.length}</div>
+
       <h1 className="hero-nazev">{h.nazev}</h1>
 
       <div className="hero-trasa">
@@ -196,7 +176,6 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
               title={`${j + 1}. ${x.nazev}`} />
           ))}
         </div>
-        <span className="hero-stace cislo">{cislo}/{stav.hospody.length}</span>
       </div>
 
       <JakDlouho od={odKdy} />
@@ -206,10 +185,7 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
           const hotovo = !!t?.[z.id as Zaklad][h.id];
           return (
             <button key={z.id} className={`zaskrt${hotovo ? " hotovo" : ""}`} aria-pressed={hotovo}
-              onClick={() => {
-                if (prepniZaklad(z.id as Zaklad, h.id)) odmena("+1");
-                setPuls((x) => x + 1);
-              }}>
+              onClick={() => { if (prepniZaklad(z.id as Zaklad, h.id)) odmena("+1"); }}>
               <span className="zaskrt-kolecko"><Ikona jmeno="check" px={14} /></span>
               <span className="zaskrt-text">{vazat(z.nazev)}</span>
               <span className="zaskrt-hodnota cislo">+1</span>

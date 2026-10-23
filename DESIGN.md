@@ -219,6 +219,18 @@ a dvě obří tlačítka — takže nic nevedlo a hlavní informace zanikla.
 Pod kartou jde skóre, pak pořadí týmů, pak úkoly — každý blok tišší než
 ten nad ním.
 
+### Úklid podle HIG
+
+Karta nesla čtyři věci naráz: obrovský obrys čísla štace za nadpisem, jméno,
+pruh trasy s „4/9" a řádku s časem. Obrys lezl přes jméno i přes pruh, takže
+se nedalo poznat, co je na kartě hlavní — proti zásadě *obsah před ozdobou*
+a *dát hlavní věci dost místa* (HIG: Layout → Visual hierarchy).
+
+Číslo štace se proto přesunulo nahoru jako **tiché nadočko** („4. štace z 9").
+Nese tu samou informaci, nic nepřekrývá, a odpadlo s ním „4/9" u pruhu —
+jeden údaj dvakrát na jedné kartě. Pruh trasy je vlasový, šipky tišší.
+Zůstala jedna osa shora dolů: číslo → jméno → trasa → čas → zápis.
+
 ## Navigace
 
 Dvě cesty na to samé: **švih do boku** a **hamburger vpravo nahoře**.
