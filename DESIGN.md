@@ -225,11 +225,17 @@ obsah pod něj nejde, na rozdíl od appky z plochy. Teplá záře (`.app::after`
 přitom byla u horní hrany nejsilnější, takže nad teplou appkou visel studený
 pruh a šev byl vidět přesně na hraně.
 
-Řeší to **maska na záři**: horní kus se vytratí do ztracena
-(`mask-image: linear-gradient(to bottom, transparent 0, #000
-calc(env(safe-area-inset-top) + 110px))`). První řádek stránky je tím čistý
-podklad, `theme-color` je ten samý `#2B2B23` a šev není kde vidět. Záře
-naskočí až pod lištou, takže „teplé světlo shora" zůstává.
+Řeší to **spočítaná záře**: střed je ve čtvrtině výšky a dohasne dřív, než
+se k horní hraně vrátí (`radial-gradient(140% 52% at 50% 24%, …,
+transparent 46%)` — vzdálenost k hraně je 46,15 % poloměru, konec je na
+46 %, takže u hrany vychází nula). První řádek stránky je tím čistý podklad,
+`theme-color` je ten samý `#2B2B23` a šev není kde vidět.
+
+Napoprvé to dělala **maska** (lineární přechod shora). Výsledek byl stejný,
+ale na iOS se tím celý ten pás dostal do vrstvy, kterou Safari vykresluje
+v nižším rozlišení: **logo a pilulka týmu pod ní byly rozmazané**, zbytek
+obrazovky ostrý. Spočítaný gradient dělá to samé a žádnou vrstvu navíc
+nepotřebuje.
 
 Zkoušelo se i opačně — nechat záři a dát do `theme-color` spočítanou barvu
 prvního řádku (`#3A3421`, sedí na jednu hodnotu z 255). Šev to odstranilo,
