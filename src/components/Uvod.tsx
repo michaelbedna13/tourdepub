@@ -256,8 +256,12 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
     return () => { platne = false; };
   }, []);
 
-  /** Úvod se nevypne střihem, ale vytratí se. */
+  /** Úvod se nevypne střihem, ale vytratí se. Pustit se smí jen jednou:
+   *  bere se i z pointerup i z kliknutí (viz Přeskočit níž). */
+  const zavirano = useRef(false);
   function zavri() {
+    if (zavirano.current) return;
+    zavirano.current = true;
     // kdyby se zavíralo ještě ve fázi značky (třeba z klávesnice), nesmí
     // zůstat viset nad appkou
     odklidZnacku();
@@ -292,7 +296,12 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
     <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " jede" : " znacka"}`}
       role="dialog" aria-label="Úvod">
       {kde >= 0 && (
-        <div className="uvod-obsah">
+        /* Ťuknutí kamkoli taky přeskočí. Není to jen pohodlí: Přeskočit je
+           malé tlačítko nad vrstvou, která se kompozitně vykresluje zvlášť,
+           a když ho prohlížeč z jakéhokoli důvodu netrefí, nemá divák jak
+           ven. Takhle platí přesně to, co má: buď se to dokouká, nebo se
+           ťukne a je konec. Listovat se pořád nedá. */
+        <div className="uvod-obsah" onPointerUp={zavri}>
           <div className="uvod-oko">
             {/* Kamera: sedí ve středu obrazovky a plátnem pod sebou posouvá
                 tak, aby střed záběru padl přesně na ni. Pořadí v transformu
@@ -331,7 +340,13 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
               je to popis filmu, ne jeho kus. */}
           <div className="uvod-hlava">
             <Logo trida="uvod-znak" />
-            <button className="uvod-preskocit" onClick={zavri}>Přeskočit</button>
+            {/* Na dotyk se reaguje na pointerup, ne až na kliknutí. Klik si
+                iOS dopočítává sám a nad vrstvou s touch-action:none a vlastní
+                kompozicí ho umí zahodit — tlačítko pak nedělá nic. onClick
+                zůstává kvůli klávesnici a myši; zavri() se stejně pustí jen
+                jednou. */}
+            <button className="uvod-preskocit" type="button"
+              onPointerUp={zavri} onClick={zavri}>Přeskočit</button>
           </div>
 
           {/* Pruh dole je stopáž, ne ovládání: kolik ze znělky zbývá. Jede

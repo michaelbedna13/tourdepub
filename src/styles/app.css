@@ -1031,7 +1031,11 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    se počítá kolem něj. Délku přejezdu dává React (každý záběr může mít
    svoji), průběh je tady — pomalý rozjezd i dojezd, aby to byla jízda,
    ne skok. */
-.uvod-oko{position:absolute;inset:0;overflow:hidden}
+/* Vrstvení napevno, ne podle pořadí v dokumentu: oko je dole, popisky nad
+   ním. Kamera uvnitř oka má will-change a je to vlastní vrstvicí kontext,
+   takže nechat to na pořadí je zbytečné riziko — Přeskočit musí být nahoře
+   za všech okolností. */
+.uvod-oko{position:absolute;inset:0;overflow:hidden;z-index:0}
 .uvod-kamera{
   position:absolute;left:50%;top:50%;width:0;height:0;
   transform-origin:0 0;will-change:transform;
@@ -1083,20 +1087,24 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 /* ---------- popis filmu ----------
    Značka a Přeskočit visí nad scénou a s kamerou se nehýbou. */
 .uvod-hlava{
-  position:absolute;left:0;right:0;top:0;
+  position:absolute;left:0;right:0;top:0;z-index:2;
   display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:calc(env(safe-area-inset-top) + 22px) 24px 0;
 }
 .uvod-znak{height:30px;width:auto;display:block;color:var(--text)}
 /* Přeskočit je tichý text, ne tlačítko. */
-.uvod-preskocit{min-height:44px;padding:0 2px;margin:-10px -2px;
+/* Ťukací plocha je větší než nápis: 44 px na výšku a vzduch po stranách,
+   zatažený zpátky záporným okrajem, aby nápis zůstal zarovnaný s okrajem
+   stránky. touch-action:manipulation vyřadí čekání na dvojťuk. */
+.uvod-preskocit{min-height:44px;padding:0 14px;margin:-10px -14px;
   font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--text);opacity:.55}
+  color:var(--text);opacity:.55;touch-action:manipulation}
+.uvod-preskocit:active{opacity:.9}
 
 /* Stopáž, ne ovládání: v průpravě se nikam neklepe, tohle jen říká, kolik
    ze znělky zbývá. Jede v CSS, aby se kvůli ní nepřekresloval React. */
 .uvod-pas{
-  position:absolute;left:24px;right:24px;
+  position:absolute;left:24px;right:24px;z-index:2;
   bottom:calc(env(safe-area-inset-bottom) + 22px);
   height:3px;border-radius:2px;overflow:hidden;
   background:color-mix(in srgb,var(--text) 18%,transparent);
