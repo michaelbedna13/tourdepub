@@ -798,25 +798,18 @@ input,textarea,select{caret-color:var(--text)}
   font-size:14px;line-height:1.5;padding:22px 18px 24px;
   box-shadow:0 14px 34px rgba(0,0,0,.4);
   /* Papír, ne plocha. Dvě vrstvy zamíchané rovnou do podkladu, ne nad
-     textem — vrstva nad ním by rozmazala tisk a obě pseudotřídy navíc drží
-     roztržené okraje.
-     Nahoře zmuchlání: nasvícený šum (feDiffuseLighting) dá hřbety a stíny
-     jako na papíru, co ležel v kapse. Plocha bez hřbetu vychází na střední
-     šedou, takže overlay nechá barvu papíru být a ukáže jen přehyby — při
-     plném nasvícení by se účtenka vybílila. Pod tím obyčejné zrno. */
-  background-image:url("../assets/papir-zmuchlany.svg"),url("../assets/zrno-tisk.svg");
-  background-size:360px 360px,150px 150px;
-  background-blend-mode:overlay,multiply;
+     textem — vrstva nad ním by rozmazala tisk.
+     Nahoře zmuchlání (scripts/zmuchlani.mjs): rovné plošky oddělené ostrým
+     hřbetem, jak když papír chvíli ležel v kapse. Jsou to jenom stíny na bílé,
+     takže multiply nechá papír být a ztmaví jen přehyby.
+     Roztáhne se přes celou účtenku (100% 100%), ne dlaždicově — zmuchlání
+     se neopakuje, každý papír je zmuchlaný jinak. Pod tím obyčejné zrno.
+     Roztržené zuby nahoře a dole šly pryč: doklad z pokladny je rovný list,
+     zuby z něj dělaly lístek z bloku. */
+  background-image:url("../assets/papir-zmuchlany.png"),url("../assets/zrno-tisk.svg");
+  background-size:100% 100%,150px 150px;
+  background-blend-mode:multiply,multiply;
 }
-/* Roztržený okraj nahoře i dole: dva trojúhelníkové přechody vedle sebe. */
-.uctenka::before,.uctenka::after{
-  content:"";position:absolute;left:0;right:0;height:8px;
-  background:
-    linear-gradient(-135deg,var(--papir) 50%,transparent 50%) 0 0/16px 8px repeat-x,
-    linear-gradient(135deg,var(--papir) 50%,transparent 50%) 8px 0/16px 8px repeat-x;
-}
-.uctenka::before{top:-8px;transform:scaleY(-1)}
-.uctenka::after{bottom:-8px}
 
 /* Horní řádka dokladu: co to je a pod jakým číslem. Číslo je počet čárek
    na stole, takže během večera naskakuje jako počítadlo na pokladně. */
