@@ -1,16 +1,20 @@
-// Úvod po každém spuštění: značka se složí písmeno po písmenu, pak jedna
-// jediná obrazovka — nadpis, čím to je, a vrávorající panák.
+// Úvod po každém spuštění: značka se složí písmeno po písmenu, pak čtyři
+// plakáty, kterými se proklikává.
 //
-// Dřív to bylo plátno, po kterém jezdila kamera přes dvanáct záběrů. Byla
-// to pěkná práce a trvala čtrnáct vteřin pokaždé, co někdo appku otevřel.
-// Průprava má říct, o co jde, ne se předvést; kdo to čte podruhé, ťukne
-// a je pryč.
+// Každý plakát stojí na stejné mřížce — šest sloupců, jeden žlab — a liší
+// se tím, kde na ní kresba a text leží. Mřížka drží rytmus, rozmístění dělá
+// rozdíl: čtyři stejně poskládané obrazovky za sebou vypadají jako formulář,
+// a plakáty se mají střídat.
+//
+// Nikam se to neposouvá samo. Dřív to byla patnáctivteřinová znělka a než
+// se dočetla věta, obrazovka byla pryč; teď se ťuká dál a kdo to zná, dá
+// Přeskočit.
 //
 // Značku kreslí index.html, ne React, a React ji nepřekresluje. Logo svítí
 // od prvního snímku a skládá se po písmenech; kdyby se o něj React uprostřed
 // přihlásil, animace by buď naskočila v půlce, nebo by písmena zmizela
-// a začala znova. Tahle vrstva je proto do příchodu obrazovky průhledná
-// a značka pod ní prosvítá — teprve s ní se #uvod odklidí.
+// a začala znova. Tahle vrstva je proto do příchodu plakátů průhledná
+// a značka pod ní prosvítá — teprve s prvním se #uvod odklidí.
 import { useEffect, useId, useRef, useState } from "react";
 import { vazat } from "../lib/format";
 import { UVOD_KRESBY } from "../lib/uvod-kresby";
@@ -27,17 +31,32 @@ const ZNACKA_PO_STARTU = 1000;
 const PISMA_NEJVIC = 2500;
 /** Jak dlouho se úvod vytrácí, než se odklidí. */
 const ZAVRENI = 300;
-/** Jak dlouho obrazovka vydrží, než se zavře sama. Je to na přečtení,
- *  ne na prohlížení — kdo to zná, ťukne a je pryč dřív. */
-const CTENI = 9000;
 
-const NADPIS = "Devět špeluněk, jedna noc";
-/** Co se hraje, za co jsou čárky a co se vyhrává. Tři odstavce, ať je mezi
- *  nimi vzduch — natlačené do jednoho bloku to byl příbalový leták. */
-const POPIS = [
-  "Partyja se protáhne devíti brněnskejma špeluňkama. Valí se to od šesti večer do dvou do rána.",
-  "Za každou štaci a za každej škopek je čárka. Ty tučný ale padajó za srandy — za koule a za to, že to v palici nemáš vypatlaný.",
-  "Kdo má na konci nejvíc čárek, bere celej bank.",
+interface Plakat {
+  /** Klíč kresby v UVOD_KRESBY. */
+  id: keyof typeof UVOD_KRESBY;
+  /** Rozmístění na mřížce. Čtyři skladby, každá jinak — viz app.css.
+   *  a: text nahoře, kresba dole vpravo
+   *  b: kresba nahoře vpravo (menší), text dole
+   *  c: kresba dole vlevo, přes víc sloupců
+   *  d: kresba nahoře přes celou šířku, text pod ní */
+  skladba: "a" | "b" | "c" | "d";
+  nadpis: string;
+  text: string;
+}
+
+/** Čtyři plakáty: co se hraje, za co jsou čárky, co se trestá a co se
+ *  vyhrává. Mluví to hantecem z Pravidel, ne návodem — v appce, kde se
+ *  jinde píše o betelný řežbě, je spisovný výklad cizí hlas. */
+const PLAKATY: Plakat[] = [
+  { id: "opilec", skladba: "a", nadpis: "Devět špeluněk, jedna noc",
+    text: "Partyja se protáhne devíti brněnskejma špeluňkama. Valí se to od šesti večer do dvou do rána." },
+  { id: "carky", skladba: "b", nadpis: "Čárky nejsou za chlast",
+    text: "Za každou štaci a za každej škopek je čárka. Ty tučný ale padajó za srandy — za koule a za to, že to v palici nemáš vypatlaný." },
+  { id: "snek", skladba: "c", nadpis: "Kdo se loudá, ten nemá",
+    text: "Na štaci je tak 45 minut. Kdo se fest loudá a ostatní na něj čumijó, za srandy v tý špeluňce nemá ani čárku." },
+  { id: "koruna", skladba: "d", nadpis: "Celej bank bere jedna",
+    text: "Vlezné je kilo na palici a celej bank shrábne parta s nejvíc čárkama. Tak ať je to betelný." },
 ];
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
@@ -103,25 +122,24 @@ function nactiPisma(): Promise<unknown> {
 }
 
 export function Uvod({ hotovo }: { hotovo: () => void }) {
-  // false = ještě svítí značka z index.html
-  const [obrazovka, setObrazovka] = useState(false);
+  // -1 = ještě svítí značka z index.html, 0+ = pořadí plakátu
+  const [kde, setKde] = useState(-1);
   const [zavira, setZavira] = useState(false);
 
   // Značka odejde, až se čárky dokreslily a písma jsou opravdu načtená.
-  // Značka a obrazovka se prolnou přes sebe — kdyby jedna odešla dřív, než
-  // druhá přijde, byl by mezi nimi prázdný snímek.
+  // Značka a první plakát se prolnou přes sebe — kdyby jedna odešla dřív,
+  // než druhý přijde, byl by mezi nimi prázdný snímek.
   useEffect(() => {
     let platne = true;
     const pockej = (ms: number) => new Promise((h) => setTimeout(h, ms));
     Promise.all([
       pockej(Math.max(ZNACKA_PO_STARTU, ZNACKA_NEJMIN - performance.now())),
       Promise.race([nactiPisma(), pockej(PISMA_NEJVIC)]),
-    ]).then(() => { if (!platne) return; odklidZnacku(); setObrazovka(true); });
+    ]).then(() => { if (!platne) return; odklidZnacku(); setKde(0); });
     return () => { platne = false; };
   }, []);
 
-  /** Úvod se nevypne střihem, ale vytratí se. Pustit se smí jen jednou:
-   *  bere se i z ťuknutí, i z doběhnutého času. */
+  /** Úvod se nevypne střihem, ale vytratí se. Pustit se smí jen jednou. */
   const zavirano = useRef(false);
   function zavri() {
     if (zavirano.current) return;
@@ -136,34 +154,51 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
     setTimeout(hotovo, ZAVRENI);
   }
 
-  const zavriRef = useRef(zavri);
-  zavriRef.current = zavri;
-  useEffect(() => {
-    if (!obrazovka) return;
-    const t = setTimeout(() => zavriRef.current(), CTENI);
-    return () => clearTimeout(t);
-  }, [obrazovka]);
+  function dal() {
+    if (kde + 1 >= PLAKATY.length) zavri();
+    else setKde(kde + 1);
+  }
+
+  const p = PLAKATY[Math.max(0, kde)];
+  const posledni = kde + 1 === PLAKATY.length;
 
   return (
-    <div className={`uvod${zavira ? " zavira" : ""}${obrazovka ? " jede" : " znacka"}`}
+    <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " jede" : " znacka"}`}
       role="dialog" aria-label="Úvod">
-      {obrazovka && (
-        /* Ťuknutí kamkoli zavře. Tlačítko navíc by bylo zbytečné: je to
-           jedna obrazovka, ze které vede jediná cesta dál. */
-        <div className="uvod-obsah" onPointerUp={zavri}>
-          <Logo trida="uvod-znak" />
-
-          <div className="uvod-stred">
-            <h1 className="uvod-nadpis">{vazat(NADPIS)}</h1>
-            <div className="uvod-popis">
-              {POPIS.map((o) => <p key={o}>{vazat(o)}</p>)}
-            </div>
-            <div className="uvod-kresba"><Cmaranice id="opilec" /></div>
+      {kde >= 0 && (
+        /* Ťuknutí kamkoli posune dál. Tlačítko dole je jen cedule, že to tak
+           funguje — na celé obrazovce se trefí líp než do slova. */
+        <div className="uvod-obsah" onPointerUp={dal}>
+          <div className="uvod-hlava">
+            <Logo trida="uvod-znak" />
+            {/* Přeskočit nesmí propadnout do ťuknutí pod sebou, jinak by
+                posunulo dál a teprve pak zavřelo. */}
+            <button className="uvod-preskocit" type="button"
+              onPointerUp={(e) => { e.stopPropagation(); zavri(); }}
+              onClick={(e) => { e.stopPropagation(); zavri(); }}>Přeskočit</button>
           </div>
 
-          {/* Stopáž, ne ovládání: kolik zbývá, než se obrazovka zavře sama. */}
-          <div className="uvod-pas" aria-hidden="true">
-            <span className="uvod-pas-cara" style={{ "--stopaz": `${CTENI}ms` } as React.CSSProperties} />
+          {/* key: každý plakát přijede jako nový, ne že se přepíše text */}
+          <div className={`uvod-list ${p.skladba}`} key={kde}>
+            <div className="uvod-kresba"><Cmaranice id={p.id} /></div>
+            <h1 className="uvod-nadpis">{vazat(p.nadpis)}</h1>
+            <p className="uvod-text">{vazat(p.text)}</p>
+          </div>
+
+          <div className="uvod-spodek">
+            <div className="uvod-tecky" role="img"
+              aria-label={`Plakát ${kde + 1} ze ${PLAKATY.length}`}>
+              {PLAKATY.map((_, i) => (
+                <span key={i} className={`uvod-tecka${i === kde ? " ted" : ""}${i < kde ? " bylo" : ""}`} />
+              ))}
+            </div>
+            <span className="uvod-dal">
+              {posledni ? "Jedeme na to" : "Dál"}
+              <svg className="uvod-sipka" viewBox="0 0 24 10" fill="none" stroke="currentColor"
+                strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M1 5h21M17 1l5 4-5 4" />
+              </svg>
+            </span>
           </div>
         </div>
       )}
@@ -171,9 +206,9 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   );
 }
 
-/** Kresba úvodu: ta samá ruka jako ikony, jen velká. Plocha je v barvě textu,
- *  výstřižky jsou průhledné a prosvítá jimi podklad — proto maska, ne dvě
- *  barvy (viz Ikona). */
+/** Kresba plakátu: ta samá ruka jako ikony, jen velká. Plocha je v barvě
+ *  textu, výstřižky jsou průhledné a prosvítá jimi podklad — proto maska,
+ *  ne dvě barvy (viz Ikona). */
 function Cmaranice({ id }: { id: keyof typeof UVOD_KRESBY }) {
   // useId vrací dvojtečky, které v url(#…) nefungují všude
   const maska = `uk${useId().replace(/[^a-zA-Z0-9]/g, "")}`;

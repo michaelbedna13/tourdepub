@@ -1011,6 +1011,19 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    s krémovým inkoustem, půlka světlá s černým. Nic uvnitř se proto neodvozuje
    od --text ani od --podklad, všechno je currentColor. */
 .uvod{
+  /* ---- mřížka plakátů ----
+     Šest sloupců a jeden žlab. Šestka proto, že se dělí na polovinu, třetinu
+     i dvě třetiny, takže kresba může zabrat čtyři sloupce vpravo, tři vlevo
+     nebo všech šest — a pokaždé sedne na tu samou osnovu.
+     Svislý rytmus je násobek osmi: jedna mezera mezi nadpisem a větou,
+     větší mezi textem a kresbou, ať je poznat, co k čemu patří. */
+  --uvod-sloupcu:6;
+  --uvod-zlab:14px;
+  --uvod-okraj:28px;
+  --uvod-sirka:430px;
+  --uvod-mezera-text:24px;
+  --uvod-mezera-blok:56px;
+
   position:fixed;inset:0;z-index:120;
   background:var(--podklad);color:var(--text);
   /* Pod úvodem je appka a nemá se pod ním posouvat. */
@@ -1024,83 +1037,97 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 /* na konci se úvod vytratí, nevypne se střihem */
 .uvod.zavira{opacity:0;pointer-events:none}
 
-/* Jedna obrazovka: značka nahoře, uprostřed panák s nadpisem a popisem,
-   dole stopáž. Mezery jsou velké schválně — je to plakát, ne formulář,
-   a má se to dát přečíst na jeden nádech. */
 .uvod-obsah{
   position:absolute;inset:0;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;
-  padding:calc(env(safe-area-inset-top) + 26px) 28px calc(env(safe-area-inset-bottom) + 24px);
+  padding:calc(env(safe-area-inset-top) + 22px) var(--uvod-okraj)
+          calc(env(safe-area-inset-bottom) + 20px);
   /* o chvilku později než začne odcházet značka: prázdný snímek mezi nimi
      nevznikne, ale ani se nepřekrývají tak, že by text ležel přes logo */
   animation:uvod-prichod .34s .16s var(--krok) both;
 }
-/* Značka má pod sebou pořádnou mezeru: bez ní seděl nadpis rovnou na ní
-   a četlo se to jako jeden trojřádkový blok, ne jako hlavička a nadpis. */
-.uvod-znak{flex:none;align-self:flex-start;height:30px;width:auto;display:block;
-  margin-bottom:46px;color:var(--text)}
 
-/* Skladba plakátu: nahoře vede text, dole ho drží kresba. Panák visel
-   předtím nad nadpisem hned pod značkou a vypadal jako maskot přilepený
-   k logu, ne jako kresba na plakátu. Teď stojí dole vpravo, v tom, co po
-   textu zbyde — a čím vyšší displej, tím je větší. */
-.uvod-stred{
-  flex:1;min-height:0;width:100%;max-width:420px;
-  display:flex;flex-direction:column;justify-content:flex-start;text-align:left;
-}
-.uvod-kresba{
-  flex:0 1 auto;min-height:0;display:flex;align-items:flex-end;
-  /* auto nahoře: kresba se odtlačí na spodek volného místa */
-  margin:auto 0 0;align-self:flex-end;color:var(--text);
-  animation:uvod-prichod .5s .36s var(--krok) both;
-}
-.uvod-cmaranice{height:clamp(104px,28vh,250px);max-height:100%;width:auto;display:block;
-  /* ať se kresba nepere o místo s textem: smrskne se, než by ho vytlačila */
-  min-height:0}
+/* Značka vlevo, Přeskočit vpravo — drobnosti po okrajích jako na tištěném
+   plakátu, uprostřed to hlavní. */
+.uvod-hlava{flex:none;display:flex;align-items:center;justify-content:space-between;
+  gap:16px;width:100%;max-width:var(--uvod-sirka);padding-bottom:var(--uvod-mezera-blok)}
+.uvod-znak{height:30px;width:auto;display:block;color:var(--text)}
+.uvod-preskocit{min-height:44px;padding:0 14px;margin:-10px -14px;
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text);opacity:.55;touch-action:manipulation}
+.uvod-preskocit:active{opacity:.9}
 
-/* Nadpis unese sedmistovku i obtah — je to první věc, co se čte po kresbě.
-   Prokládání je stažené pod jedničku, ale ne o moc: české háčky a čárky
-   vystupují nad verzálky a při těsnějším prokladu sedí druhému řádku
-   na hlavě. */
+/* Plakát. Mřížka drží vodorovné rozmístění, svisle se skládá v pořadí,
+   které si určí skladba. Celý blok je vycentrovaný mezi lištou a spodkem,
+   takže volné místo se rozdělí nad něj a pod něj stejným dílem. */
+.uvod-list{
+  flex:1;min-height:0;width:100%;max-width:var(--uvod-sirka);
+  display:grid;grid-template-columns:repeat(var(--uvod-sloupcu),1fr);
+  column-gap:var(--uvod-zlab);align-content:center;
+  animation:uvod-prichod .3s var(--krok) both;
+}
+/* Kresba se nikdy neroztahuje přes svoje sloupce — šířku jí dává mřížka
+   a výška ji následuje. Strop je kvůli nízkým displejům. */
+.uvod-kresba{display:flex;min-height:0;color:var(--text)}
+.uvod-cmaranice{width:100%;height:auto;max-height:36vh;display:block}
+
 .uvod-nadpis{
-  flex:none;margin:0 0 24px;font-weight:700;-webkit-text-stroke:1px currentColor;
-  font-size:clamp(30px,8.2vw,44px);line-height:1.1;letter-spacing:-.03em;
+  margin:0;font-weight:700;-webkit-text-stroke:1px currentColor;
+  /* Osm a půl procenta šířky: v Hagridu se nadpis při deseti lámal na tři
+     řádky a vytlačil kresbu. Náhradní písmo je užší, takže v testech vyšly
+     dva řádky a vypadalo to v pořádku — měřeno až na telefonu. */
+  font-size:clamp(28px,8.5vw,42px);line-height:1.1;letter-spacing:-.03em;
   /* vyrovná délku řádků, ať nezůstane na posledním jedno slovo */
   text-wrap:balance;
-  animation:uvod-prichod .5s .14s var(--krok) both;
 }
-/* Tři odstavce s pořádnou mezerou mezi nimi a volným prokladem uvnitř.
-   Natlačené do jednoho bloku to byl příbalový leták. */
-.uvod-popis{
-  flex:none;display:flex;flex-direction:column;gap:18px;max-width:30em;
+.uvod-text{
+  margin:var(--uvod-mezera-text) 0 0;
   font-family:var(--pismo);font-size:var(--t-hlavni);line-height:1.7;
   color:var(--text-2);
-  animation:uvod-prichod .5s .26s var(--krok) both;
 }
-.uvod-popis p{margin:0}
 
-/* Stopáž, ne ovládání: kolik zbývá, než se obrazovka zavře sama. Ťuká se
-   kamkoli, takže tohle nemá být tlačítko. */
-.uvod-pas{
-  flex:none;width:100%;max-width:420px;height:3px;border-radius:2px;
-  margin-top:28px;overflow:hidden;
-  background:color-mix(in srgb,var(--text) 16%,transparent);
-}
-.uvod-pas-cara{display:block;width:100%;height:100%;border-radius:inherit;
-  background:var(--text);transform-origin:left center;
-  animation:uvod-stopaz var(--stopaz) linear both}
-@keyframes uvod-stopaz{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+/* ---- čtyři skladby ----
+   Liší se jen tím, které sloupce a který řádek co dostane. Pořadí v DOM je
+   pořád stejné (kresba, nadpis, text), skladba ho přerovná. */
+/* a: text nahoře, kresba dole vpravo přes čtyři sloupce */
+.uvod-list.a .uvod-nadpis{grid-column:1/7;grid-row:1}
+.uvod-list.a .uvod-text{grid-column:1/6;grid-row:2}
+.uvod-list.a .uvod-kresba{grid-column:3/7;grid-row:3;margin-top:var(--uvod-mezera-blok)}
+/* b: kresba nahoře vpravo a menší, text pod ní */
+.uvod-list.b .uvod-kresba{grid-column:4/7;grid-row:1;margin-bottom:var(--uvod-mezera-blok)}
+.uvod-list.b .uvod-nadpis{grid-column:1/7;grid-row:2}
+.uvod-list.b .uvod-text{grid-column:1/6;grid-row:3}
+/* c: kresba dole vlevo, text nad ní odsazený doprava */
+.uvod-list.c .uvod-nadpis{grid-column:1/7;grid-row:1}
+.uvod-list.c .uvod-text{grid-column:2/7;grid-row:2}
+.uvod-list.c .uvod-kresba{grid-column:1/5;grid-row:3;margin-top:var(--uvod-mezera-blok)}
+/* d: kresba nahoře přes celou šířku, pod ní nadpis i věta */
+.uvod-list.d .uvod-kresba{grid-column:2/6;grid-row:1;margin-bottom:var(--uvod-mezera-blok)}
+.uvod-list.d .uvod-nadpis{grid-column:1/7;grid-row:2}
+.uvod-list.d .uvod-text{grid-column:1/7;grid-row:3}
 
-/* Na krátkém displeji se celý blok nevejde a kresba se v pružném rozvržení
-   smrskne na odznáček pod logem. Radši se stáhne všechno naráz a o kus míň:
-   menší nadpis, hustší odstavce, menší mezery. Pořád to dýchá, jen míň. */
+/* Spodek: kolikátý plakát vlevo, cedule „ťukni dál" vpravo. */
+.uvod-spodek{flex:none;display:flex;align-items:center;justify-content:space-between;
+  gap:14px;width:100%;max-width:var(--uvod-sirka);padding-top:var(--uvod-mezera-blok)}
+.uvod-tecky{display:flex;gap:6px;flex:none}
+.uvod-tecka{width:22px;height:4px;border-radius:2px;
+  background:color-mix(in srgb,var(--text) 22%,transparent);
+  transition:background .25s var(--krok)}
+.uvod-tecka.bylo{background:color-mix(in srgb,var(--text) 46%,transparent)}
+.uvod-tecka.ted{background:var(--text)}
+/* Není to tlačítko: ťuká se kamkoli. Jen to říká, co se stane. */
+.uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text)}
+.uvod-sipka{width:24px;height:10px;flex:none}
+
+/* Na krátkém displeji se stáhne všechno naráz: menší nadpis, hustší text,
+   menší mezery. Pořád to dýchá, jen míň. */
 @media (max-height:690px){
-  .uvod-obsah{padding-top:calc(env(safe-area-inset-top) + 20px)}
-  .uvod-znak{margin-bottom:26px}
-  .uvod-cmaranice{height:clamp(84px,16vh,140px)}
-  .uvod-nadpis{font-size:clamp(26px,7.4vw,34px);margin-bottom:18px}
-  .uvod-popis{gap:13px;font-size:var(--t-text);line-height:1.62}
-  .uvod-pas{margin-top:18px}
+  .uvod{--uvod-mezera-blok:32px;--uvod-mezera-text:16px}
+  .uvod-nadpis{font-size:clamp(25px,7.2vw,32px)}
+  .uvod-text{font-size:var(--t-text);line-height:1.6}
+  .uvod-cmaranice{max-height:26vh}
 }
 
 @keyframes uvod-prichod{
