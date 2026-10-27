@@ -1,12 +1,22 @@
 // Úvod po každém spuštění: značka se složí písmeno po písmenu, pak průprava.
-// Vždycky jde přeskočit a žádná stránka se nepřehodí sama — Mišák chtěl mít
-// jistotu, že si to někdo opravdu přečetl, ne že mu to uteklo.
+//
+// Průprava není čtyři obrazovky, po kterých se listuje. Je to jedno velké
+// plátno — nadpisy, věty a kresby rozházené po ploše — a po něm jezdí kamera.
+// Najede na detail slova, odjede na celý nadpis, přesune se na větu, pak na
+// kresbu, která se mezitím hýbe. Buď se to dokouká, nebo přeskočí; ťukat se
+// nikam nedá, protože ve chvíli, kdy po někom chceš ťukat, to přestane být
+// film a jsou z toho zase čtyři obrazovky formuláře.
+//
+// Podklad je tmavý jako zbytek appky, texty krémové, barevné jsou jen kresby.
+// Barevné plakáty na celou plochu dělaly z každého přejezdu blik a pruh nad
+// stránkou se musel přebarvovat s nimi; tohle je jedna scéna od začátku
+// do konce, takže se nahoře nic nepřepisuje.
 //
 // Značku kreslí index.html, ne React, a React ji nepřekresluje. Logo svítí
 // od prvního snímku a skládá se po písmenech; kdyby se o něj React uprostřed
 // přihlásil, animace by buď naskočila v půlce, nebo by písmena zmizela
 // a začala znova. Tahle vrstva je proto do příchodu průpravy průhledná
-// a značka pod ní prosvítá — teprve s první stránkou se #uvod odklidí.
+// a značka pod ní prosvítá — teprve s prvním záběrem se #uvod odklidí.
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { vazat } from "../lib/format";
 import { UVOD_KRESBY } from "../lib/uvod-kresby";
@@ -24,48 +34,129 @@ const PISMA_NEJVIC = 2500;
 /** Jak dlouho se úvod vytrácí, než se odklidí. */
 const ZAVRENI = 300;
 
-interface Stranka {
+/** Jak dlouho kamera přejíždí mezi dvěma záběry. Je to pořádný kus času
+ *  každého záběru schválně: kamera, co doletí za dvě desetiny a pak stojí,
+ *  je střih. Tohle má být jízda. */
+const PREJEZD = 600;
+
+/* ---------- plátno ----------
+   Souřadnice jsou v bodech plátna, ne v pixelech obrazovky. Kamera si je
+   přepočítá sama, takže celá průprava vypadá stejně na telefonu i na
+   širokém okně — jen se na širokém vidí víc do stran.
+
+   Kapitoly jsou pod sebou po KROK bodech. Je to víc, než se vejde do
+   nejširšího záběru, takže se sousedi do obrazu nikdy nedostanou; mezi
+   nimi je prázdno, kterým kamera proletí. */
+const PLATNO_SIRKA = 600;
+const KROK = 1800;
+
+interface Kapitola {
   /** Klíč kresby v UVOD_KRESBY. */
   id: keyof typeof UVOD_KRESBY;
-  /** Plná barva celé stránky a inkoust, kterým se na ni kreslí i píše.
-   *  Není to nádech barvy jako dřív — stránka je plakát, ne tmavá
-   *  obrazovka s podtónem. */
+  /** Barva kresby a zdůrazněného slova. Jediná barva na scéně. */
   barva: string;
-  inkoust: string;
-  /** Kam na stránce padne text: pod kresbu, kolem ní, nebo nad ni.
-   *  Čtyři stejně poskládané stránky za sebou vypadají jako formulář —
-   *  plakáty se mají střídat. */
-  skladba?: "kolem" | "nahore";
-  /** Kam se kresba přitiskne. */
-  kotva?: "vlevo" | "vpravo";
+  /** Nadpis je rozdělený: první slovo nese barvu a na ně najíždí první
+   *  záběr, zbytek je krémový. */
+  duraz: string;
   nadpis: string;
   text: string;
 }
 
-const KREM = "#F2E7CF";
-const INKOUST = "#1A1A14";
-
-/** Shrnutí pravidel na čtyři plakáty. Je to výtah z obrazovky Pravidla —
+/** Shrnutí pravidel na čtyři kapitoly. Je to výtah z obrazovky Pravidla —
  *  co se hraje, za co jsou čárky, co se trestá a co se vyhrává.
  *
  *  Mluví to hantecem z Pravidel, ne návodem. Přepsat to do spisovného
- *  („Valí se to od šesti večer do dvou do rána, ve dvou až třech partách")
  *  bylo věcně správně a znělo to jako příbalový leták — v appce, kde se
- *  jinde píše o betelný řežbě a vypatlaný palici, je to cizí hlas. Krátké
- *  věty, dvě na stránku, ať to je k přečtení na jeden pohled. */
-const PRUPRAVA: Stranka[] = [
-  { id: "skopek", barva: "#E5331F", inkoust: KREM, nadpis: "Devět špeluněk, jedna noc",
+ *  jinde píše o betelný řežbě a vypatlaný palici, je to cizí hlas. */
+const KAPITOLY: Kapitola[] = [
+  { id: "skopek", barva: "#E5331F", duraz: "Devět", nadpis: "špeluněk, jedna noc",
     text: "Devět brněnskejch špeluněk a partyje, co si nedá říct. Valí se to od šesti večer do dvou do rána." },
-  { id: "carky", barva: "#F9A204", inkoust: INKOUST, skladba: "kolem", kotva: "vlevo",
-    nadpis: "Čárky nejsou za chlast",
+  { id: "carky", barva: "#F9A204", duraz: "Čárky", nadpis: "nejsou za chlast",
     text: "Za každou špeluňku čárka, za škopek čárka. Ale ty tučný padajó za srandy — za koule a za to, že to v palici nemáš vypatlaný." },
-  { id: "snek", barva: "#006633", inkoust: KREM, skladba: "nahore", kotva: "vpravo",
-    nadpis: "Kdo se loudá, ten nemá",
+  { id: "snek", barva: "#CBD183", duraz: "Kdo se loudá,", nadpis: "ten nemá",
     text: "Na štaci je tak 45 minut. Kdo se fest loudá a ostatní na něj čumijó, za srandy v tý špeluňce nemá ani čárku." },
-  { id: "koruna", barva: KREM, inkoust: INKOUST, kotva: "vlevo",
-    nadpis: "Celej bank bere jedna",
+  { id: "koruna", barva: "#EFCE7B", duraz: "Celej bank", nadpis: "bere jedna",
     text: "Vlezné je kilo na palici a celej bank shrábne parta s nejvíc čárkama. Tak ať je to betelný." },
 ];
+
+/** Kde co na plátně leží. Plátno je schválně úzké: čím míň bodů je přes
+ *  šířku, tím větší je všechno v obraze. Když bylo široké tisíc, vešel se
+ *  do záběru celý nadpis, ale zabíral pětinu výšky a zbytek byla díra.
+ *
+ *  Liché kapitoly mají větu odsazenou doprava, aby kamera nejezdila pořád
+ *  stejnou drahou. */
+function mistaKapitoly(i: number) {
+  const oy = i * KROK;
+  const zrcadlo = i % 2 === 1;
+  return {
+    oy, zrcadlo,
+    nadpis: { x: 30, y: oy + 120, w: 540 },
+    text: { x: zrcadlo ? 150 : 30, y: oy + 560, w: 420 },
+    kresba: { x: 300, y: oy + 880, r: 115 },
+  };
+}
+
+interface Zaber {
+  /** Střed záběru na plátně. */
+  x: number; y: number;
+  /** Výřez plátna, který se má do obrazu vejít celý. */
+  w: number; h: number;
+  /** Jak dlouho záběr trvá i s přejezdem na něj. */
+  cas: number;
+}
+
+/** Jak dlouho který záběr v kapitole trvá. Pořadí je pevné: detail slova,
+ *  odjezd na celý nadpis, přejezd dolů na větu s kresbou. */
+const CASY = [750, 1100, 1550];
+const CELKEM = CASY.reduce((a, b) => a + b, 0) * KAPITOLY.length;
+/** Vzduch kolem výřezu, v bodech plátna. Nahoře a dole ho je víc: tam visí
+ *  značka s Přeskočit a dole stopáž, a text jim lezl pod ně. */
+const OKRAJ_X = 44, OKRAJ_Y = 84;
+
+type Ram = { x: number; y: number; w: number; h: number };
+/** Kde prvek na plátně leží. offsetLeft/offsetTop se počítají od nejbližšího
+ *  polohovaného předka, a ten nemusí být plátno: zvýrazněné slovo sedí uvnitř
+ *  nadpisu, takže samo o sobě hlásilo (0, −5) a kamera na ně mířila na začátek
+ *  plátna. Proto se posuny sčítají až k plátnu. */
+function ram(el: HTMLElement, platno: HTMLElement): Ram {
+  let x = 0, y = 0;
+  for (let e: HTMLElement | null = el; e && e !== platno; e = e.offsetParent as HTMLElement | null) {
+    x += e.offsetLeft; y += e.offsetTop;
+  }
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+}
+/** Výřez kolem jednoho nebo víc prvků i s okrajem. */
+function vyrez(prvky: Ram[], cas: number): Zaber {
+  const x1 = Math.min(...prvky.map((r) => r.x)) - OKRAJ_X;
+  const y1 = Math.min(...prvky.map((r) => r.y)) - OKRAJ_Y;
+  const x2 = Math.max(...prvky.map((r) => r.x + r.w)) + OKRAJ_X;
+  const y2 = Math.max(...prvky.map((r) => r.y + r.h)) + OKRAJ_Y;
+  return { x: (x1 + x2) / 2, y: (y1 + y2) / 2, w: x2 - x1, h: y2 - y1, cas };
+}
+
+/** Storyboard se neodhaduje, ale změří na vysázené stránce.
+ *
+ *  Napevno napsané výřezy vypadaly dobře přesně do chvíle, než se nadpis
+ *  zalomil jinak — a ten se zalomí pokaždé, když místo Hagridu naskočí
+ *  náhradní písmo. Pak kamera mířila vedle a věta lezla z obrazu. Prvky
+ *  jsou na plátně absolutně, takže offsetLeft/offsetTop jsou rovnou body
+ *  plátna; stačí je obalit a přidat okraj.
+ *
+ *  Tři záběry na kapitolu a každý jinak blízko — jenom popojíždět ve stejném
+ *  přiblížení není jízda kamerou, ale posouvání papíru:
+ *  1. detail barevného slova (nejblíž, slovo přes půl obrazovky),
+ *  2. odjezd na celý nadpis,
+ *  3. přejezd dolů na větu i s kresbou, a zase o kus blíž. */
+function zmerStoryboard(platno: HTMLElement): Zaber[] {
+  const vem = (t: string) => [...platno.querySelectorAll<HTMLElement>(t)].map((e) => ram(e, platno));
+  const duraz = vem(".uvod-duraz"), nadpis = vem(".uvod-nadpis");
+  const text = vem(".uvod-text"), kresba = vem(".uvod-kresba");
+  return KAPITOLY.flatMap((_, i) => [
+    vyrez([duraz[i]], CASY[0]),
+    vyrez([nadpis[i]], CASY[1]),
+    vyrez([text[i], kresba[i]], CASY[2]),
+  ]);
+}
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
  *  nadvakrát (nejdřív logo, pak podklad), tohle je obojí dohromady.
@@ -129,58 +220,32 @@ function nactiPisma(): Promise<unknown> {
   }
 }
 
-/** Přebarví pruh nad stránkou (v prohlížeči) na barvu stránky průpravy.
- *  Bez toho visí nad barevným plakátem tmavý pruh v barvě appky.
- *
- *  Mění se obojí: `theme-color` i podklad `<html>` a `<body>`. Samotná
- *  `theme-color` nestačila — iOS Safari kreslí ten pruh z podkladu stránky,
- *  takže barva v hlavičce se dala přepsat, jak chtěla, a pruh zůstával
- *  tmavý. Plakát je `position:fixed` vrstva nad stránkou, takže podklad pod
- *  ním o jeho barvě neví a musí se mu říct.
- *
- *  Layout, ne obyčejný efekt: obyčejný běží až po vykreslení, takže by byl
- *  na každém přepnutí stránky jeden snímek se starou barvou pruhu.
- *
- *  Po konci se vrátí to, co stálo ve stylu — prázdný řetězec, ne pevná
- *  barva, aby platilo i pravidlo pro širokou obrazovku. */
-function useBarvaOkoli(barva: string | null) {
-  useLayoutEffect(() => {
-    if (!barva) return;
-    const stary = document.querySelector('meta[name="theme-color"]');
-    const puvodni = stary?.getAttribute("content") ?? null;
-    // Přepsat obsah nestačilo: Safari si barvu přečte při načtení a změny
-    // atributu si nevšimne. Na výměnu celého prvku reaguje, takže se starý
-    // odklidí a nový se vloží.
-    stary?.remove();
-    const novy = document.createElement("meta");
-    novy.name = "theme-color";
-    novy.content = barva;
-    document.head.appendChild(novy);
-    document.documentElement.style.backgroundColor = barva;
-    document.body.style.backgroundColor = barva;
-    return () => {
-      novy.remove();
-      if (puvodni) {
-        const zpet = document.createElement("meta");
-        zpet.name = "theme-color";
-        zpet.content = puvodni;
-        document.head.appendChild(zpet);
-      }
-      document.documentElement.style.backgroundColor = "";
-      document.body.style.backgroundColor = "";
-    };
-  }, [barva]);
-}
-
 export function Uvod({ hotovo }: { hotovo: () => void }) {
-  // -1 = značka, 0+ = stránka průpravy
+  // -1 = značka, 0+ = pořadí záběru
   const [kde, setKde] = useState(-1);
   const [zavira, setZavira] = useState(false);
-  const svih = useRef<number | null>(null);
+  // Kamera počítá přiblížení z opravdové velikosti okna: scale() chce číslo
+  // a v CSS se dvě délky vydělit nedají, takže min(šířka, výška) tady.
+  const [okno, setOkno] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+  const [zabery, setZabery] = useState<Zaber[]>([]);
+  const platno = useRef<HTMLDivElement>(null);
+
+  // Změřit se musí před vykreslením, jinak by první snímek byl z nezměřené
+  // kamery — tedy někde mimo. Přesázení po změně okna se chytne taky:
+  // jiná šířka obrazovky plátnem nehýbe, ale jiná písma ano.
+  useLayoutEffect(() => {
+    if (platno.current) setZabery(zmerStoryboard(platno.current));
+  }, [kde >= 0]);
+
+  useEffect(() => {
+    const zmer = () => setOkno({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener("resize", zmer);
+    return () => window.removeEventListener("resize", zmer);
+  }, []);
 
   // Značka odejde, až se čárky dokreslily a písma jsou opravdu načtená.
-  // Značka a první stránka se prolnou přes sebe — kdyby jedna odešla dřív,
-  // než druhá přijde, byl by mezi nimi prázdný snímek.
+  // Značka a první záběr se prolnou přes sebe — kdyby jedna odešla dřív,
+  // než druhý přijde, byl by mezi nimi prázdný snímek.
   useEffect(() => {
     let platne = true;
     const pockej = (ms: number) => new Promise((h) => setTimeout(h, ms));
@@ -203,70 +268,78 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
     setTimeout(hotovo, ZAVRENI);
   }
 
-  function dal() {
-    if (kde + 1 >= PRUPRAVA.length) zavri();
-    else setKde(kde + 1);
-  }
+  // Kamera jede sama: každý záběr si odbyde svůj čas a pustí další. Po
+  // posledním se úvod zavře, takže appka naskočí bez jediného ťuknutí.
+  const zavriRef = useRef(zavri);
+  zavriRef.current = zavri;
+  useEffect(() => {
+    if (kde < 0) return;
+    const t = setTimeout(() => {
+      if (kde + 1 >= CASY.length * KAPITOLY.length) zavriRef.current();
+      else setKde(kde + 1);
+    }, CASY[kde % CASY.length]);
+    return () => clearTimeout(t);
+  }, [kde]);
 
-  const posledni = kde + 1 === PRUPRAVA.length;
-  const s = PRUPRAVA[Math.max(0, kde)];
-  // Drží se i při zavírání: plakát se vytrácí a pruh nad ním nemá skočit
-  // dřív než on. Vrátí se to, až úvod zmizí úplně.
-  useBarvaOkoli(kde >= 0 ? s.barva : null);
+  // Dokud není změřeno, kamera stojí na jedničce – ale to je jen jeden snímek
+  // před prvním layout efektem, nikdo to neuvidí.
+  const z = zabery[Math.max(0, kde)] ?? { x: PLATNO_SIRKA / 2, y: 300, w: PLATNO_SIRKA, h: 600, cas: CASY[0] };
+  // Výřez se má vejít celý, takže rozhoduje ta těsnější strana. Na telefonu
+  // je to skoro vždycky šířka, na širokém okně výška.
+  const zvetseni = Math.min(okno.w / z.w, okno.h / z.h);
 
   return (
-    <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " barevna" : " znacka"}`}
-      style={{ "--papir": s.barva, "--inkoust": s.inkoust } as React.CSSProperties}
-      role="dialog" aria-label="Úvod"
-      onPointerDown={(e) => { svih.current = e.clientX; }}
-      onPointerUp={(e) => {
-        const z = svih.current;
-        svih.current = null;
-        if (z === null || kde < 0) return;
-        const dx = e.clientX - z;
-        // švih do boku listuje, ťuknutí kamkoli na obrazovku posune dál
-        if (dx < -50) dal();
-        else if (dx > 50) setKde(Math.max(0, kde - 1));
-        else dal();
-      }}
-    >
-      {/* Plakát: značka a číslo nahoře, čmáranice přes půl obrazovky,
-          dole nadpis s větou a úplně na spodku lišta s ovládáním. Je to
-          skladba z tiskového plakátu, ne z formuláře — stránka má mít jednu
-          věc, na kterou se kouká, a všechno ostatní potichu po okrajích. */}
+    <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " jede" : " znacka"}`}
+      role="dialog" aria-label="Úvod">
       {kde >= 0 && (
         <div className="uvod-obsah">
-          {/* Nahoře značka a Přeskočit, dole proužky a Dál. Dvě řádky po dvou
-              věcech, každá drží obě hrany stránky. Dřív byly dole tři věci
-              vedle sebe (proužky, Přeskočit, Dál) a číslo stránky nahoře —
-              jenže proužky číslo stránky říkají taky, takže to bylo jednou
-              navíc, a tři věci na jedné řádce se nedaly vyvážit. */}
+          <div className="uvod-oko">
+            {/* Kamera: sedí ve středu obrazovky a plátnem pod sebou posouvá
+                tak, aby střed záběru padl přesně na ni. Pořadí v transformu
+                je schválně scale() a teprve pak translate() — posun se tím
+                počítá v bodech plátna, ne v pixelech obrazovky, takže se
+                nemusí nikde násobit přiblížením. */}
+            <div className="uvod-kamera"
+              style={{
+                transform: `scale(${zvetseni}) translate(${-z.x}px, ${-z.y}px)`,
+                transitionDuration: `${PREJEZD}ms`,
+              }}>
+              <div className="uvod-platno" ref={platno} style={{ width: PLATNO_SIRKA, height: KAPITOLY.length * KROK }}>
+                {KAPITOLY.map((k, i) => {
+                  const m = mistaKapitoly(i);
+                  return (
+                    <div key={k.id} style={{ "--kap": k.barva } as React.CSSProperties}>
+                      <h2 className="uvod-nadpis"
+                        style={{ left: m.nadpis.x, top: m.nadpis.y, width: m.nadpis.w }}>
+                        <span className="uvod-duraz">{vazat(k.duraz)}</span> {vazat(k.nadpis)}
+                      </h2>
+                      <p className="uvod-text"
+                        style={{ left: m.text.x, top: m.text.y, width: m.text.w }}>{vazat(k.text)}</p>
+                      <div className={`uvod-kresba kr-${k.id}`}
+                        style={{ left: m.kresba.x - m.kresba.r, top: m.kresba.y - m.kresba.r,
+                          width: m.kresba.r * 2, height: m.kresba.r * 2 }}>
+                        <Cmaranice id={k.id} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Značka a Přeskočit visí nad scénou a s kamerou se nehýbou —
+              je to popis filmu, ne jeho kus. */}
           <div className="uvod-hlava">
             <Logo trida="uvod-znak" />
-            <button className="uvod-preskocit" onClick={zavri}
-              onPointerUp={(e) => e.stopPropagation()}>Přeskočit</button>
+            <button className="uvod-preskocit" onClick={zavri}>Přeskočit</button>
           </div>
 
-          <div className={`uvod-stranka${s.skladba ? " " + s.skladba : ""}`} key={kde}>
-            <div className={`uvod-kresba${s.kotva ? " " + s.kotva : ""}`}><Cmaranice id={s.id} /></div>
-            <h1 className="uvod-nadpis">{vazat(s.nadpis)}</h1>
-            <p className="uvod-text">{vazat(s.text)}</p>
-          </div>
-
-          <div className="uvod-spodek">
-            <div className="uvod-tecky" role="img"
-              aria-label={`Stránka ${kde + 1} z ${PRUPRAVA.length}`}>
-              {PRUPRAVA.map((_, i) => (
-                <span key={i} className={`uvod-tecka${i === kde ? " ted" : ""}${i < kde ? " bylo" : ""}`} />
-              ))}
-            </div>
-            <button className="uvod-dal" onClick={dal} onPointerUp={(e) => e.stopPropagation()}>
-              {posledni ? "Jedeme na to" : "Dál"}
-              <svg className="uvod-sipka" viewBox="0 0 24 10" fill="none" stroke="currentColor"
-                strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M1 5h21M17 1l5 4-5 4" />
-              </svg>
-            </button>
+          {/* Pruh dole je stopáž, ne ovládání: kolik ze znělky zbývá. Jede
+              jedním tahem přes všechny záběry, proto není keyed a přehozením
+              záběru se nerestartuje. */}
+          <div className="uvod-pas" role="img"
+            aria-label={`Úvod, ${kde + 1}. záběr z ${CASY.length * KAPITOLY.length}`}>
+            <span className="uvod-pas-cara" style={{ "--stopaz": `${CELKEM}ms` } as React.CSSProperties} />
           </div>
         </div>
       )}
@@ -274,9 +347,9 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
   );
 }
 
-/** Čmáranice stránky: ta samá ruka jako ikony, jen velká. Plocha je v barvě
- *  inkoustu, výstřižky jsou průhledné a prosvítá jimi barva stránky —
- *  proto maska, ne dvě barvy (viz Ikona). */
+/** Kresba kapitoly: ta samá ruka jako ikony, jen velká. Plocha je v barvě
+ *  kapitoly, výstřižky jsou průhledné a prosvítá jimi podklad — proto maska,
+ *  ne dvě barvy (viz Ikona). */
 function Cmaranice({ id }: { id: keyof typeof UVOD_KRESBY }) {
   // useId vrací dvojtečky, které v url(#…) nefungují všude
   const maska = `uk${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
