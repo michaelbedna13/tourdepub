@@ -175,6 +175,17 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
   background-size:192px 192px;
   mix-blend-mode:overlay;
 }
+/* Dvě náhradní podoby zrna z #/ladeni. Míchání nutí prohlížeč složit celý
+   obsah pod vrstvou do jednoho obrázku, aby měl co míchat, a právě takový
+   obrázek iOS při posouvání překresluje v nižším rozlišení. Průhledná
+   dlaždice se jen překryje, takže žádnou vrstvu navíc nevyrábí. */
+html.zrno-alfa .app::before{
+  background-image:url("../assets/zrno-alfa.png");
+  mix-blend-mode:normal;
+}
+html.zrno-ne .app::before{display:none}
+html.zare-ne .app::after{display:none}
+html.pruh-ne body::before{display:none}
 @media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
   .app::before{background-size:96px 96px}
 }
@@ -1099,6 +1110,22 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   from{opacity:0;transform:translateY(12px)}
   to{opacity:1;transform:none}
 }
+
+/* ---------- ladění (#/ladeni) ---------- */
+/* Skrytá obrazovka na hledání chyb, co se projeví jenom na telefonu.
+   Vypadá jako zbytek appky, ale nic se tu neladí designem – jsou to spínače. */
+.ladeni-blok{padding:18px 20px 20px;margin-bottom:16px}
+.ladeni-blok h2{margin-bottom:8px}
+.ladeni-popis{font-size:var(--t-drobne);line-height:1.55;color:var(--text-2);margin:0 0 14px}
+.ladeni-volby{display:flex;flex-wrap:wrap;gap:8px}
+.ladeni-volba{min-height:40px;padding:0 14px;border-radius:var(--pilulka);
+  font-family:var(--pismo);font-size:var(--t-drobne);font-weight:700;
+  color:var(--text-2);background:color-mix(in srgb,var(--text) 10%,transparent);
+  transition:background .16s,color .16s}
+.ladeni-volba.ted{color:var(--podklad);background:var(--text)}
+.ladeni-reset{min-height:44px;padding:0 4px;font-family:var(--pismo);
+  font-size:var(--t-drobne);font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text-3)}
 
 /* odměna po zápisu */
 .plusjedna{position:fixed;left:50%;bottom:52%;z-index:50;font-family:var(--nadpisy);font-size:38px;

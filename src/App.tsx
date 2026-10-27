@@ -9,6 +9,7 @@ import { spustSync } from "./lib/sync";
 import { Hospody } from "./obrazovky/Hospody";
 import { Hra } from "./obrazovky/Hra";
 import { Kategorie } from "./obrazovky/Kategorie";
+import { Ladeni } from "./obrazovky/Ladeni";
 import { Pravidla } from "./obrazovky/Pravidla";
 import { Tymy } from "./obrazovky/Tymy";
 import { Ukoly } from "./obrazovky/Ukoly";
@@ -35,6 +36,8 @@ export function App() {
           <Route path="tymy" element={<Tymy />} />
           <Route path="hospody" element={<Hospody />} />
           <Route path="pravidla" element={<Pravidla />} />
+          {/* schválně není v menu: hledání chyb, co se projeví jen na telefonu */}
+          <Route path="ladeni" element={<Ladeni />} />
           {/* stará adresa z oblíbených nebo překlep – ať to nespadne na prázdnou stránku */}
           <Route path="*" element={<Hra />} />
         </Route>

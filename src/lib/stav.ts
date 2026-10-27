@@ -46,6 +46,10 @@ export interface Stav {
   tymId: string;
   hospody: Hospoda[];
   ukoly: Ukol[];
+  /** Id výchozích úkolů, které už appka tomuhle telefonu jednou nabídla.
+   *  Díky tomu se nový úkol z data.ts doplní i do rozehrané hry, a zároveň
+   *  se nevrátí ten, který si parta smazala. */
+  znameUkoly: string[];
 }
 
 /** Co se o týmu posílá na server. */
@@ -124,8 +128,55 @@ function prazdnyStav(): Stav {
     tymId: t.id,
     hospody: VYCHOZI_HOSPODY.map((h) => ({ ...h })),
     ukoly: VYCHOZI_UKOLY.map((u) => ({ ...u })),
+    znameUkoly: VYCHOZI_UKOLY.map((u) => u.id),
   };
 }
+
+/** Výchozí sada, jak vypadala, než tohle doplňování vzniklo. Slouží jako
+ *  seznam „už nabídnutých" pro stavy, co znameUkoly ještě nemají — bez něj
+ *  by se za nenabídnutý považoval i úkol, který si parta smazala, a vrátil
+ *  by se jí do galerie. Je to otisk historie, ne seznam k údržbě: nové úkoly
+ *  se sem NEPŘIDÁVAJÍ, od nich je právě znameUkoly. */
+const PRVNICH_23 = [
+  "caluje", "chudak", "smelinar", "baleni", "ticha", "rada", "hokuspokus", "hadka",
+  "budny", "hajzl", "pumpa", "taxal", "lajna", "rev", "bullseye", "bicak",
+  "vycepni", "maturita", "versovany", "anglan", "narodni", "zlodej", "fotka",
+];
+
+/** Doplní do uloženého stavu výchozí úkoly, které v něm ještě nikdy nebyly.
+ *
+ *  Appka si při prvním spuštění udělá vlastní kopii seznamu úkolů, aby se
+ *  dal upravovat v telefonu. Jenže tím se odřízla od data.ts: nový úkol se
+ *  nasadil, a kdo už appku jednou otevřel, ho nikdy neuviděl. Tohle je ten
+ *  most mezi výchozí sadou a rozehranou hrou.
+ *
+ *  Smazané úkoly se nevracejí: co už bylo jednou nabídnuto, zůstane
+ *  v znameUkoly, i když to parta vyhodí. U starého stavu, který ten seznam
+ *  ještě nemá, se za nabídnuté považuje všechno, co v něm zrovna leží —
+ *  takže první doplnění přidá jenom to, co v data.ts opravdu přibylo.
+ *
+ *  Pořadí se drží data.ts: nový úkol se zařadí za ten, za kterým je napsaný,
+ *  ne na konec galerie. */
+function doplnUkoly(z: Stav, ulozeneZname: unknown) {
+  // Čte se seznam z ULOŽENÉHO stavu, ne ze složeného: ten má pod sebou
+  // prazdnyStav() s kompletní výchozí sadou, takže by každý úkol vycházel
+  // jako dávno nabídnutý a nedoplnilo by se nikdy nic.
+  const zname = new Set(Array.isArray(ulozeneZname) && ulozeneZname.length
+    ? (ulozeneZname as string[])
+    : PRVNICH_23);
+  VYCHOZI_UKOLY.forEach((u, i) => {
+    if (zname.has(u.id)) return;
+    zname.add(u.id);
+    const pred = VYCHOZI_UKOLY[i - 1]?.id;
+    const kam = pred ? z.ukoly.findIndex((x) => x.id === pred) : -1;
+    if (kam >= 0) z.ukoly.splice(kam + 1, 0, { ...u });
+    else z.ukoly.push({ ...u });
+  });
+  z.znameUkoly = [...zname];
+}
+
+/** Doplnila se výchozí sada? Pak se musí hned zapsat – viz níž. */
+let zapisPoDoplneni = false;
 
 /** Co se dá vyčíst z localStorage. Může to být i stav z dřívější verze,
  *  tak se na to kouká jako na neznámý objekt a tvar se dorovná níž. */
@@ -154,6 +205,11 @@ function nacti(): Stav {
   }
 
   const z: Stav = { ...prazdnyStav(), ...(ulozeno as Stav) };
+  doplnUkoly(z, ulozeno.znameUkoly);
+  // Doplnění se musí zapsat hned, ne až s první čárkou: dokud leží jenom
+  // v paměti, znameUkoly nikde není a mazání úkolu by se při dalším spuštění
+  // neudrželo — smazaný by se vrátil.
+  if (!Array.isArray(ulozeno.znameUkoly)) zapisPoDoplneni = true;
   if (!z.tymy?.length) {
     const t = novyTym("Naše parta", BARVY[0]);
     z.tymy = [t];
@@ -186,6 +242,9 @@ function nacti(): Stav {
 }
 
 export const stav: Stav = nacti();
+// Mikroúloha, ne rovnou: uloz() si sahá na věci, které se v tomhle souboru
+// zavádějí až pod námi.
+if (zapisPoDoplneni) queueMicrotask(uloz);
 
 /** Každý tým musí stát v nějaké existující hospodě. Tým se štací null (nový tým)
  *  nebo štací, která se mezitím smazala, by neměl kam zapsat čárku a zápis by tiše propadl. */
