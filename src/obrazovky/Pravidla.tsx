@@ -7,6 +7,8 @@ import { Obtiznost } from "../components/Obtiznost";
 import { Okno } from "../components/Okno";
 import { potvrdit } from "../components/Potvrzeni";
 import { OBTIZNOST } from "../lib/data";
+import { bodovani, JAK_SE_VALI, UVODNIK, ZAKLAD } from "../lib/pravidla";
+import { Pravidlo } from "../components/Pravidlo";
 import { sklonuj, vazat } from "../lib/format";
 import { nastavSpravce, sediKod, useSpravce } from "../lib/spravce";
 import { strop, tym, useStav, vynulujTym } from "../lib/stav";
@@ -37,28 +39,22 @@ export function Pravidla() {
       <div className="pravidla">
         {/* úvodní odstavec se čte jako text, ne jako seznam pravidel */}
         <div className="pravidla-uvod">
-          <p>{vazat("Bacha, to není jenom takový to klasický večerní nasávání v Štatlu. Tady se jede betelná řežba přes brněnský špeluňky, kde čárky nemáš jenom za vyžahnutý pruty, ale hlavně za to, že máš koule, dobrej kšaft a v palici to nemáš vypatlaný.")}</p>
+          <p>{vazat(UVODNIK)}</p>
         </div>
         <p>
-          <b>O co jde:</b> {vazat("Nahrabat víc čárek než ty druhý partyje a urvat titul z Tour De Pub.")}<br />
-          <b>Vlezné do kotla:</b> Kilo na palici.<br />
-          <b>Celej bank:</b> {vazat("První parta bere všecko — všechny love só jejich.")}
+          {ZAKLAD.map((b, i) => (
+            <span key={b.stitek}>{i > 0 && <br />}<Pravidlo bod={b} /></span>
+          ))}
         </p>
 
         <h2>JAK SE TO VALÍ</h2>
         <ol>
-          <li><b>Časovej cajk:</b> Valí se to od <b>šesti večer do dvou do rána</b>.{" "}
-            {vazat("Co se zvrtne potom, už se do čárek nepočítá.")}</li>
-          <li><b>Partyje:</b> Jede se ve dvou až třech partách.</li>
-          <li><b>Žádný courání:</b>{" "}
-            {vazat("Na každou štaci je zhruba 45 minut. Jak se nějaká parta bude fest loudat a ty druhý na ně budou muset čumět, tak v té špeluňce nebudou mít za ty srandy ani čárku.")}</li>
+          {JAK_SE_VALI.map((b) => <li key={b.stitek}><Pravidlo bod={b} /></li>)}
         </ol>
 
         <h2>BODOVÁNÍ</h2>
         <ol>
-          <li>{vazat("Čárka za každou špeluňku, do který vlezete.")} <b className="cislo">(max. {s.hospody})</b></li>
-          <li>{vazat("Čárka, když v tý štaci lupne aspoň půlka partyje jeden škopek.")} <b className="cislo">(max. {s.hospody})</b></li>
-          <li>{vazat("Další čárky za plnění srand, rozhozený podle toho, jaká je to haluz:")}</li>
+          {bodovani(s.hospody).map((b) => <li key={b.text}><Pravidlo bod={b} /></li>)}
         </ol>
         <div className="legenda">
           {OBTIZNOST.map((o) => (

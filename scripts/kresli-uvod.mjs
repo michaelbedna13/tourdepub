@@ -125,7 +125,7 @@ const KRESBY = {
 };
 
 /** Co se opravdu zapisuje do src/lib/uvod-kresby.ts. */
-const POUZITE = ["opilec", "carky", "snek", "koruna"];
+const POUZITE = ["opilec", "skopek", "carky", "snek", "koruna"];
 
 const out = [];
 for (const [k, f] of Object.entries(KRESBY)) {

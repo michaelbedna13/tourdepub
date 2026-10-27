@@ -17,8 +17,11 @@
 // a značka pod ní prosvítá — teprve s prvním se #uvod odklidí.
 import { useEffect, useId, useRef, useState } from "react";
 import { vazat } from "../lib/format";
+import { bodovani, COURANI, PARTYJE, CAJK, UVODNIK, ZAKLAD, type Bod } from "../lib/pravidla";
+import { stav } from "../lib/stav";
 import { UVOD_KRESBY } from "../lib/uvod-kresby";
 import { Logo } from "./Logo";
+import { Pravidlo } from "./Pravidlo";
 
 /** Nejmíň takhle dlouho zůstane značka od načtení stránky. */
 const ZNACKA_NEJMIN = 1700;
@@ -35,28 +38,31 @@ const ZAVRENI = 300;
 interface Plakat {
   /** Klíč kresby v UVOD_KRESBY. */
   id: keyof typeof UVOD_KRESBY;
-  /** Rozmístění na mřížce. Čtyři skladby, každá jinak — viz app.css.
+  /** Rozmístění na mřížce. Pět skladeb, každá jinak — viz app.css.
    *  a: text nahoře, kresba dole vpravo
    *  b: kresba nahoře vpravo (menší), text dole
-   *  c: kresba dole vlevo, přes víc sloupců
-   *  d: kresba nahoře přes celou šířku, text pod ní */
-  skladba: "a" | "b" | "c" | "d";
+   *  c: kresba dole vlevo, text odsazený doprava
+   *  d: kresba nahoře uprostřed, text pod ní
+   *  e: kresba dole přes celou šířku */
+  skladba: "a" | "b" | "c" | "d" | "e";
   nadpis: string;
-  text: string;
+  /** Jeden odstavec, nebo seznam pravidel. Vždycky jedno z toho. */
+  text?: string;
+  body?: Bod[];
 }
 
-/** Čtyři plakáty: co se hraje, za co jsou čárky, co se trestá a co se
- *  vyhrává. Mluví to hantecem z Pravidel, ne návodem — v appce, kde se
- *  jinde píše o betelný řežbě, je spisovný výklad cizí hlas. */
+/** Pět plakátů. Nejsou to moje věty: text se bere z lib/pravidla.ts, odkud
+ *  čte i obrazovka Pravidla. Úvod tedy neříká „něco jako pravidla", ale
+ *  přímo je — a když se jedno změní, změní se obojí.
+ *
+ *  Jeden plakát = jedna kapitola pravidel. Dlouhé courání má celý pro sebe,
+ *  aby se nemuselo tlačit vedle cajku a partyjí. */
 const PLAKATY: Plakat[] = [
-  { id: "opilec", skladba: "a", nadpis: "Devět špeluněk, jedna noc",
-    text: "Partyja se protáhne devíti brněnskejma špeluňkama. Valí se to od šesti večer do dvou do rána." },
-  { id: "carky", skladba: "b", nadpis: "Čárky nejsou za chlast",
-    text: "Za každou štaci a za každej škopek je čárka. Ty tučný ale padajó za srandy — za koule a za to, že to v palici nemáš vypatlaný." },
-  { id: "snek", skladba: "c", nadpis: "Kdo se loudá, ten nemá",
-    text: "Na štaci je tak 45 minut. Kdo se fest loudá a ostatní na něj čumijó, za srandy v tý špeluňce nemá ani čárku." },
-  { id: "koruna", skladba: "d", nadpis: "Celej bank bere jedna",
-    text: "Vlezné je kilo na palici a celej bank shrábne parta s nejvíc čárkama. Tak ať je to betelný." },
+  { id: "opilec", skladba: "a", nadpis: "Betelná řežba", text: UVODNIK },
+  { id: "skopek", skladba: "b", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
+  { id: "snek", skladba: "c", nadpis: "Žádný courání", text: COURANI.text },
+  { id: "carky", skladba: "d", nadpis: "Bodování", body: bodovani(stav.hospody.length, true) },
+  { id: "koruna", skladba: "e", nadpis: "Celej bank", body: ZAKLAD },
 ];
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
@@ -182,7 +188,10 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
           <div className={`uvod-list ${p.skladba}`} key={kde}>
             <div className="uvod-kresba"><Cmaranice id={p.id} /></div>
             <h1 className="uvod-nadpis">{vazat(p.nadpis)}</h1>
-            <p className="uvod-text">{vazat(p.text)}</p>
+            <div className="uvod-telo">
+              {p.text && <p>{vazat(p.text)}</p>}
+              {p.body?.map((b) => <p key={b.stitek ?? b.text}><Pravidlo bod={b} /></p>)}
+            </div>
           </div>
 
           <div className="uvod-spodek">

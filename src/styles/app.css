@@ -1081,31 +1081,42 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   /* vyrovná délku řádků, ať nezůstane na posledním jedno slovo */
   text-wrap:balance;
 }
-.uvod-text{
+/* Tělo plakátu: buď jeden odstavec, nebo pravidla pod sebou. Mezi nimi je
+   mezera, uvnitř volný proklad — čte se to na plakátu, ne v seznamu. */
+.uvod-telo{
   margin:var(--uvod-mezera-text) 0 0;
-  font-family:var(--pismo);font-size:var(--t-hlavni);line-height:1.7;
+  display:flex;flex-direction:column;gap:14px;
+  font-family:var(--pismo);font-size:var(--t-hlavni);line-height:1.65;
   color:var(--text-2);
 }
+.uvod-telo p{margin:0}
+/* Štítek pravidla je to, co se z řádky čte první. */
+.uvod-telo b{color:var(--text);font-weight:700}
 
 /* ---- čtyři skladby ----
    Liší se jen tím, které sloupce a který řádek co dostane. Pořadí v DOM je
    pořád stejné (kresba, nadpis, text), skladba ho přerovná. */
 /* a: text nahoře, kresba dole vpravo přes čtyři sloupce */
 .uvod-list.a .uvod-nadpis{grid-column:1/7;grid-row:1}
-.uvod-list.a .uvod-text{grid-column:1/6;grid-row:2}
+.uvod-list.a .uvod-telo{grid-column:1/6;grid-row:2}
 .uvod-list.a .uvod-kresba{grid-column:3/7;grid-row:3;margin-top:var(--uvod-mezera-blok)}
 /* b: kresba nahoře vpravo a menší, text pod ní */
 .uvod-list.b .uvod-kresba{grid-column:4/7;grid-row:1;margin-bottom:var(--uvod-mezera-blok)}
 .uvod-list.b .uvod-nadpis{grid-column:1/7;grid-row:2}
-.uvod-list.b .uvod-text{grid-column:1/6;grid-row:3}
+.uvod-list.b .uvod-telo{grid-column:1/6;grid-row:3}
 /* c: kresba dole vlevo, text nad ní odsazený doprava */
 .uvod-list.c .uvod-nadpis{grid-column:1/7;grid-row:1}
-.uvod-list.c .uvod-text{grid-column:2/7;grid-row:2}
+.uvod-list.c .uvod-telo{grid-column:2/7;grid-row:2}
 .uvod-list.c .uvod-kresba{grid-column:1/5;grid-row:3;margin-top:var(--uvod-mezera-blok)}
-/* d: kresba nahoře přes celou šířku, pod ní nadpis i věta */
+/* d: kresba nahoře uprostřed, pod ní nadpis i text */
 .uvod-list.d .uvod-kresba{grid-column:2/6;grid-row:1;margin-bottom:var(--uvod-mezera-blok)}
 .uvod-list.d .uvod-nadpis{grid-column:1/7;grid-row:2}
-.uvod-list.d .uvod-text{grid-column:1/7;grid-row:3}
+.uvod-list.d .uvod-telo{grid-column:1/7;grid-row:3}
+/* e: text nahoře, kresba dole přes celou šířku — nejširší záběr, na konec */
+.uvod-list.e .uvod-nadpis{grid-column:1/7;grid-row:1}
+.uvod-list.e .uvod-telo{grid-column:1/7;grid-row:2}
+.uvod-list.e .uvod-kresba{grid-column:1/7;grid-row:3;justify-content:center;
+  margin-top:var(--uvod-mezera-blok)}
 
 /* Spodek: kolikátý plakát vlevo, cedule „ťukni dál" vpravo. */
 .uvod-spodek{flex:none;display:flex;align-items:center;justify-content:space-between;
