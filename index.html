@@ -11,13 +11,19 @@
      vykreslení — a Safari v prohlížeči do té doby obarví lištu nad stránkou
      výchozí černou místo podkladem appky. -->
 <meta name="color-scheme" content="dark">
-<!-- Barva pruhu nad stránkou v prohlížeči. Je to čistý podklad a sedí přesně:
-     teplá záře (.app::after) se nahoře vytrácí do ztracena, takže první řádek
-     stránky je taky čistý podklad a šev není kde vidět. Zkoušelo se i opačně
-     (nechat záři a dát sem barvu prvního řádku), jenže pak nad gradientem
-     visel pruh jedné ploché barvy a jako pás to bylo poznat pořád.
-     Průprava si pruh přebarvuje na barvu stránky, viz Uvod.tsx. -->
-<meta name="theme-color" content="#2B2B23">
+<!-- Barva pruhu nad stránkou v prohlížeči. NENÍ to --podklad (#2B2B23), ale
+     barva, kterou appka na prvním řádku opravdu nakreslí.
+
+     Dvě věci se u horní hrany potkávají. Teplá záře (.app::after) je tam
+     spočítaná na nulu, takže ta nepřidá nic. Filmové zrno ale leží i přes
+     první řádek a podklad o kousek zvedne — tečky jsou půl na půl bílé
+     a černé, jenže na tmavém podkladu bílá přidá víc, než černá ubere.
+     Naměřeno: (43,43,35) bez zrna, (45,45,37) se zrnem.
+
+     Dokud tu stálo #2B2B23, byl mezi pruhem a stránkou schod o dva stupně
+     a v prohlížeči to bylo poznat jako šev. Platí to oběma směry: když se
+     sáhne na zrno, musí se barva přeměřit. -->
+<meta name="theme-color" content="#2D2D25">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

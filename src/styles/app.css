@@ -131,18 +131,27 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
    (html.uvodni .app má visibility:hidden) a objeví se, až úvod odchází. */
 .app::after{
   content:"";position:fixed;inset:0;z-index:25;pointer-events:none;
-  /* Horní záře začíná až pod horní hranou, ne na ní: střed je ve čtvrtině
-     výšky a dohasne dřív, než se k hraně vrátí. U hrany je tím čistý podklad,
-     stejný jako pruh, který si nad stránkou kreslí prohlížeč sám — a šev
-     není kde vidět.
+  /* Svislý přechod, ne kruhový. Na nule u horní hrany to dokázal i kruhový,
+     jenže hned pod ní stoupal strmě — během třiceti bodů se podklad zvedl
+     o polovinu — a oko to čte jako hranu, i když na samotné hraně barva
+     sedí. Pruh, který si nad stránkou kreslí prohlížeč, je plochý; aby na
+     něj stránka navázala, musí být prvních pár desítek bodů plochých taky.
 
-     Dřív to dělala maska (lineární přechod shora), jenže na iOS se tím celý
-     ten pás dostal do vrstvy, kterou Safari vykresluje v nižším rozlišení:
-     logo a pilulka týmu pod ní byly rozmazané, zbytek obrazovky ostrý.
-     Spočítaný gradient dělá to samé a žádnou vrstvu navíc nepotřebuje. */
+     Proto rovný začátek v BODECH, ne v procentech výšky: pruh nad stránkou
+     je vysoký pořád stejně, ať je telefon jakkoli dlouhý. Prvních 76 bodů
+     je čistý podklad, pak záře teprve naskakuje a vrcholí kolem tří set.
+
+     Maskou by se to udělalo elegantněji, ale na iOS se tím celý horní pás
+     dostane do vrstvy, kterou Safari vykresluje v nižším rozlišení — logo
+     a pilulka týmu pod ní byly rozmazané. Spočítaný přechod dělá to samé
+     a žádnou vrstvu navíc nepotřebuje. */
   background:
-    radial-gradient(140% 52% at 50% 24%, rgba(249,162,4,.14), transparent 46%),
-    radial-gradient(120% 38% at 50% 108%, rgba(216,86,14,.06), transparent 60%);
+    linear-gradient(to bottom,
+      transparent 76px,
+      rgba(249,162,4,.13) 300px,
+      rgba(249,162,4,.05) 58%,
+      transparent 80%),
+    linear-gradient(to top, rgba(216,86,14,.07), transparent 32%);
 }
 
 /* Filmové zrno přes celou appku. Leží nad vším, co appka nakreslí, a nechytá
