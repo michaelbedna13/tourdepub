@@ -175,37 +175,6 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
   .app::before{background-size:64px 64px}
 }
 
-/* ---------- horní mlha ----------
-   Jediné pravidlo: dokud je obrazovka nahoře a je vidět lišta, nahoře není
-   nic. Jakmile obsah začne podjíždět, zakryje ho mlha — rozostření a zároveň
-   přechod do barvy appky, takže text nemizí pod hranou ostrým střihem.
-
-   Dřív tu byl neprůhledný pruh, co měl přebít systémové rozostření iOS 26.
-   Jenže ten tam byl pořád, i když pod ním nic nebylo, a na lištu appky
-   dosedal přesně tak, že vypadala rozmazaně. Tohle je obráceně: nic tam
-   není, dokud není co zakrývat.
-
-   Maska je tady bezpečná, i kdyby ji prohlížeč vykreslil hrubě: je to
-   rozostření, takže na něm hrubost není poznat. Na celoobrazovkové vrstvě
-   to bezpečné nebylo.
-
-   z-index 55 je pod zrnem (60), takže zrno běží i přes mlhu, a nad obsahem
-   i září — právě ty se mají rozostřit. */
-.strop{
-  position:fixed;top:0;z-index:55;pointer-events:none;
-  left:50%;width:min(100%,var(--sirka));translate:-50% 0;
-  height:calc(var(--vrch) + 10px);
-  background:linear-gradient(to bottom,
-    var(--podklad) 18%,
-    color-mix(in srgb,var(--podklad) 55%,transparent) 62%,
-    transparent);
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-  -webkit-mask-image:linear-gradient(to bottom,#000 58%,transparent);
-  mask-image:linear-gradient(to bottom,#000 58%,transparent);
-  opacity:0;transition:opacity .2s var(--krok);
-}
-html.posunuto .strop{opacity:1}
-
 h1,h2,h3{margin:0;font-family:var(--nadpisy);line-height:var(--radky-nadpis);
   letter-spacing:-.015em;text-transform:uppercase}
 /* velké nadpisy lehce, drobné popisky tučně – viz poznámka u --nadpisy */

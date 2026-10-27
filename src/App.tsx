@@ -43,27 +43,6 @@ export function App() {
   );
 }
 
-/** Příznak „obsah je posunutý" na <html>. Podle něj se objeví horní mlha.
- *
- *  Pravidlo je jedno: dokud je obrazovka nahoře a je vidět lišta, nahoře nic
- *  není. Jakmile obsah začne podjíždět, mlha ho zakryje. Dřív to appka řešila
- *  obráceně – zakrývala horní hranu pořád, aby přebila systémové rozostření
- *  iOS – a byla z toho rozmazaná lišta i ve chvíli, kdy pod ní nic nebylo.
- *
- *  Jen přepíná třídu, nic nepřekresluje: samotné objevení je v CSS. */
-function useHorniMlha() {
-  useEffect(() => {
-    const zmer = () =>
-      document.documentElement.classList.toggle("posunuto", window.scrollY > 8);
-    zmer();
-    window.addEventListener("scroll", zmer, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", zmer);
-      document.documentElement.classList.remove("posunuto");
-    };
-  }, []);
-}
-
 // Pořadí pro švih do boku. Stejné jako v menu, ať se to nepere.
 const HLAVNI = ["/", "/ukoly", "/tymy", "/hospody", "/pravidla"];
 const KATEGORIE_CESTY = KATEGORIE.map((k) => `/ukoly/${k.id}`);
@@ -73,19 +52,11 @@ function Kostra() {
   // V kategorii se švihem chodí mezi kategoriemi, ne na jinou obrazovku –
   // tam člověk zrovna prochází úkoly a skok na Hospody by byl překvapení.
   const svih = useSvih(pathname.startsWith("/ukoly/") ? KATEGORIE_CESTY : HLAVNI);
-  // ještě před vykreslením nové obrazovky, ať neproblikne na staré pozici.
-  // Zároveň se shodí příznak posunu: nová obrazovka začíná nahoře, takže
-  // horní mlha nemá co zakrývat.
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.classList.remove("posunuto");
-  }, [pathname]);
-  useHorniMlha();
+  // ještě před vykreslením nové obrazovky, ať neproblikne na staré pozici
+  useLayoutEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div className="app" {...svih.obal}>
       <Ramy />
-      {/* Horní mlha. Je tu, až když je obsah posunutý – viz useHorniMlha. */}
-      <div className="strop" aria-hidden="true" />
       {/* klíč podle adresy: každá obrazovka přijede, ne střih */}
       <main className={`obrazovka${svih.prichod ? ` z-${svih.prichod}` : ""}`}
         key={pathname} ref={svih.vrstva}>
