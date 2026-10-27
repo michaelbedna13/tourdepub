@@ -570,9 +570,10 @@ input,textarea,select{caret-color:var(--text)}
 .kat-karta{
   display:block;position:relative;overflow:hidden;
   border-radius:var(--r);padding:22px 24px;min-height:152px;
-  /* barvu textu dává kategorie sama (zelená a červená jsou tmavé, žlutá
-     světlá); tady je jen záloha, kdyby chyběla */
-  color:var(--na-akci);
+  /* Na vybarvené ploše se píše krémem, na všech třech kategoriích stejně.
+     Podklad je na to sražený (viz karta v data.ts), takže jedna barva textu
+     stačí a žádná karta nevyčnívá černým písmem. */
+  color:var(--text);
   transition:transform .14s var(--krok),filter .16s;
 }
 .kat-karta:active{transform:scale(.985);filter:brightness(.95)}

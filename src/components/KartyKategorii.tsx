@@ -21,7 +21,7 @@ export function KartyKategorii({ male = false }: { male?: boolean }) {
         const naDosah = t ? vse.filter((u) => jdePridat(u, t)).length : 0;
         return (
           <Link key={k.id} to={`/ukoly/${k.id}`} className={`kat-karta${male ? " mala" : ""}`}
-            style={{ background: k.barva, color: k.naBarve }}>
+            style={{ background: k.karta }}>
             <Ikona jmeno={k.ikona} px={male ? 92 : 116} trida="kat-vodoznak" />
             <div className="kat-vrch">
               <span className="kat-pocet cislo">{hotovo}/{vse.length}</span>

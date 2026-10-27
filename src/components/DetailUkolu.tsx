@@ -77,7 +77,7 @@ export function DetailUkolu({ u, k, zavri, uprav }: Props) {
       <div className={`detail-karta${splneno ? " splneno" : ""}`} ref={spojRefy} tabIndex={-1}
         role="dialog" aria-label={u.nazev}
         style={{ "--kat": k.barva,
-                 ...(splneno ? { background: k.barva, color: k.naBarve } : {}) } as React.CSSProperties}
+                 ...(splneno ? { background: k.karta } : {}) } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()} {...dolu.obal}>
 
         {/* Kresba nahoře vlevo, ovládání vpravo — jako datum na kartě,

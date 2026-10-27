@@ -42,7 +42,7 @@ export function KartaUkolu({ u, k, otevri }: Props) {
     <div
       className={`ukol-karta${splneno ? " splneno" : ""}`}
       style={splneno
-        ? { background: k.barva, color: k.naBarve }
+        ? { background: k.karta }
         : { "--kat": k.barva } as React.CSSProperties}
       role="button" tabIndex={0}
       onClick={otevri}
