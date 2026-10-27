@@ -1,4 +1,4 @@
-import { Carky } from "./Carky";
+import { Logo } from "./Logo";
 import { Ikona } from "./Ikona";
 import { sklonuj, sklonujTym, sklonujUkol, vazat } from "../lib/format";
 import { RAZITKO } from "../lib/razitko";
@@ -15,7 +15,6 @@ interface Parta {
 interface Props {
   poradi: Parta[];
   /** Za koho se na tomhle telefonu zapisuje. */
-  tymId: string | null;
   hospod: number;
   ukolu: number;
   strop: number;
@@ -50,9 +49,8 @@ function datum(d = new Date()): string {
  *
  *  Skladba je převzatá z opravdové účtenky: štítek a číslo dokladu nahoře,
  *  pod tím značka, heslo mezi lomítky, datum mezi přerušovanými čarami,
- *  položky s vodicími tečkami, tlustý součet, čárkový kód a poděkování. */
-export function Uctenka({ poradi, tymId, hospod, ukolu, strop, prepni, uprav }: Props) {
-  const muj = poradi.find((p) => p.id === tymId);
+ *  položky s vodicími tečkami, tlustý součet a patička. */
+export function Uctenka({ poradi, hospod, ukolu, strop, prepni, uprav }: Props) {
   // Číslo dokladu: kolik čárek je za večer na stole dohromady. Během večera
   // naskakuje jako počítadlo na pokladně — a je to pořád pravdivý údaj.
   const cislo = String(poradi.reduce((a, p) => a + p.body, 0)).padStart(6, "0");
@@ -64,8 +62,7 @@ export function Uctenka({ poradi, tymId, hospod, ukolu, strop, prepni, uprav }: 
       </div>
 
       <div className="uc-hlava">
-        <div className="uc-znacka">TOUR DE PUB</div>
-        <div className="uc-mesto">BRNO</div>
+        <Logo trida="uc-znacka" />
       </div>
       <div className="uc-heslo">
         /{hospod} {hospod === 1 ? "špeluňka" : hospod < 5 ? "špeluňky" : "špeluněk"}
@@ -113,10 +110,7 @@ export function Uctenka({ poradi, tymId, hospod, ukolu, strop, prepni, uprav }: 
 
       <div className="uc-cara" />
       <div className="uc-paticka">
-        {/* Čárkový kód: na opravdové účtence je tu čárový kód, tady jsou to
-            skutečné čárky party, za kterou na tomhle telefonu zapisuješ. */}
-        {muj && muj.body > 0 && <div className="uc-carky"><Carky kolik={muj.body} vyska={26} /></div>}
-        <div className="uc-diky">Díky!</div>
+        <div className="uc-diky">Brno Edition</div>
         <div className="uc-pata">
           <span>{vazat(`max ${strop} ${sklonuj(strop)}`)}</span>
           <span>TOURDEPUB</span>

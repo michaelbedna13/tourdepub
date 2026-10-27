@@ -167,6 +167,27 @@ const KRESBY = {
     I(cut(rect(26, 74, 74, 88, 4), { ...R, amp: 1 })),
     I(cut(star(84, 18, 11, 4), { ...R, amp: .8, tension: .2 })),
   ],
+  // Falešnej jubilant: dort s jednou svíčkou. Jedna svíčka, ne věnec —
+  // ve dvaadvaceti bodech se z víc svíček stane hřeben.
+  jubilant: () => [
+    I(cut([[50, 4], [57, 13], [55, 23], [45, 23], [43, 13]], { ...R, amp: .8 })),
+    I(cut(rect(45, 20, 55, 40, 2), { ...R, amp: .8 })),
+    I(cut(rect(22, 40, 78, 60, 5), H)),
+    C(cut(rect(22, 48, 78, 52, 1), JEMNE)),
+    I(cut(rect(13, 60, 87, 84, 6), H)),
+    C(cut(rect(13, 70, 87, 74, 1), JEMNE)),
+    I(cut(rect(6, 84, 94, 93, 4), { ...R, amp: .9 })),
+  ],
+  // Vrchní na zkoušku: motýlek. Podnos s půllitrem je zepředu jen ovál
+  // a splyne s ostatními kresbami; motýlek je poznat i jako dlaždice.
+  vrchni: () => [
+    I(cut([[8, 28], [42, 44], [42, 62], [8, 78], [12, 53]], H)),
+    I(cut([[92, 28], [58, 44], [58, 62], [92, 78], [88, 53]], H)),
+    C(cut(stroke(22, 42, 22, 64, 5), { ...R, amp: .7 })),
+    C(cut(stroke(78, 42, 78, 64, 5), { ...R, amp: .7 })),
+    I(cut(rect(40, 38, 60, 68, 5), { ...R, amp: 1 })),
+  ],
+
   // Veršovanej lokál: bublina s notou
   versovany: () => [
     I(cut([[12, 46], [16, 24], [38, 12], [64, 13], [86, 24], [90, 46], [80, 64], [54, 72], [36, 72], [24, 88], [26, 68], [14, 60]], H)),
@@ -207,6 +228,29 @@ const KRESBY = {
     C(cut(ell(48, 56, 21, 21, 22), { ...R, amp: 1 })),
     I(cut(ell(48, 56, 10, 10, 18), { ...R, amp: .8 })),
     C(cut(ell(78, 40, 6, 6, 16), JEMNE)),
+  ],
+  // Živý sochy: figura na dvoustupňovém podstavci. Ruka nahoru a mezera mezi
+  // paží a trupem — bez ní se ruka slila do siluety a zbyl panák.
+  sochy: () => [
+    hlava(48, 16, 11),
+    I(cut([[40, 28], [58, 28], [61, 56], [37, 56]], H)),
+    I(cut(stroke(58, 32, 78, 12, 9), { ...R, amp: .9 })),
+    I(cut(stroke(38, 32, 26, 54, 8), { ...R, amp: .9 })),
+    C(cut(stroke(36, 38, 36, 56, 4), JEMNE)),
+    I(cut(rect(42, 56, 58, 72, 2), { ...R, amp: .9 })),
+    I(cut(rect(30, 72, 70, 80, 2), { ...R, amp: .9 })),
+    I(cut(rect(20, 80, 80, 94, 3), H)),
+  ],
+  // Tácková galerie: dva tácky přes sebe, na předním čmáranice. Kulaté tácky
+  // se slily v myší hlavu, tak jsou hranaté a pootočené jako na stole;
+  // mezi nimi je vystřižená spára, jinak je z nich jeden kus papíru.
+  tacky: () => [
+    I(cut(rot(rect(30, 12, 88, 70, 5), -13, 50, 50), H)),
+    C(cut(rot(rect(14, 24, 76, 86, 5), 9, 50, 50), { ...R, amp: .9 })),
+    I(cut(rot(rect(18, 28, 72, 82, 5), 9, 50, 50), H)),
+    C(cut(ell(36, 48, 4, 4, 14), JEMNE)),
+    C(cut(ell(55, 45, 4, 4, 14), JEMNE)),
+    C(cut(srpek(45, 58, 13, 4), { ...R, amp: .7, step: 5 })),
   ],
 };
 

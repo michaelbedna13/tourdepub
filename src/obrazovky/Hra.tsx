@@ -50,7 +50,6 @@ export function Hra() {
         <div className="sekce">
           <Uctenka
             poradi={poradi}
-            tymId={stav.tymId}
             hospod={stav.hospody.length}
             ukolu={stav.ukoly.length}
             strop={strop().celkem}

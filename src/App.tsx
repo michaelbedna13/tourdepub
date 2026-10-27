@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { HashRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { PotvrzeniHost } from "./components/Potvrzeni";
+import { Ramy } from "./components/Ramy";
 import { Uvod } from "./components/Uvod";
 import { KATEGORIE } from "./lib/data";
 import { useSvih } from "./lib/svih";
@@ -55,6 +56,7 @@ function Kostra() {
   useLayoutEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div className="app" {...svih.obal}>
+      <Ramy />
       {/* klíč podle adresy: každá obrazovka přijede, ne střih */}
       <main className={`obrazovka${svih.prichod ? ` z-${svih.prichod}` : ""}`}
         key={pathname} ref={svih.vrstva}>

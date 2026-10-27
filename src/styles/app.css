@@ -826,10 +826,9 @@ input,textarea,select{caret-color:var(--text)}
 .uc-cislo{font-family:inherit;font-variant-numeric:tabular-nums}
 
 .uc-hlava{text-align:center;padding:14px 0 0}
-.uc-znacka{font-family:var(--nadpisy);font-size:30px;letter-spacing:.02em;line-height:1.05;
-  color:var(--tisk-cervena)}
-.uc-mesto{font-family:var(--nadpisy);font-size:12px;letter-spacing:.34em;margin:2px 0 0 .34em;
-  color:var(--tisk-cervena)}
+/* Značka na účtence je kreslená, ne vysázená: na dokladu je to otisk, ne
+   nadpis — a je to ta samá značka jako v liště a na ikoně appky. */
+.uc-znacka{display:block;height:84px;width:auto;margin:0 auto;color:var(--tisk-cervena)}
 /* Heslo mezi lomítky, jak to tiskne pokladna pod hlavičkou. */
 .uc-heslo{text-align:center;font-size:11.5px;letter-spacing:.02em;margin-top:12px;opacity:.78}
 .uc-datum{text-align:center;font-size:13px;font-weight:700;letter-spacing:.06em;
@@ -869,11 +868,7 @@ input,textarea,select{caret-color:var(--text)}
 .uc-razitko span{font-family:var(--nadpisy);font-size:11px;letter-spacing:.08em}
 
 .uc-paticka{text-align:center}
-/* Na opravdové účtence je tu čárový kód. Tady jsou to čárky party, za kterou
-   zapisuješ — a je to ten samý pruh svislých čar. */
-.uc-carky{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 9px;margin:16px 0 12px;
-  color:var(--inkoust)}
-.uc-diky{font-family:var(--nadpisy);font-size:26px;letter-spacing:.01em;line-height:1;
+.uc-diky{font-family:var(--nadpisy);margin-top:18px;font-size:24px;letter-spacing:.01em;line-height:1;
   color:var(--tisk-cervena)}
 .uc-pata{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
   margin-top:18px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.62}
@@ -1141,6 +1136,26 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   0%{opacity:0;transform:translate(-50%,8px) scale(.8)}
   20%{opacity:1;transform:translate(-50%,-4px) scale(1)}
   100%{opacity:0;transform:translate(-50%,-64px) scale(1)}
+}
+
+/* ——— Nastříhané rámy karet ———————————————————————————————————————————
+   Karty měly rádius z pravítka, zbytek appky je stříhaný z papíru — vedle
+   ikon a kreseb to byly dva různé rukopisy. Obrys teď vede ta samá křivka
+   jako u kreseb (scripts/kresli-ramy.mjs, cut() z cary.mjs), jen přepočtená
+   na 0–1, aby se napnula na velikost karty. Pro každý tvar karty je vlastní
+   cesta, ať se vlnka netahá na nudli. Rádius pod tím zůstává: když prohlížeč
+   clip-path na objectBoundingBox neumí, karta je prostě zakulacená jako dřív. */
+.ramy{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+@supports (clip-path:url(#ram-hero)){
+  .hero{clip-path:url(#ram-hero)}
+  .kat-karta{clip-path:url(#ram-kat)}
+  .kat-karta.mala{clip-path:url(#ram-katMala)}
+  .ukol-karta{clip-path:url(#ram-ukol)}
+  /* Detail se ořezává taky, ale stín pod ním musí jít přes drop-shadow:
+     clip-path uřízne box-shadow i s ním, kdežto drop-shadow kopíruje
+     vystřižený tvar. */
+  .detail-karta{clip-path:url(#ram-detail);box-shadow:none;
+    filter:drop-shadow(0 18px 40px rgba(0,0,0,.45))}
 }
 
 @media (prefers-reduced-motion:reduce){
