@@ -77,7 +77,6 @@ export function Uctenka({ poradi, hospod, ukolu, strop, prepni, uprav }: Props) 
         <div key={p.id} className="uc-parta">
           <div className="uc-nazev">
             <button className="uc-jmeno" onClick={() => prepni(p.id)}>
-              <span className="uc-poradi cislo">#{i + 1}</span>
               <span className="uc-znak" style={{ background: p.barva }} />
               <span className="uc-text">{p.nazev}</span>
             </button>

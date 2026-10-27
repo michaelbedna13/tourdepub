@@ -520,11 +520,14 @@ input,textarea,select{caret-color:var(--text)}
 /* odškrtávátka drží dolní hranu karty */
 /* Linky a plošky uvnitř karty jsou z inkoustu karty, ne z krémových --linka*:
    na světlé štaci by krémová linka na barvě zmizela. */
+/* Jedna linka, a to ta nad odškrtávátky: odděluje zápis od jména štace,
+   tedy dvě různé věci. Mezi odškrtávátky samými linka nebyla potřeba —
+   jsou to dvě položky téhož, každá má svoje kolečko a svůj řádek, a čára
+   mezi nimi z karty dělala tabulku. */
 .hero-zapis{position:relative;z-index:1;margin:auto -22px -18px;
   border-top:1px solid color-mix(in srgb,currentColor 16%,transparent)}
 .zaskrt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
   padding:18px 22px;min-height:66px;transition:background .16s}
-.zaskrt + .zaskrt{border-top:1px solid color-mix(in srgb,currentColor 16%,transparent)}
 .zaskrt:active{background:color-mix(in srgb,currentColor 9%,transparent)}
 .zaskrt-kolecko{
   width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;
@@ -679,11 +682,19 @@ input,textarea,select{caret-color:var(--text)}
 /* Ne stránka a ne plachta přes celou obrazovku: ta samá karta, jen větší,
    a galerie za ní se rozostří. Ťuknutí vedle kartu zavře. */
 .detail{
-  position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+  /* Přetahuje přes okraj obrazovky. Safari bere podklad pro rozostření
+     o chlup jinak zarovnaný, než kreslí samotnou plachtu, a na hraně po tom
+     zbyde úzký proužek, který rozostřený není. Když plachta přeteče ven,
+     proužek skončí za okrajem a nikdo ho neuvidí; o ten samý kus se přidá
+     do vycpávky, aby karta uvnitř zůstala, kde byla. */
+  --presah:8px;
+  position:fixed;inset:calc(-1 * var(--presah));z-index:40;
+  display:flex;align-items:center;justify-content:center;
   /* Celá plachta si bere dotyk: bez toho si tah vedle karty vezme prohlížeč
      a scrolluje stránkou pod otevřeným detailem. */
   touch-action:none;
-  padding:calc(var(--vrch) + 8px) var(--okraj) calc(env(safe-area-inset-bottom) + 24px);
+  padding:calc(var(--vrch) + 8px + var(--presah)) calc(var(--okraj) + var(--presah))
+          calc(env(safe-area-inset-bottom) + 24px + var(--presah));
   background:rgba(22,22,18,.52);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
   animation:zjevit .18s var(--krok);
 }
@@ -834,10 +845,13 @@ input,textarea,select{caret-color:var(--text)}
 .uc-parta{position:relative;padding:2px 0}
 .uc-nazev{display:flex;align-items:center;gap:6px}
 /* Jméno je tlačítko přes celou šířku: ťuknutím se přepne, za koho zapisuješ. */
-.uc-jmeno{flex:1;min-width:0;display:flex;align-items:center;gap:8px;text-align:left;
-  color:inherit;font:inherit;font-weight:700;font-size:15px;letter-spacing:.02em;
+/* Jméno party nese celou řádku. Dřív před ním stálo pořadové číslo (#1, #2),
+   jenže pořadí je vidět z toho, kdo je nahoře — a razítko VEDE to říká ještě
+   jednou. Byly to tři způsoby, jak povědět to samé, a účtenka z toho byla
+   zasekaná. Bez čísla je řádka čistá a jméno může být o kus větší. */
+.uc-jmeno{flex:1;min-width:0;display:flex;align-items:center;gap:9px;text-align:left;
+  color:inherit;font:inherit;font-weight:700;font-size:17px;letter-spacing:.04em;
   text-transform:uppercase;padding:6px 0;margin:-6px 0}
-.uc-poradi{flex:none;opacity:.55}
 .uc-znak{width:9px;height:9px;border-radius:2px;flex:none;box-shadow:0 0 0 1px rgba(21,26,32,.25)}
 .uc-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .uc-tuzka{flex:none;width:34px;height:34px;display:grid;place-items:center;
@@ -948,7 +962,13 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .menu-radek{min-height:58px}
 
 /* ---------- okno ---------- */
-.okno{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;
+/* Přetah přes okraj ze stejného důvodu jako u detailu – viz tam. Okno sedí
+   u dolní hrany, takže se o ten přetah musí vrátit vycpávkou, jinak by se
+   spodek okna schoval pod obrazovku. */
+.okno{--presah:8px;
+  position:fixed;inset:calc(-1 * var(--presah));z-index:40;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:0 var(--presah) var(--presah);
   background:rgba(3,7,5,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
   animation:zjevit .18s var(--krok)}
 .okno-telo{width:100%;max-width:var(--sirka);background:var(--vrstva);
@@ -993,11 +1013,8 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    od --text ani od --podklad, všechno je currentColor. */
 .uvod{
   position:fixed;inset:0;z-index:120;
-  /* Tmavo jako zbytek appky. Barevné plakáty na celou plochu znamenaly, že
-     se při každém přehození přebarvila i obrazovka a pruh nad ní; tohle je
-     jedna scéna od začátku do konce, takže nahoře nic nebliká. */
   background:var(--podklad);color:var(--text);
-  /* Pod průpravou je appka a nemá se pod ní posouvat. */
+  /* Pod úvodem je appka a nemá se pod ním posouvat. */
   touch-action:none;
   transition:opacity .3s var(--krok);
 }
@@ -1008,102 +1025,78 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 /* na konci se úvod vytratí, nevypne se střihem */
 .uvod.zavira{opacity:0;pointer-events:none}
 
+/* Jedna obrazovka: značka nahoře, uprostřed panák s nadpisem a popisem,
+   dole stopáž. Mezery jsou velké schválně — je to plakát, ne formulář,
+   a má se to dát přečíst na jeden nádech. */
 .uvod-obsah{
   position:absolute;inset:0;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;
+  padding:calc(env(safe-area-inset-top) + 26px) 28px calc(env(safe-area-inset-bottom) + 24px);
   /* o chvilku později než začne odcházet značka: prázdný snímek mezi nimi
      nevznikne, ale ani se nepřekrývají tak, že by text ležel přes logo */
   animation:uvod-prichod .34s .16s var(--krok) both;
 }
+.uvod-znak{flex:none;align-self:flex-start;height:30px;width:auto;display:block;color:var(--text)}
 
-/* ---------- kamera nad plátnem ----------
-   Oko je výřez, kamera je bod uprostřed obrazovky a plátno pod ní visí.
-   Kamera má nulovou velikost a počátek transformu v sobě, takže se plátno
-   posune tak, aby střed záběru padl přesně na střed obrazovky, a přiblížení
-   se počítá kolem něj. Délku přejezdu dává React (každý záběr může mít
-   svoji), průběh je tady — pomalý rozjezd i dojezd, aby to byla jízda,
-   ne skok. */
-/* Vrstvení napevno, ne podle pořadí v dokumentu: oko je dole, popisky nad
-   ním. Kamera uvnitř oka má will-change a je to vlastní vrstvicí kontext,
-   takže nechat to na pořadí je zbytečné riziko — Přeskočit musí být nahoře
-   za všech okolností. */
-.uvod-oko{position:absolute;inset:0;overflow:hidden;z-index:0}
-.uvod-kamera{
-  position:absolute;left:50%;top:50%;width:0;height:0;
-  transform-origin:0 0;will-change:transform;
-  transition-property:transform;
-  transition-timing-function:cubic-bezier(.62,.02,.28,1);
+/* Obsah je jeden blok vycentrovaný mezi značkou a stopáží. Volné místo se
+   rozdělí nad něj a pod něj stejným dílem, takže obrazovka dýchá, ať je
+   displej jakkoli vysoký. Kresba se smí smrsknout, ale ne růst — jinak by
+   si volné místo přetáhla k sobě a vycentrování by nebylo k ničemu. */
+.uvod-stred{
+  flex:1;min-height:0;width:100%;max-width:420px;
+  display:flex;flex-direction:column;justify-content:center;text-align:left;
 }
-.uvod-platno{position:absolute;left:0;top:0}
+.uvod-kresba{
+  flex:0 1 auto;min-height:0;display:flex;justify-content:flex-start;
+  margin-bottom:34px;color:var(--text);
+  animation:uvod-prichod .5s .14s var(--krok) both;
+}
+.uvod-cmaranice{height:clamp(118px,23vh,210px);max-height:100%;width:auto;display:block}
 
-/* Všechno na plátně je v jeho bodech, ne v pixelech obrazovky — velikosti
-   písma proto vypadají obrovské. Je to schválně: kamera si to přepočítá. */
+/* Nadpis unese sedmistovku i obtah — je to první věc, co se čte po kresbě.
+   Prokládání je stažené pod jedničku, ale ne o moc: české háčky a čárky
+   vystupují nad verzálky a při těsnějším prokladu sedí druhému řádku
+   na hlavě. */
 .uvod-nadpis{
-  position:absolute;margin:0;
-  font-family:var(--nadpisy);font-weight:700;
-  font-size:80px;line-height:1.08;letter-spacing:-.03em;
-  /* Obtah přidá ten kousek váhy navíc, co Hagrid nemá — stejný trik jako
-     u jména hospody na hero kartě. */
-  -webkit-text-stroke:1.2px currentColor;
-  color:var(--text);text-wrap:balance;
+  flex:none;margin:0 0 26px;font-weight:700;-webkit-text-stroke:1px currentColor;
+  font-size:clamp(30px,8.2vw,44px);line-height:1.1;letter-spacing:-.03em;
+  /* vyrovná délku řádků, ať nezůstane na posledním jedno slovo */
+  text-wrap:balance;
+  animation:uvod-prichod .5s .26s var(--krok) both;
 }
-/* První slovo nese barvu kapitoly a je to jediná barva na scéně vedle
-   kresby. Právě na ně najíždí první záběr každé kapitoly. */
-.uvod-duraz{color:var(--kap)}
-.uvod-text{
-  position:absolute;margin:0;
-  font-family:var(--pismo);font-size:28px;line-height:1.6;
-  color:var(--text);opacity:.74;
+/* Tři odstavce s pořádnou mezerou mezi nimi a volným prokladem uvnitř.
+   Natlačené do jednoho bloku to byl příbalový leták. */
+.uvod-popis{
+  flex:none;display:flex;flex-direction:column;gap:18px;max-width:30em;
+  font-family:var(--pismo);font-size:var(--t-hlavni);line-height:1.7;
+  color:var(--text-2);
+  animation:uvod-prichod .5s .36s var(--krok) both;
 }
-.uvod-kresba{position:absolute;display:grid;place-items:center;color:var(--kap)}
-.uvod-cmaranice{width:100%;height:100%;display:block}
+.uvod-popis p{margin:0}
 
-/* Kresby se hýbou samy. Bez toho je každý záběr fotka a z jízdy kamery je
-   prohlížení alba; tohle je to, co z toho dělá film. Běží pořád, i když
-   kresba zrovna není v obraze — jsou čtyři a je to transform, takže na tom
-   nesejde. */
-.kr-skopek .uvod-cmaranice{animation:kr-prihne 3.4s ease-in-out infinite}
-@keyframes kr-prihne{0%,100%{rotate:-5deg}50%{rotate:6deg}}
-.kr-carky .uvod-cmaranice{animation:kr-dechne 2.6s ease-in-out infinite}
-@keyframes kr-dechne{0%,100%{scale:1}50%{scale:1.06}}
-/* Šnek leze, protože kapitola je o tom, kdo se loudá. */
-.kr-snek .uvod-cmaranice{animation:kr-leze 6s ease-in-out infinite}
-@keyframes kr-leze{
-  0%{translate:-16% 0;rotate:-2deg}
-  50%{translate:16% 2%;rotate:2deg}
-  100%{translate:-16% 0;rotate:-2deg}
-}
-.kr-koruna .uvod-cmaranice{animation:kr-houpne 4s ease-in-out infinite}
-@keyframes kr-houpne{0%,100%{translate:0 -3%;rotate:-3deg}50%{translate:0 3%;rotate:3deg}}
-
-/* ---------- popis filmu ----------
-   Značka a Přeskočit visí nad scénou a s kamerou se nehýbou. */
-.uvod-hlava{
-  position:absolute;left:0;right:0;top:0;z-index:2;
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:calc(env(safe-area-inset-top) + 22px) 24px 0;
-}
-.uvod-znak{height:30px;width:auto;display:block;color:var(--text)}
-/* Přeskočit je tichý text, ne tlačítko. */
-/* Ťukací plocha je větší než nápis: 44 px na výšku a vzduch po stranách,
-   zatažený zpátky záporným okrajem, aby nápis zůstal zarovnaný s okrajem
-   stránky. touch-action:manipulation vyřadí čekání na dvojťuk. */
-.uvod-preskocit{min-height:44px;padding:0 14px;margin:-10px -14px;
-  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--text);opacity:.55;touch-action:manipulation}
-.uvod-preskocit:active{opacity:.9}
-
-/* Stopáž, ne ovládání: v průpravě se nikam neklepe, tohle jen říká, kolik
-   ze znělky zbývá. Jede v CSS, aby se kvůli ní nepřekresloval React. */
+/* Stopáž, ne ovládání: kolik zbývá, než se obrazovka zavře sama. Ťuká se
+   kamkoli, takže tohle nemá být tlačítko. */
 .uvod-pas{
-  position:absolute;left:24px;right:24px;z-index:2;
-  bottom:calc(env(safe-area-inset-bottom) + 22px);
-  height:3px;border-radius:2px;overflow:hidden;
-  background:color-mix(in srgb,var(--text) 18%,transparent);
+  flex:none;width:100%;max-width:420px;height:3px;border-radius:2px;
+  margin-top:28px;overflow:hidden;
+  background:color-mix(in srgb,var(--text) 16%,transparent);
 }
 .uvod-pas-cara{display:block;width:100%;height:100%;border-radius:inherit;
   background:var(--text);transform-origin:left center;
   animation:uvod-stopaz var(--stopaz) linear both}
 @keyframes uvod-stopaz{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* Na krátkém displeji se celý blok nevejde a kresba se v pružném rozvržení
+   smrskne na odznáček pod logem. Radši se stáhne všechno naráz a o kus míň:
+   menší nadpis, hustší odstavce, menší mezery. Pořád to dýchá, jen míň. */
+@media (max-height:690px){
+  .uvod-obsah{padding-top:calc(env(safe-area-inset-top) + 20px)}
+  .uvod-kresba{margin-bottom:22px}
+  .uvod-cmaranice{height:clamp(96px,17vh,150px)}
+  .uvod-nadpis{font-size:clamp(26px,7.4vw,34px);margin-bottom:18px}
+  .uvod-popis{gap:13px;font-size:var(--t-text);line-height:1.62}
+  .uvod-pas{margin-top:18px}
+}
 
 @keyframes uvod-prichod{
   from{opacity:0;transform:translateY(12px)}
@@ -1145,7 +1138,6 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   /* Stopáž není ozdoba, ale údaj: kdyby ji zkrácení animací smrsklo na nulu,
      pruh naskočí na plno a lže o tom, kolik zbývá. Délku dává React. */
   .uvod-pas-cara{animation-duration:var(--stopaz) !important}
-  .uvod-cmaranice{animation:none !important}
   .hero-pas{scroll-behavior:auto}
 }
 @media (min-width:600px){

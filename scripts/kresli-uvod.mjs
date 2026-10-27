@@ -17,6 +17,9 @@ const I = (d) => ["i", d], C = (d) => ["c", d];
 const ROUGH = { amp: 1.3, step: 7, tension: 0.42 };
 const HRUBE = { amp: 1.7, step: 6, tension: 0.4, nicks: 1 };
 
+// Z těchhle se do appky dostane jen to, co je v POUZITE. Zbytek zůstává
+// tady jako zdroj: kreslilo se to pro starou průpravu přes čtyři plakáty
+// a může se to hodit, ale vozit čtyři nepoužité kresby v balíku je zbytečné.
 const KRESBY = {
   // Škopek, co si to šlape po štacích.
   skopek: () => [
@@ -84,10 +87,47 @@ const KRESBY = {
     C(cut(ell(28, 56, 4, 4, 18), { ...ROUGH, amp: .4, step: 2 })),
     C(cut(ell(72, 56, 4, 4, 18), { ...ROUGH, amp: .4, step: 2 })),
   ],
+  // Opilec: panák v půlce vrávorání. Hlava je nakloněná, ruce rozhozené
+  // a nohy od sebe, takže silueta sama o sobě říká, že to nestojí rovně.
+  // Oči jsou dvě různé — jedno kolečko a jeden křížek — a pusa je otevřená:
+  // dvě souměrné tečky z toho dělaly spokojeného panáčka, ne namazaného.
+  opilec: () => [
+    // hlava, nakloněná doleva
+    I(cut(ell(42, 24, 16, 15, 20), { ...ROUGH, amp: 1.1 })),
+    // vlasy na ježka, pár chomáčů nahoru
+    I(cut([[28, 18], [31, 7], [36, 14], [42, 4], [47, 13], [54, 6], [56, 16], [52, 22], [32, 23]],
+          { ...ROUGH, amp: 1.1, tension: .45 })),
+    // obličej: kolečko, křížek, otevřená pusa
+    C(cut(ell(36, 23, 4.5, 4.5, 22), { ...ROUGH, amp: .4, step: 2 })),
+    C(cut(stroke(45, 19, 53, 27, 3), { ...ROUGH, amp: .4, step: 3 })),
+    C(cut(stroke(53, 19, 45, 27, 3), { ...ROUGH, amp: .4, step: 3 })),
+    C(cut(ell(42, 34, 6, 4.5, 20), { ...ROUGH, amp: .5, step: 3 })),
+    // trup, podle nakloněné hlavy taky nakřivo
+    I(cut([[36, 38], [52, 40], [58, 62], [42, 65], [33, 58]], HRUBE)),
+    // ruka nahoru a do strany, s roztaženou dlaní
+    I(cut(stroke(54, 44, 82, 26, 7), { ...ROUGH, amp: 1 })),
+    I(cut(stroke(82, 26, 93, 14, 4), { ...ROUGH, amp: .7 })),
+    I(cut(stroke(82, 26, 96, 26, 4), { ...ROUGH, amp: .7 })),
+    I(cut(stroke(82, 26, 90, 38, 4), { ...ROUGH, amp: .7 })),
+    // druhá ruka visí dolů dozadu
+    I(cut(stroke(36, 46, 19, 57, 7), { ...ROUGH, amp: 1 })),
+    I(cut(stroke(19, 57, 6, 52, 4), { ...ROUGH, amp: .7 })),
+    I(cut(stroke(19, 57, 8, 66, 4), { ...ROUGH, amp: .7 })),
+    // nohy od sebe, každá jinak
+    I(cut(stroke(42, 63, 26, 88, 8), { ...ROUGH, amp: 1.1 })),
+    I(cut(stroke(54, 63, 70, 84, 8), { ...ROUGH, amp: 1.1 })),
+    // chodidla
+    I(cut(rect(18, 86, 34, 94, 3), { ...ROUGH, amp: 1 })),
+    I(cut(rect(64, 82, 80, 90, 3), { ...ROUGH, amp: 1 })),
+  ],
 };
+
+/** Co se opravdu zapisuje do src/lib/uvod-kresby.ts. */
+const POUZITE = ["opilec"];
 
 const out = [];
 for (const [k, f] of Object.entries(KRESBY)) {
+  if (!POUZITE.includes(k)) continue;
   nasad(11 + k.length * 17); // pevná náhodnost na kresbu, ať se změnou jedné nepřekreslí ostatní
   out.push(`  ${k}: ${JSON.stringify(f())},`);
 }
@@ -98,4 +138,4 @@ writeFileSync(new URL("../src/lib/uvod-kresby.ts", import.meta.url),
   `// Vrstvy: "i" = papír (barva textu), "c" = výstřižek (průhledný). viewBox 0 0 100 100.\n` +
   `import type { Vrstva } from "./ikony";\n\n` +
   `export const UVOD_KRESBY = {\n${out.join("\n")}\n} satisfies Record<string, Vrstva[]>;\n`);
-console.log("src/lib/uvod-kresby.ts:", Object.keys(KRESBY).length, "kreseb");
+console.log("src/lib/uvod-kresby.ts:", out.length, "kreseb (ve skriptu", Object.keys(KRESBY).length + ")");
