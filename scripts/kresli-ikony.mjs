@@ -48,15 +48,40 @@ const IKONY = {
     I(cut(stroke(55, 62, 74, 90, 12), { ...ROUGH, amp: 1.7, step: 7 })),
   ],
   // Žranice a divadlo: vidlička, všechno tlusté ať to drží i v malém
-  zranice: () => [
-    // násada
-    I(cut(rect(42, 46, 58, 90, 5), { ...ROUGH, amp: 1.9 })),
-    // hlava a tři hroty
-    I(cut(rect(28, 40, 72, 56, 5), { ...ROUGH, amp: 1.9 })),
-    I(cut(rect(28, 10, 40, 46, 4), { ...ROUGH, amp: 1.7 })),
-    I(cut(rect(44, 10, 56, 46, 4), { ...ROUGH, amp: 1.7 })),
-    I(cut(rect(60, 10, 72, 46, 4), { ...ROUGH, amp: 1.7 })),
-  ],
+  // Žranice a divadlo: zkřížený příbor. Samotná vidlička tu stála dřív a se
+  // třemi tlustými hroty na bloku vypadala jako kaktus — hroty se slily
+  // a z vidličky zbyl trs. Tenhle kříž je poznat i jako vodoznak za textem:
+  // dvě věci přes sebe mají čitelnou siluetu, jedna svislá nemá.
+  //
+  // Nůž se kreslí první, pak se do něj vystřihne vidlička nafouknutá o kus
+  // (spára), a teprve pak vidlička sama. Bez té spáry se v místě křížení
+  // slijí v jeden hranol.
+  zranice: () => {
+    // Zkřížený příbor. Samotná vidlička tu stála dřív a se třemi tlustými
+    // hroty na bloku vypadala jako kaktus. První pokus o kříž zase nestačil
+    // sklonit — obojí zůstalo skoro svisle a slilo se to v pařát.
+    // Tohle je rozevřené na sedmdesát stupňů, takže je kříž poznat i jako
+    // vodoznak za textem.
+    const posun = (t, dx) => t.map(([x, y]) => [x + dx, y]);
+    const vidlicka = (o) => [
+      rect(47 - o, 48 - o, 53 + o, 90 + o, 3),
+      rect(38 - o, 40 - o, 62 + o, 52 + o, 3),
+      rect(38 - o, 12 - o, 43.5 + o, 44 + o, 2),
+      rect(47.2 - o, 12 - o, 52.8 + o, 44 + o, 2),
+      rect(56.5 - o, 12 - o, 62 + o, 44 + o, 2),
+    ].map((t) => rot(posun(t, -7), -36, 50, 56));
+    const nuz = (o) => [
+      rect(47 - o, 50 - o, 53 + o, 90 + o, 3),
+      [[50, 8 - o], [57.5 + o, 26], [57.5 + o, 54 + o], [42.5 - o, 54 + o], [42.5 - o, 30]],
+    ].map((t) => rot(posun(t, 7), 36, 50, 56));
+    // Nůž je vespod, pak se do něj vystřihne vidlička nafouknutá o kus
+    // (spára) a teprve pak vidlička sama. Bez spáry se v křížení slijí.
+    return [
+      ...nuz(0).map((t) => I(cut(t, { ...ROUGH, amp: 1.7 }))),
+      ...vidlicka(2.5).map((t) => C(cut(t, { ...ROUGH, amp: 1.1 }))),
+      ...vidlicka(0).map((t) => I(cut(t, { ...ROUGH, amp: 1.5 }))),
+    ];
+  },
 
   // ---------- hra ----------
   // hospoda: sud – domek by se pletl s ikonou Dnes

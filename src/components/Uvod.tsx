@@ -55,14 +55,16 @@ interface Plakat {
  *  čte i obrazovka Pravidla. Úvod tedy neříká „něco jako pravidla", ale
  *  přímo je — a když se jedno změní, změní se obojí.
  *
- *  Jeden plakát = jedna kapitola pravidel. Dlouhé courání má celý pro sebe,
- *  aby se nemuselo tlačit vedle cajku a partyjí. */
+ *  Jeden plakát = jedna kapitola pravidel a jedna kresba, co říká to samé:
+ *  budík k času, šnek k loudání, čárky k bodování, kotel k banku. Dlouhé
+ *  courání má plakát celý pro sebe, aby se nemuselo tlačit vedle cajku
+ *  a partyjí. */
 const PLAKATY: Plakat[] = [
   { id: "opilec", skladba: "a", nadpis: "Betelná řežba", text: UVODNIK },
-  { id: "skopek", skladba: "b", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
+  { id: "hodiny", skladba: "b", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
   { id: "snek", skladba: "c", nadpis: "Žádný courání", text: COURANI.text },
   { id: "carky", skladba: "d", nadpis: "Bodování", body: bodovani(stav.hospody.length, true) },
-  { id: "koruna", skladba: "e", nadpis: "Celej bank", body: ZAKLAD },
+  { id: "kotel", skladba: "e", nadpis: "Celej bank", body: ZAKLAD },
 ];
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází

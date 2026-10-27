@@ -5,6 +5,11 @@
 // plakátu úvodu zabírají půl obrazovky, takže si můžou dovolit víc dílů
 // a obličej.
 //
+// Jedna kresba na kapitolu pravidel, a každá říká to, o čem ta kapitola je:
+// opilec (o co jde), budík (časovej cajk), šnek (žádný courání), čárky
+// (bodování), kotel (celej bank). Škopek a koruna, co tu stály dřív, šly
+// pryč — škopek říkal jen „pivo" a koruna „vítěz", ani jedno není pravidlo.
+//
 // Spuštění: node scripts/kresli-uvod.mjs (bez závislostí; náhodnost je pevná)
 import { writeFileSync } from "node:fs";
 import { nasad, cut, ell, rect, srpek as usmev, stroke } from "./cary.mjs";
@@ -16,77 +21,68 @@ const I = (d) => ["i", d], C = (d) => ["c", d];
 // jen se ztiší.
 const ROUGH = { amp: 1.3, step: 7, tension: 0.42 };
 const HRUBE = { amp: 1.7, step: 6, tension: 0.4, nicks: 1 };
+/* Na malá kolečka: skoro žádné kymácení, jinak z nich jsou kosočtverce. */
+const JEMNE = { amp: .5, step: 3, tension: 0.42 };
 
 // Z těchhle se do appky dostane jen to, co je v POUZITE. Zbytek zůstává
 // tady jako zdroj: kreslilo se to pro starou průpravu přes čtyři plakáty
 // a může se to hodit, ale vozit čtyři nepoužité kresby v balíku je zbytečné.
 const KRESBY = {
-  // Škopek, co si to šlape po štacích.
-  skopek: () => [
-    // ucho: kroužek napravo od těla, ať se s ním neslije
-    I(cut(ell(76, 54, 14, 15, 16), { ...ROUGH, amp: 1.1 })),
-    C(cut(ell(76, 54, 7, 8, 14), { ...ROUGH, amp: .9 })),
-    // tělo
-    I(cut([[22, 26], [46, 24], [68, 26], [69, 52], [66, 78], [46, 81], [25, 78], [22, 52]], HRUBE)),
-    // pěna: sedí na okraji, přetéká jen kousek do stran
-    I(cut([[22, 28], [22, 18], [31, 12], [40, 16], [49, 10], [58, 15], [68, 12], [73, 20], [70, 30], [50, 33], [30, 32]],
-          { ...ROUGH, amp: 1.2, tension: 0.5 })),
-    // Odlesky skla tu nejsou schválně: vedly přesně přes oči a pusu
-    // a obličej se v nich ztrácel. Buď sklo, nebo tvář — ne obojí.
-    // Obličej. Kolečka musí mít hodně bodů a skoro žádné kymácení, jinak
-    // z nich jsou kosočtverce — na malé ploše je výchylka vidět nejvíc.
-    C(cut(ell(39, 48, 5, 5, 22), { ...ROUGH, amp: .45, step: 2 })),
-    C(cut(ell(53, 48, 5, 5, 22), { ...ROUGH, amp: .45, step: 2 })),
-    C(cut(usmev(46, 58, 12, 4.5), { ...ROUGH, amp: .7, step: 4 })),
-    // nohy a chodidla
-    I(cut(stroke(37, 76, 33, 92, 8), { ...ROUGH, amp: 1.1, step: 7 })),
-    I(cut(stroke(55, 76, 59, 92, 8), { ...ROUGH, amp: 1.1, step: 7 })),
-    I(cut(stroke(35, 91, 24, 94, 8), { ...ROUGH, amp: 1.1, step: 7 })),
-    I(cut(stroke(57, 91, 68, 94, 8), { ...ROUGH, amp: 1.1, step: 7 })),
+  // Časovej cajk: budík. Kapitola je o tom, odkdy dokdy se valí, takže
+  // ciferník, ne škopek — ten by říkal „pivo" a to už říká zbytek appky.
+  hodiny: () => [
+    I(cut(ell(28, 20, 13, 11, 18), { ...ROUGH, amp: 1.1 })),
+    I(cut(ell(72, 20, 13, 11, 18), { ...ROUGH, amp: 1.1 })),
+    I(cut(stroke(24, 82, 16, 94, 9), { ...ROUGH, amp: 1 })),
+    I(cut(stroke(76, 82, 84, 94, 9), { ...ROUGH, amp: 1 })),
+    // spára kolem ciferníku, jinak se zvonky slijí s tělem a je z toho hlava
+    C(cut(ell(50, 54, 40, 40, 26), { ...ROUGH, amp: 1 })),
+    I(cut(ell(50, 54, 36, 36, 26), { ...ROUGH, amp: 1.3 })),
+    // ručičky: šest a dvě, tedy ten cajk, o kterém kapitola je
+    C(cut(stroke(50, 54, 50, 82, 7), { ...ROUGH, amp: .7 })),
+    C(cut(stroke(50, 54, 74, 40, 7), { ...ROUGH, amp: .7 })),
+    C(cut(ell(50, 54, 5, 5, 16), JEMNE)),
   ],
 
-  // Čtyři čárky, pátá přes ně — a culí se to.
-  carky: () => [
-    I(cut(stroke(25, 12, 21, 58, 9), { ...ROUGH, amp: 1.6, step: 7 })),
-    I(cut(stroke(42, 12, 39, 58, 9), { ...ROUGH, amp: 1.6, step: 7 })),
-    I(cut(stroke(59, 13, 57, 59, 9), { ...ROUGH, amp: 1.6, step: 7 })),
-    I(cut(stroke(76, 12, 74, 58, 9), { ...ROUGH, amp: 1.6, step: 7 })),
-    I(cut(stroke(13, 50, 85, 20, 9), { ...ROUGH, amp: 1.7, step: 7 })),
-    // obličej pod čárkami
-    I(cut(ell(37, 73, 5.5, 5.5, 12), { ...ROUGH, amp: 1.2 })),
-    I(cut(ell(63, 73, 5.5, 5.5, 12), { ...ROUGH, amp: 1.2 })),
-    I(cut(usmev(50, 80, 14, 5), { ...ROUGH, amp: 1.2, step: 6 })),
-  ],
-
-  // Šnek: kdo se loudá, ten nemá.
+  // Žádný courání: šnek. Překreslený tlustěji než ten z první průpravy —
+  // ulita má teď dva závity místo jednoho kroužku, takže je poznat i malá.
   snek: () => [
-    // tykadla s bambulemi na koncích
-    I(cut(stroke(82, 60, 86, 30, 5.5), { ...ROUGH, amp: .8, step: 7 })),
-    I(cut(stroke(74, 62, 68, 34, 5.5), { ...ROUGH, amp: .8, step: 7 })),
-    I(cut(ell(87, 25, 6, 6, 20), { ...ROUGH, amp: .5, step: 3 })),
-    I(cut(ell(67, 29, 6, 6, 20), { ...ROUGH, amp: .5, step: 3 })),
-    // Noha i hlava jsou jeden kus: napravo se pruh zvedne do hlavy, ze které
-    // teprve vyrůstají tykadla. Dokud byla hlava zvlášť, plavala vedle těla.
-    I(cut([[6, 88], [10, 78], [26, 72], [52, 70], [68, 68], [78, 58], [88, 56], [93, 66], [92, 80], [88, 90], [10, 90]], HRUBE)),
-    C(cut(ell(84, 66, 2.8, 2.8, 16), { ...ROUGH, amp: .4, step: 2 })),
-    // ulita jako terč: tři kola přes sebe dají závit. Mezery musí být široké,
-    // jinak se prstence při kymácení slijí do koláče.
-    I(cut(ell(38, 42, 26, 25, 22), { ...ROUGH, amp: 1.1, step: 6 })),
-    C(cut(ell(38, 42, 17, 16, 20), { ...ROUGH, amp: .8, step: 5 })),
-    I(cut(ell(38, 42, 8, 8, 18), { ...ROUGH, amp: .6, step: 4 })),
+    I(cut([[10, 74], [26, 64], [52, 62], [76, 66], [90, 74], [92, 84], [74, 90], [30, 90], [12, 86]], HRUBE)),
+    I(cut(stroke(84, 70, 90, 44, 8), { ...ROUGH, amp: .9 })),
+    I(cut(stroke(70, 68, 64, 44, 8), { ...ROUGH, amp: .9 })),
+    I(cut(ell(90, 40, 7, 7, 16), { ...ROUGH, amp: .7 })),
+    I(cut(ell(63, 40, 7, 7, 16), { ...ROUGH, amp: .7 })),
+    I(cut(ell(42, 46, 30, 30, 24), { ...ROUGH, amp: 1.2 })),
+    C(cut(ell(42, 46, 21, 21, 22), { ...ROUGH, amp: .9 })),
+    I(cut(ell(42, 46, 13, 13, 20), { ...ROUGH, amp: .8 })),
+    C(cut(ell(42, 46, 5, 5, 16), JEMNE)),
   ],
 
-  // Koruna: celej bank bere jedna.
-  koruna: () => [
-    I(cut([[13, 78], [17, 22], [33, 46], [50, 14], [67, 46], [83, 22], [87, 78]],
-          { ...HRUBE, tension: 0.18 })),
-    // Bez obličeje: oči vystřižené do koruny vypadaly jako kočka, ne jako
-    // koruna. Kámen uprostřed a čelenka pod ním je to, co z toho dělá korunu.
-    C(cut(ell(50, 54, 7, 7, 22), { ...ROUGH, amp: .5, step: 3 })),
-    C(cut(rect(20, 66, 80, 71, 2), { ...ROUGH, amp: .8, step: 7 })),
-    C(cut(ell(28, 56, 4, 4, 18), { ...ROUGH, amp: .4, step: 2 })),
-    C(cut(ell(72, 56, 4, 4, 18), { ...ROUGH, amp: .4, step: 2 })),
+  // Bodování: pět čárek, jak se píšou na zeď. Předchozí kresba měla v sobě
+  // obličej a byla z toho postavička — tohle je prostě zápis.
+  carky: () => [
+    I(cut(stroke(22, 16, 18, 80, 10), { ...ROUGH, amp: 1.1 })),
+    I(cut(stroke(40, 14, 38, 80, 10), { ...ROUGH, amp: 1.1 })),
+    I(cut(stroke(58, 14, 60, 80, 10), { ...ROUGH, amp: 1.1 })),
+    I(cut(stroke(76, 16, 80, 80, 10), { ...ROUGH, amp: 1.1 })),
+    I(cut(stroke(10, 74, 90, 22, 10), { ...ROUGH, amp: 1.2 })),
   ],
+
+  // Celej bank: kotel. Pravidla mluví o vlezném do kotla, tak ať to je kotel
+  // a ne koruna — koruna říká „vítěz", kotel říká, o co se hraje.
+  kotel: () => [
+    // mince: plné kotouče, ne kroužky — s dírou uprostřed to byly koblihy
+    I(cut(ell(34, 22, 10, 9, 20), { ...ROUGH, amp: .8 })),
+    I(cut(ell(54, 14, 11, 10, 20), { ...ROUGH, amp: .8 })),
+    I(cut(ell(72, 25, 9, 8, 20), { ...ROUGH, amp: .8 })),
+    // spára pod okrajem, ať mince nesplynou s kotlem
+    C(cut(rect(6, 36, 94, 54, 5), { ...ROUGH, amp: 1 })),
+    I(cut(rect(10, 40, 90, 52, 5), { ...ROUGH, amp: 1.2 })),
+    I(cut([[20, 50], [80, 50], [75, 78], [64, 90], [36, 90], [25, 78]], HRUBE)),
+    I(cut(stroke(12, 56, 4, 68, 8), { ...ROUGH, amp: .9 })),
+    I(cut(stroke(88, 56, 96, 68, 8), { ...ROUGH, amp: .9 })),
+  ],
+
   // Opilec: panák v půlce vrávorání. Hlava je nakloněná, ruce rozhozené
   // a nohy od sebe, takže silueta sama o sobě říká, že to nestojí rovně.
   // Oči jsou dvě různé — jedno kolečko a jeden křížek — a pusa je otevřená:
@@ -125,7 +121,7 @@ const KRESBY = {
 };
 
 /** Co se opravdu zapisuje do src/lib/uvod-kresby.ts. */
-const POUZITE = ["opilec", "skopek", "carky", "snek", "koruna"];
+const POUZITE = ["opilec", "hodiny", "snek", "carky", "kotel"];
 
 const out = [];
 for (const [k, f] of Object.entries(KRESBY)) {
