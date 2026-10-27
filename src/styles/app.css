@@ -145,47 +145,29 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
     radial-gradient(120% 38% at 50% 108%, rgba(216,86,14,.06), transparent 60%);
 }
 
-/* Filmové zrno přes celou appku. Leží nad vším, co appka nakreslí, nechytá
-   dotyk a v režimu overlay je to opravdu zrno: střední šedá nemění nic,
-   odchylky nahoru a dolů jen rozkmitají to, co je pod ní. Průměr dlaždice
-   je přesně 128, takže podklad zůstane tou barvou, kterou má být.
+/* Filmové zrno přes celou appku. Leží nad vším, co appka nakreslí, a nechytá
+   dotyk.
 
-   Dřív to byla dlaždice z feTurbulence a vypadalo to levně hned dvakrát.
-   Jednak má turbulence čtyři oktávy, takže kromě zrna dělala i mraky —
-   velké světlé a tmavé fleky přes půl obrazovky. A hlavně se míchala
-   s ničím: .app je vlastní vrstvicí kontext (position + z-index) a ten
-   je pro míchání izolovaný, takže zrno uvnitř nevidělo podklad stránky
-   pod sebou a z „soft-light" zbyla půlprůhledná šedá. Podklad #2B2B23 se
-   tím na obrazovce zvedl na #444440 — appka nebyla tmavá, byla šedivá.
-   Proto .app teď kreslí svůj podklad sám (viz .app níž).
+   Jsou to bílé a černé tečky s nízkou průhledností na průhledném podkladu
+   (scripts/zrno.mjs), takže se jenom normálně překryjí. Dřív se míchalo přes
+   mix-blend-mode. Míchání je hezčí — je úměrné podkladu — jenže kvůli němu
+   musí prohlížeč složit CELÝ obsah pod vrstvou do jednoho obrázku, aby měl
+   s čím míchat, a takový obrázek iOS při posouvání překresluje v nižším
+   rozlišení: text nahoře pak změkne. Je to ta samá příčina, jakou měla maska
+   na záři.
 
-   Dlaždice je hotový obrázek, ne filtr, a je 192 px velká: 192 se dělí
-   dvěma i třemi, takže na každé hustotě displeje padne jeden pixel
-   obrázku přesně na jeden pixel displeje. Zrno je pak ostré a jemné jako
-   na filmu. Když se měřítko netrefí, prohlížeč obrázek převáží a vznikne
-   přesně ta rozmazaná kaše, co na zrnu vypadá lacině. */
+   Dlaždice je hotový obrázek, ne filtr, a je 192 px velká: 192 se dělí dvěma
+   i třemi, takže na každé hustotě displeje padne jeden pixel obrázku přesně
+   na jeden pixel displeje a zrno je ostré. Když se měřítko netrefí, prohlížeč
+   obrázek převáží a vznikne přesně ta rozmazaná kaše, co vypadá lacině. */
 .app::before{
   content:"";position:fixed;top:0;bottom:0;z-index:60;pointer-events:none;
-  /* Jen přes sloupec appky, ne přes celou obrazovku: míchá se s tím, co
-     nakreslí .app, a vedle sloupce (na monitoru) by nemělo s čím — z overlay
-     by tam zbyla půlprůhledná šedá dlaždice. Na telefonu je sloupec celá
-     obrazovka, takže je to totéž. */
+  /* Jen přes sloupec appky: na široké obrazovce by dlaždice ležela i vedle
+     něj, kde pro ni není podklad. Na telefonu je sloupec celá obrazovka. */
   left:50%;width:min(100%,var(--sirka));translate:-50% 0;
-  background-image:url("../assets/zrno-film.png");
+  background-image:url("../assets/zrno.png");
   background-size:192px 192px;
-  mix-blend-mode:overlay;
 }
-/* Dvě náhradní podoby zrna z #/ladeni. Míchání nutí prohlížeč složit celý
-   obsah pod vrstvou do jednoho obrázku, aby měl co míchat, a právě takový
-   obrázek iOS při posouvání překresluje v nižším rozlišení. Průhledná
-   dlaždice se jen překryje, takže žádnou vrstvu navíc nevyrábí. */
-html.zrno-alfa .app::before{
-  background-image:url("../assets/zrno-alfa.png");
-  mix-blend-mode:normal;
-}
-html.zrno-ne .app::before{display:none}
-html.zare-ne .app::after{display:none}
-html.pruh-ne body::before{display:none}
 @media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
   .app::before{background-size:96px 96px}
 }
@@ -193,24 +175,36 @@ html.pruh-ne body::before{display:none}
   .app::before{background-size:64px 64px}
 }
 
-/* iOS 26 kreslí v appce z plochy přes horní okraj systémové rozostření
-   („liquid glass"), aby stavová lišta zůstala čitelná nad čímkoli, co pod ní
-   projede. Obsah pod ním je pak rozmazaný — u nás značka a pilulka týmu,
-   protože lišta appky začíná přesně tam. V prohlížeči se to nekreslí, proto
-   to tam bylo ostré a z plochy ne.
-   Vypnout se to nedá: žádná meta ani vlastnost na to není. WebKit ale efekt
-   vynechá, když horní hranu zakrývá PEVNÁ NEPRŮHLEDNÁ plocha — tohle je ona.
-   Pruh přes celou šířku, vysoký přesně jako safe-area.
-   background-color:inherit, ne pevná barva: v průpravě si <body> přebarvuje
-   podklad na barvu plakátu (useBarvaOkoli v Uvod.tsx) a pruh to má převzít,
-   jinak by nad červeným plakátem visel tmavý pás.
-   z-index 130 je nad průpravou (120), aby horní hranu zakrýval vždycky. */
-@media (display-mode: standalone) {
-  body::before{
-    content:"";position:fixed;top:0;left:0;right:0;z-index:130;pointer-events:none;
-    height:env(safe-area-inset-top);background-color:inherit;
-  }
+/* ---------- horní mlha ----------
+   Jediné pravidlo: dokud je obrazovka nahoře a je vidět lišta, nahoře není
+   nic. Jakmile obsah začne podjíždět, zakryje ho mlha — rozostření a zároveň
+   přechod do barvy appky, takže text nemizí pod hranou ostrým střihem.
+
+   Dřív tu byl neprůhledný pruh, co měl přebít systémové rozostření iOS 26.
+   Jenže ten tam byl pořád, i když pod ním nic nebylo, a na lištu appky
+   dosedal přesně tak, že vypadala rozmazaně. Tohle je obráceně: nic tam
+   není, dokud není co zakrývat.
+
+   Maska je tady bezpečná, i kdyby ji prohlížeč vykreslil hrubě: je to
+   rozostření, takže na něm hrubost není poznat. Na celoobrazovkové vrstvě
+   to bezpečné nebylo.
+
+   z-index 55 je pod zrnem (60), takže zrno běží i přes mlhu, a nad obsahem
+   i září — právě ty se mají rozostřit. */
+.strop{
+  position:fixed;top:0;z-index:55;pointer-events:none;
+  left:50%;width:min(100%,var(--sirka));translate:-50% 0;
+  height:calc(var(--vrch) + 10px);
+  background:linear-gradient(to bottom,
+    var(--podklad) 18%,
+    color-mix(in srgb,var(--podklad) 55%,transparent) 62%,
+    transparent);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  -webkit-mask-image:linear-gradient(to bottom,#000 58%,transparent);
+  mask-image:linear-gradient(to bottom,#000 58%,transparent);
+  opacity:0;transition:opacity .2s var(--krok);
 }
+html.posunuto .strop{opacity:1}
 
 h1,h2,h3{margin:0;font-family:var(--nadpisy);line-height:var(--radky-nadpis);
   letter-spacing:-.015em;text-transform:uppercase}
@@ -251,8 +245,8 @@ input,textarea,select{caret-color:var(--text)}
    z appky posuvnou plochu a rozbil plovoucí lištu) */
 .app{position:relative;z-index:1;max-width:var(--sirka);margin:0 auto;min-height:100dvh;
   overflow-x:clip;
-  /* Podklad kreslí appka, ne jen stránka pod ní: zrno v .app::before se
-     míchá jenom s tím, co je uvnitř .app, a bez tohohle by nemělo s čím. */
+  /* Podklad kreslí appka, ne jen stránka pod ní: pod appkou je na široké
+     obrazovce tmavší plocha a sloupec má mít svou vlastní barvu. */
   background:var(--podklad);
   /* pan-y, ne auto: při výchozím nastavení si vodorovný tah zabere posun
      stránky a prohlížeč přestane posílat pointermove – švih do boku se pak
@@ -356,9 +350,7 @@ input,textarea,select{caret-color:var(--text)}
 
 /* ---------- plochy ---------- */
 .vrstva{background:var(--vrstva);border-radius:var(--r);overflow:hidden}
-.vrstva.prodyseny{padding:var(--vnitrek)}
 .radky > * + *{border-top:1px solid var(--linka-sl)}
-.strop-cislo{font-family:var(--nadpisy);color:var(--text)}
 
 /* ---------- tlačítka: tři váhy, ať je jasné, co je hlavní ---------- */
 /* 1. hlavní akce – světlá plocha, tmavý text */
@@ -551,8 +543,6 @@ input,textarea,select{caret-color:var(--text)}
 .zaskrt.hotovo .zaskrt-hodnota{color:color-mix(in srgb,currentColor 52%,transparent)}
 
 /* ---------- skóre a pořadí týmů na Hře ---------- */
-.carky{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:flex-end}
-.carky svg{display:block;overflow:visible}
 
 /* mini tabulka: jak si vedou týmy */
 /* ---------- Úkoly: karty kategorií ---------- */
@@ -906,7 +896,7 @@ input,textarea,select{caret-color:var(--text)}
 
 /* ---------- řádky seznamů ---------- */
 .radek{display:flex;align-items:center;gap:14px;padding:18px var(--vnitrek);width:100%;text-align:left}
-/* Vycpávka řádku patří .radku, takže tlačítko uvnitř bylo vysoké jen jako
+/* Vycpávka patří řádku, takže tlačítko uvnitř bylo vysoké jen jako
    text (29 px) a ťuknutí vedle jména spadlo do prázdna. Záporný okraj mu dá
    celou výšku řádku, aniž by se cokoli posunulo. */
 .radek-telo{flex:1;min-width:0;text-align:left;padding:18px 0;margin:-18px 0}
@@ -1118,22 +1108,6 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   from{opacity:0;transform:translateY(12px)}
   to{opacity:1;transform:none}
 }
-
-/* ---------- ladění (#/ladeni) ---------- */
-/* Skrytá obrazovka na hledání chyb, co se projeví jenom na telefonu.
-   Vypadá jako zbytek appky, ale nic se tu neladí designem – jsou to spínače. */
-.ladeni-blok{padding:18px 20px 20px;margin-bottom:16px}
-.ladeni-blok h2{margin-bottom:8px}
-.ladeni-popis{font-size:var(--t-drobne);line-height:1.55;color:var(--text-2);margin:0 0 14px}
-.ladeni-volby{display:flex;flex-wrap:wrap;gap:8px}
-.ladeni-volba{min-height:40px;padding:0 14px;border-radius:var(--pilulka);
-  font-family:var(--pismo);font-size:var(--t-drobne);font-weight:700;
-  color:var(--text-2);background:color-mix(in srgb,var(--text) 10%,transparent);
-  transition:background .16s,color .16s}
-.ladeni-volba.ted{color:var(--podklad);background:var(--text)}
-.ladeni-reset{min-height:44px;padding:0 4px;font-family:var(--pismo);
-  font-size:var(--t-drobne);font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--text-3)}
 
 /* odměna po zápisu */
 .plusjedna{position:fixed;left:50%;bottom:52%;z-index:50;font-family:var(--nadpisy);font-size:38px;

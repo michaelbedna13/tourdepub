@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Hlava } from "../components/Hlava";
 import { Ikona } from "../components/Ikona";
 import { Logo } from "../components/Logo";
@@ -89,18 +89,6 @@ export function Pravidla() {
                 <div className="radek-pod">{vazat(`Smaže zápisy týmu ${t?.nazev || ""}. Hospody a úkoly zůstanou.`)}</div>
               </div>
             </button>
-          )}
-          {/* Ladění je na hledání chyb, co se projeví jen na telefonu. Pod
-              správcem proto, aby na to parta uprostřed hry nenarazila a
-              nevypnula si půlku vzhledu. */}
-          {spravce && (
-            <Link className="radek" to="/ladeni">
-              <div className="radek-telo">
-                <div className="radek-nazev">Ladění vzhledu</div>
-                <div className="radek-pod">{vazat("Vypínání vrstev, když appka vypadá divně. Nic to nerozbije.")}</div>
-              </div>
-              <Ikona jmeno="hvezda" px={18} />
-            </Link>
           )}
         </div>
       </div>

@@ -1,16 +1,13 @@
-// Vyrobí zrno s průhledným podkladem: src/assets/zrno-alfa.png.
+// Vyrobí zrno s průhledným podkladem: src/assets/zrno.png.
 //
-// Zrno v appce se dneska míchá přes mix-blend-mode. Míchání je hezké —
-// je úměrné podkladu, takže na tmavém nepřepaluje — jenže kvůli němu musí
-// prohlížeč vykreslit CELÝ obsah pod vrstvou do jednoho obrázku, aby měl
-// co míchat. Na iOS se takový obrázek při posouvání překresluje v nižším
-// rozlišení a všechno pod ním změkne. Přesně tohle už jednou udělala maska
-// na záři (viz app.css) a lišta byla rozmazaná.
+// Jsou to bílé a černé tečky s nízkou průhledností na průhledném podkladu,
+// takže se přes appku jenom normálně překryjí.
 //
-// Tahle dlaždice žádné míchání nepotřebuje: jsou to bílé a černé tečky
-// s nízkou průhledností na průhledném podkladu, takže se jen normálně
-// překryjí. Zrno je o něco míň úměrné podkladu, zato nenutí prohlížeč
-// skládat stránku do vrstvy.
+// Dřív se zrno míchalo přes mix-blend-mode. Míchání je hezčí — je úměrné
+// podkladu, takže na tmavém nepřepaluje — jenže kvůli němu musí prohlížeč
+// složit CELÝ obsah pod vrstvou do jednoho obrázku, aby měl s čím míchat,
+// a takový obrázek iOS při posouvání překresluje v nižším rozlišení: text
+// nahoře pak změkne. Je to ta samá příčina, jakou měla maska na záři.
 //
 // 192 px: dělí se dvěma i třemi, takže na každé hustotě displeje padne
 // jeden pixel obrázku přesně na jeden pixel displeje a zrno je ostré.
@@ -65,5 +62,5 @@ const png = Buffer.concat([
   Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
   kus("IHDR", ihdr), kus("IDAT", deflateSync(syrove, { level: 9 })), kus("IEND", Buffer.alloc(0)),
 ]);
-writeFileSync(new URL("../src/assets/zrno-alfa.png", import.meta.url), png);
-console.log("src/assets/zrno-alfa.png:", N, "×", N, "–", Math.round(png.length / 1024), "kB");
+writeFileSync(new URL("../src/assets/zrno.png", import.meta.url), png);
+console.log("src/assets/zrno.png:", N, "×", N, "–", Math.round(png.length / 1024), "kB");

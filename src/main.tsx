@@ -4,11 +4,6 @@ import "./styles/pisma.css";
 import "./styles/app.css";
 import { App } from "./App";
 import { Zachrana } from "./components/Zachrana";
-import { nasadLadeni } from "./lib/ladeni";
-
-// Přepínače z #/ladeni se nasadí dřív, než se cokoli nakreslí – jinak by
-// stránka naskočila s výchozími vrstvami a hned se překreslila.
-nasadLadeni();
 
 // chová se jako appka: přibližování dvěma prsty nic nepřinese a jen rozhodí
 // rozložení (iOS ignoruje user-scalable=no, proto i gesta)

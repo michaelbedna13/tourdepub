@@ -5,7 +5,7 @@
 // samostatné podcesty. Pro animaci písmeno po písmeni se musí rozdělit tak,
 // aby díra zůstala u svého písmene; jinak by se vybarvila.
 //
-// Zapisuje LOGO_PISMENA do src/lib/logo.ts a rozdělenou značku do index.html.
+// Zapisuje rozdělenou značku do index.html.
 // Spuštění: node scripts/pismena-loga.mjs   (po každém prevod-loga.py)
 import { readFileSync, writeFileSync } from "node:fs";
 
@@ -53,16 +53,9 @@ for (const p of pismena) {
 for (const r of radky) r.sort((a, b) => a.o.x0 - b.o.x0);
 const serazeno = radky.flat();
 
-// Do src/lib/logo.ts vedle celé dráhy: tu pořád potřebuje ikona appky
-// a patička Pravidel, kde se nic neanimuje.
-const blok = `export const LOGO_PISMENA: string[] = [\n`
-  + serazeno.map((p) => `  "${p.d}",`).join("\n") + `\n];\n`;
-const nove = /export const LOGO_PISMENA[\s\S]*?^\];\n/m.test(zdroj)
-  ? zdroj.replace(/export const LOGO_PISMENA[\s\S]*?^\];\n/m, blok)
-  : zdroj.trimEnd() + "\n\n// Jednotlivá písmena značky, v pořadí čtení. Pro animaci v úvodu.\n" + blok;
-writeFileSync(new URL("../src/lib/logo.ts", import.meta.url), nove);
-
-// A do index.html, kde značka svítí od prvního snímku a kde se taky animuje.
+// Písmena jdou jenom do index.html: tam značka svítí od prvního snímku
+// a tam se taky skládá. V logo.ts byla dřív i jejich kopie pro React, jenže
+// React je nekreslí — jen by se vozila v balíku.
 const stranka = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const svg = `<svg class="logo" viewBox="0 0 962.6 651.3" fill="#F2E7CF" fill-rule="evenodd"`
   + ` role="img" aria-label="Tour de Pub">`
