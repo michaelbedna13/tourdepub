@@ -56,30 +56,26 @@ const IKONY = {
   // Nůž se kreslí první, pak se do něj vystřihne vidlička nafouknutá o kus
   // (spára), a teprve pak vidlička sama. Bez té spáry se v místě křížení
   // slijí v jeden hranol.
+  // Žranice a divadlo: divadelní maska. Nejdřív tu stála vidlička a se třemi
+  // tlustými hroty na bloku vypadala jako kaktus, pak zkřížený příbor — jenže
+  // ta kategorie je z devíti úkolů osmkrát divadlo: hrát vrchního, sehrát
+  // scénku, dělat živou sochu, vysvětlovat něco anglicky. Příbor mluvil
+  // o žrádle, kterého tam skoro není.
+  //
+  // Zkoušela se i opona (ve zmenšení z ní byla jeskyně) a dvě masky přes
+  // sebe (na dvaceti bodech kaše). Jedna maska je čitelná ve všech velikostech.
   zranice: () => {
-    // Zkřížený příbor. Samotná vidlička tu stála dřív a se třemi tlustými
-    // hroty na bloku vypadala jako kaktus. První pokus o kříž zase nestačil
-    // sklonit — obojí zůstalo skoro svisle a slilo se to v pařát.
-    // Tohle je rozevřené na sedmdesát stupňů, takže je kříž poznat i jako
-    // vodoznak za textem.
-    const posun = (t, dx) => t.map(([x, y]) => [x + dx, y]);
-    const vidlicka = (o) => [
-      rect(47 - o, 48 - o, 53 + o, 90 + o, 3),
-      rect(38 - o, 40 - o, 62 + o, 52 + o, 3),
-      rect(38 - o, 12 - o, 43.5 + o, 44 + o, 2),
-      rect(47.2 - o, 12 - o, 52.8 + o, 44 + o, 2),
-      rect(56.5 - o, 12 - o, 62 + o, 44 + o, 2),
-    ].map((t) => rot(posun(t, -7), -36, 50, 56));
-    const nuz = (o) => [
-      rect(47 - o, 50 - o, 53 + o, 90 + o, 3),
-      [[50, 8 - o], [57.5 + o, 26], [57.5 + o, 54 + o], [42.5 - o, 54 + o], [42.5 - o, 30]],
-    ].map((t) => rot(posun(t, 7), 36, 50, 56));
-    // Nůž je vespod, pak se do něj vystřihne vidlička nafouknutá o kus
-    // (spára) a teprve pak vidlička sama. Bez spáry se v křížení slijí.
+    // široké čelo, úzká brada – aby to byla maska, ne koláč
+    const obrys = [
+      [-28, -34], [-16, -42], [0, -44], [16, -42], [28, -34], [32, -16],
+      [28, 4], [18, 22], [6, 34], [0, 38], [-6, 34], [-18, 22], [-28, 4], [-32, -16],
+    ].map(([x, y]) => [50 + x, 48 + y]);
     return [
-      ...nuz(0).map((t) => I(cut(t, { ...ROUGH, amp: 1.7 }))),
-      ...vidlicka(2.5).map((t) => C(cut(t, { ...ROUGH, amp: 1.1 }))),
-      ...vidlicka(0).map((t) => I(cut(t, { ...ROUGH, amp: 1.5 }))),
+      I(cut(obrys, HRUBE)),
+      // oči šikmo, ne kulatá kolečka: kolečka dělají z masky obličej panáka
+      C(cut(rot(ell(36, 40, 11, 6, 20), -14, 36, 40), { ...ROUGH, amp: 1.1 })),
+      C(cut(rot(ell(64, 40, 11, 6, 20), 14, 64, 40), { ...ROUGH, amp: 1.1 })),
+      C(cut(ell(50, 66, 14, 9, 22), { ...ROUGH, amp: 1.2 })),
     ];
   },
 
