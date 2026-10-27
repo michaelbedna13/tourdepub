@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Hlava } from "../components/Hlava";
 import { Ikona } from "../components/Ikona";
 import { Okno } from "../components/Okno";
-import { BARVY_HOSPOD } from "../lib/data";
 import { potvrdit } from "../components/Potvrzeni";
 import {
   nastavHospodu, pridejHospodu, posunHospoduVPoradi, smazHospodu, stav, tym,
-  upravHospodu, useStav, volnaBarvaHospody,
+  upravHospodu, useStav,
 } from "../lib/stav";
 import { vazat } from "../lib/format";
 import { useSpravce } from "../lib/spravce";
@@ -73,13 +72,12 @@ function OknoHospody({ id, zavri }: { id?: string; zavri: () => void }) {
   const nova = !id;
   const h = id ? stav.hospody.find((x) => x.id === id) : undefined;
   const [nazev, setNazev] = useState(h?.nazev ?? "");
-  const [barva, setBarva] = useState(h?.barva ?? volnaBarvaHospody());
 
   if (!nova && !h) return null;
 
   function uloz() {
-    if (nova) pridejHospodu(nazev, barva);
-    else upravHospodu(id!, nazev, barva);
+    if (nova) pridejHospodu(nazev);
+    else upravHospodu(id!, nazev);
     zavri();
   }
 
@@ -97,15 +95,6 @@ function OknoHospody({ id, zavri }: { id?: string; zavri: () => void }) {
           placeholder="U Ričího" autoComplete="off" enterKeyHint="done"
           onKeyDown={(e) => { if (e.key === "Enter") uloz(); }} />
       </label>
-      <div className="pole">
-        <span className="nazev">Barva štace</span>
-        <span className="barvy">
-          {BARVY_HOSPOD.map((b) => (
-            <button key={b} style={{ background: b }} aria-pressed={b === barva}
-              aria-label={`Barva ${b}`} onClick={() => setBarva(b)} />
-          ))}
-        </span>
-      </div>
       <div className="okno-akce">
         <button className="tl hlavni" onClick={uloz}><Ikona jmeno="check" px={19} /> Hotovo</button>
         {!nova && stav.hospody.length > 1 && (

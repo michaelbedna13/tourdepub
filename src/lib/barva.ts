@@ -1,27 +1,13 @@
-// Počítání s barvami. Potřebujeme to na jedno jediné: z barvy štace udělat
-// plochu, na které se dá číst. Paleta hospod (BARVY_HOSPOD) jde od tmavé
-// rzi po světle růžovou a karta štace je ve všech devíti případech stejná
-// — krémový text na barevném podkladu. Kdyby se barva vzala tak, jak je,
-// „máslová" a „nádech růžové" by byly nečitelné.
+// Barvy štací. Devět hospod mělo dřív devět nesouvisejících barev z plakátové
+// palety — rez, chrpa, pistácie, máslová — a vedle sebe to byl vzorník, ne
+// trasa. Teď je to jedna barva: ta z Lucky Bastarda, první štace, rozepsaná
+// přes celý večer.
+//
+// Mění se tři věci naráz a všechny stejným směrem: odstín jde od oranžové
+// k vínové, sytost klesá a barva tmavne. Je to tedy ciferník večera —
+// z první štace je vidět, že je začátek, z deváté, že už je pozdě.
 
 type Hsl = { h: number; s: number; l: number };
-
-/** #RRGGBB (i zkrácené #RGB) na HSL. Mimo rozsah vrací šedou. */
-function naHsl(hex: string): Hsl {
-  const h = hex.replace("#", "");
-  const plny = h.length === 3 ? h.split("").map((z) => z + z).join("") : h;
-  const c = parseInt(plny, 16);
-  if (plny.length !== 6 || Number.isNaN(c)) return { h: 0, s: 0, l: .5 };
-  const r = ((c >> 16) & 255) / 255, g = ((c >> 8) & 255) / 255, b = (c & 255) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
-  const l = (max + min) / 2;
-  if (!d) return { h: 0, s: 0, l };
-  const s = d / (1 - Math.abs(2 * l - 1));
-  const uhel = max === r ? ((g - b) / d + (g < b ? 6 : 0))
-    : max === g ? (b - r) / d + 2
-    : (r - g) / d + 4;
-  return { h: uhel * 60, s, l };
-}
 
 function slozka(p: number, q: number, t: number): number {
   let x = t;
@@ -62,31 +48,29 @@ function naSvetlost(z: Hsl, cil: number): Hsl {
   return { ...z, l: (dolu + nahoru) / 2 };
 }
 
-// Na kartě štace se píše krémem, na všech štacích stejně. Barva se tedy musí
-// vejít pod mez, kde krém drží kontrast 4,5:1 (relativní světlost 0,139).
-const PASMO_OD = .075, PASMO_DO = .132;
-// Spodek přechodu je o tenhle díl tmavší než vršek.
+// Na kartě štace se píše krémem, na všech štacích stejně. Nejsvětlejší
+// barva rampy tedy musí zůstat pod mezí, kde krém drží kontrast 4,5:1
+// (relativní světlost 0,139). Naměřeno: první štace vychází na 4,6:1,
+// devátá na 7,9:1.
+const ZAC = { h: 26, s: .92, svetlo: .136 };
+const KON = { h: 4, s: .40, svetlo: .058 };
+// Spodek přechodu na kartě je o tenhle díl tmavší než vršek.
 const TMAVSI = .55;
-// Světlost nejtmavší a nejsvětlejší barvy v paletě hospod. Barva se do pásma
-// nesráží na jednu hodnotu, ale přemapuje: kdyby všechny skončily na stejné
-// světlosti, florida, zlatý samet a máslová by vyšly jako tři stejné hnědé.
-// Takhle si pořadí i rozestupy nesou s sebou.
-const PALETA_OD = .19, PALETA_DO = .66;
 
-/** Barva štace rozepsaná na kartu Hry: plná barva nahoře a stejná barva
- *  stažená do tmy dole.
+const mezi = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/** Barva štace podle místa na trase, rozepsaná na kartu Hry: plná barva
+ *  nahoře a stejná barva stažená do tmy dole.
  *
  *  Karta štace byla dřív barva naředěná na devět procent do podkladu, takže
  *  devět hospod vypadalo jako devět stejných karet. Teď je v barvě celá.
- *  Píše se na ni krémem — na všech štacích stejně, protože jméno hospody má
- *  vypadat pokaždé stejně — a to znamená, že barva musí do tmy. Odstín
- *  i sytost zůstávají, takže hospodu pořád poznáš podle barvy; sytost se
- *  u kalných barev naopak přitáhne, protože tmavá a nesytá je šedivá. */
-export function tonHospody(barva: string): { plna: string; tma: string } {
-  const z = naHsl(barva);
-  const dil = Math.min(1, Math.max(0, (svetlost(z) - PALETA_OD) / (PALETA_DO - PALETA_OD)));
-  const cil = PASMO_OD + (PASMO_DO - PASMO_OD) * dil;
-  const syta = { ...z, s: Math.min(.92, Math.max(z.s * 1.15, .18)) };
-  const plna = naSvetlost(syta, cil);
+ *
+ *  Barva se bere z pořadí, ne z hospody: je to údaj o tom, kolik večera je
+ *  za tebou, ne značka podniku. Kdo si hospody přeskládá nebo přidá desátou,
+ *  dostane rampu přepočítanou, ne díru v ní. */
+export function barvaStace(poradi: number, celkem: number): { plna: string; tma: string } {
+  const t = celkem > 1 ? Math.min(1, Math.max(0, poradi / (celkem - 1))) : 0;
+  const z = { h: mezi(ZAC.h, KON.h, t), s: mezi(ZAC.s, KON.s, t), l: .5 };
+  const plna = naSvetlost(z, mezi(ZAC.svetlo, KON.svetlo, t));
   return { plna: zHsl(plna), tma: zHsl({ ...plna, l: plna.l * TMAVSI }) };
 }

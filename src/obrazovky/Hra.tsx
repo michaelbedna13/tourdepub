@@ -5,7 +5,7 @@ import { Ikona } from "../components/Ikona";
 import { PruhSyncu } from "../components/PruhSyncu";
 import { Uctenka } from "../components/Uctenka";
 import { ZAKLAD, type Hospoda } from "../lib/data";
-import { tonHospody } from "../lib/barva";
+import { barvaStace } from "../lib/barva";
 import { naDvaRadky, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
 import { RAZITKO } from "../lib/razitko";
@@ -134,13 +134,17 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   const posledni = cislo === stav.hospody.length;
   // štace je hotová, když je zapsaný příchod i škopek – pak na kartu klapne razítko
   const hotova = !!t?.prichod[h.id] && !!t?.skopek[h.id];
-  // Karta je celá v barvě štace; tonHospody() z barvy udělá plochu, na které
-  // drží krémový text. Vevnitř karty se pak všechno kreslí z currentColor.
-  const ton = tonHospody(h.barva);
+  // Karta je celá v barvě štace a ta se počítá z místa na trase, ne z hospody:
+  // je to údaj o tom, kolik večera je za tebou. Vevnitř karty se pak všechno
+  // kreslí z currentColor.
+  const ton = barvaStace(cislo - 1, stav.hospody.length);
+  // Kolik už toho parta má v sobě, od nuly na první štaci po jedničku na
+  // poslední. Karta se podle toho motá a jméno se dvojí – viz app.css.
+  const opilost = stav.hospody.length > 1 ? (cislo - 1) / (stav.hospody.length - 1) : 0;
   return (
     <section className={`hero${aktivni ? " ted" : ""}${hotova ? " hotova" : ""}`}
       style={{
-        "--hosp-plna": ton.plna, "--hosp-tma": ton.tma,
+        "--hosp-plna": ton.plna, "--hosp-tma": ton.tma, "--opilost": opilost,
       } as React.CSSProperties}
       aria-label={`${cislo}. štace: ${h.nazev}${hotova ? " (hotová)" : ""}`}>
       {/* Razítko přes celou kartu, ne odznáček v rohu: hotová štace má být

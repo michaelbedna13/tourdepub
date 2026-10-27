@@ -383,6 +383,22 @@ input,textarea,select{caret-color:var(--text)}
 /* karta, co jen vykukuje, nemá přetahovat pozornost */
 .hero:not(.ted){opacity:.45}
 
+/* ---------- opilost ----------
+   --opilost dává Hra: nula na první štaci, jednička na poslední. Všechno,
+   co z ní vychází, je v nule doslova nula, takže první karta stojí jak
+   přibitá a devátá se houpe. Mezi tím to narůstá samo.
+
+   Houpe se karta, ne obrazovka. Motat celou appku by znamenalo, že se na
+   ni ke konci večera nedá ťuknout — a to je zrovna chvíle, kdy se do ní
+   zapisuje nejvíc. Takhle je to obraz stavu, ne překážka. */
+.hero{
+  animation:stace-motani calc(5.4s + var(--opilost) * 1.8s) ease-in-out infinite alternate;
+}
+@keyframes stace-motani{
+  from{rotate:calc(var(--opilost) * -0.7deg);translate:calc(var(--opilost) * -3px) 0}
+  to{rotate:calc(var(--opilost) * 0.7deg);translate:calc(var(--opilost) * 3px) 0}
+}
+
 /* Číslo štace jako tiché nadočko nad jménem. Dřív to byl obrovský obrys
    za nadpisem, co lezl přes jméno i přes pruh trasy — karta z toho byla
    přeplácaná a nedalo se poznat, co je na ní hlavní. Tohle nese tu samou
@@ -445,6 +461,13 @@ input,textarea,select{caret-color:var(--text)}
    Karty v pásu jsou stejně vysoké podle té nejdelší, a bez toho by u kratších
    názvů vznikla díra a odškrtávátka by při švihu skákala nahoru a dolů. */
 .hero-nazev{
+  /* Dvojité vidění: jméno štace dostane dva krémové stíny do stran. Při nulové
+     opilosti mají nulový posun, takže na první štaci po nich není ani stopa.
+     Je to stín, ne pohyb, takže to platí i při vypnutých animacích — a to je
+     správně: dvojí vidění není animace, ale stav. */
+  text-shadow:
+    calc(var(--opilost) * 3px) 0 calc(var(--opilost) * 1px) color-mix(in srgb,currentColor 30%,transparent),
+    calc(var(--opilost) * -3px) 0 calc(var(--opilost) * 1px) color-mix(in srgb,currentColor 20%,transparent);
   /* Jediný řez navíc, co Hagrid má, je sedmistovka — a název hospody je
      hlavní věc na obrazovce, tak ji unese. Tučný Hagrid je ale široký,
      takže stažení je menší než u ostatních nadpisů; jinak se verzálky
