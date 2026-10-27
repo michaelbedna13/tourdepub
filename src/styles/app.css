@@ -244,7 +244,13 @@ input,textarea,select{caret-color:var(--text)}
      iPhone ne. Koncový snímek je stejný jako klidový stav, takže doplňovat
      dopředu stejně není co. */
   animation:obsah-prichod .34s var(--krok) backwards;
+  /* Pod otevřenou vrstvou se obrazovka rozmaže. Dělá to filtr na obsahu,
+     ne backdrop-filter na plachtě: Safari si podklad pro backdrop vzorkuje
+     zvlášť a u levého okraje po překreslení zůstával nerozostřený proužek.
+     Tohle žádnou hranu ke vzorkování nemá. */
+  transition:filter .18s var(--krok);
 }
+html.rozmazat .obrazovka{filter:blur(7px)}
 /* Z plochy appka kreslí i pod stavovou lištu, a na telefonech, kde je
    safe-area nula, by se nadpis schoval pod hodiny. Mění se token, ne
    odsazení: musí se to propsat i do lišty. */
@@ -597,8 +603,15 @@ input,textarea,select{caret-color:var(--text)}
    a ořezával se na „Kecy a …“. */
 /* Nasvícení obrazovky kategorie její barvou. Leží pod obsahem a dolů se
    ztrácí — nahoře, kde je nadpis, má být nejvíc. */
-.kat-nasvit{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
+/* Lepivě, ne fixed. Jakmile má předek filtr (rozmazání obrazovky pod
+   otevřeným detailem), fixed se přepočítá na jeho box — tedy na celou výšku
+   obsahu a dovnitř okrajů — a z nasvícení by byl pruh s dírami po stranách.
+   Lepivé polohování filtr nezajímá a drží se u horní hrany stejně jako fixed.
+   Sám prvek je nulové výšky, aby nezabíral místo; kreslí jeho výstelka. */
+.kat-nasvit{position:sticky;top:0;height:0;z-index:0;pointer-events:none}
+.kat-nasvit::before{
+  content:"";position:absolute;top:0;left:50%;translate:-50% 0;
+  width:100vw;height:100dvh;
   background:linear-gradient(to bottom,
     color-mix(in srgb,var(--kat) 14%,transparent),
     color-mix(in srgb,var(--kat) 4%,transparent) 36%,
@@ -681,20 +694,13 @@ input,textarea,select{caret-color:var(--text)}
 /* Ne stránka a ne plachta přes celou obrazovku: ta samá karta, jen větší,
    a galerie za ní se rozostří. Ťuknutí vedle kartu zavře. */
 .detail{
-  /* Přetahuje přes okraj obrazovky. Safari bere podklad pro rozostření
-     o chlup jinak zarovnaný, než kreslí samotnou plachtu, a na hraně po tom
-     zbyde úzký proužek, který rozostřený není. Když plachta přeteče ven,
-     proužek skončí za okrajem a nikdo ho neuvidí; o ten samý kus se přidá
-     do vycpávky, aby karta uvnitř zůstala, kde byla. */
-  --presah:8px;
-  position:fixed;inset:calc(-1 * var(--presah));z-index:40;
-  display:flex;align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
   /* Celá plachta si bere dotyk: bez toho si tah vedle karty vezme prohlížeč
      a scrolluje stránkou pod otevřeným detailem. */
   touch-action:none;
-  padding:calc(var(--vrch) + 8px + var(--presah)) calc(var(--okraj) + var(--presah))
-          calc(env(safe-area-inset-bottom) + 24px + var(--presah));
-  background:rgba(22,22,18,.52);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  padding:calc(var(--vrch) + 8px) var(--okraj) calc(env(safe-area-inset-bottom) + 24px);
+  /* Jen ztmavení. Rozostření dělá .obrazovka pod vrstvou, viz lib/vrstvy.ts. */
+  background:rgba(22,22,18,.52);
   animation:zjevit .18s var(--krok);
 }
 /* Výška je daná, ne odvozená z délky popisu: karta s dvěma větami a karta
@@ -961,14 +967,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .menu-radek{min-height:58px}
 
 /* ---------- okno ---------- */
-/* Přetah přes okraj ze stejného důvodu jako u detailu – viz tam. Okno sedí
-   u dolní hrany, takže se o ten přetah musí vrátit vycpávkou, jinak by se
-   spodek okna schoval pod obrazovku. */
-.okno{--presah:8px;
-  position:fixed;inset:calc(-1 * var(--presah));z-index:40;
-  display:flex;align-items:flex-end;justify-content:center;
-  padding:0 var(--presah) var(--presah);
-  background:rgba(3,7,5,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+.okno{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;
+  /* Jen ztmavení; rozostření dělá .obrazovka pod vrstvou (lib/vrstvy.ts). */
+  background:rgba(3,7,5,.62);
   animation:zjevit .18s var(--krok)}
 .okno-telo{width:100%;max-width:var(--sirka);background:var(--vrstva);
   border-radius:28px 28px 0 0;padding:26px 22px calc(24px + env(safe-area-inset-bottom));

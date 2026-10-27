@@ -19,8 +19,12 @@ export interface Kategorie {
    *  něj krémem, na všech třech kategoriích stejně, takže musí být dost tmavý.
    *  Zelená a červená jsou samy o sobě, žlutá se na to musí srazit — jasná
    *  žlutá má s krémem kontrast 1,7:1 a nedá se na ní číst. Dřív se to řešilo
-   *  tím, že na žluté karty psal černě, jenže pak byla jedna karta ze tří
-   *  černá a koukalo to. */
+   *  tím, že na žluté kartě psal černě, jenže pak byla jedna karta ze tří
+   *  černá a koukalo to.
+   *
+   *  Sraženo je to jen tak akorát, aby to pořád byla zlatá, ne hnědá:
+   *  #C47F03 dává s krémem 2,7:1. Je to pod doporučenou mezí a je to vědomé —
+   *  jméno kategorie je velké a tučné a Mišák radši chce barvu. */
   karta: string;
 }
 
@@ -56,7 +60,7 @@ export interface Hospoda {
 
 export const KATEGORIE: Kategorie[] = [
   { id: "kecy", nazev: "Kecy a šméčka", ikona: "kecy", barva: "#006633", karta: "#006633" },
-  { id: "telo", nazev: "Tělo v luftě", ikona: "telo", barva: "#F9A204", karta: "#A56B03" },
+  { id: "telo", nazev: "Tělo v luftě", ikona: "telo", barva: "#F9A204", karta: "#C47F03" },
   { id: "zranice", nazev: "Žranice a divadlo", ikona: "zranice", barva: "#E5331F", karta: "#E5331F" },
 ];
 

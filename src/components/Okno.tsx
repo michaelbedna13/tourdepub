@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useRozmazanePozadi } from "../lib/vrstvy";
 import { vazat } from "../lib/format";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 /** Okno vyjeté od spodní hrany. Jedna ruka, palec dosáhne na akce dole. */
 export function Okno({ nadpis, pod, zavri, children }: Props) {
+  useRozmazanePozadi();
   const telo = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

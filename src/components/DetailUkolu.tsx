@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useRozmazanePozadi } from "../lib/vrstvy";
 import type { Kategorie, Ukol } from "../lib/data";
 import { sklonuj, vazat } from "../lib/format";
 import { odmena } from "../lib/odmena";
@@ -31,6 +32,7 @@ interface Props {
  *  jinak — vypadalo to, že appka na ťuknutí nereaguje. Posouvání je to,
  *  co každý zkusí první. */
 export function DetailUkolu({ u, k, zavri, uprav }: Props) {
+  useRozmazanePozadi();
   const t = tym();
   const kolik = kolikrat(u.id, t);
   const opakovatelny = u.max > 1;
