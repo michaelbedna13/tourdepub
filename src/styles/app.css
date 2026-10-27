@@ -520,12 +520,10 @@ input,textarea,select{caret-color:var(--text)}
 /* odškrtávátka drží dolní hranu karty */
 /* Linky a plošky uvnitř karty jsou z inkoustu karty, ne z krémových --linka*:
    na světlé štaci by krémová linka na barvě zmizela. */
-/* Jedna linka, a to ta nad odškrtávátky: odděluje zápis od jména štace,
-   tedy dvě různé věci. Mezi odškrtávátky samými linka nebyla potřeba —
-   jsou to dvě položky téhož, každá má svoje kolečko a svůj řádek, a čára
-   mezi nimi z karty dělala tabulku. */
-.hero-zapis{position:relative;z-index:1;margin:auto -22px -18px;
-  border-top:1px solid color-mix(in srgb,currentColor 16%,transparent)}
+/* Bez linek. Zápis od jména štace odděluje pruh trasy, co je nad ním —
+   ten tam je tak jako tak a dělá to pomyslně. Dvě čáry navíc (nad blokem
+   a mezi položkami) z karty dělaly tabulku. */
+.hero-zapis{position:relative;z-index:1;margin:auto -22px -18px}
 .zaskrt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
   padding:18px 22px;min-height:66px;transition:background .16s}
 .zaskrt:active{background:color-mix(in srgb,currentColor 9%,transparent)}
@@ -1036,33 +1034,39 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
      nevznikne, ale ani se nepřekrývají tak, že by text ležel přes logo */
   animation:uvod-prichod .34s .16s var(--krok) both;
 }
-.uvod-znak{flex:none;align-self:flex-start;height:30px;width:auto;display:block;color:var(--text)}
+/* Značka má pod sebou pořádnou mezeru: bez ní seděl nadpis rovnou na ní
+   a četlo se to jako jeden trojřádkový blok, ne jako hlavička a nadpis. */
+.uvod-znak{flex:none;align-self:flex-start;height:30px;width:auto;display:block;
+  margin-bottom:46px;color:var(--text)}
 
-/* Obsah je jeden blok vycentrovaný mezi značkou a stopáží. Volné místo se
-   rozdělí nad něj a pod něj stejným dílem, takže obrazovka dýchá, ať je
-   displej jakkoli vysoký. Kresba se smí smrsknout, ale ne růst — jinak by
-   si volné místo přetáhla k sobě a vycentrování by nebylo k ničemu. */
+/* Skladba plakátu: nahoře vede text, dole ho drží kresba. Panák visel
+   předtím nad nadpisem hned pod značkou a vypadal jako maskot přilepený
+   k logu, ne jako kresba na plakátu. Teď stojí dole vpravo, v tom, co po
+   textu zbyde — a čím vyšší displej, tím je větší. */
 .uvod-stred{
   flex:1;min-height:0;width:100%;max-width:420px;
-  display:flex;flex-direction:column;justify-content:center;text-align:left;
+  display:flex;flex-direction:column;justify-content:flex-start;text-align:left;
 }
 .uvod-kresba{
-  flex:0 1 auto;min-height:0;display:flex;justify-content:flex-start;
-  margin-bottom:34px;color:var(--text);
-  animation:uvod-prichod .5s .14s var(--krok) both;
+  flex:0 1 auto;min-height:0;display:flex;align-items:flex-end;
+  /* auto nahoře: kresba se odtlačí na spodek volného místa */
+  margin:auto 0 0;align-self:flex-end;color:var(--text);
+  animation:uvod-prichod .5s .36s var(--krok) both;
 }
-.uvod-cmaranice{height:clamp(118px,23vh,210px);max-height:100%;width:auto;display:block}
+.uvod-cmaranice{height:clamp(104px,28vh,250px);max-height:100%;width:auto;display:block;
+  /* ať se kresba nepere o místo s textem: smrskne se, než by ho vytlačila */
+  min-height:0}
 
 /* Nadpis unese sedmistovku i obtah — je to první věc, co se čte po kresbě.
    Prokládání je stažené pod jedničku, ale ne o moc: české háčky a čárky
    vystupují nad verzálky a při těsnějším prokladu sedí druhému řádku
    na hlavě. */
 .uvod-nadpis{
-  flex:none;margin:0 0 26px;font-weight:700;-webkit-text-stroke:1px currentColor;
+  flex:none;margin:0 0 24px;font-weight:700;-webkit-text-stroke:1px currentColor;
   font-size:clamp(30px,8.2vw,44px);line-height:1.1;letter-spacing:-.03em;
   /* vyrovná délku řádků, ať nezůstane na posledním jedno slovo */
   text-wrap:balance;
-  animation:uvod-prichod .5s .26s var(--krok) both;
+  animation:uvod-prichod .5s .14s var(--krok) both;
 }
 /* Tři odstavce s pořádnou mezerou mezi nimi a volným prokladem uvnitř.
    Natlačené do jednoho bloku to byl příbalový leták. */
@@ -1070,7 +1074,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   flex:none;display:flex;flex-direction:column;gap:18px;max-width:30em;
   font-family:var(--pismo);font-size:var(--t-hlavni);line-height:1.7;
   color:var(--text-2);
-  animation:uvod-prichod .5s .36s var(--krok) both;
+  animation:uvod-prichod .5s .26s var(--krok) both;
 }
 .uvod-popis p{margin:0}
 
@@ -1091,8 +1095,8 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    menší nadpis, hustší odstavce, menší mezery. Pořád to dýchá, jen míň. */
 @media (max-height:690px){
   .uvod-obsah{padding-top:calc(env(safe-area-inset-top) + 20px)}
-  .uvod-kresba{margin-bottom:22px}
-  .uvod-cmaranice{height:clamp(96px,17vh,150px)}
+  .uvod-znak{margin-bottom:26px}
+  .uvod-cmaranice{height:clamp(84px,16vh,140px)}
   .uvod-nadpis{font-size:clamp(26px,7.4vw,34px);margin-bottom:18px}
   .uvod-popis{gap:13px;font-size:var(--t-text);line-height:1.62}
   .uvod-pas{margin-top:18px}

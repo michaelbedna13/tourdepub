@@ -154,11 +154,11 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
           <Logo trida="uvod-znak" />
 
           <div className="uvod-stred">
-            <div className="uvod-kresba"><Cmaranice id="opilec" /></div>
             <h1 className="uvod-nadpis">{vazat(NADPIS)}</h1>
             <div className="uvod-popis">
               {POPIS.map((o) => <p key={o}>{vazat(o)}</p>)}
             </div>
+            <div className="uvod-kresba"><Cmaranice id="opilec" /></div>
           </div>
 
           {/* Stopáž, ne ovládání: kolik zbývá, než se obrazovka zavře sama. */}

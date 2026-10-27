@@ -101,7 +101,9 @@ const KRESBY = {
     C(cut(ell(36, 23, 4.5, 4.5, 22), { ...ROUGH, amp: .4, step: 2 })),
     C(cut(stroke(45, 19, 53, 27, 3), { ...ROUGH, amp: .4, step: 3 })),
     C(cut(stroke(53, 19, 45, 27, 3), { ...ROUGH, amp: .4, step: 3 })),
-    C(cut(ell(42, 34, 6, 4.5, 20), { ...ROUGH, amp: .5, step: 3 })),
+    /* Pusa je malá a vysoko. Velká sahala až na spodní obrys hlavy, takže
+       panákovi nezbyla brada a vypadalo to jak useknuté. */
+    C(cut(ell(42, 31, 4.2, 3.4, 20), { ...ROUGH, amp: .4, step: 2 })),
     // trup, podle nakloněné hlavy taky nakřivo
     I(cut([[36, 38], [52, 40], [58, 62], [42, 65], [33, 58]], HRUBE)),
     // ruka nahoru a do strany, s roztaženou dlaní
