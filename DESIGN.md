@@ -218,6 +218,33 @@ při přepočítání neposkakovalo.
 Prohlížeč je dosadí z náhradního písma a je to v řádku poznat. Při výměně
 psacího fontu zkontroluj `ť ď ě ů ř Ú Š Č Ž Ň`; dělá to `scripts/stahni-pisma.mjs`.
 
+## Rozostření horní hrany v appce z plochy
+
+iOS 26 kreslí v appce přidané na plochu přes horní okraj systémové rozostření
+(„liquid glass"), aby stavová lišta zůstala čitelná nad čímkoli, co pod ní
+projede. Obsah pod ním je rozmazaný — u nás značka a pilulka týmu, protože
+lišta appky začíná přesně tam. **V prohlížeči se to nekreslí**, takže stejná
+stránka je v Safari ostrá a z plochy ne.
+
+Vypnout se to nedá, žádná meta ani vlastnost na to není. WebKit ale efekt
+vynechá, když horní hranu zakrývá **pevná neprůhledná plocha**. Tou je
+`body::before`: pruh přes celou šířku, vysoký přesně jako `safe-area-inset-top`,
+`position: fixed`, jen v `@media (display-mode: standalone)`.
+
+Dvě drobnosti, na kterých to stojí:
+
+- `background-color: inherit`, ne pevná barva. V průpravě si `<body>`
+  přebarvuje podklad na barvu plakátu (`useBarvaOkoli`) a pruh to musí
+  převzít, jinak by nad červeným plakátem visel tmavý pás.
+- `z-index: 130`, tedy **nad průpravou** (120), aby horní hranu zakrýval
+  i během úvodu.
+
+Kdyby to nestačilo, druhá cesta je přepnout
+`apple-mobile-web-app-status-bar-style` z `black-translucent` na `default`:
+web view pak začíná až pod stavovou lištou a iOS nemá přes co kreslit.
+Stojí to ale obsah pod lištou a **appku je potřeba z plochy smazat a přidat
+znovu**, protože iOS si styl pamatuje z instalace.
+
 ## Pruh nad stránkou v prohlížeči
 
 Pruh nad stránkou kreslí Safari samo, **plnou barvou z `theme-color`** —

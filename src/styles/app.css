@@ -182,6 +182,25 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
   .app::before{background-size:64px 64px}
 }
 
+/* iOS 26 kreslí v appce z plochy přes horní okraj systémové rozostření
+   („liquid glass"), aby stavová lišta zůstala čitelná nad čímkoli, co pod ní
+   projede. Obsah pod ním je pak rozmazaný — u nás značka a pilulka týmu,
+   protože lišta appky začíná přesně tam. V prohlížeči se to nekreslí, proto
+   to tam bylo ostré a z plochy ne.
+   Vypnout se to nedá: žádná meta ani vlastnost na to není. WebKit ale efekt
+   vynechá, když horní hranu zakrývá PEVNÁ NEPRŮHLEDNÁ plocha — tohle je ona.
+   Pruh přes celou šířku, vysoký přesně jako safe-area.
+   background-color:inherit, ne pevná barva: v průpravě si <body> přebarvuje
+   podklad na barvu plakátu (useBarvaOkoli v Uvod.tsx) a pruh to má převzít,
+   jinak by nad červeným plakátem visel tmavý pás.
+   z-index 130 je nad průpravou (120), aby horní hranu zakrýval vždycky. */
+@media (display-mode: standalone) {
+  body::before{
+    content:"";position:fixed;top:0;left:0;right:0;z-index:130;pointer-events:none;
+    height:env(safe-area-inset-top);background-color:inherit;
+  }
+}
+
 h1,h2,h3{margin:0;font-family:var(--nadpisy);line-height:var(--radky-nadpis);
   letter-spacing:-.015em;text-transform:uppercase}
 /* velké nadpisy lehce, drobné popisky tučně – viz poznámka u --nadpisy */
