@@ -47,7 +47,6 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
         )}
         <span className="hlava-vypln" />
         <button className="prepinac-tymu" onClick={() => setOkno("prepinac")} aria-label="Přepnout tým">
-          <span className="tecka" style={{ background: t?.barva }} />
           <b>{t?.nazev || "Bez týmu"}</b>
           <Ikona jmeno="i-dolu" px={13} />
         </button>
@@ -66,7 +65,6 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
           <div className="vrstva radky" style={{ marginBottom: 12 }}>
             {stav.tymy.map((x) => (
               <button key={x.id} className="radek" onClick={() => { prepniTym(x.id); setOkno("zadne"); }}>
-                <span className="tecka" style={{ background: x.barva }} />
                 <div className="radek-telo"><div className="radek-nazev">{x.nazev || "Bez názvu"}</div></div>
                 <div className="radek-body cislo">{body(x)}</div>
                 {x.id === stav.tymId && <Ikona jmeno="check" px={18} />}

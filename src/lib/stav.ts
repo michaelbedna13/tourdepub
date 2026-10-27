@@ -17,7 +17,6 @@ const VERZE = 2;
 export interface Tym {
   id: string;
   nazev: string;
-  barva: string;
   /** Pracoval s týmem někdo doopravdy? Nepoužívaný se na server neposílá. */
   vlastni: boolean;
   /** Razítko poslední změny – rozhoduje při slučování se serverem. */
@@ -56,7 +55,6 @@ export interface Stav {
 export interface RadekTymu {
   id: string;
   nazev: string;
-  barva: string;
   hospoda: number;
   body: number;
   rozpad: Rozpad;
@@ -81,32 +79,14 @@ export type Zaklad = "prichod" | "skopek";
  *  Dvě zeleně vedle sebe vadit nemusí — liší se světlostí natolik, že se
  *  jako tečka o devíti pixelech nespletou; losos z obtížnosti by se naopak
  *  s červenou pral. */
-export const BARVY = ["#E5331F", "#F9A204", "#45B877", "#2E9BB5", "#F2E7CF", "#006633"];
-
-/** Nejbližší barva z palety, ale ne ta, co už někdo má. Party založené dřív
- *  mají uloženou barvu, co v paletě už není (písková, růžová) — ta by v appce
- *  zůstala viset a v přepínači by se nedala znovu vybrat. Bez ohlídání
- *  obsazených by navíc obě skončily na krémové, protože k ní mají nejblíž
- *  obě, a dvě party se stejnou barvou jsou horší než barva mimo paletu. */
-function nejblizsiBarva(barva: string, obsazene: Set<string>): string {
-  const rgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-  const [r, g, b] = rgb(barva);
-  const podle = BARVY.map((x) => {
-    const [xr, xg, xb] = rgb(x);
-    return { x, d: (r - xr) ** 2 + (g - xg) ** 2 + (b - xb) ** 2 };
-  }).sort((a, b2) => a.d - b2.d);
-  // volná z palety; když jsou všechny zabrané, bere se prostě ta nejbližší
-  return (podle.find((k) => !obsazene.has(k.x)) ?? podle[0]).x;
-}
-
 const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 
 /** `vlastni` říká, jestli s týmem někdo opravdu pracoval. Tým, co si appka
  *  založila sama při prvním spuštění a nikdo ho nepojmenoval ani s ním nehrál,
  *  se na server neposílá — jinak by se v pořadí objevila „Naše parta“ z každého
  *  telefonu i prohlížeče, který web jen otevřel. */
-export function novyTym(nazev = "", barva = BARVY[0], vlastni = true): Tym {
-  return { id: noveId(), nazev, barva, vlastni, upraveno: null, bylNaServeru: false,
+export function novyTym(nazev = "", vlastni = true): Tym {
+  return { id: noveId(), nazev, vlastni, upraveno: null, bylNaServeru: false,
            hospoda: null, prichod: {}, prichodCas: {}, skopek: {}, ukoly: {}, zlodej: {} };
 }
 
@@ -120,7 +100,7 @@ function dotknuto(t: Tym | undefined) {
 
 function prazdnyStav(): Stav {
   // false: dokud ho nikdo nepojmenuje ani s ním nezahraje, zůstane jen tady
-  const t = novyTym("Naše parta", BARVY[0], false);
+  const t = novyTym("Naše parta", false);
   t.hospoda = VYCHOZI_HOSPODY[0].id;
   return {
     verze: VERZE,
@@ -193,7 +173,7 @@ function nacti(): Stav {
 
   // starší verze měla jednu partu a napevno dané hospody a úkoly
   if (!ulozeno.verze || ulozeno.verze < 2) {
-    const t = novyTym(ulozeno.parta?.nazev || "Naše parta", ulozeno.parta?.barva || BARVY[0]);
+    const t = novyTym(ulozeno.parta?.nazev || "Naše parta");
     t.prichod = ulozeno.prichod || {};
     t.skopek = ulozeno.skopek || {};
     t.ukoly = ulozeno.ukoly || {};
@@ -211,7 +191,7 @@ function nacti(): Stav {
   // neudrželo — smazaný by se vrátil.
   if (!Array.isArray(ulozeno.znameUkoly)) zapisPoDoplneni = true;
   if (!z.tymy?.length) {
-    const t = novyTym("Naše parta", BARVY[0]);
+    const t = novyTym("Naše parta");
     z.tymy = [t];
     z.tymId = t.id;
   }
@@ -219,16 +199,9 @@ function nacti(): Stav {
   srovnejStace(z);
   // starší uložené stavy příznak nemají; tým s vlastním jménem nebo s čárkami
   // je zjevně používaný
-  // barvy, co party už mají a v paletě jsou, si drží přednost
-  const obsazene = new Set(z.tymy.map((t) => t.barva).filter((b) => BARVY.includes(b)));
   for (const t of z.tymy) {
     // starší uložený stav časy příchodů nemá; karta si pak nemá co ukázat a je to v pořádku
     if (!t.prichodCas) t.prichodCas = {};
-    // barvy mimo paletu (z dřívější sady) se překlopí na nejbližší volnou z ní
-    if (t.barva && !BARVY.includes(t.barva)) {
-      t.barva = nejblizsiBarva(t.barva, obsazene);
-      obsazene.add(t.barva);
-    }
     if (t.vlastni === undefined) {
       t.vlastni = t.nazev !== "Naše parta"
         || Object.keys(t.prichod).length > 0
@@ -283,8 +256,8 @@ export function useStav(): Stav {
 
 export const tym = (): Tym | undefined => stav.tymy.find((t) => t.id === stav.tymId) || stav.tymy[0];
 
-export function pridejTym(nazev: string, barva?: string | null): Tym {
-  const t = novyTym(nazev, barva || BARVY[stav.tymy.length % BARVY.length]);
+export function pridejTym(nazev: string): Tym {
+  const t = novyTym(nazev);
   t.hospoda = stav.hospody[0]?.id || null;
   t.upraveno = new Date().toISOString();
   stav.tymy.push(t);
@@ -292,11 +265,10 @@ export function pridejTym(nazev: string, barva?: string | null): Tym {
   return t;
 }
 
-export function upravTym(id: string, zmeny: Partial<Pick<Tym, "nazev" | "barva">>) {
+export function upravTym(id: string, zmeny: Partial<Pick<Tym, "nazev">>) {
   const t = stav.tymy.find((x) => x.id === id);
   if (!t) return;
   if (zmeny.nazev !== undefined) t.nazev = zmeny.nazev;
-  if (zmeny.barva !== undefined) t.barva = zmeny.barva;
   dotknuto(t); // pojmenovaný tým už patří ostatním na oči
   uloz();
 }
@@ -468,7 +440,7 @@ export function strop() {
 export function poradiTymu() {
   return stav.tymy
     .map((t) => ({
-      id: t.id, nazev: t.nazev || "Bez názvu", barva: t.barva, body: body(t),
+      id: t.id, nazev: t.nazev || "Bez názvu", body: body(t),
       rozpad: rozpad(t), hospoda: indexHospody(t) + 1,
     }))
     .sort((a, b) => b.body - a.body || b.rozpad.makacky - a.rozpad.makacky);
@@ -563,7 +535,6 @@ export function kOdeslani(t: Tym): RadekTymu {
   return {
     id: t.id,
     nazev: t.nazev || "Bezejmenná parta",
-    barva: t.barva,
     hospoda: indexHospody(t) + 1,
     body: body(t),
     rozpad: rozpad(t),
@@ -580,7 +551,7 @@ export function slucZeServeru(radky: RadekTymu[]) {
 
   for (const r of radky) {
     const zeServeru = {
-      nazev: r.nazev, barva: r.barva, vlastni: true, upraveno: r.upraveno,
+      nazev: r.nazev, vlastni: true, upraveno: r.upraveno,
       bylNaServeru: true,
       hospoda: r.stav?.hospoda ?? stav.hospody[0]?.id ?? null,
       prichod: r.stav?.prichod || {}, prichodCas: r.stav?.prichodCas || {},
@@ -596,7 +567,7 @@ export function slucZeServeru(radky: RadekTymu[]) {
 
   // tým smazaný na jiném telefonu musí zmizet i tady
   stav.tymy = stav.tymy.filter((t) => !t.bylNaServeru || naServeru.has(t.id));
-  if (!stav.tymy.length) stav.tymy = [novyTym("Naše parta", BARVY[0], false)];
+  if (!stav.tymy.length) stav.tymy = [novyTym("Naše parta", false)];
   if (!stav.tymy.some((t) => t.id === stav.tymId)) stav.tymId = stav.tymy[0].id;
 
   srovnejStace(stav);

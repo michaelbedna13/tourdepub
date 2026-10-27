@@ -7,7 +7,6 @@ import type { Rozpad } from "../lib/stav";
 interface Parta {
   id: string;
   nazev: string;
-  barva: string;
   body: number;
   rozpad: Rozpad;
 }
@@ -77,7 +76,6 @@ export function Uctenka({ poradi, hospod, ukolu, strop, prepni, uprav }: Props) 
         <div key={p.id} className="uc-parta">
           <div className="uc-nazev">
             <button className="uc-jmeno" onClick={() => prepni(p.id)}>
-              <span className="uc-znak" style={{ background: p.barva }} />
               <span className="uc-text">{p.nazev}</span>
             </button>
             {/* Razítko až od první čárky – na začátku večera nikdo nevede.
