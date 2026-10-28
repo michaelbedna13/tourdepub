@@ -93,9 +93,10 @@
      „horní hrana v appce z plochy". V prohlížeči je nula, aby se s ním dalo
      počítat všude. */
   --pruh:0px;
-  /* Kolik místa si dole bere plovoucí rozcestník — obsah obrazovky o to
-     víc odsadí, ať poslední karta nekončí pod ním. */
-  --lista:78px;
+  /* Kolik místa si dole nechá obsah na plovoucí tlačítko rozcestníku. Není
+     to jeho celá výška: tlačítko je kolečko v pravém rohu, text mu podjede
+     vedle, jen poslední řádka pod ním nemá končit. */
+  --lista:22px;
 
   /* Proklad velkých nadpisů. Česká verzálka nese háčky a čárky nad výškou
      písmen, takže u víceřádkového nadpisu sedí diakritika spodního řádku
@@ -1047,72 +1048,24 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
    zespodu jako ostatní okna. Tlačítko nahoře, terče dole: ťuká se do nich
    jednou rukou v hospodě a horní roh je pro palec ten nejhorší kus obrazovky. */
 
-/* ---------- plovoucí rozcestník ---------- */
-/* Pět obrazovek appky dole, pořád na očích. Hamburger v pravém horním rohu
-   byl pro palec ten nejhorší kus obrazovky a každý přechod stál dvě ťuknutí;
-   v hospodě se appka drží jednou rukou, v druhé je škopek.
-
-   Plave nad obsahem, nelepí se na spodní hranu: appka je papírová a tohle má
-   být lísteček položený přes ni, ne systémová lišta. Proto taky obrys
-   stříhaný nůžkama (viz Nastříhané rámy karet) a stín pod ním.
-
-   z-index 30 je nad obrazovkou (1) a nad září (25), ale POD vrstvami (40):
-   otevřený detail i spodní okno ho mají překrýt, jinak by lísteček visel nad
-   kartou, která zrovna patří celé obrazovce. */
-.rozcestnik{
-  position:fixed;left:50%;translate:-50% 0;z-index:30;
-  bottom:calc(env(safe-area-inset-bottom) + 14px);
-  width:min(100% - 2 * var(--okraj), 358px);
-  /* Dotek bere jen pás, ne celá šířka obrazovky kolem něj. */
-  pointer-events:none;
-  transition:opacity .18s var(--krok),transform .22s var(--krok);
-}
-/* Pod otevřenou vrstvou rozcestník odejde dolů. Zůstat nemůže: leží nad
-   obrazovkou, takže by se jako jediná věc za plachtou nerozmazal — ostrý
-   lísteček na rozmazaném pozadí. A spodní okno vyjíždí přesně přes něj. */
-html.rozmazat .rozcestnik{opacity:0;transform:translateY(12px);pointer-events:none}
-.rozcestnik-pas{
-  pointer-events:auto;
-  display:flex;align-items:stretch;gap:2px;
-  padding:7px 8px;border-radius:var(--pilulka);
-  background:var(--vrstva-2);
-  box-shadow:0 12px 30px rgba(0,0,0,.42),0 0 0 1px rgba(239,235,224,.05);
-}
-.rozcestnik-tl{
-  flex:1 1 0;min-width:0;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  min-height:50px;padding:6px 2px;border-radius:var(--pilulka);
-  color:var(--text-3);
-  transition:color .16s var(--krok),background .18s var(--krok),transform .12s var(--krok);
-}
-.rozcestnik-tl:active{transform:scale(.92)}
-/* Kde zrovna jsem: plná barva a plocha pod tím. Jen barva nestačila —
-   v šeru hospody se tři stupně šedi nerozeznají. */
-.rozcestnik-tl.ted{color:var(--text);background:rgba(239,235,224,.1)}
-.rozcestnik-popis{
-  font-family:var(--pismo);font-weight:700;font-size:9.5px;letter-spacing:.06em;
-  text-transform:uppercase;line-height:1;
-  /* Jména se nelámou ani nekrátí třemi tečkami: radši se o chlup stáhnou. */
-  white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:clip;
-}
-
-/* ---------- FAB menu ---------- */
-/* Kulaté tlačítko vpravo dole, co se rozbalí do nabídky akcí — FAB menu
-   z Material 3, co nahradilo starý „speed dial". Dva až šest příbuzných
-   úkonů nad tlačítkem, každý s ikonou a jménem, a tlačítko se při otevření
+/* ---------- rozcestník (FAB menu) ---------- */
+/* Kulaté tlačítko vpravo dole, co se rozbalí do pěti obrazovek appky — FAB
+   menu z Material 3, co nahradilo starý „speed dial". Nabídka visí nad
+   tlačítkem, každá položka má ikonu a jméno, a tlačítko se při otevření
    překlopí na křížek.
 
-   Patří do něj akce, ne obrazovky: po appce se chodí rozcestníkem.
+   Dole vpravo, ne nahoře: hamburger stával v pravém HORNÍM rohu, tedy v tom
+   nejhorším kusu obrazovky, jaký palec má. V hospodě se appka drží jednou
+   rukou, v druhé je škopek.
 
-   Sedí nad rozcestníkem, ne vedle něj — dva plovoucí prvky na jedné řádce
-   by se praly o palec a o šířku. Barva je logová červená: je to jediná věc
-   na obrazovce, co má křičet, a žádná kategorie ji nenese jako plochu. */
+   Barva je logová červená: je to jediná věc na obrazovce, co má křičet,
+   a žádná kategorie ji nenese jako plochu. */
 .fab{
   /* Vpravo u sloupce appky, ne u okraje okna: na široké obrazovce je appka
      uprostřed a tlačítko má patřit k ní. */
   position:fixed;z-index:31;
   right:max(var(--okraj), calc(50% - var(--sirka) / 2 + var(--okraj)));
-  bottom:calc(env(safe-area-inset-bottom) + 14px + var(--lista) + 2px);
+  bottom:calc(env(safe-area-inset-bottom) + 16px);
   width:60px;height:60px;display:grid;place-items:center;
   border-radius:var(--pilulka);
   background:var(--tisk-cervena,#E5331F);color:#FFF4E6;
@@ -1124,10 +1077,13 @@ html.rozmazat .rozcestnik{opacity:0;transform:translateY(12px);pointer-events:no
    zůstal by jako jediná ostrá věc nad rozmazanou appkou. Pod VLASTNÍ nabídkou
    samozřejmě zůstat musí — tu zrovna drží. */
 html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-events:none}
-/* Plus se otočením stane křížkem: jedna kresba, žádné probliknutí dvou. */
-.fab-znak{transition:rotate .24s var(--krok)}
+/* Dvě kresby přes sebe: zavřené tlačítko musí říct „nabídka", otevřené
+   „zavřít". Prolnou se a křížek se do místa dotočí, ať to není střih. */
+.fab-znak{grid-area:1/1;transition:opacity .18s var(--krok),rotate .26s var(--krok)}
+.fab-znak-krizek{opacity:0;rotate:0deg}
 .fab.otevreno{z-index:41}
-.fab.otevreno .fab-znak{rotate:45deg}
+.fab.otevreno .fab-znak-menu{opacity:0;rotate:-30deg}
+.fab.otevreno .fab-znak-krizek{opacity:1;rotate:45deg}
 
 .fab-plachta{
   position:fixed;inset:0;z-index:40;touch-action:none;
@@ -1143,7 +1099,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .fab-nabidka{
   position:absolute;
   right:max(var(--okraj), calc(50% - var(--sirka) / 2 + var(--okraj)));
-  bottom:calc(env(safe-area-inset-bottom) + 14px + var(--lista) + 2px + 60px + 14px);
+  bottom:calc(env(safe-area-inset-bottom) + 16px + 60px + 14px);
   display:flex;flex-direction:column;align-items:flex-end;gap:10px;
 }
 .fab-radek{
@@ -1156,10 +1112,11 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   animation:fab-radek-prichod .26s var(--krok) backwards;
 }
 .fab-radek:active{transform:scale(.95)}
-/* Co teď nejde, z nabídky nemizí — jen zhasne. Nabídka, co pokaždé mění
-   počet řádků, se nedá zapamatovat rukou. */
-.fab-radek:disabled{opacity:.42}
 .fab-radek .ikona{color:var(--podklad);opacity:.7}
+/* Kde zrovna jsem. Nabídka se otevírá odkudkoli, takže musí umět říct i to,
+   odkud — jinak je to pět stejných lístků. */
+.fab-radek.ted{background:var(--tisk,#E5331F);color:#FFF4E6}
+.fab-radek.ted .ikona{color:inherit;opacity:1}
 @keyframes fab-radek-prichod{
   from{opacity:0;transform:translateY(14px) scale(.94)}
 }
@@ -1384,9 +1341,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
     filter:drop-shadow(0 18px 40px rgba(0,0,0,.45))}
   /* To samé u rozcestníku: ořez sebere i obrys z box-shadow, tak stín
      i linku kreslí drop-shadow kopírující vystřižený tvar. */
-  .rozcestnik-pas{clip-path:url(#ram-lista);box-shadow:none;
-    filter:drop-shadow(0 10px 24px rgba(0,0,0,.42)) drop-shadow(0 0 .5px rgba(239,235,224,.16))}
-  /* FAB i jeho řádky jsou taky stříhané, ne kružítkové. */
+  /* FAB i jeho řádky jsou stříhané, ne kružítkové. */
   .fab{clip-path:url(#ram-fab);box-shadow:none;
     filter:drop-shadow(0 10px 26px rgba(0,0,0,.45))}
   .fab-radek{clip-path:url(#ram-fabRadek);box-shadow:none;

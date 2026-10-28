@@ -1,32 +1,36 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { JmenoIkony } from "../lib/ikony";
 import { useRozmazanePozadi } from "../lib/vrstvy";
 import { Ikona } from "./Ikona";
 
-export interface AkceFabu {
-  /** Co se stane. Vrátí false, když se nestalo nic (nemá co zapsat). */
-  udelej: () => void;
-  popis: string;
-  ikona: JmenoIkony;
-  /** Nedá se teď použít — zůstane v nabídce, ale zešedne (viz HIG: položku
-   *  nemazat, jen zhasnout, ať nabídka nemění tvar). */
-  nejde?: boolean;
-}
+const POLOZKY: { kam: string; popis: string; ikona: JmenoIkony; sedi: (cesta: string) => boolean }[] = [
+  { kam: "/", popis: "Hra", ikona: "i-domu", sedi: (c) => c === "/" },
+  // obrazovka jedné kategorie patří pod Úkoly
+  { kam: "/ukoly", popis: "Úkoly", ikona: "hvezda", sedi: (c) => c.startsWith("/ukoly") },
+  // Jména se drží nadpisů obrazovek, ne hantecu z úkolů: musí sedět slovo,
+  // které se objeví hned po ťuknutí.
+  { kam: "/tymy", popis: "Týmy", ikona: "trofej", sedi: (c) => c.startsWith("/tymy") },
+  { kam: "/hospody", popis: "Hospody", ikona: "hospoda", sedi: (c) => c.startsWith("/hospody") },
+  { kam: "/pravidla", popis: "Pravidla", ikona: "i-pravidla", sedi: (c) => c.startsWith("/pravidla") },
+];
 
-/** Kulaté tlačítko v pravém dolním rohu, co se rozbalí do nabídky akcí.
+/** Rozcestník jako FAB menu: kulaté tlačítko v pravém dolním rohu, co se
+ *  rozbalí do pěti obrazovek appky.
  *
- *  Je to FAB menu z Material 3 (nahradilo starý „speed dial"): dva až šest
- *  příbuzných úkonů, co visí nad tlačítkem, každý s ikonou a jménem, a samo
- *  tlačítko se při otevření překlopí na křížek.
+ *  Je to FAB menu z Material 3 (nahradilo starý „speed dial"): nabídka visí
+ *  nad tlačítkem, každá položka má ikonu a jméno a samo tlačítko se při
+ *  otevření překlopí na křížek.
  *
- *  Patří do něj AKCE, ne obrazovky — od chození po appce je rozcestník dole.
- *  Tyhle čtyři se dělají každou štaci a dělaly se jedině na Hře: kdo zrovna
- *  četl úkoly, musel se vracet. Odsud jdou odkudkoli.
+ *  Dole vpravo, ne nahoře. Hamburger stával v pravém HORNÍM rohu, tedy
+ *  v tom nejhorším kusu obrazovky, jaký palec má — v hospodě se appka drží
+ *  jednou rukou a v druhé je škopek. Nabídka se rozbaluje nahoru, takže si
+ *  prst nestíní to, co vybírá.
  *
- *  Dole vpravo, ne nahoře: ťuká se do něj jednou rukou se škopkem v druhé
- *  a nabídka se rozbaluje nahoru, takže si prst nestíní to, co vybírá. */
-export function FabMenu({ akce }: { akce: AkceFabu[] }) {
+ *  Pět položek je v rozsahu, co komponenta snese (dva až šest), a žádná
+ *  z nich není podstránka něčeho jiného, tak nemá co být schovaná hlouběji. */
+export function FabMenu() {
   const [otevreno, setOtevreno] = useState(false);
 
   // Celé to visí na <body>, ne uvnitř .app. Appka má vlastní vrstvení
@@ -37,24 +41,27 @@ export function FabMenu({ akce }: { akce: AkceFabu[] }) {
     <>
       <button type="button"
         className={`fab${otevreno ? " otevreno" : ""}`}
-        aria-expanded={otevreno}
-        aria-label={otevreno ? "Zavřít nabídku" : "Rychlý zápis"}
+        aria-expanded={otevreno} aria-haspopup="menu"
+        aria-label={otevreno ? "Zavřít rozcestník" : "Rozcestník"}
         onClick={() => setOtevreno((x) => !x)}>
-        {/* Jedna kresba pro obojí: plus se otočením o 45° stane křížkem,
-            takže se tvar opravdu přelije, nepřebliknou dvě ikony. */}
-        <Ikona jmeno="plus" px={26} trida="fab-znak" />
+        {/* Dvě kresby přes sebe, prolnou se. Otáčet plus na křížek šlo jednou
+            kresbou, jenže zavřené tlačítko musí říct „nabídka", ne „přidat". */}
+        <Ikona jmeno="i-menu" px={24} trida="fab-znak fab-znak-menu" />
+        <Ikona jmeno="plus" px={26} trida="fab-znak fab-znak-krizek" />
       </button>
 
-      {otevreno && <Nabidka akce={akce} zavri={() => setOtevreno(false)} />}
+      {otevreno && <Nabidka zavri={() => setOtevreno(false)} />}
     </>,
     document.body,
   );
 }
 
-function Nabidka({ akce, zavri }: { akce: AkceFabu[]; zavri: () => void }) {
-  // Pozadí se rozmaže a rozcestník dole odejde — to samé, co dělá detail
-  // úkolu. Nabídka nad ostrou appkou by byla jen další vrstva lístečků.
+function Nabidka({ zavri }: { zavri: () => void }) {
+  // Pozadí se rozmaže — to samé, co dělá detail úkolu. Nabídka nad ostrou
+  // appkou by byla jen další vrstva lístečků.
   useRozmazanePozadi();
+  const { pathname } = useLocation();
+  const kam = useNavigate();
   const zavrit = useRef(zavri);
   zavrit.current = zavri;
 
@@ -64,20 +71,32 @@ function Nabidka({ akce, zavri }: { akce: AkceFabu[]; zavri: () => void }) {
     return () => window.removeEventListener("keydown", klavesa);
   }, []);
 
+  function jdi(cesta: string) {
+    zavri();
+    // Ťuknutí na obrazovku, na které už jsem, vyjede nahoru. Je to to samé,
+    // co dělá iOS, a na dlouhé galerii úkolů to ušetří půl minuty tahání.
+    if (cesta !== pathname) kam(cesta);
+    else window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
     <div className="fab-plachta" onClick={zavri}>
       <div className="fab-nabidka" role="menu" onClick={(e) => e.stopPropagation()}>
-        {akce.map((a, i) => (
-          <button key={a.popis} type="button" role="menuitem"
-            className="fab-radek" disabled={a.nejde}
-            /* Položky nenaskočí naráz, ale jedna po druhé odspoda — oko
-               stihne přečíst, co přibylo. Zpoždění drží pořadí v nabídce. */
-            style={{ animationDelay: `${(akce.length - 1 - i) * 45}ms` }}
-            onClick={() => { a.udelej(); zavri(); }}>
-            <Ikona jmeno={a.ikona} px={19} />
-            <span>{a.popis}</span>
-          </button>
-        ))}
+        {POLOZKY.map((p, i) => {
+          const ted = p.sedi(pathname);
+          return (
+            <button key={p.kam} type="button" role="menuitem"
+              className={`fab-radek${ted ? " ted" : ""}`}
+              aria-current={ted ? "page" : undefined}
+              /* Položky nenaskočí naráz, ale jedna po druhé odspoda — oko
+                 stihne přečíst, co přibylo. Zpoždění drží pořadí v nabídce. */
+              style={{ animationDelay: `${(POLOZKY.length - 1 - i) * 40}ms` }}
+              onClick={() => jdi(p.kam)}>
+              <Ikona jmeno={p.ikona} px={19} />
+              <span>{p.popis}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
