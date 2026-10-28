@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { KATEGORIE } from "../lib/data";
-import { sklonujUkol, vazat } from "../lib/format";
+import { naDvaRadky, sklonujUkol } from "../lib/format";
 import { jdePridat, kolikrat, stav, tym, useStav } from "../lib/stav";
 import { Ikona } from "./Ikona";
 
@@ -27,7 +27,13 @@ export function KartyKategorii({ male = false }: { male?: boolean }) {
               <span className="kat-pocet cislo">{hotovo}/{vse.length}</span>
               <Ikona jmeno="i-zpet" px={15} trida="otocit kat-sipka" />
             </div>
-            <h2 className="kat-nazev">{vazat(k.nazev)}</h2>
+            {/* Zlom natvrdo, ne jak to vyjde. „Žranice a divadlo" se na kartu
+                nevešlo na jeden řádek a lámalo se samo, kdežto „Kecy a šméčka"
+                a „Tělo v luftě" zůstaly na jednom — tři karty pod sebou pak
+                měly každá jinou výšku a jiný tvar nadpisu. */}
+            <h2 className="kat-nazev">
+              {naDvaRadky(k.nazev).map((r) => <span key={r} className="kat-radek">{r}</span>)}
+            </h2>
             <span className="kat-pod cislo">
               {naDosah ? `${naDosah} ${sklonujUkol(naDosah)} na dosah` : "tady už nic nezbývá"}
             </span>

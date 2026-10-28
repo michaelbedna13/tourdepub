@@ -732,6 +732,9 @@ html.rozmazat .obrazovka{filter:blur(5px)}
 .kat-sipka{opacity:.6}
 .kat-nazev{position:relative;z-index:1;margin-top:32px;padding-right:64px;
   font-size:25px;line-height:var(--radky-nadpis);letter-spacing:-.02em;overflow-wrap:anywhere}
+/* Každý řádek nadpisu je vlastní span (viz naDvaRadky), ať se všechny tři
+   karty lámou stejně a mají stejnou výšku. */
+.kat-radek{display:block}
 .kat-pod{position:relative;z-index:1;display:block;margin-top:9px;
   font-family:var(--pismo);font-size:var(--t-drobne);opacity:.72}
 /* V seznamu úkolů zůstane z barvy kategorie jen čárka nad nadpisem; význam

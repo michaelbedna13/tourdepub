@@ -31,14 +31,19 @@ export function sklonujTym(n: number): string {
 /** Rozdělí jméno na dva co nejvyrovnanější řádky. Jednoslovné jméno vrátí
  *  jako jeden řádek — není kde zlomit.
  *
- *  Karty štací jsou stejně vysoké a jméno na nich má mít pokaždé stejný
- *  tvar. Nechat to na prohlížeči znamená, že se „U Ričího" vejde na řádek
- *  a „Na dobré cestě" se zlomí, takže dvě sousední karty vypadají jako dva
- *  různé návrhy. Tady se zlomí všechno, co má aspoň dvě slova, a to v místě,
- *  po kterém jsou oba řádky nejpodobnější. */
+ *  Karty štací i kategorií jsou stejně vysoké a jméno na nich má mít pokaždé
+ *  stejný tvar. Nechat to na prohlížeči znamená, že se „U Ričího" vejde
+ *  na řádek a „Na dobré cestě" se zlomí, takže dvě sousední karty vypadají
+ *  jako dva různé návrhy. Tady se zlomí všechno, co má aspoň dvě slova,
+ *  a to v místě, po kterém jsou oba řádky nejpodobnější.
+ *
+ *  Nejdřív projde vazat(), takže se dělí jen v obyčejné mezeře. „Kecy
+ *  a šméčka" se tím zlomí na „Kecy" a „a šméčka", ne na „Kecy a" a „šméčka":
+ *  jednopísmenná spojka na konci řádku je v češtině chyba a vedle „Žranice"
+ *  / „a divadlo" by to navíc byly dva různé tvary téže věci. */
 export function naDvaRadky(text: string): string[] {
-  const slova = text.trim().split(/\s+/);
-  if (slova.length < 2) return [text.trim()];
+  const slova = vazat(text.trim()).split(" ");
+  if (slova.length < 2) return [slova[0]];
   let nej = 0;
   let nejrozdil = Infinity;
   for (let i = 1; i < slova.length; i++) {
@@ -51,7 +56,7 @@ export function naDvaRadky(text: string): string[] {
     const rozdil = Math.abs(vlevo.length - vpravo.length);
     if (rozdil < nejrozdil) { nejrozdil = rozdil; nej = i; }
   }
-  if (!nej) return [text.trim()];
+  if (!nej) return [slova.join(" ")];
   return [slova.slice(0, nej).join(" "), slova.slice(nej).join(" ")];
 }
 
