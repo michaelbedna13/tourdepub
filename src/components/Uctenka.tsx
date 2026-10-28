@@ -33,10 +33,22 @@ function Polozka({ nazev, kolik }: { nazev: string; kolik: number }) {
   );
 }
 
+const dva = (x: number) => String(x).padStart(2, "0");
+
 /** Datum ve tvaru, v jakém ho tiskne pokladna. */
 function datum(d = new Date()): string {
-  const dva = (x: number) => String(x).padStart(2, "0");
   return `${dva(d.getDate())}/${dva(d.getMonth() + 1)} ${d.getFullYear()}`;
+}
+
+/** Číslo dokladu, jak ho tiskne opravdová pokladna: den a měsíc, lomítko,
+ *  pořadí. Pořadí je počet čárek na stole dohromady — během večera naskakuje
+ *  jako počítadlo a je to pořád pravdivý údaj.
+ *
+ *  Samotné datum (281026) by se do šesti číslic vešlo přesně, jenže tři řádky
+ *  pod tím stojí DATUM a byla by to ta samá informace dvakrát. Takhle se den
+ *  propíše a číslo přitom zůstane číslem dokladu, ne datem potřetí. */
+function cisloDokladu(carek: number, d = new Date()): string {
+  return `${dva(d.getDate())}${dva(d.getMonth() + 1)}/${String(carek).padStart(4, "0")}`;
 }
 
 /** Pořadí part jako účtenka z hospody.
@@ -50,9 +62,7 @@ function datum(d = new Date()): string {
  *  pod tím značka, heslo mezi lomítky, datum mezi přerušovanými čarami,
  *  položky s vodicími tečkami, tlustý součet a patička. */
 export function Uctenka({ poradi, hospod, ukolu, strop, prepni, uprav }: Props) {
-  // Číslo dokladu: kolik čárek je za večer na stole dohromady. Během večera
-  // naskakuje jako počítadlo na pokladně — a je to pořád pravdivý údaj.
-  const cislo = String(poradi.reduce((a, p) => a + p.body, 0)).padStart(6, "0");
+  const cislo = cisloDokladu(poradi.reduce((a, p) => a + p.body, 0));
   return (
     <div className="uctenka">
       <div className="uc-vrch">

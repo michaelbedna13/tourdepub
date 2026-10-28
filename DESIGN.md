@@ -868,8 +868,12 @@ s vodicími tečkami, součet a dole drobná patička. Položky začínají na s
 levé hraně jako jméno party — jméno je hlavička bloku, ne nadpis seznamu.
 Součet má nejsilnější linku z celé účtenky, ale pořád tečkovanou: plná čára
 tu byla jediná a vedle tří tečkovaných nad sebou vypadala jako podtržení
-z textového editoru. Číslo dokladu je **počet čárek na stole dohromady** —
-během večera naskakuje jako počítadlo na pokladně a je to pořád pravdivý údaj.
+z textového editoru. Číslo dokladu je **den a měsíc, lomítko a počet čárek na stole dohromady**
+(`2810/0008`), jak to tiskne opravdová pokladna. Pořadí během večera naskakuje
+jako počítadlo a je to pořád pravdivý údaj. Samotné datum (`281026`) by se do
+šesti číslic vešlo přesně, jenže tři řádky pod tím stojí DATUM a byla by to ta
+samá informace dvakrát; takhle se den propíše a číslo přitom zůstane číslem
+dokladu, ne datem potřetí.
 Červená je `#E5331F` na velké texty; na drobné popisky by na krémovém papíru
 neudržela kontrast, tak je pro ně tmavší (`#B4220F`).
 
