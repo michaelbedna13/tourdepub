@@ -246,9 +246,18 @@ Takže v `@media (display-mode: standalone)`:
 - `body::before` je pevný pás té výšky přes celou šířku v **plné barvě**.
   Rozostřená plná barva je ta samá plná barva, takže po efektu nezbyde nic
   k vidění.
-- Zrno (`.app::before`) začíná až pod pásem. Záře (`.app::after`) se nehýbe:
-  je to hladký přechod, na prvních desítkách bodů stejně na nule, a pás ji
-  tam překrývá.
+- **Zrno i záře začínají až pod pásem.** Zrno proto, aby u hrany nebylo co
+  rozmazat. Záře proto, že pás je plná barva bez ní: kdyby záře počítala od
+  nuly obrazovky, hned za hranou pásu by stránka byla o pár stupňů světlejší
+  a pás by se četl jako samostatná deska, i když na samotné hraně barva sedí.
+  Takhle má záře svých prvních rovných 76 bodů až pod pásem a stoupat začne
+  o kus níž, kde už žádná hrana není.
+- **Posledních 18 bodů pásu se prolíná** (`--prolnuti`): plná deska skončí,
+  přejde do ztracena a pod ní se zrno postupně vynořuje. Bez toho začínalo
+  zrno naráz a i při přesně sedící barvě byla hrana poznat — ne jako schod
+  ve světlosti, ale jako hrana mezi hladkou plochou a zrnitou. Konec přechodu
+  je psaný jako `rgba` téže barvy, ne `transparent`: některé prohlížeče
+  prokládají přes průhlednou černou a byl by tam tmavý nádech.
 - `--vrch` (odsazení obrazovky) vychází z `--pruh`, takže obsah začíná osm
   bodů pod ním. Plakáty úvodu se počítají ze stejného čísla.
 

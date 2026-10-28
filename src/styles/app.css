@@ -295,15 +295,40 @@ html.rozmazat .obrazovka{filter:blur(7px)}
   :root{
     --pruh:calc(max(env(safe-area-inset-top),50px) + 28px);
     --vrch:calc(var(--pruh) + 8px);
+    /* Na kolika bodech se pás a zrno prolnou. Bez toho zrno začínalo naráz
+       a i při přesně sedící barvě byla hrana poznat — ne jako schod
+       ve světlosti, ale jako hrana mezi hladkou plochou a zrnitou. */
+    --prolnuti:18px;
   }
+  /* Plná deska. Sahá jen po začátek prolnutí, aby pod sebou neměla nic,
+     co by šlo rozmazat. */
   body::before{
-    content:"";position:fixed;top:0;left:0;right:0;height:var(--pruh);
+    content:"";position:fixed;top:0;left:0;right:0;
+    height:calc(var(--pruh) - var(--prolnuti));
     z-index:61;pointer-events:none;background-color:#2D2D25;
   }
-  /* Zrno začíná až pod pásem, ať u horní hrany není co rozmazat. Záře se
-     nehýbe: je to hladký přechod, který je na prvních desítkách bodů stejně
-     na nule, a pás ji tam navíc překrývá. */
-  .app::before{top:var(--pruh)}
+  /* Prolnutí: ta samá barva, co se vytrácí do ztracena, a pod ní se zrno
+     postupně vynořuje. Konec je psaný jako rgba téže barvy, ne `transparent`
+     — některé prohlížeče prokládají přes průhlednou ČERNOU a na konci
+     přechodu by byl tmavý nádech. */
+  body::after{
+    content:"";position:fixed;left:0;right:0;
+    top:calc(var(--pruh) - var(--prolnuti));height:var(--prolnuti);
+    z-index:61;pointer-events:none;
+    background:linear-gradient(to bottom,#2D2D25,rgba(45,45,37,0));
+  }
+  /* Zrno i záře začínají až pod pásem.
+
+     Zrno proto, aby u horní hrany nebylo co rozmazat. Záře proto, že pás je
+     plná barva bez ní: kdyby záře začínala počítat od nuly obrazovky, pod
+     pásem už by stoupala a hned za jeho hranou by byla stránka o pár stupňů
+     světlejší. Pás by se tím četl jako samostatná deska, i když na samotné
+     hraně barva sedí — přesně ta past, co si vybrala svoje i u pruhu
+     v prohlížeči. Takhle má záře svých prvních rovných 76 bodů až POD pásem,
+     takže hned za jeho hranou je pořád čistý podklad se zrnem, tedy ta samá
+     barva, a stoupat začne o kus níž, kde už žádná hrana není. */
+  .app::before{top:calc(var(--pruh) - var(--prolnuti))}
+  .app::after{top:var(--pruh)}
 }
 @keyframes obsah-prichod{
   from{opacity:0;transform:translateY(8px)}
