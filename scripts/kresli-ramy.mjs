@@ -54,14 +54,34 @@ const KARTY = {
   // Kolečko má střih slabší a hustěji vzorkovaný oblouk: na malém kruhu
   // dělala plná vlna boule, co vypadaly jako chyba vykreslení, ne jako nůžky.
   fab:     [ 64,  64, 32, { amp: 1.1, step: 9, kroku: 14 }],
-  fabRadek:[210,  48, 24, { amp: 1.5, step: 13 }],
 };
+
+// Pilulky rozcestníku. Jsou malé, takže střih musí být silnější, aby ho bylo
+// vůbec poznat: půldruhého bodu se na osmačtyřicetibodové pilulce ztratí
+// a vypadá to jak vysázený obdélník. A hlavně je jich pět vedle sebe —
+// s jedním rámem pro všechny mají úplně stejný tvar a právě ta shoda je na
+// tom to strojové. Každá dostane svůj, zbytek obstará jejich různá šířka.
+//
+// vsun drží střih uvnitř pilulky. Dráha smí vyjet za hranu rámečku, jenže
+// namalovat se dá jen po ni — a z vlny, co přeteče, zůstane rovný pahýl.
+// U velkých karet se to ztratí, u pilulky je to vidět jako useknutý bok.
+// Rámeček se proto nakreslí o střih menší a posune doprostřed.
+const PILULEK = 5;
+for (let i = 1; i <= PILULEK; i++)
+  KARTY[`fabRadek${i}`] = [210, 48, 24, { amp: 2.4, step: 11, vsun: true }];
 
 const out = [];
 for (const [jm, [w, h, r, strih = VLNA]] of Object.entries(KARTY)) {
-  nasad(31 + jm.length * 19); // pevná náhodnost na tvar
+  // Pevná náhodnost na tvar. Seminko se počítá z celého jména, ne z jeho
+  // délky — pilulky se jmenují stejně dlouze a vyšly by jedna jak druhá.
+  nasad([...jm].reduce((h, z) => (h * 31 + z.charCodeAt(0)) % 100000, 7));
   // step je dlouhý schválně: střih nůžkami má po hraně pár vln, ne pilu
-  const d = cut(zakulacenyRam(w, h, r, strih.kroku), { tension: .5, ...strih });
+  // Půldruhého násobku střihu: vlna se po vyhlazení ještě kousek přehoupne
+  // přes vrchol, takže samotná amplituda nestačí.
+  const a = strih.vsun ? strih.amp * 1.5 : 0;
+  const ram = zakulacenyRam(w - 2 * a, h - 2 * a, r, strih.kroku)
+    .map(([x, y]) => [x + a, y + a]);
+  const d = cut(ram, { tension: .5, ...strih });
   out.push(`  ${jm}: "${naPomer(d, w, h)}",`);
 }
 writeFileSync(new URL("../src/lib/ramy.ts", import.meta.url),

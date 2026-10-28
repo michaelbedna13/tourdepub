@@ -1396,8 +1396,16 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   /* FAB i jeho řádky jsou stříhané, ne kružítkové. */
   .fab{clip-path:url(#ram-fab);box-shadow:none;
     filter:drop-shadow(0 10px 26px rgba(0,0,0,.45))}
-  .fab-radek{clip-path:url(#ram-fabRadek);box-shadow:none;
-    filter:drop-shadow(0 8px 20px rgba(0,0,0,.38))}
+  /* Každá pilulka má svůj střih. S jedním rámem pro všech pět byly jedna jak
+     druhá a vedle sebe to bylo první, čeho si oko všimlo — pravidelnost tam,
+     kde má být ruka. Pořadí je pevné (rozcestník má pět položek), takže
+     stačí nth-child a nemusí se do toho míchat JavaScript. */
+  .fab-radek{box-shadow:none;filter:drop-shadow(0 8px 20px rgba(0,0,0,.38))}
+  .fab-radek:nth-child(1){clip-path:url(#ram-fabRadek1)}
+  .fab-radek:nth-child(2){clip-path:url(#ram-fabRadek2)}
+  .fab-radek:nth-child(3){clip-path:url(#ram-fabRadek3)}
+  .fab-radek:nth-child(4){clip-path:url(#ram-fabRadek4)}
+  .fab-radek:nth-child(5){clip-path:url(#ram-fabRadek5)}
 }
 
 @media (prefers-reduced-motion:reduce){
