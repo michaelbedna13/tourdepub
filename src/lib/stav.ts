@@ -54,6 +54,10 @@ export interface Stav {
 /** Co se o týmu posílá na server. */
 export interface RadekTymu {
   id: string;
+  /** Do které hry řádek patří, a pozůstatková barva party. Obojí doplňuje
+   *  sync.ts, ne kOdeslani(): popis týmu to není. */
+  hra?: string;
+  barva?: string;
   nazev: string;
   hospoda: number;
   body: number;

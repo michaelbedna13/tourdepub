@@ -132,11 +132,30 @@ async function posli(): Promise<boolean> {
     // založila sama a nikdo se ho nedotkl, zůstane jen v telefonu.
     const k = stav.tymy.filter((t) => t.vlastni);
     if (!k.length) return true;
-    const { error } = await klient.from(TABULKA).upsert(k.map(kOdeslani));
+    // hra se přidává až tady: kOdeslani() popisuje tým, do které hry patří
+    // je věc připojení. Bez něj zápis spadne — sloupec je not null a appka
+    // by se k serveru hlásila, aniž by do něj kdy něco dostala.
+    //
+    // barva je pozůstatek. Party ji měly, než se z týmu stalo jenom jméno
+    // (viz „Tým je jméno, ne barva"), jenže sloupec v tabulce zůstal povinný.
+    // Posílá se prázdná, ať nemusí nikdo sahat do databáze; nová tabulka
+    // z supabase/party.sql už ji povinnou nemá a časem může zmizet.
+    const radky = k.map((t) => ({ ...kOdeslani(t), hra: HRA, barva: "" }));
+    const { error } = await klient.from(TABULKA).upsert(radky);
     if (error) throw error;
     return true;
-  } catch {
-    return false; // offline: zůstane to v telefonu a pošle se příště
+  } catch (e) {
+    // Rozdíl mezi „není signál" a „zápis neprojde nikdy" se musí poznat.
+    // Chyba z PostgRESTu má kód a znamená nastavení, ne síť: taková se
+    // ohlásí, jinak se appka tváří připojeně a nic neposílá — přesně ten
+    // stav, co je ze všech nejhorší. Výpadek sítě kód nemá a mlčí se,
+    // zápis se zkusí znovu.
+    if ((e as { code?: string })?.code) {
+      chyba = popisChyby(e);
+      rezim = "chyba";
+      zmena();
+    }
+    return false;
   }
 }
 
@@ -172,6 +191,9 @@ function popisChyby(e: unknown): string {
   const kod = o.code || "";
   const zprava = o.message || String(e);
 
+  // sloupec, který appka neposílá, a tabulka ho vyžaduje
+  if (kod === "23502" || /not-null constraint|null value in column/i.test(zprava))
+    return `Tabulka „${TABULKA}“ čeká sloupec, který appka neposílá. Spusť v Supabase SQL Editoru znovu obsah supabase/party.sql.`;
   // tabulka v projektu není
   if (kod === "PGRST205" || kod === "42P01" || /schema cache|does not exist/i.test(zprava))
     return `Tabulka „${TABULKA}“ v projektu není. Spusť v Supabase SQL Editoru obsah supabase/party.sql.`;

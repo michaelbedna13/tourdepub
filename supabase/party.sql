@@ -12,7 +12,7 @@ create table if not exists public.tourdepub_tymy (
   id        uuid primary key,
   hra       text not null,
   nazev     text not null,
-  barva     text not null,
+  barva     text not null default '',
   hospoda   int  not null default 1,
   body      int  not null default 0,
   rozpad    jsonb not null default '{}'::jsonb,
@@ -24,6 +24,13 @@ create table if not exists public.tourdepub_tymy (
 
 -- pro tabulky založené dřív, než sloupec existoval
 alter table public.tourdepub_tymy add column if not exists stav jsonb not null default '{}'::jsonb;
+
+-- Barva party z appky zmizela (tým je jméno, ne barva), ale sloupec tu zůstal
+-- povinný a shazoval každý zápis — appka se tvářila připojeně a na server
+-- se přitom nikdy nic nedostalo. Zápis ji teď posílá prázdnou, tohle je pro
+-- případ, že by jednou přestal.
+alter table public.tourdepub_tymy alter column barva drop not null;
+alter table public.tourdepub_tymy alter column barva set default '';
 
 create index if not exists tourdepub_tymy_hra_idx on public.tourdepub_tymy (hra);
 
