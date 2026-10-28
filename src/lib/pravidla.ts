@@ -10,11 +10,11 @@
 import { OBTIZNOST } from "./data";
 
 export interface Bod {
-  /** Tučný štítek na začátku řádky. */
+  /** Popisek nad větou — čeho se pravidlo týká. */
   stitek?: string;
   text: string;
-  /** Kus textu, co se má zvýraznit. Musí v textu doslova být. */
-  duraz?: string;
+  /** Tichý dovětek na konci, typicky strop. Není to součást věty. */
+  strop?: string;
 }
 
 /** Úvodní odstavec: čte se jako text, ne jako pravidlo. */
@@ -32,7 +32,6 @@ export const ZAKLAD: Bod[] = [
 export const CAJK: Bod = {
   stitek: "Časovej cajk",
   text: "Valí se to od šesti večer do dvou do rána. Co se zvrtne potom, už se do čárek nepočítá.",
-  duraz: "šesti večer do dvou do rána",
 };
 export const PARTYJE: Bod = { stitek: "Partyje", text: "Jede se ve dvou až třech partách." };
 export const COURANI: Bod = {
@@ -48,14 +47,18 @@ const HALUZE = () =>
 
 /** Za co padají čárky. Strop se odvíjí od počtu štací, takže se předává.
  *
+ *  Štítek je tady hodnota, ne jméno pravidla: na obrazovce Pravidel z toho
+ *  je sloupec čísel vlevo a věta vpravo, takže je na první pohled vidět, co
+ *  kolik nese. Strop je zvlášť, aby nemusel viset v závorce uprostřed věty.
+ *
  *  `shrnuti` je pro úvod: na obrazovce Pravidel pod třetím bodem následuje
  *  legenda s půllitry, kdežto na plakátu by dvojtečka visela do prázdna,
  *  tak se stupnice dopíše rovnou do věty. Čísla jsou v obou případech
  *  z OBTIZNOST, takže se rozejít nemůžou. */
 export const bodovani = (hospod: number, shrnuti = false): Bod[] => [
-  { text: `Čárka za každou špeluňku, do který vlezete. (max. ${hospod})`, duraz: `(max. ${hospod})` },
-  { text: `Čárka, když v tý štaci lupne aspoň půlka partyje jeden škopek. (max. ${hospod})`, duraz: `(max. ${hospod})` },
+  { stitek: "+1", text: "Za každou špeluňku, do který vlezete.", strop: `nejvíc ${hospod}` },
+  { stitek: "+1", text: "Za škopek ve štaci — stačí, když ho lupne aspoň půlka partyje.", strop: `nejvíc ${hospod}` },
   shrnuti
-    ? { text: `Další čárky za plnění srand podle toho, jaká je to haluz: ${HALUZE()}.`, duraz: HALUZE() }
-    : { text: "Další čárky za plnění srand, rozhozený podle toho, jaká je to haluz:" },
+    ? { stitek: "+1–3", text: `Za srandy, podle toho, jaká je to haluz: ${HALUZE()}.` }
+    : { stitek: "+1–3", text: "Za srandy, podle toho, jaká je to haluz:" },
 ];

@@ -1202,15 +1202,52 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .rezim.zivy .ikona{color:var(--text)}
 .rezim .drobne{opacity:.9}
 
-/* pravidla */
-.pravidla h2{font-size:var(--t-text);margin:34px 0 12px;color:var(--text-3);letter-spacing:.07em}
-.pravidla p{margin-bottom:12px;color:var(--text-2);line-height:1.65;font-size:var(--t-text)}
-.pravidla ol{margin:0 0 14px;padding-left:22px;color:var(--text-2);line-height:1.65;font-size:var(--t-text)}
-.pravidla li{margin-bottom:12px}
-.pravidla b{color:var(--text);font-weight:700}
-.pravidla-uvod{margin-bottom:26px}
-.pravidla-uvod p{font-size:var(--t-hlavni);line-height:1.7;margin-bottom:14px}
-.legenda{display:flex;flex-direction:column;gap:12px}
+/* ---------- pravidla ---------- */
+/* Stránka k přečtení, ne k prolistování. Byly to odrážky s tučným jménem
+   a dvojtečkou, k tomu zvýrazněná slova uprostřed vět a číslovaný seznam —
+   dohromady text z Wordu, ne stránka. Teď to stojí na třech věcech: úvodní
+   odstavec, oddíly s nadpisem a v nich popisek NAD větou. */
+
+/* Úvod je lead: větší písmo a volnější proklad, aby se dal přečíst jedním
+   dechem a bylo jasné, že je to řeč, ne pravidlo. */
+.pravidla-lead{font-size:var(--t-hlavni);line-height:1.72;color:var(--text-2)}
+
+.pr-oddil{margin-top:44px}
+/* Nadpis oddílu je značkové písmo, ne drobný popisek: na stránce, kde jsou
+   jen texty, musí být poznat předěl dřív, než se začne číst. Linka pod ním
+   dělá to, co na plakátu dělá bílé místo. */
+.pravidla h2{
+  margin:0 0 20px;padding-bottom:12px;
+  font-size:19px;color:var(--text);letter-spacing:.02em;
+  border-bottom:1px solid var(--linka);
+}
+
+.pr-body{display:flex;flex-direction:column;gap:22px;margin:0}
+/* Popisek je drobný a tichý, věta nese váhu. Opačně (tučné jméno
+   s dvojtečkou před větou) to vypadalo, že nejdůležitější na pravidle je
+   jeho jméno. */
+.pr-bod dt{
+  margin-bottom:6px;font-family:var(--pismo);font-weight:700;
+  font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);
+}
+.pr-bod dd{margin:0;font-size:var(--t-text);line-height:1.68;color:var(--text-2)}
+
+/* Hodnoty do sloupce vlevo, věty vpravo. Je na první pohled vidět, co kolik
+   nese, a oko nemusí lovit číslo uprostřed odstavce. */
+.pr-skore{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+.pr-skore li{display:flex;gap:16px;align-items:baseline}
+.pr-skore-hodnota{
+  flex:none;width:48px;text-align:right;white-space:nowrap;
+  font-family:var(--nadpisy);font-weight:700;font-size:17px;
+  letter-spacing:.01em;color:var(--text);
+}
+.pr-skore-text{flex:1;min-width:0;font-size:var(--t-text);line-height:1.68;color:var(--text-2)}
+/* Strop není součást věty, tak ani nestojí v ní: vlastní řádka, tiše. */
+.pr-skore-strop{display:block;margin-top:3px;font-size:var(--t-drobne);color:var(--text-3)}
+/* Stupnice haluzí patří pod třetí bod, ne na novou plochu — je proto
+   odsazená. Ne až pod jeho větu (o šířku sloupce s hodnotami): na telefonu
+   by se nejdelší řádka otřela o pravý okraj. */
+.legenda{display:flex;flex-direction:column;gap:12px;margin:16px 0 0 36px}
 .legenda-radek{display:flex;align-items:center;gap:12px;font-size:var(--t-text);color:var(--text-2)}
 
 /* ---------- úvod po spuštění ---------- */
@@ -1291,6 +1328,9 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 }
 /* Tělo plakátu: buď jeden odstavec, nebo pravidla pod sebou. Mezi nimi je
    mezera, uvnitř volný proklad — čte se to na plakátu, ne v seznamu. */
+/* Tichý dovětek na plakátu: v řádce, ne na vlastní — tam na to není místo. */
+.pravidlo-strop{opacity:.6}
+.pravidlo-strop::before{content:" — "}
 .uvod-telo{
   margin:var(--uvod-mezera-text) 0 0;
   display:flex;flex-direction:column;gap:14px;
@@ -1298,8 +1338,16 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   color:var(--text-2);
 }
 .uvod-telo p{margin:0}
-/* Štítek pravidla je to, co se z řádky čte první. */
-.uvod-telo b{color:var(--text);font-weight:700}
+/* Štítek stojí NAD větou, ne před ní. V řádce za ním chyběla interpunkce
+   a četlo se to jako rozjetá věta („Časovej cajk Valí se to od šesti"),
+   s dvojtečkou zase jako heslo z Wordu. Vlastní řádka to řeší obojí — a je
+   to ta samá sazba jako na obrazovce Pravidel, takže plakát a stránka mluví
+   stejně. U hodnot (+1) se to nedělí: tam je štítek číslo, ne jméno. */
+.uvod-telo b{display:block;color:var(--text);font-weight:700;
+  font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:4px}
+.uvod-telo .cena b{display:inline;font-size:inherit;letter-spacing:inherit;
+  text-transform:none;color:var(--text);margin:0}
 
 /* ---- čtyři skladby ----
    Liší se jen tím, které sloupce a který řádek co dostane. Pořadí v DOM je

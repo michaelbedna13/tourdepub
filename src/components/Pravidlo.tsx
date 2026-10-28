@@ -1,18 +1,20 @@
 import { vazat } from "../lib/format";
 import type { Bod } from "../lib/pravidla";
 
-/** Jedno pravidlo: tučný štítek, text a v něm případně zvýrazněný kus.
- *  Kreslí ho obrazovka Pravidel i úvod, aby obojí vypadalo stejně. */
+/** Jedno pravidlo na plakátu úvodu: popisek, věta, případně tichý dovětek.
+ *  Obrazovka Pravidel si je sází po svém (popisek nad větou, hodnoty do
+ *  sloupce) — na plakátu je na to málo místa, tak se to vejde do řádky.
+ *
+ *  Zvýrazňování kusů věty tudy kdysi taky chodilo. Šlo pryč: tučné slovo
+ *  uprostřed odstavce nic nezdůrazní, jen to vypadá jako text z Wordu. */
 export function Pravidlo({ bod }: { bod: Bod }) {
-  const { stitek, text, duraz } = bod;
-  const i = duraz ? text.indexOf(duraz) : -1;
+  const { stitek, text, strop } = bod;
   return (
     <>
-      {stitek && <b>{vazat(stitek)}:</b>}
+      {stitek && <b>{vazat(stitek)}</b>}
       {stitek && " "}
-      {i < 0
-        ? vazat(text)
-        : <>{vazat(text.slice(0, i))}<b>{vazat(duraz!)}</b>{vazat(text.slice(i + duraz!.length))}</>}
+      {vazat(text)}
+      {strop && <span className="pravidlo-strop">{vazat(strop)}</span>}
     </>
   );
 }

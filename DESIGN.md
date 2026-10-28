@@ -468,6 +468,31 @@ Kolečko i řádky jsou stříhané nůžkama (`ram-fab`, `ram-fabRadek`), jen s
 slabším střihem: na malém kruhu dělala plná vlna boule, co vypadaly jako
 chyba vykreslení, ne jako nůžky.
 
+## Pravidla
+
+Stránka k přečtení, ne k prolistování. Byly to odrážky s tučným jménem
+a dvojtečkou, k tomu **zvýrazněná slova uprostřed vět** a číslovaný seznam —
+dohromady text z Wordu, ne stránka. Stojí to teď na třech věcech:
+
+- **Úvod je lead.** Větší písmo, volnější proklad; dá se přečíst jedním
+  dechem a je z něj jasné, že je to řeč, ne pravidlo.
+- **Oddíly mají pořádný nadpis.** Značkové písmo, krémový, s linkou pod
+  sebou. Na stránce, kde jsou jen texty, musí být poznat předěl dřív, než
+  se začne číst — drobný tichý popisek to nezvládl.
+- **Popisek stojí NAD větou**, drobný a tichý, a váhu nese věta. Opačně
+  (tučné jméno s dvojtečkou před větou) to vypadalo, že nejdůležitější na
+  pravidle je jeho jméno. Plakáty v úvodu sázejí pravidla stejně, takže
+  stránka a plakát mluví jedním hlasem.
+
+Bodování je **sloupec hodnot vlevo a věty vpravo**: je na první pohled vidět,
+co kolik nese, a oko nemusí lovit číslo uprostřed odstavce. Strop (`nejvíc 9`)
+má vlastní tichou řádku — není to součást věty, tak ani nestojí v ní.
+Stupnice haluzí patří pod třetí bod, takže je odsazená; ne až pod jeho větu,
+na telefonu by se nejdelší řádka otřela o pravý okraj.
+
+**Zvýrazňování kusů vět (`duraz`) šlo z celé appky pryč.** Tučné slovo
+uprostřed odstavce nic nezdůrazní, jen to vypadá jako text z Wordu.
+
 ## Navigace
 
 Dvě cesty na to samé: **švih do boku** a **hamburger vpravo nahoře**.

@@ -211,7 +211,13 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
             <h1 className="uvod-nadpis">{vazat(p.nadpis)}</h1>
             <div className="uvod-telo">
               {p.text && <p>{vazat(p.text)}</p>}
-              {p.body?.map((b) => <p key={b.stitek ?? b.text}><Pravidlo bod={b} /></p>)}
+              {/* Bodování nese v štítku hodnotu (+1), ne jméno pravidla — ta
+                  zůstává v řádce s větou, zbytek má štítek nad sebou. */}
+              {p.body?.map((b) => (
+                <p key={b.stitek ?? b.text} className={b.strop || b.stitek?.startsWith("+") ? "cena" : undefined}>
+                  <Pravidlo bod={b} />
+                </p>
+              ))}
             </div>
           </div>
 

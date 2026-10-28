@@ -7,8 +7,7 @@ import { Obtiznost } from "../components/Obtiznost";
 import { Okno } from "../components/Okno";
 import { potvrdit } from "../components/Potvrzeni";
 import { OBTIZNOST } from "../lib/data";
-import { bodovani, JAK_SE_VALI, UVODNIK, ZAKLAD } from "../lib/pravidla";
-import { Pravidlo } from "../components/Pravidlo";
+import { bodovani, JAK_SE_VALI, UVODNIK, ZAKLAD, type Bod } from "../lib/pravidla";
 import { sklonuj, vazat } from "../lib/format";
 import { nastavSpravce, sediKod, useSpravce } from "../lib/spravce";
 import { strop, tym, useStav, vynulujTym } from "../lib/stav";
@@ -36,34 +35,44 @@ export function Pravidla() {
     <>
       <Hlava nadpis="Pravidla" />
 
+      {/* Pravidla jsou k přečtení, ne k prolistování: úvodní odstavec, pak tři
+          oddíly, a v každém popisek nad větou. Dřív to byly odrážky s tučným
+          názvem a dvojtečkou a k tomu zvýrazněná slova uprostřed vět — text
+          z Wordu, ne stránka. */}
       <div className="pravidla">
-        {/* úvodní odstavec se čte jako text, ne jako seznam pravidel */}
-        <div className="pravidla-uvod">
-          <p>{vazat(UVODNIK)}</p>
-        </div>
-        <p>
-          {ZAKLAD.map((b, i) => (
-            <span key={b.stitek}>{i > 0 && <br />}<Pravidlo bod={b} /></span>
-          ))}
-        </p>
+        <p className="pravidla-lead">{vazat(UVODNIK)}</p>
 
-        <h2>JAK SE TO VALÍ</h2>
-        <ol>
-          {JAK_SE_VALI.map((b) => <li key={b.stitek}><Pravidlo bod={b} /></li>)}
-        </ol>
+        <Oddil nadpis="Základ">
+          <Body body={ZAKLAD} />
+        </Oddil>
 
-        <h2>BODOVÁNÍ</h2>
-        <ol>
-          {bodovani(s.hospody).map((b) => <li key={b.text}><Pravidlo bod={b} /></li>)}
-        </ol>
-        <div className="legenda">
-          {OBTIZNOST.map((o) => (
-            <div key={o.piva} className="legenda-radek">
-              <Obtiznost piva={o.piva} sNazvem={false} />
-              <span>{vazat(`${o.nazev} — ${o.piva} ${sklonuj(o.piva)}`)}</span>
-            </div>
-          ))}
-        </div>
+        <Oddil nadpis="Jak se to valí">
+          <Body body={JAK_SE_VALI} />
+        </Oddil>
+
+        {/* Čísla do sloupce vlevo, věty vpravo: je na první pohled vidět,
+            co kolik nese, a oko nemusí lovit hodnotu uprostřed odstavce. */}
+        <Oddil nadpis="Za co padají čárky">
+          <ul className="pr-skore">
+            {bodovani(s.hospody).map((b) => (
+              <li key={b.text}>
+                <span className="pr-skore-hodnota cislo">{b.stitek}</span>
+                <span className="pr-skore-text">
+                  {vazat(b.text)}
+                  {b.strop && <span className="pr-skore-strop">{vazat(b.strop)}</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="legenda">
+            {OBTIZNOST.map((o) => (
+              <div key={o.piva} className="legenda-radek">
+                <Obtiznost piva={o.piva} sNazvem={false} />
+                <span>{vazat(`${o.nazev} — ${o.piva} ${sklonuj(o.piva)}`)}</span>
+              </div>
+            ))}
+          </div>
+        </Oddil>
       </div>
 
       <div className="sekce">
@@ -107,6 +116,33 @@ export function Pravidla() {
         </Okno>
       )}
     </>
+  );
+}
+
+/** Oddíl pravidel: nadpis s linkou pod sebou a obsah. Linka dělá to, co na
+ *  plakátu dělá bílé místo — řekne, že tady začíná něco nového. */
+function Oddil({ nadpis, children }: { nadpis: string; children: React.ReactNode }) {
+  return (
+    <section className="pr-oddil">
+      <h2>{vazat(nadpis)}</h2>
+      {children}
+    </section>
+  );
+}
+
+/** Seznam pravidel: popisek nad větou, ne tučně a s dvojtečkou před ní.
+ *  Popisek je drobný a tichý, věta nese váhu — opačně to vypadalo, že
+ *  nejdůležitější na pravidle je jeho jméno. */
+function Body({ body }: { body: Bod[] }) {
+  return (
+    <dl className="pr-body">
+      {body.map((b) => (
+        <div className="pr-bod" key={b.stitek ?? b.text}>
+          {b.stitek && <dt>{vazat(b.stitek)}</dt>}
+          <dd>{vazat(b.text)}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
