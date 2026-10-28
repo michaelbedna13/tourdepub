@@ -7,12 +7,12 @@
 //
 // Jedna kresba na kapitolu pravidel, a každá říká to, o čem ta kapitola je:
 // opilec (o co jde), budík (časovej cajk), šnek (žádný courání), čárky
-// (bodování), kotel (celej bank). Škopek a koruna, co tu stály dřív, šly
+// (bodování), pytel s prachama (celej bank). Škopek a koruna, co tu stály dřív, šly
 // pryč — škopek říkal jen „pivo" a koruna „vítěz", ani jedno není pravidlo.
 //
 // Spuštění: node scripts/kresli-uvod.mjs (bez závislostí; náhodnost je pevná)
 import { writeFileSync } from "node:fs";
-import { nasad, cut, ell, rect, srpek as usmev, stroke } from "./cary.mjs";
+import { nasad, cut, ell, rect, rot, srpek as usmev, stroke } from "./cary.mjs";
 
 const I = (d) => ["i", d], C = (d) => ["c", d];
 // Mírnější kymácení než u ikon. Amplituda je v souřadnicích čtverce, takže
@@ -68,8 +68,27 @@ const KRESBY = {
     I(cut(stroke(10, 74, 90, 22, 10), { ...ROUGH, amp: 1.2 })),
   ],
 
-  // Celej bank: kotel. Pravidla mluví o vlezném do kotla, tak ať to je kotel
-  // a ne koruna — koruna říká „vítěz", kotel říká, o co se hraje.
+
+
+  // Celej bank: pytel s prachama. Kotel s mincemi tu stál dřív a ve zmenšení
+  // z něj byl hrnec s knedlíkama. Pytel s uzlem je tvar, co se pozná i
+  // v náprstku; mince na břiše je malá a posazená výš, aby zůstal vidět tvar
+  // pytle. Zkoušel se i větší kroužek uprostřed (četl se jako díra nebo
+  // objektiv), mince u paty (slily se s obrysem), škopek s bankovkama
+  // (dvojí sdělení) a hromada bankovek (vypadalo to jako cihly).
+  pytel: () => [
+    I(cut(ell(40, 12, 11, 9, 18), { ...ROUGH, amp: 1.1 })),
+    I(cut(ell(61, 10, 10, 8, 18), { ...ROUGH, amp: 1.1 })),
+    I(cut(rect(34, 18, 67, 32, 4), { ...ROUGH, amp: 1.1 })),
+    C(cut(rect(32, 24, 69, 28, 2), { ...ROUGH, amp: .7 })),
+    I(cut([[38, 30], [20, 43], [11, 62], [14, 80], [30, 93], [50, 96],
+           [70, 93], [86, 80], [89, 62], [80, 43], [63, 30]], HRUBE)),
+    C(cut(ell(50, 60, 13, 12, 20), { ...ROUGH, amp: .8 })),
+    I(cut(ell(50, 60, 8, 7, 18), { ...ROUGH, amp: .8 })),
+  ],
+
+
+
   kotel: () => [
     // mince: plné kotouče, ne kroužky — s dírou uprostřed to byly koblihy
     I(cut(ell(34, 22, 10, 9, 20), { ...ROUGH, amp: .8 })),
@@ -121,7 +140,7 @@ const KRESBY = {
 };
 
 /** Co se opravdu zapisuje do src/lib/uvod-kresby.ts. */
-const POUZITE = ["opilec", "hodiny", "snek", "carky", "kotel"];
+const POUZITE = ["opilec", "hodiny", "snek", "carky", "pytel"];
 
 /** Obálka kresby: nejmenší rámeček, do kterého se vejde inkoust.
  *

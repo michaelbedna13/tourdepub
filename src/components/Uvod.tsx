@@ -57,7 +57,7 @@ const PLAKATY: Plakat[] = [
   { id: "hodiny", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
   { id: "snek", nadpis: "Žádný courání", text: COURANI.text },
   { id: "carky", nadpis: "Bodování", body: bodovani(stav.hospody.length, true) },
-  { id: "kotel", nadpis: "Celej bank", body: ZAKLAD },
+  { id: "pytel", nadpis: "Celej bank", body: ZAKLAD },
 ];
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází

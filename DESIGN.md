@@ -694,7 +694,8 @@ jiného nesedlo.
 **2. Průprava.** Pět plakátů a na nich **pravidla, ne jejich převyprávění**:
 texty se berou z `src/lib/pravidla.ts`, odkud je čte i obrazovka Pravidla, tak
 se nemůžou rozejít. Jeden plakát = jedna kapitola a jedna kresba, co říká to
-samé: budík k času, šnek k loudání, čárky k bodování, kotel k banku.
+samé: budík k času, šnek k loudání, čárky k bodování, pytel s prachama
+k banku.
 
 Stránka je **plakát**, ne obrazovka s nádechem barvy. Plná barva přes celou
 plochu, jeden inkoust na všechno a jedna velká čmáranice uprostřed. Nahoře
