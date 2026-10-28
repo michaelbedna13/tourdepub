@@ -407,63 +407,41 @@ Nese tu samou informaci, nic nepřekrývá, a odpadlo s ním „4/9" u pruhu —
 jeden údaj dvakrát na jedné kartě. Pruh trasy je vlasový, šipky tišší.
 Zůstala jedna osa shora dolů: číslo → jméno → trasa → čas → zápis.
 
-## Rozcestník
+## Rozcestník (FAB menu)
 
-Pět obrazovek appky leží v **plovoucím rozcestníku dole** — ikona a jméno,
-pořád na očích, a je z něj vidět, kde člověk zrovna je.
+Po appce se chodí **kulatým červeným tlačítkem v pravém dolním rohu**, co se
+rozbalí do pěti obrazovek. Je to **FAB menu z Material 3** — komponenta, co
+nahradila starý „speed dial": nabídka visí nad tlačítkem, každá položka má
+ikonu a jméno, a tlačítko se při otevření překlopí na křížek.
 
-Předtím to byl hamburger v pravém horním rohu a rozcestí, co vyjelo zespodu.
-Dvě ťuknutí na každý přechod, a to první v tom nejhorším kusu obrazovky, jaký
-palec má. V hospodě se appka drží jednou rukou, v druhé je škopek — terče
-patří dolů. Apple to má v iOS 26 stejně: lišta plave nad obsahem u spodní
-hrany, ne u horní.
+**Dole vpravo, ne nahoře.** Hamburger stával v pravém HORNÍM rohu, tedy v tom
+nejhorším kusu obrazovky, jaký palec má — v hospodě se appka drží jednou
+rukou, v druhé je škopek. Nabídka se rozbaluje nahoru, takže si prst nestíní
+to, co vybírá.
 
-- **Pět položek** je přesně na horní hranici toho, co se do lišty vejde (HIG
-  doporučuje tři až pět). Všech pět se ale používá celý večer a nic z toho
-  není podstránka něčeho jiného, takže nemá co být schované.
-- **Jména u ikon.** HIG to doporučuje a tady to platí dvojnásob: appku člověk
-  vidí potřetí v životě, v šeru a po pátém škopku. Trofej ani korbel samy
-  nikomu neřeknou „Týmy" a „Hospody". Jména se drží nadpisů obrazovek, ne
-  hantecu z úkolů — musí sedět slovo, které se objeví hned po ťuknutí.
-- **Plave, nelepí se.** Appka je papírová a tohle má být lísteček položený
-  přes ni, ne systémová lišta. Proto má taky obrys stříhaný nůžkama
-  (`ram-lista`) a stín pod sebou.
-- **Pod otevřenou vrstvou odejde dolů.** Leží nad obrazovkou, takže by se
-  jako jediná věc za plachtou nerozmazal — ostrý lísteček na rozmazaném
-  pozadí. A spodní okno vyjíždí přesně přes něj.
-- **Ťuknutí na obrazovku, na které už jsem, vyjede nahoru.** To samé dělá
-  iOS a na dlouhé galerii úkolů to ušetří půl minuty tahání.
-- `--lista` drží výšku, o kterou se zvětší spodní odsazení obrazovky, ať
-  poslední karta nekončí pod ním.
-
-## Rychlý zápis (FAB menu)
-
-Vpravo dole je **kulaté červené tlačítko**, co se rozbalí do nabídky tří
-úkonů: *Jsme v špeluňce*, *Škopek lupnutej*, *Další štace*. Je to **FAB menu
-z Material 3** — komponenta, co nahradila starý „speed dial": dva až šest
-příbuzných úkonů nad tlačítkem, každý s ikonou a jménem, a samo tlačítko se
-při otevření překlopí na křížek (plus se otočí o 45°, aby se tvar přelil
-a nepřeblikly dvě kresby).
-
-**Jsou to akce, ne obrazovky.** Chození po appce obstarává rozcestník dole;
-FAB je na to, co se dělá, ne kam se jde. Tyhle tři úkony se dělají každou
-štaci a šly jedině z Hry — kdo zrovna četl úkoly, musel se vracet.
-
-- **Dole vpravo**, nad rozcestníkem, ne vedle něj: dva plovoucí prvky na jedné
-  řádce by se praly o palec i o šířku. Nabídka se rozbaluje nahoru, takže si
-  prst nestíní to, co vybírá.
+- **Pět položek** je v rozsahu, co komponenta snese (dva až šest), a žádná
+  z nich není podstránka něčeho jiného, tak nemá co být schovaná hlouběji.
+- **Jména u ikon.** Appku člověk vidí potřetí v životě, v šeru a po pátém
+  škopku; trofej ani korbel samy neřeknou „Týmy" a „Hospody". Drží se nadpisů
+  obrazovek, ne hantecu z úkolů — musí sedět slovo, co se objeví hned po
+  ťuknutí.
+- **Kde zrovna jsem, svítí červeně.** Nabídka se otevírá odkudkoli, takže
+  musí umět říct i to, odkud — jinak je to pět stejných lístků.
+- **Dvě kresby v tlačítku přes sebe**, prolnou se: zavřené musí říct
+  „nabídka", otevřené „zavřít". Otáčet plus na křížek šlo jednou kresbou,
+  jenže plus říká „přidat".
 - **Logová červená.** Je to jediná věc na obrazovce, co má křičet, a žádná
   kategorie tu barvu nenese jako plochu.
-- **Co zrovna nejde, nemizí — jen zhasne.** Nabídka, co pokaždé mění počet
-  řádků, se nedá zapamatovat rukou.
-- **Položky naskakují jedna po druhé odspoda** (45 ms na řádek), ať oko stihne
+- **Položky naskakují jedna po druhé odspoda** (40 ms na řádek), ať oko stihne
   přečíst, co přibylo.
+- **Ťuknutí na obrazovku, na které už jsem, vyjede nahoru.** To samé dělá iOS
+  a na dlouhé galerii úkolů to ušetří půl minuty tahání.
 - **Visí na `<body>`, ne uvnitř `.app`.** Appka má vlastní vrstvení
   (`position:relative; z-index:1`), takže cokoli uvnitř — i s `z-index:99` —
   zůstane pod plachtou kreslenou nad ní; tlačítko se při otevření ztmavovalo
   vlastní nabídkou.
-- **Pod cizí vrstvou odejde** stejně jako rozcestník. Pod vlastní nabídkou
-  zůstat musí, tu zrovna drží.
+- **Pod cizí vrstvou odejde** (detail úkolu, spodní okno): zůstalo by jako
+  jediná ostrá věc nad rozmazanou appkou. Pod vlastní nabídkou zůstat musí.
 
 Kolečko i řádky jsou stříhané nůžkama (`ram-fab`, `ram-fabRadek`), jen se
 slabším střihem: na malém kruhu dělala plná vlna boule, co vypadaly jako
