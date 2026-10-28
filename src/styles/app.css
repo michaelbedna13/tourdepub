@@ -89,10 +89,10 @@
      se přilepila hned na začátku a sjela o ten rozdíl dolů přes podnadpis.
      V prohlížeči to nebylo vidět, protože tam je safe-area nula. */
   --vrch:calc(env(safe-area-inset-top) + 18px);
-  /* Horní pás proti rozostření hrany na iOS 26 — jen v appce z plochy, viz
+  /* Jak hluboko rozmazává iOS 26 horní hranu — jen v appce z plochy, viz
      „horní hrana v appce z plochy". V prohlížeči je nula, aby se s ním dalo
      počítat všude. */
-  --pruh:0px;
+  --rozostreni:0px;
   /* Kolik místa si dole nechá obsah na plovoucí tlačítko rozcestníku. Není
      to jeho celá výška: tlačítko je kolečko v pravém rohu, text mu podjede
      vedle, jen poslední řádka pod ním nemá končit. */
@@ -141,35 +141,17 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
    nehledal. Je pryč celé, i s vypínačem. */
 
 
-/* Filmové zrno přes celou appku. Leží nad vším, co appka nakreslí, a nechytá
-   dotyk.
+/* Filmové zrno bývalo jednou vrstvou přes celou appku (.app::before,
+   z-index 60, pevná dlaždice z assets/zrno.png). Vypadalo to dobře, jenže
+   to byla samá vysoká frekvence až k horní hraně — a přesně tu hranu iOS 26
+   rozmazává. Horní pás, prolnutí, natrefovaná barva desky a pokaždé nové
+   přeměřování byly jen záplaty na tohle.
 
-   Jsou to bílé a černé tečky s nízkou průhledností na průhledném podkladu
-   (scripts/zrno.mjs), takže se jenom normálně překryjí. Dřív se míchalo přes
-   mix-blend-mode. Míchání je hezčí — je úměrné podkladu — jenže kvůli němu
-   musí prohlížeč složit CELÝ obsah pod vrstvou do jednoho obrázku, aby měl
-   s čím míchat, a takový obrázek iOS při posouvání překresluje v nižším
-   rozlišení: text nahoře pak změkne. Je to ta samá příčina, jakou měla maska
-   na záři.
-
-   Dlaždice je hotový obrázek, ne filtr, a je 192 px velká: 192 se dělí dvěma
-   i třemi, takže na každé hustotě displeje padne jeden pixel obrázku přesně
-   na jeden pixel displeje a zrno je ostré. Když se měřítko netrefí, prohlížeč
-   obrázek převáží a vznikne přesně ta rozmazaná kaše, co vypadá lacině. */
-.app::before{
-  content:"";position:fixed;top:0;bottom:0;z-index:60;pointer-events:none;
-  /* Jen přes sloupec appky: na široké obrazovce by dlaždice ležela i vedle
-     něj, kde pro ni není podklad. Na telefonu je sloupec celá obrazovka. */
-  left:50%;width:min(100%,var(--sirka));translate:-50% 0;
-  background-image:url("../assets/zrno.png");
-  background-size:192px 192px;
-}
-@media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
-  .app::before{background-size:96px 96px}
-}
-@media (-webkit-min-device-pixel-ratio:3),(min-resolution:288dpi){
-  .app::before{background-size:64px 64px}
-}
+   Zrno je proto na plochách, ne na pozadí: tam, kde je barva, se vyplatí
+   (rozbije ji jak papír pod tiskem), a pozadí je odshora dolů jedna plochá
+   barva, takže na horní hraně není co rozmazat a nemá co nenavazovat.
+   Dlaždice assets/zrno.png a scripts/zrno.mjs zůstávají, kdyby se to mělo
+   vrátit; appka je nepoužívá. */
 
 h1,h2,h3{margin:0;font-family:var(--nadpisy);line-height:var(--radky-nadpis);
   letter-spacing:-.015em;text-transform:uppercase}
@@ -256,96 +238,38 @@ html.rozmazat .obrazovka{filter:blur(5px)}
 /* ---------- horní hrana v appce z plochy ---------- */
 /* iOS 26 kreslí v appce přidané na plochu přes horní okraj webového pohledu
    systémové rozostření („scroll edge effect", liquid glass), aby stavová
-   lišta zůstala čitelná nad čímkoli, co pod ní projede. Vypnout se to nedá,
-   žádná meta ani vlastnost na to není, a v prohlížeči se to nekreslí — proto
-   byla ta samá stránka v Safari ostrá a z plochy rozmazaná.
+   lišta zůstala čitelná nad čímkoli, co pod ní projede. Vypnout se to nedá:
+   žádná meta ani CSS vlastnost na to není, schovat ten pohled jde jen
+   z nativního obalu (UIKit, SwiftUI). V prohlížeči se nekreslí — proto byla
+   ta samá stránka v Safari ostrá a z plochy rozmazaná.
 
-   Rozostření je vidět jen tam, kde je co rozostřit. Náš horní pás byl plný
-   detailu: filmové zrno (.app::before) je pevné, leží přes celou obrazovku
-   včetně horní hrany a je to samá vysoká frekvence. Rozmazané zrno vedle
-   ostrého je šmouha a tam, kde rozostření končí, je z toho navíc poznat
-   hrana. Tohle se honilo přes obsah — neprůhledný pruh, zrušené míchání,
-   jiné rozmazání — a nemohlo to pomoct, protože se nehledalo tam, co se
-   rozmazává.
-
-   Takže: v appce z plochy začíná zrno (i záře) až PO pásu a sám pás je
-   plná barva. Rozostřená plná barva je ta samá plná barva, takže po efektu
-   nezbyde nic k vidění. Barva pásu NENÍ --podklad, ale barva, kterou appka
-   se zrnem na prvním řádku opravdu nakreslí (naměřeno (45,45,37)) — ta samá,
-   co stojí v theme-color v index.html. Kdyby to byl čistý podklad, byl by
-   na konci pásu schod o dva stupně a šev tam, kde zrno začíná. Když se sáhne
-   na zrno, přeměř obojí.
-
-   WebKit navíc efekt vynechá, když u horní hrany najde pevnou plochu přes
-   celou šířku s plnou barvou, a tou barvou hranu vyplní (FixedContainerEdges).
-   Pás tu podmínku splňuje, takže je šance, že se efekt nenakreslí vůbec.
-   Ověřit to tady nejde, Chromium ani WebKit v kontejneru takový efekt nemá.
-
-   z-index 61 je nad zrnem (60) a pod průpravou (120): v průpravě je horní
-   pás plný podklad bez zrna, tam není co rozostřovat a pruh by nad ním jen
-   svítil o dva stupně vedle.
-
-   Výška pásu drží i odsazení obrazovky: appka z plochy kreslí pod stavovou
-   lištu a na telefonech, kde je safe-area nula, by se nadpis schoval pod
-   hodiny.
-
-   Jak hluboko efekt sahá, se dá vyčíst z fotky obrazovky: zrno je šum, takže
-   stačí jet po svislici a počítat jeho rozptyl. Naměřeno na iPhonu se
-   safe-area 59 bodů — do 58 bodů rozptyl 0,2 (plochá deska, není co
-   rozmazat), od 59 do 90 stoupá z 0,3 na 1,3 (zrno tam je, ale rozmazané),
-   od 94 drží 4,0 (ostré zrno). Efekt končí šestatřicet bodů POD safe-area,
+   Jak hluboko efekt sahá, šlo vyčíst z fotky obrazovky, dokud appka nosila
+   zrno přes celé pozadí: zrno je šum, takže stačilo jet po svislici
+   a počítat rozptyl. Na iPhonu se safe-area 59 bodů vyšlo do 58 bodů 0,2
+   (plochá deska), od 59 do 90 náběh z 0,3 na 1,3 (zrno rozmazané), od 94
+   rovných 4,0 (ostré zrno). Efekt končí šestatřicet bodů POD safe-area,
    ne na ní.
 
-   Z toho plyne všechno ostatní. Nad tou hranicí nesmí být nic ostrého: ani
-   zrno, ani logo, ani pilulka týmu. Pokus zkrátit desku na safe-area (nahoře
-   bylo sto pět bodů prázdných a chtělo to zhubnout) skončil tím, že se
-   rozmazalo zrno i horní půlka loga. Hubne se tedy pod logem, kde žádný
-   efekt není. */
+   Obrana proti němu bývala vrstva přes vrstvu: plná deska u horní hrany,
+   prolnutí do zrna, barva desky natrefovaná na barvu appky se zrnem, mizení
+   desky pod otevřeným detailem. Odpadlo to všechno naráz ve chvíli, kdy zrno
+   zmizelo z pozadí (viz poznámku o zrnu výš). Pozadí je odshora dolů jedna
+   plochá barva, rozmazaná plná barva je ta samá plná barva, takže po efektu
+   nezbyde nic k vidění a není tam hrana, co by měla navazovat. Ta samá barva
+   stojí i v theme-color v index.html, aby na ni navazoval kus nad stránkou.
+
+   Zbyla jediná povinnost: v té zóně nesmí stát žádný OBSAH. Logo ani pilulka
+   týmu se nerozmazávají o nic míň než zrno — zkoušelo se posadit hlavičku
+   na dvaaosmdesát bodů a byla rozmazaná. Na to je --vrch. */
 @media (display-mode:standalone){
   :root{
     /* Kam sahá systémové rozostření. Padesát bodů je dno pro telefony,
        kde je safe-area nula. */
     --rozostreni:calc(max(env(safe-area-inset-top),50px) + 36px);
-    /* Na kolika bodech se pás a zrno prolnou. Bez toho zrno začínalo naráz
-       a i při přesně sedící barvě byla hrana poznat — ne jako schod
-       ve světlosti, ale jako hrana mezi hladkou plochou a zrnitou.
-       Prolnutí KONČÍ přesně na hranici efektu: nad ní je zrno pod závojem,
-       takže rozmazat se nemá co, a pod ní začíná ostré zrno bez závoje. */
-    --prolnuti:16px;
-    --pruh:var(--rozostreni);
-    /* Obsah začíná hned pod efektem. Osm bodů navíc tu stávalo a nebylo
-       k čemu. */
+    /* Appka z plochy kreslí pod stavovou lištu, takže obsah začíná až
+       pod efektem. Nad ním by byl rozmazaný. */
     --vrch:var(--rozostreni);
   }
-  /* Plná deska. Sahá jen po začátek prolnutí, aby pod sebou neměla nic,
-     co by šlo rozmazat. */
-  body::before{
-    content:"";position:fixed;top:0;left:0;right:0;
-    height:calc(var(--rozostreni) - var(--prolnuti));
-    z-index:61;pointer-events:none;background-color:#2D2D25;
-  }
-  /* Prolnutí: ta samá barva, co se vytrácí do ztracena, a pod ní se zrno
-     postupně vynořuje. Konec je psaný jako rgba téže barvy, ne `transparent`
-     — některé prohlížeče prokládají přes průhlednou ČERNOU a na konci
-     přechodu by byl tmavý nádech. */
-  body::after{
-    content:"";position:fixed;left:0;right:0;
-    top:calc(var(--rozostreni) - var(--prolnuti));height:var(--prolnuti);
-    z-index:61;pointer-events:none;
-    background:linear-gradient(to bottom,#2D2D25,rgba(45,45,37,0));
-  }
-  /* Pod otevřenou vrstvou pás odejde. Leží nad plachtou (61 proti 40), takže
-     jako jediný kus obrazovky nezešeřil ani se nerozmazal a nahoře z toho byl
-     světlejší pruh s ostrou hranou. Naměřeno na telefonu: horních 70 bodů
-     (44,44,36), zbytek obrazovky (35,43,34).
-     Zmizet může bez následků: nad pásem stejně žádné zrno není, takže pod ním
-     zbyde plochá barva s plachtou přes ni, a plochou barvu nemá systémové
-     rozostření jak poznat. */
-  html.rozmazat body::before,html.rozmazat body::after{opacity:0}
-  body::before,body::after{transition:opacity .18s var(--krok)}
-
-  /* Zrno začíná až pod pásem, aby u horní hrany nebylo co rozmazat. */
-  .app::before{top:calc(var(--rozostreni) - var(--prolnuti))}
 }
 @keyframes obsah-prichod{
   from{opacity:0;transform:translateY(8px)}
@@ -650,7 +574,10 @@ html.rozmazat .obrazovka{filter:blur(5px)}
    ne jako plakát. Zrno v režimu multiply ji rozbije stejně, jako to dělá
    papír pod barvou. */
 .kat-karta{position:relative;overflow:hidden}
-.kat-karta::after{
+/* Zrno nese každá barevná plocha sama. Je to multiply, takže je úměrné
+   podkladu — na světlé kartě kategorie je vidět, na tmavé dlaždici úkolu
+   jen tuší. Pozadí appky žádné nemá, viz poznámku o zrnu výš. */
+.kat-karta::after,.hero::after,.ukol-karta::after,.detail-karta::after{
   content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
   background-image:url("../assets/zrno-tisk.svg");background-size:150px 150px;
   mix-blend-mode:multiply;opacity:.55;
@@ -1282,9 +1209,9 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .uvod-obsah{
   position:absolute;inset:0;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;
-  /* --pruh je v prohlížeči nula, z plochy je to horní pás (viz horní hrana
-     v appce z plochy); plakát musí začít až pod ním. */
-  padding:calc(max(env(safe-area-inset-top),var(--pruh)) + 22px) var(--uvod-okraj)
+  /* --rozostreni je v prohlížeči nula, z plochy je to zóna, kterou iOS
+     rozmazává (viz horní hrana v appce z plochy); plakát začíná až pod ní. */
+  padding:calc(max(env(safe-area-inset-top),var(--rozostreni)) + 22px) var(--uvod-okraj)
           calc(env(safe-area-inset-bottom) + 20px);
   /* o chvilku později než začne odcházet značka: prázdný snímek mezi nimi
      nevznikne, ale ani se nepřekrývají tak, že by text ležel přes logo */
