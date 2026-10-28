@@ -322,22 +322,33 @@ html.rozmazat .obrazovka{filter:blur(5px)}
 
    Výška pásu drží i odsazení obrazovky: appka z plochy kreslí pod stavovou
    lištu a na telefonech, kde je safe-area nula, by se nadpis schoval pod
-   hodiny. Dvacet osm bodů nad safe-area je rezerva — rozostření sahá hlouběji
-   než samotná lišta a kdyby pás byl kratší, zasáhlo by zrno pod ním. */
+   hodiny.
+
+   Pás byl dlouho o osmadvacet bodů vyšší než stavová lišta — rezerva pro
+   případ, že rozostření sahá hlouběji. Jenže spolu s odsazením obsahu z toho
+   nahoře bylo sto pět bodů, než začalo logo, a to je pětina displeje prázdná.
+   Rozmazává se hrana pohledu, tedy safe-area; plná deska má přesně její výšku
+   a prolnutí začíná hned pod ní. Rozostřené prolnutí je pořád to samé
+   prolnutí, takže i kdyby efekt sahal o pár bodů hlouběji, nemá co pokazit. */
 @media (display-mode:standalone){
   :root{
-    --pruh:calc(max(env(safe-area-inset-top),50px) + 28px);
-    --vrch:calc(var(--pruh) + 8px);
+    /* Kam sahá systémové rozostření: přes stavovou lištu. Padesát bodů je
+       dno pro telefony, kde je safe-area nula. */
+    --cista:max(env(safe-area-inset-top),50px);
     /* Na kolika bodech se pás a zrno prolnou. Bez toho zrno začínalo naráz
        a i při přesně sedící barvě byla hrana poznat — ne jako schod
        ve světlosti, ale jako hrana mezi hladkou plochou a zrnitou. */
-    --prolnuti:18px;
+    --prolnuti:14px;
+    --pruh:calc(var(--cista) + var(--prolnuti));
+    /* Obsah začíná hned za prolnutím. Osm bodů navíc tu stávalo a nebylo
+       k čemu: pod prolnutím je už obyčejná stránka. */
+    --vrch:var(--pruh);
   }
-  /* Plná deska. Sahá jen po začátek prolnutí, aby pod sebou neměla nic,
-     co by šlo rozmazat. */
+  /* Plná deska přes rozmazávanou hranu. Pod sebou nemá nic, co by šlo
+     rozmazat. */
   body::before{
     content:"";position:fixed;top:0;left:0;right:0;
-    height:calc(var(--pruh) - var(--prolnuti));
+    height:var(--cista);
     z-index:61;pointer-events:none;background-color:#2D2D25;
   }
   /* Prolnutí: ta samá barva, co se vytrácí do ztracena, a pod ní se zrno
@@ -346,7 +357,7 @@ html.rozmazat .obrazovka{filter:blur(5px)}
      přechodu by byl tmavý nádech. */
   body::after{
     content:"";position:fixed;left:0;right:0;
-    top:calc(var(--pruh) - var(--prolnuti));height:var(--prolnuti);
+    top:var(--cista);height:var(--prolnuti);
     z-index:61;pointer-events:none;
     background:linear-gradient(to bottom,#2D2D25,rgba(45,45,37,0));
   }
@@ -370,7 +381,7 @@ html.rozmazat .obrazovka{filter:blur(5px)}
      v prohlížeči. Takhle má záře svých prvních rovných 76 bodů až POD pásem,
      takže hned za jeho hranou je pořád čistý podklad se zrnem, tedy ta samá
      barva, a stoupat začne o kus níž, kde už žádná hrana není. */
-  .app::before{top:calc(var(--pruh) - var(--prolnuti))}
+  .app::before{top:var(--cista)}
   .app::after{top:var(--pruh)}
 }
 @keyframes obsah-prichod{
@@ -408,7 +419,10 @@ html.rozmazat .obrazovka{filter:blur(5px)}
    aby se z dlouhého seznamu úkolů dalo doběhnout do menu — jenže úkoly jsou
    teď rovnou na Hře, takže se do menu chodí jednou za večer. Zůstal po tom
    jen pruh přes celou šířku, který nikdy nebyl pěkný a zakrýval obsah. */
-.hlava{display:flex;align-items:center;gap:10px;min-height:44px;margin-bottom:32px}
+/* Dvacet bodů pod logem, ne dvaatřicet. S odsazením shora a s tím, jak je
+   logo vycentrované v pětačtyřicetibodovém terči, z toho bylo pětačtyřicet
+   bodů mezi logem a první kartou. */
+.hlava{display:flex;align-items:center;gap:10px;min-height:44px;margin-bottom:20px}
 /* Značka v liště, jako v úvodu. Dřív se o místo prala s nadpisem; ten je teď
    pod lištou, takže tu značka stojí sama a má kolem sebe vzduch. */
 .hlava-znak{height:26px;width:auto;display:block;color:var(--text);opacity:.92}
