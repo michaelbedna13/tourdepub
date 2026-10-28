@@ -30,8 +30,31 @@ const POLOZKY: { kam: string; popis: string; ikona: JmenoIkony; sedi: (cesta: st
  *
  *  Pět položek je v rozsahu, co komponenta snese (dva až šest), a žádná
  *  z nich není podstránka něčeho jiného, tak nemá co být schovaná hlouběji. */
+/** Jak dlouho se nabídka zavírá, než se odklidí. Drží se .fab-radek.zavira
+ *  v app.css: poslední položka odchází se zpožděním, takže doběh je o ten
+ *  stagger delší než samotná animace. */
+const ZAVRENI = 260;
+
 export function FabMenu() {
   const [otevreno, setOtevreno] = useState(false);
+  // Zavírání je vlastní stav, ne jen odebrání z DOMu. Dokud se nabídka jen
+  // odpojila, položky zmizely střihem — otevření bylo plynulé a zavření
+  // cuknutí.
+  const [zavira, setZavira] = useState(false);
+  const cas = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => clearTimeout(cas.current), []);
+
+  function prepni() {
+    if (otevreno) zavri();
+    else { clearTimeout(cas.current); setZavira(false); setOtevreno(true); }
+  }
+
+  function zavri() {
+    if (!otevreno || zavira) return;
+    setZavira(true);
+    cas.current = setTimeout(() => { setOtevreno(false); setZavira(false); }, ZAVRENI);
+  }
 
   // Celé to visí na <body>, ne uvnitř .app. Appka má vlastní vrstvení
   // (position:relative, z-index 1), takže cokoli uvnitř — i s z-indexem 99 —
@@ -40,23 +63,23 @@ export function FabMenu() {
   return createPortal(
     <>
       <button type="button"
-        className={`fab${otevreno ? " otevreno" : ""}`}
+        className={`fab${otevreno && !zavira ? " otevreno" : ""}`}
         aria-expanded={otevreno} aria-haspopup="menu"
         aria-label={otevreno ? "Zavřít rozcestník" : "Rozcestník"}
-        onClick={() => setOtevreno((x) => !x)}>
+        onClick={prepni}>
         {/* Dvě kresby přes sebe, prolnou se. Otáčet plus na křížek šlo jednou
             kresbou, jenže zavřené tlačítko musí říct „nabídka", ne „přidat". */}
         <Ikona jmeno="i-menu" px={24} trida="fab-znak fab-znak-menu" />
         <Ikona jmeno="plus" px={26} trida="fab-znak fab-znak-krizek" />
       </button>
 
-      {otevreno && <Nabidka zavri={() => setOtevreno(false)} />}
+      {otevreno && <Nabidka zavri={zavri} zavira={zavira} />}
     </>,
     document.body,
   );
 }
 
-function Nabidka({ zavri }: { zavri: () => void }) {
+function Nabidka({ zavri, zavira }: { zavri: () => void; zavira: boolean }) {
   // Pozadí se rozmaže — to samé, co dělá detail úkolu. Nabídka nad ostrou
   // appkou by byla jen další vrstva lístečků.
   useRozmazanePozadi();
@@ -80,17 +103,19 @@ function Nabidka({ zavri }: { zavri: () => void }) {
   }
 
   return (
-    <div className="fab-plachta" onClick={zavri}>
+    <div className={`fab-plachta${zavira ? " zavira" : ""}`} onClick={zavri}>
       <div className="fab-nabidka" role="menu" onClick={(e) => e.stopPropagation()}>
         {POLOZKY.map((p, i) => {
           const ted = p.sedi(pathname);
           return (
             <button key={p.kam} type="button" role="menuitem"
-              className={`fab-radek${ted ? " ted" : ""}`}
+              className={`fab-radek${ted ? " ted" : ""}${zavira ? " zavira" : ""}`}
               aria-current={ted ? "page" : undefined}
               /* Položky nenaskočí naráz, ale jedna po druhé odspoda — oko
-                 stihne přečíst, co přibylo. Zpoždění drží pořadí v nabídce. */
-              style={{ animationDelay: `${(POLOZKY.length - 1 - i) * 40}ms` }}
+                 stihne přečíst, co přibylo. Při zavírání jde pořadí obráceně,
+                 od nejvzdálenější dolů k tlačítku: nabídka se do něj vrací,
+                 ne že zhasne. */
+              style={{ animationDelay: `${(zavira ? i : POLOZKY.length - 1 - i) * 36}ms` }}
               onClick={() => jdi(p.kam)}>
               <Ikona jmeno={p.ikona} px={19} />
               <span>{p.popis}</span>

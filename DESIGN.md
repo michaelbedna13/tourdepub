@@ -432,8 +432,15 @@ to, co vybírá.
   jenže plus říká „přidat".
 - **Logová červená.** Je to jediná věc na obrazovce, co má křičet, a žádná
   kategorie tu barvu nenese jako plochu.
-- **Položky naskakují jedna po druhé odspoda** (40 ms na řádek), ať oko stihne
-  přečíst, co přibylo.
+- **Položky vyjíždějí z tlačítka**, jedna po druhé odspoda (36 ms na řádek):
+  počátek posunu i zmenšení je v pravém dolním rohu, takže položka vypadá,
+  že se z kolečka vysunula. Při zavírání jde pořadí obráceně, od nejvzdálenější
+  zpátky dolů — nabídka se do tlačítka vrací, ne že zhasne.
+- **Zavírání je vlastní stav**, ne jen odebrání z DOMu. Dokud se nabídka jen
+  odpojila, položky zmizely střihem a otevření bylo plynulé, kdežto zavření
+  cuknutí. Zavírá se rychleji než otevírá (0,2 s proti 0,42 s): při otevření
+  se nabídka čte, při zavření už je rozhodnuto a čekat na doběh animace, co
+  nikdo nesleduje, se tváří jako zasekaná appka.
 - **Ťuknutí na obrazovku, na které už jsem, vyjede nahoru.** To samé dělá iOS
   a na dlouhé galerii úkolů to ušetří půl minuty tahání.
 - **Visí na `<body>`, ne uvnitř `.app`.** Appka má vlastní vrstvení
@@ -825,6 +832,15 @@ Dlaždice i detail mají **jedno odsazení dokola** (18 a 22 bodů). Bylo
 nestejné — na dlaždici 20 nahoře, 18 po stranách i dole — a čtvereček dole
 vpravo tím seděl blíž ke spodní hraně než jméno k levé. Na kartě se čtyřmi
 prvky je každý nestejný okraj vidět.
+
+**Kresba má pevnou výšku, ne „co zbyde".** Dokud si brala zbytek karty, měla
+každá dlaždice kresbu jinak velkou a jinde — naměřeno přes galerii **112 až
+132 bodů výšky a horní hrana od 16,6 do 29,6**, podle toho, jestli se jméno
+pod ní vešlo na jeden řádek nebo na dva. Vedle sebe to vypadalo, že každá
+karta má svoje měřítko. **Místo na jméno drží každá karta na dva řádky**,
+i když má jméno na jeden; jinak jednořádková jména klesla o dvacet bodů níž
+a v mřížce po dvou vedle sebe neseděla žádná účaří. Teď začínají všechny
+kresby i všechna jména na stejné lince a řádka s cenou je všude stejně.
 
 **Kresba má uvnitř vlastní okraj** (9 bodů na dlaždici, 11 v detailu).
 Doladění (`LADENI_KRESEB`) umí kresbu zvětšit až o šestnáct procent

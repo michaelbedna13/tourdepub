@@ -724,11 +724,18 @@ html.rozmazat .obrazovka{filter:blur(7px)}
    v galerii, ať je kresba jakkoli vysoká.
    Barva je kategorie vytažená ke krémové: čistě krémová kresba na barevné
    kartě přebíjela jméno, čistě kategorie splývala s podkladem. */
-/* Kresba má vlastní okraj uvnitř karty. Doladění (LADENI_KRESEB) umí kresbu
-   zvětšit až o šestnáct procent a zvětšuje se transformem, tedy PO rozvržení
-   — bez téhle rezervy přetekla ven z odsazení karty a končila osm bodů od
-   hrany, zatímco jméno pod ní mělo osmnáct. */
-.ukol-karta-obraz{flex:1;min-height:0;display:grid;place-items:center;padding:2px 9px 0}
+/* Kresba má PEVNOU výšku, ne „co zbyde". Dokud si brala zbytek karty, měla
+   každá dlaždice kresbu jinak velkou a jinde: naměřeno přes galerii 112 až
+   132 bodů výšky a horní hrana od 16,6 do 29,6 — podle toho, jestli se jméno
+   pod ní vešlo na jeden řádek nebo na dva. Vedle sebe to vypadalo, že každá
+   karta má svoje měřítko.
+
+   Devět bodů odsazení uvnitř je rezerva na doladění (LADENI_KRESEB): to umí
+   kresbu zvětšit až o šestnáct procent a zvětšuje se transformem, tedy až PO
+   rozvržení, takže by jinak přetekla ven z odsazení karty.
+
+   flex:0 1 — nesmí růst, ale smí se stlačit, kdyby jméno vyšlo na tři řádky. */
+.ukol-karta-obraz{flex:0 1 116px;height:116px;display:grid;place-items:center;padding:9px}
 .ukol-karta-kresba{
   max-width:100%;max-height:100%;width:auto;height:auto;
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
@@ -739,8 +746,13 @@ html.rozmazat .obrazovka{filter:blur(7px)}
    ne v rohu nad kresbou: ruka ho tam má blíž, kresba nemusí uhýbat a karta
    se čte odshora dolů jako jedna věc. */
 .ukol-karta-nazev{
-  margin-top:16px;font-family:var(--pismo);font-weight:700;
+  margin-top:14px;font-family:var(--pismo);font-weight:700;
   font-size:17px;line-height:1.22;letter-spacing:-.012em;text-transform:none;
+  /* Místo na dva řádky drží každá karta, i když má jméno na jeden. Jinak
+     jednořádková jména klesla o dvacet bodů níž než dvouřádková a v mřížce
+     po dvou vedle sebe neseděla žádná účaří. Takhle začínají všechna jména
+     na stejné lince a řádka s cenou je na všech kartách taky stejně. */
+  min-height:2.44em;
   /* Žádné dělení slov. Safari umí česky a opravdu dělilo — „Balení starý-ho
      kusu", „Tichá špeluň-ka", „Rada za vše-chny prachy" — a na dvouřádkovém
      jménu na malé kartě to nevypadá jako sazba, ale jako chyba. Zlom se dělá
@@ -1106,8 +1118,10 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
       rgba(12,12,9,.5), rgba(12,12,9,0) 16%,
       rgba(12,12,9,0) 84%, rgba(12,12,9,.5)),
     rgba(22,22,18,.52);
-  animation:zjevit .18s var(--krok);
+  animation:zjevit .22s var(--krok);
 }
+.fab-plachta.zavira{animation:zhasnout .24s var(--krok) forwards}
+@keyframes zhasnout{to{opacity:0}}
 /* Nabídka stojí nad tlačítkem a je s ním zarovnaná pravou hranou, jak má
    FAB menu být — vyjíždí z něj, ne odněkud z prázdna. */
 .fab-nabidka{
@@ -1123,7 +1137,10 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   font-family:var(--pismo);font-weight:700;font-size:var(--t-text);
   white-space:nowrap;
   box-shadow:0 8px 20px rgba(0,0,0,.38);
-  animation:fab-radek-prichod .26s var(--krok) backwards;
+  /* Vyjíždí zdola od tlačítka, ne odnikud: posun i zmenšení mají počátek
+     vpravo dole, takže položka vypadá, že se z kolečka vysunula. */
+  transform-origin:100% 100%;
+  animation:fab-radek-prichod .42s var(--krok) backwards;
 }
 .fab-radek:active{transform:scale(.95)}
 .fab-radek .ikona{color:var(--podklad);opacity:.7}
@@ -1131,8 +1148,15 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
    odkud — jinak je to pět stejných lístků. */
 .fab-radek.ted{background:var(--tisk,#E5331F);color:#FFF4E6}
 .fab-radek.ted .ikona{color:inherit;opacity:1}
+/* Zavírání je rychlejší než otevírání a vrací se do tlačítka. Kratší proto,
+   že při otevření se nabídka čte, kdežto při zavření už je rozhodnuto —
+   čekat na doběh animace, co nikdo nesleduje, se tváří jako zasekaná appka. */
+.fab-radek.zavira{animation:fab-radek-odchod .2s var(--krok) forwards}
 @keyframes fab-radek-prichod{
-  from{opacity:0;transform:translateY(14px) scale(.94)}
+  from{opacity:0;transform:translate(14px,22px) scale(.82)}
+}
+@keyframes fab-radek-odchod{
+  to{opacity:0;transform:translate(10px,16px) scale(.88)}
 }
 
 /* ---------- okno ---------- */
