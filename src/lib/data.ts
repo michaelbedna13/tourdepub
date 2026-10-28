@@ -95,7 +95,7 @@ export const VYCHOZI_UKOLY: Ukol[] = [
     popis: "Jeden z vás musí fest na voko a ze srandy balit někoho, kdo by mu mohl dělat fotra nebo máti." },
   { id: "ticha", kat: "kecy", piva: 2, body: 2, max: 1, nazev: "Tichá špeluňka",
     popis: "V jedný hospodě celá parta ani muk. I objednávku musíte dát beze slov (rukama, nohama, na papír)." },
-  { id: "rada", kat: "kecy", piva: 2, body: 2, max: 1, nazev: "Rada za všechny prachy",
+  { id: "rada", kat: "kecy", piva: 2, body: 2, max: 1, nazev: "Rada nad zlato",
     popis: "Vytáhněte z nějakýho cizáka radu na hustej fejlovej problém (např. „Su těhotná, co mám dělat?“). Musíte to vykómat do detailu." },
   { id: "hokuspokus", kat: "kecy", piva: 3, body: 3, max: 1, nazev: "Trapnej hókuspókus",
     popis: "Rozbalte u cizího stolu nějaký kouzlo tak, aby bylo jasný, že to je totální šméčko. Nebo jinej trapas. Ani muk, že valíte nějakou hru." },

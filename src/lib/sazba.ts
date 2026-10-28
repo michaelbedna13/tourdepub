@@ -3,13 +3,13 @@ import { vazat } from "./format";
 
 /** Sazba jména na dlaždici úkolu.
  *
- *  Jedno jméno ze všech — „Rada za všechny prachy" — je delší, než kolik se
- *  na kartu vejde na dva řádky. Dřív se stahovalo podle počtu znaků: devatenáct
- *  písmen byla hranice a všechno delší dostalo menší písmo. Jenže počet znaků
- *  o šířce nerozhoduje (ve stejné sazbě je „Rada za všechny" širší než
- *  „všechny prachy", i když má o písmeno víc) a odhad byl skoro dvakrát
- *  přísnější, než bylo potřeba. Výsledek šlo vedle sousední karty poznat na
- *  první pohled a vypadalo to jako chyba.
+ *  Jméno delší, než kolik se na kartu vejde na dva řádky, se musí stáhnout.
+ *  Dřív se to odhadovalo z počtu znaků: devatenáct písmen byla hranice
+ *  a všechno delší dostalo menší písmo. Jenže počet znaků o šířce
+ *  nerozhoduje (ve stejné sazbě je „Rada za všechny" širší než „všechny
+ *  prachy", i když má o písmeno víc) a odhad byl skoro dvakrát přísnější,
+ *  než bylo potřeba. Výsledek šlo vedle sousední karty poznat na první
+ *  pohled a vypadalo to jako chyba.
  *
  *  Tady se nehádá: jméno se změří na plátně v tom písmu, které se opravdu
  *  načetlo, a stáhne se přesně o to, co chybí. Nejdřív prostrkáním, teprve

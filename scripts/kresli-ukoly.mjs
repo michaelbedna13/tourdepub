@@ -49,7 +49,7 @@ const KRESBY = {
     C(cut(stroke(34, 26, 66, 58, 10), { ...R, amp: .8 })),
     C(cut(stroke(66, 26, 34, 58, 10), { ...R, amp: .8 })),
   ],
-  // Rada za všechny prachy: žárovka
+  // Rada nad zlato: žárovka
   rada: () => [
     I(cut(ell(50, 40, 24, 26, 22), { ...R, amp: 1.1 })),
     I(cut(rect(38, 62, 62, 78, 3), { ...R, amp: .9 })),
