@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Hlava } from "../components/Hlava";
 import { KartyKategorii } from "../components/KartyKategorii";
 import { Ikona } from "../components/Ikona";
+import { OknoTymu } from "../components/OknoTymu";
 import { PruhSyncu } from "../components/PruhSyncu";
 import { Uctenka } from "../components/Uctenka";
 import { ZAKLAD, type Hospoda } from "../lib/data";
@@ -22,7 +23,11 @@ export function Hra() {
   const t = tym();
   const poradi = poradiTymu();
 
-  if (!t) return <><Hlava nadpis="Hra" /><div className="prazdno">Nejdřív si založ tým.</div></>;
+  // Bez týmu se nemá co zapisovat. Dřív si appka partu zakládala sama, takže
+  // sem nikdo nedošel; teď je to první obrazovka po instalaci a musí z ní jít
+  // tým rovnou založit — poslat člověka hledat to do rozcestníku je zbytečná
+  // zatáčka.
+  if (!t) return <PrazdnaHra />;
 
   return (
     <>
@@ -213,3 +218,19 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   );
 }
 
+/** Hra bez týmu: jedna věta a tlačítko, co ho založí. */
+function PrazdnaHra() {
+  const [novy, setNovy] = useState(false);
+  return (
+    <>
+      <Hlava nadpis="Hra" />
+      <div className="prazdno">Nejdřív si založ tým, pak se dá zapisovat.</div>
+      <div className="sekce">
+        <button className="tl hlavni" onClick={() => setNovy(true)}>
+          <Ikona jmeno="plus" px={18} /> Založit tým
+        </button>
+      </div>
+      {novy && <OknoTymu zavri={() => setNovy(false)} />}
+    </>
+  );
+}

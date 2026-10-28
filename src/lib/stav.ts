@@ -81,10 +81,10 @@ export type Zaklad = "prichod" | "skopek";
  *  s červenou pral. */
 const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 
-/** `vlastni` říká, jestli s týmem někdo opravdu pracoval. Tým, co si appka
- *  založila sama při prvním spuštění a nikdo ho nepojmenoval ani s ním nehrál,
- *  se na server neposílá — jinak by se v pořadí objevila „Naše parta“ z každého
- *  telefonu i prohlížeče, který web jen otevřel. */
+/** `vlastni` říká, jestli tým někdo opravdu založil. Appka si žádný
+ *  nezakládá, ale ve starších uložených stavech leží „Naše parta“, kterou
+ *  si při prvním spuštění zakládala sama — takový tým se na server neposílá
+ *  a při načtení se zahodí, viz nacti(). */
 export function novyTym(nazev = "", vlastni = true): Tym {
   return { id: noveId(), nazev, vlastni, upraveno: null, bylNaServeru: false,
            hospoda: null, prichod: {}, prichodCas: {}, skopek: {}, ukoly: {}, zlodej: {} };
@@ -99,13 +99,13 @@ function dotknuto(t: Tym | undefined) {
 }
 
 function prazdnyStav(): Stav {
-  // false: dokud ho nikdo nepojmenuje ani s ním nezahraje, zůstane jen tady
-  const t = novyTym("Naše parta", false);
-  t.hospoda = VYCHOZI_HOSPODY[0].id;
+  // Žádný tým. Appka si ho dřív zakládala sama („Naše parta“) a bylo to
+  // k ničemu: kdo web jen otevřel, založil si partu, a jak na cokoli ťukl,
+  // vyjela do pořadí všem ostatním. Tým zakládá člověk, ne spuštění.
   return {
     verze: VERZE,
-    tymy: [t],
-    tymId: t.id,
+    tymy: [],
+    tymId: "",
     hospody: VYCHOZI_HOSPODY.map((h) => ({ ...h })),
     ukoly: VYCHOZI_UKOLY.map((u) => ({ ...u })),
     znameUkoly: VYCHOZI_UKOLY.map((u) => u.id),
@@ -181,7 +181,13 @@ function nacti(): Stav {
     // dřív se štace držela jako číslo, teď jako id hospody
     const h = VYCHOZI_HOSPODY[(ulozeno.hospoda || 1) - 1];
     t.hospoda = h ? h.id : null;
-    return { ...prazdnyStav(), tymy: [t], tymId: t.id };
+    // Prázdný zápis ze staré verze žádnou partu nenese. Převádět ho na
+    // „Naši partu“ by znamenalo založit tým za někoho, kdo si ho nezaložil.
+    const maCo = !!ulozeno.parta?.nazev
+      || Object.keys(t.prichod).length > 0
+      || Object.keys(t.skopek).length > 0
+      || Object.keys(t.ukoly).length > 0;
+    return maCo ? { ...prazdnyStav(), tymy: [t], tymId: t.id } : prazdnyStav();
   }
 
   const z: Stav = { ...prazdnyStav(), ...(ulozeno as Stav) };
@@ -190,13 +196,7 @@ function nacti(): Stav {
   // v paměti, znameUkoly nikde není a mazání úkolu by se při dalším spuštění
   // neudrželo — smazaný by se vrátil.
   if (!Array.isArray(ulozeno.znameUkoly)) zapisPoDoplneni = true;
-  if (!z.tymy?.length) {
-    const t = novyTym("Naše parta");
-    z.tymy = [t];
-    z.tymId = t.id;
-  }
-  if (!z.tymy.some((t) => t.id === z.tymId)) z.tymId = z.tymy[0].id;
-  srovnejStace(z);
+  if (!z.tymy) z.tymy = [];
   // starší uložené stavy příznak nemají; tým s vlastním jménem nebo s čárkami
   // je zjevně používaný
   for (const t of z.tymy) {
@@ -209,6 +209,12 @@ function nacti(): Stav {
         || Object.keys(t.ukoly).length > 0;
     }
   }
+  // „Naše parta“, kterou si dřív zakládalo samo spuštění a nikdo se jí
+  // nedotkl, se zahodí. Nic se tím neztratí: vlastni:false znamená bez jména
+  // i bez jediné čárky. Pojmenovaná nebo rozehraná parta má vlastni:true.
+  z.tymy = z.tymy.filter((t) => t.vlastni !== false);
+  if (!z.tymy.some((t) => t.id === z.tymId)) z.tymId = z.tymy[0]?.id || "";
+  srovnejStace(z);
   return z;
 }
 
@@ -273,10 +279,13 @@ export function upravTym(id: string, zmeny: Partial<Pick<Tym, "nazev">>) {
   uloz();
 }
 
+/** Smaže tým. Jde smazat i poslední: bez týmu se prostě nezapisuje a Hra
+ *  si řekne o založení. Dřív tu stála pojistka, že poslední tým zůstane,
+ *  jenže ta jen držela při životě partu, kterou nikdo nechtěl. */
 export function smazTym(id: string): boolean {
-  if (stav.tymy.length <= 1) return false; // poslední tým nemažeme, hra by neměla za koho zapisovat
+  if (!stav.tymy.some((t) => t.id === id)) return false;
   stav.tymy = stav.tymy.filter((t) => t.id !== id);
-  if (stav.tymId === id) stav.tymId = stav.tymy[0].id;
+  if (stav.tymId === id) stav.tymId = stav.tymy[0]?.id || "";
   uloz();
   return true;
 }
@@ -567,8 +576,9 @@ export function slucZeServeru(radky: RadekTymu[]) {
 
   // tým smazaný na jiném telefonu musí zmizet i tady
   stav.tymy = stav.tymy.filter((t) => !t.bylNaServeru || naServeru.has(t.id));
-  if (!stav.tymy.length) stav.tymy = [novyTym("Naše parta", false)];
-  if (!stav.tymy.some((t) => t.id === stav.tymId)) stav.tymId = stav.tymy[0].id;
+  // a když po tom nezbyde žádný, žádný tu ani není. Dřív se tu dopisovala
+  // „Naše parta“ a vypadalo to, že si ji appka vyrobila sama ze vzduchu.
+  if (!stav.tymy.some((t) => t.id === stav.tymId)) stav.tymId = stav.tymy[0]?.id || "";
 
   srovnejStace(stav);
   uloz();
