@@ -231,7 +231,13 @@ input,textarea,select{caret-color:var(--text)}
 .ikona{display:block;flex:none}
 /* Kresby si smí doladit velikost a posun (LADENI_KRESEB v kresby-ladeni.ts):
    čtvercový rámeček sedí jedné, ale štíhlá postava se v něm ztratí. */
-.kresba{transform:translate(var(--kr-x,0),var(--kr-y,0)) scale(var(--kr-zvet,1))}
+/* Zvětšení roste od SPODNÍ hrany, ne ze středu. Kresba stojí na spodní
+   hraně svého rámečku, aby měla ke jménu pod sebou vždycky stejně daleko;
+   kdyby se zvětšovala ze středu, doladěná kresba by se té mezery o kus
+   zakousla (naměřeno 9 bodů místo 16). Takhle přeteče jen nahoru, kde je
+   volné místo. */
+.kresba{transform:translate(var(--kr-x,0),var(--kr-y,0)) scale(var(--kr-zvet,1));
+  transform-origin:50% 100%}
 .otocit{transform:scaleX(-1)}
 .spatne{color:var(--spatne)}
 .drobne{font-size:var(--t-drobne);color:var(--text-3);word-break:break-word}
@@ -344,6 +350,16 @@ html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
     z-index:61;pointer-events:none;
     background:linear-gradient(to bottom,#2D2D25,rgba(45,45,37,0));
   }
+  /* Pod otevřenou vrstvou pás odejde. Leží nad plachtou (61 proti 40), takže
+     jako jediný kus obrazovky nezešeřil ani se nerozmazal a nahoře z toho byl
+     světlejší pruh s ostrou hranou. Naměřeno na telefonu: horních 70 bodů
+     (44,44,36), zbytek obrazovky (35,43,34).
+     Zmizet může bez následků: nad pásem stejně žádné zrno není, takže pod ním
+     zbyde plochá barva s plachtou přes ni, a plochou barvu nemá systémové
+     rozostření jak poznat. */
+  html.rozmazat body::before,html.rozmazat body::after{opacity:0}
+  body::before,body::after{transition:opacity .18s var(--krok)}
+
   /* Zrno i záře začínají až pod pásem.
 
      Zrno proto, aby u horní hrany nebylo co rozmazat. Záře proto, že pás je
@@ -752,7 +768,13 @@ html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
    rozvržení, takže by jinak přetekla ven z odsazení karty.
 
    flex:0 1 — nesmí růst, ale smí se stlačit, kdyby jméno vyšlo na tři řádky. */
-.ukol-karta-obraz{flex:0 1 116px;height:116px;display:grid;place-items:center;padding:9px}
+/* Kresba sedí na SPODNÍ hraně svého rámečku, ne uprostřed. Kresby se ořezávají
+   na obálku, takže nejsou čtvercové: široká (srdce) se ve čtvercovém rámečku
+   vejde na šířku a nahoře i dole jí zbyde místo, vysoká ho vyplní. Při
+   zarovnání na střed se tím měnila mezera mezi kresbou a jménem od karty ke
+   kartě. Na spodní hraně má každá kresba k jménu stejně daleko a volné místo
+   zůstane nahoře, kde ho kryje odsazení karty. */
+.ukol-karta-obraz{flex:0 1 112px;height:112px;display:grid;place-items:end center;padding:0 9px}
 .ukol-karta-kresba{
   max-width:100%;max-height:100%;width:auto;height:auto;
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
@@ -763,13 +785,16 @@ html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
    ne v rohu nad kresbou: ruka ho tam má blíž, kresba nemusí uhýbat a karta
    se čte odshora dolů jako jedna věc. */
 .ukol-karta-nazev{
-  margin-top:14px;font-family:var(--pismo);font-weight:700;
-  font-size:17px;line-height:1.22;letter-spacing:-.012em;text-transform:none;
+  margin-top:16px;font-family:var(--pismo);font-weight:700;
+  /* O bod menší než dřív: v sedmnácti se „Rada za všechny prachy" lámala na
+     tři řádky, stlačila kresbu a cenu přitiskla k jménu. V šestnácti se delší
+     jména vejdou na dva. */
+  font-size:16px;line-height:1.25;letter-spacing:-.012em;text-transform:none;
   /* Místo na dva řádky drží každá karta, i když má jméno na jeden. Jinak
      jednořádková jména klesla o dvacet bodů níž než dvouřádková a v mřížce
      po dvou vedle sebe neseděla žádná účaří. Takhle začínají všechna jména
      na stejné lince a řádka s cenou je na všech kartách taky stejně. */
-  min-height:2.44em;
+  min-height:2.5em;
   /* Žádné dělení slov. Safari umí česky a opravdu dělilo — „Balení starý-ho
      kusu", „Tichá špeluň-ka", „Rada za vše-chny prachy" — a na dvouřádkovém
      jménu na malé kartě to nevypadá jako sazba, ale jako chyba. Zlom se dělá
@@ -783,7 +808,7 @@ html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
    vyšší než řádka vedle něj, takže k šesti bodům okraje přidá ještě svoje
    zarovnání na střed — s dvanácti to pod jménem zívalo víc než nad ním. */
 .ukol-karta-spodek{display:flex;align-items:center;justify-content:space-between;
-  gap:10px;margin-top:6px}
+  gap:10px;margin-top:8px}
 .ukol-karta-zaco{min-width:0;font-family:var(--pismo);
   font-size:var(--t-drobne);line-height:1.3;color:var(--text-3)}
 .ukol-karta.splneno .ukol-karta-zaco{color:currentColor;opacity:.72}
@@ -876,7 +901,7 @@ html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
 /* To samé jako na dlaždici: doladěná kresba se zvětšuje transformem, tedy až
    po rozvržení. Bez téhle rezervy lezla Šmelinářovi hlava ven přes horní
    hranu karty a zleva se dotýkala okraje. */
-.detail-obraz{width:152px;height:152px;display:grid;place-items:center;flex:none;
+.detail-obraz{width:152px;height:152px;display:grid;place-items:end center;flex:none;
   padding:11px;overflow:visible}
 .detail-kresba{
   max-width:100%;max-height:100%;width:auto;height:auto;

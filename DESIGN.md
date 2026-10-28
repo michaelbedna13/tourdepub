@@ -274,6 +274,15 @@ Dvě věci, na kterých to stojí:
   byl schod o dva stupně a šev tam, kde zrno začíná. Naměřeno v Chromiu:
   řádek nad pásem (45,45,37), řádek pod ním (44,9/44,3) — pod jeden stupeň.
   **Když se sáhne na zrno, přeměř obojí.**
+- **Pod otevřenou vrstvou pás odejde.** Leží nad plachtou detailu (61 proti
+  40), takže se jako jediný kus obrazovky nezešeřil ani nerozmazal a nahoře
+  z toho byl světlejší pruh s ostrou hranou. Naměřeno na telefonu: horních
+  70 bodů (44,44,36), zbytek obrazovky (35,43,34). Zmizet může bez následků:
+  nad pásem žádné zrno není, takže pod ním zbyde plochá barva s plachtou přes
+  ni, a plochou barvu nemá systémové rozostření jak poznat.
+  **Testovací prostředí to dlouho nemělo** — `ZPLOCHY` v appka.mjs dosazovalo
+  jen `--vrch`, takže se pás v testu nikdy nenakreslil a chyby, co dělá, nebylo
+  jak vidět. Teď dosazuje celý blok.
 - **`z-index: 61`**, tedy nad zrnem (60) a **pod průpravou** (120). V průpravě
   je horní pás plný podklad bez zrna — tam není co rozostřovat a pruh by nad
   ním jen svítil o dva stupně vedle.
@@ -872,6 +881,15 @@ Dlaždice i detail mají **jedno odsazení dokola** (18 a 22 bodů). Bylo
 nestejné — na dlaždici 20 nahoře, 18 po stranách i dole — a čtvereček dole
 vpravo tím seděl blíž ke spodní hraně než jméno k levé. Na kartě se čtyřmi
 prvky je každý nestejný okraj vidět.
+
+**Kresba stojí na spodní hraně svého rámečku**, ne uprostřed. Kresby se
+ořezávají na obálku, takže nejsou čtvercové: široká (srdce) se ve čtvercovém
+rámečku vejde na šířku a nahoře i dole jí zbyde místo, vysoká ho vyplní. Při
+zarovnání na střed se tím měnila mezera mezi kresbou a jménem od karty ke
+kartě (12,7 až 16 bodů). Na spodní hraně má každá kresba k jménu stejně
+daleko a volné místo zůstane nahoře, kde ho kryje odsazení karty. Doladěné
+zvětšení proto roste **od spodní hrany** (`transform-origin: 50% 100%`);
+ze středu by se té mezery o kus zakouslo.
 
 **Kresba má pevnou výšku, ne „co zbyde".** Dokud si brala zbytek karty, měla
 každá dlaždice kresbu jinak velkou a jinde — naměřeno přes galerii **112 až

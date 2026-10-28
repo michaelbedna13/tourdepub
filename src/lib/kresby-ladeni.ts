@@ -18,8 +18,11 @@ export interface LadeniKresby {
 
 export const LADENI_KRESEB: Record<string, LadeniKresby> = {
   // Šmelinář je vysoký a úzký, takže na výšku rámečku dosáhne dřív, než ho
-  // zaplní do stran — ve čtverci pak vypadá menší než ostatní.
-  smelinar: { zvetseni: 1.16, y: -2 },
+  // zaplní do stran, a ve čtverci pak vypadá menší než ostatní.
+  // Šestnáct procent to bylo, dokud se kresby zarovnávaly na střed rámečku
+  // a zvětšovaly se od středu. Teď stojí na spodní hraně a rostou nahoru, kde
+  // je nad nimi jen odsazení karty, takže se víc než šest procent nevejde.
+  smelinar: { zvetseni: 1.06 },
   // Borec, co to cáluje: kresba jde doleva dolů, tak se o kousek posune zpět.
   caluje: { zvetseni: 1.06, x: 2 },
 };
