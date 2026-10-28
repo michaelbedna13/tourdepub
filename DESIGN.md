@@ -732,22 +732,20 @@ a vycentrování je k ničemu. Výšku má podle displeje
 plakáty vedle sebe mají mít kresbu stejně velkou. Smrsknout se smí, když se
 blok nevejde.
 
-Naměřený vzduch nad blokem a pod ním (čtyři stránky za sebou):
+**Všech pět plakátů stojí stejně:** kresba nahoře uprostřed, pod ní nadpis
+a text. Skladeb tu bylo pět, každá jiná, a mělo to být střídání jako v knize
+plakátů; jenže se úvod odklikává po vteřinách a každá stránka tím skočila
+jinam. Místo rytmu z toho byl zmatek. Jedna skladba se zapamatuje po první
+stránce a oko pak čte obsah, ne rozvržení.
 
-| displej | kresba | nad / pod |
-|---|---|---|
-| 375 × 667 | 253 px | 42/42 · 22/22 · 30/29 · 43/42 |
-| 393 × 852 | 320 px | 99/99 · 79/79 · 87/87 · 100/99 |
-| 430 × 932 | 320 px | 136/136 · 116/116 · 136/136 · 137/136 |
+Dvě věci to drží opravdu na stejné lince:
 
-Rozdíl mezi stránkami je jen délkou textu, souměrnost drží všude.
-
-**Žádné dvě stránky nejsou poskládané stejně.** Čtyři stejné obrazovky za
-sebou vypadají jako formulář, ne jako série plakátů, takže se střídají tři
-skladby (text pod kresbou / nadpis nahoře a věta dole / text celý nahoře)
-a tři kotvy kresby (na střed, k levému kraji, k pravému). Kresba se u kraje
-zúží — dokud zabírala celou šířku, nebylo poznat, že je přitisknutá,
-a vypadalo to jen jako nepovedené vycentrování.
+- **Blok je ukotvený odshora, ne na střed.** Na střed se posouval podle
+  délky textu pod ním, takže kresba i nadpis skákaly plakát od plakátu
+  o pár desítek bodů.
+- **Kresba má pevný rámeček** (`min(31vh, 214px)`). Čmáranice nejsou
+  čtvercové, šnek je široký a čárky vysoké, takže bez rámečku si každá vzala
+  jinou výšku a nadpis pod ní jinou linku.
 
 Barvu i inkoust nese stránka sama (`--papir`, `--inkoust`, viz `PRUPRAVA`
 v `Uvod.tsx`): dvě stránky jsou tmavé s krémovým inkoustem, dvě světlé

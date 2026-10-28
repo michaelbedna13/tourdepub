@@ -38,13 +38,6 @@ const ZAVRENI = 300;
 interface Plakat {
   /** Klíč kresby v UVOD_KRESBY. */
   id: keyof typeof UVOD_KRESBY;
-  /** Rozmístění na mřížce. Pět skladeb, každá jinak — viz app.css.
-   *  a: text nahoře, kresba dole vpravo
-   *  b: kresba nahoře vpravo (menší), text dole
-   *  c: kresba dole vlevo, text odsazený doprava
-   *  d: kresba nahoře uprostřed, text pod ní
-   *  e: kresba dole přes celou šířku */
-  skladba: "a" | "b" | "c" | "d" | "e";
   nadpis: string;
   /** Jeden odstavec, nebo seznam pravidel. Vždycky jedno z toho. */
   text?: string;
@@ -60,11 +53,11 @@ interface Plakat {
  *  courání má plakát celý pro sebe, aby se nemuselo tlačit vedle cajku
  *  a partyjí. */
 const PLAKATY: Plakat[] = [
-  { id: "opilec", skladba: "a", nadpis: "Betelná řežba", text: UVODNIK },
-  { id: "hodiny", skladba: "b", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
-  { id: "snek", skladba: "c", nadpis: "Žádný courání", text: COURANI.text },
-  { id: "carky", skladba: "d", nadpis: "Bodování", body: bodovani(stav.hospody.length, true) },
-  { id: "kotel", skladba: "e", nadpis: "Celej bank", body: ZAKLAD },
+  { id: "opilec", nadpis: "Betelná řežba", text: UVODNIK },
+  { id: "hodiny", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
+  { id: "snek", nadpis: "Žádný courání", text: COURANI.text },
+  { id: "carky", nadpis: "Bodování", body: bodovani(stav.hospody.length, true) },
+  { id: "kotel", nadpis: "Celej bank", body: ZAKLAD },
 ];
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
@@ -206,7 +199,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
           </div>
 
           {/* key: každý plakát přijede jako nový, ne že se přepíše text */}
-          <div className={`uvod-list ${p.skladba}`} key={kde}>
+          <div className="uvod-list" key={kde}>
             <div className="uvod-kresba"><Cmaranice id={p.id} /></div>
             <h1 className="uvod-nadpis">{vazat(p.nadpis)}</h1>
             <div className="uvod-telo">
