@@ -54,8 +54,11 @@ function Kostra() {
   const svih = useSvih(pathname.startsWith("/ukoly/") ? KATEGORIE_CESTY : HLAVNI);
   // ještě před vykreslením nové obrazovky, ať neproblikne na staré pozici
   useLayoutEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  // Na úkolech teplá záře zhasne: barvu tam nesou karty kategorií a oranžové
+  // světlo jim do ní míchalo — zelená pod ním táhla do olivové.
+  const bezZare = pathname.startsWith("/ukoly");
   return (
-    <div className="app" {...svih.obal}>
+    <div className={`app${bezZare ? " bez-zare" : ""}`} {...svih.obal}>
       <Ramy />
       {/* klíč podle adresy: každá obrazovka přijede, ne střih */}
       <main className={`obrazovka${svih.prichod ? ` z-${svih.prichod}` : ""}`}

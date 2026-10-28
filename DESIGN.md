@@ -100,6 +100,11 @@ vezme jako `--kat` a dál se z ní míchá všechno ostatní (`color-mix`):
 - kresba na nich (55 % do textu),
 - tlačítko *Splněno* a počítadlo (36 %).
 
+**Na obrazovkách úkolů je zhasnutá teplá záře** (`.app.bez-zare`, nastavuje
+`Kostra` v `App.tsx` podle adresy). Záře míchala oranžovou do barev kategorií
+— zelená pod ní táhla do olivové a karty vypadaly zakouřeně. Jinde zůstává:
+tam barvu nikdo nenese a appka bez ní vypadá jako terminál.
+
 **Pozadí obrazovky kategorie barvu nenese.** Bylo nasvícené odstínem
 kategorie shora, jenže dvě plochy téže barvy nad sebou — podklad a karty —
 si vzájemně braly sílu a karty vycházely jako slabší verze pozadí. Na černé
@@ -805,6 +810,31 @@ z textového editoru. Číslo dokladu je **počet čárek na stole dohromady** �
 během večera naskakuje jako počítadlo na pokladně a je to pořád pravdivý údaj.
 Červená je `#E5331F` na velké texty; na drobné popisky by na krémovém papíru
 neudržela kontrast, tak je pro ně tmavší (`#B4220F`).
+
+## Rozostřené pozadí pod vrstvou
+
+Pod otevřeným detailem nebo oknem se rozmaže **obsah** (`filter` na
+`.obrazovka`), ne podklad plachty. `backdrop-filter` si Safari vzorkuje zvlášť
+a po překreslení u kraje selhával.
+
+U krajů se ale ukázalo něco, co není chyba prohlížeče: **karty galerie stojí
+dvacet bodů od hrany obrazovky**, rozostření jim tu hranu rozmázne na obě
+strany a doleva dosáhne asi čtrnáct bodů — takže posledních pár bodů u hrany
+zůstane holý podklad. Dokud je obraz ostrý, čte se ten pruh jako okraj
+stránky; jakmile se rozmaže, vypadá jako pruh, co „není rozmazaný".
+Naměřeno na telefonu: od kraje k šestému bodu plochá barva, pak hladký náběh
+přes třicet bodů — přesně tvar gaussovského rozostření. Rozostřit se tam
+nemá co.
+
+Zkoušelo se roztáhnout `.obrazovka` o kus ven z obrazovky, ať slábnoucí hrana
+filtru padne mimo viditelnou plochu. **Nezměřilo se žádné zlepšení** a není
+divu: problém není hrana prvku, ale že obsah ke kraji nedosahuje. Vrátilo se
+to zpátky.
+
+Spravit se to dá jedině tím, že ten okraj přestane být náhodný: plachta má po
+stranách **vinětu** (nejtmavší u hrany, do 16 % šířky se ztratí). Náběh karet
+do ní zapadne a žádný pruh tam není — vypadá to jako rámovaný obraz, ne jako
+chyba.
 
 ## Plochy, které jsme nekreslili
 

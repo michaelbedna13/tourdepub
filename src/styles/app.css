@@ -156,7 +156,14 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
       rgba(249,162,4,.05) 58%,
       transparent 80%),
     linear-gradient(to top, rgba(216,86,14,.07), transparent 32%);
+  /* Na úkolech se zhasíná (.app.bez-zare), ať teplé světlo nemíchá do barev
+     kategorií. Přechodem, ne střihem: mezi obrazovkami by to jinak cvaklo. */
+  transition:opacity .3s var(--krok);
 }
+/* Obrazovky úkolů nesou barvu kategorie na kartách a teplá záře jim do ní
+   míchala oranžovou — zelená pod ní táhla do olivové. Tady je podklad čistý
+   a barvu drží jen karty. */
+.app.bez-zare::after{opacity:0}
 
 /* Filmové zrno přes celou appku. Leží nad vším, co appka nakreslí, a nechytá
    dotyk.
@@ -250,8 +257,7 @@ input,textarea,select{caret-color:var(--text)}
   animation:obsah-prichod .34s var(--krok) backwards;
   /* Pod otevřenou vrstvou se obrazovka rozmaže. Dělá to filtr na obsahu,
      ne backdrop-filter na plachtě: Safari si podklad pro backdrop vzorkuje
-     zvlášť a u levého okraje po překreslení zůstával nerozostřený proužek.
-     Tohle žádnou hranu ke vzorkování nemá. */
+     zvlášť a u levého okraje po překreslení zůstával nerozostřený proužek. */
   transition:filter .18s var(--krok);
 }
 html.rozmazat .obrazovka{filter:blur(7px)}
@@ -759,8 +765,26 @@ html.rozmazat .obrazovka{filter:blur(7px)}
      a scrolluje stránkou pod otevřeným detailem. */
   touch-action:none;
   padding:calc(var(--vrch) + 8px) var(--okraj) calc(env(safe-area-inset-bottom) + 24px);
-  /* Jen ztmavení. Rozostření dělá .obrazovka pod vrstvou, viz lib/vrstvy.ts. */
-  background:rgba(22,22,18,.52);
+  /* Ztmavení a po stranách vinětace. Rozostření dělá .obrazovka pod vrstvou,
+     viz lib/vrstvy.ts.
+
+     Viněta je tu kvůli okrajům. Karty galerie stojí dvacet bodů od kraje
+     obrazovky a rozostření jim tu hranu rozmázne na obě strany — doleva
+     dosáhne asi čtrnáct bodů, takže posledních šest bodů u kraje zůstane
+     holý podklad. Dokud je obraz ostrý, čte se ten pruh jako okraj stránky;
+     jakmile se rozmaže, je z něj pruh, co „není rozmazaný". Není to chyba
+     prohlížeče ani vzorkování — rozostřit se tam prostě nemá co. Měřeno na
+     telefonu: od kraje k šestému bodu plochá barva, pak hladký náběh přes
+     třicet bodů, přesně jak má gaussovské rozostření vypadat.
+
+     Spravit se to dá jedině tím, že ten okraj přestane být náhodný. Viněta
+     z něj udělá kraj obrazu: nejtmavší u hrany, do šestnácti procent šířky
+     se ztratí. Náběh karet do ní zapadne a žádný pruh tam není. */
+  background:
+    linear-gradient(to right,
+      rgba(12,12,9,.55), rgba(12,12,9,0) 16%,
+      rgba(12,12,9,0) 84%, rgba(12,12,9,.55)),
+    rgba(22,22,18,.52);
   animation:zjevit .18s var(--krok);
 }
 /* Výška je daná, ne odvozená z délky popisu: karta s dvěma větami a karta
@@ -1029,8 +1053,14 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 
 /* ---------- okno ---------- */
 .okno{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;
-  /* Jen ztmavení; rozostření dělá .obrazovka pod vrstvou (lib/vrstvy.ts). */
-  background:rgba(3,7,5,.62);
+  /* Ztmavení a po stranách viněta, ze stejného důvodu jako u detailu úkolu:
+     rozostřený obsah nedosáhne až ke kraji obrazovky a holý pruh by se četl
+     jako nerozmazaný. Rozostření dělá .obrazovka pod vrstvou (lib/vrstvy.ts). */
+  background:
+    linear-gradient(to right,
+      rgba(12,12,9,.5), rgba(12,12,9,0) 16%,
+      rgba(12,12,9,0) 84%, rgba(12,12,9,.5)),
+    rgba(3,7,5,.62);
   animation:zjevit .18s var(--krok)}
 .okno-telo{width:100%;max-width:var(--sirka);background:var(--vrstva);
   border-radius:28px 28px 0 0;padding:26px 22px calc(24px + env(safe-area-inset-bottom));
@@ -1066,12 +1096,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .legenda-radek{display:flex;align-items:center;gap:12px;font-size:var(--t-text);color:var(--text-2)}
 
 /* ---------- úvod po spuštění ---------- */
-/* Průprava je plakát, ne obrazovka s nádechem barvy. Plná barva přes celou
-   plochu, jeden inkoust na všechno (čmáranice, nadpis, text i lišta dole)
-   a jedna velká čmáranice uprostřed. Barvu i inkoust nese stránka v
-   --papir a --inkoust (viz PRUPRAVA v Uvod.tsx): půlka stránek je tmavá
-   s krémovým inkoustem, půlka světlá s černým. Nic uvnitř se proto neodvozuje
-   od --text ani od --podklad, všechno je currentColor. */
+/* Průprava je plakát, ne obrazovka s nádechem barvy: podklad appky, jeden
+   inkoust na všechno (čmáranice, nadpis, text i lišta dole) a jedna velká
+   čmáranice. Rozdíl mezi plakáty nedělá barva, ale rozmístění na mřížce. */
 .uvod{
   /* ---- mřížka plakátů ----
      Šest sloupců a jeden žlab. Šestka proto, že se dělí na polovinu, třetinu
