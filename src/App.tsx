@@ -57,7 +57,9 @@ function Kostra() {
   useLayoutEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   // Na úkolech teplá záře zhasne: barvu tam nesou karty kategorií a oranžové
   // světlo jim do ní míchalo — zelená pod ním táhla do olivové.
-  const bezZare = pathname.startsWith("/ukoly");
+  // Na Pravidlech taky, i když tam žádné barevné karty nejsou: je to samý
+  // text na prázdné ploše a světlo z něj dělalo stránku s nasvíceným rohem.
+  const bezZare = pathname.startsWith("/ukoly") || pathname.startsWith("/pravidla");
   return (
     <div className={`app${bezZare ? " bez-zare" : ""}`} {...svih.obal}>
       <Ramy />

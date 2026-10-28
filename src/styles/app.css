@@ -167,13 +167,16 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
       rgba(249,162,4,.05) 58%,
       transparent 80%),
     linear-gradient(to top, rgba(216,86,14,.07), transparent 32%);
-  /* Na úkolech se zhasíná (.app.bez-zare), ať teplé světlo nemíchá do barev
-     kategorií. Přechodem, ne střihem: mezi obrazovkami by to jinak cvaklo. */
+  /* Na úkolech a v Pravidlech se zhasíná (.app.bez-zare). Přechodem, ne
+     střihem: mezi obrazovkami by to jinak cvaklo. */
   transition:opacity .3s var(--krok);
 }
 /* Obrazovky úkolů nesou barvu kategorie na kartách a teplá záře jim do ní
    míchala oranžovou — zelená pod ní táhla do olivové. Tady je podklad čistý
-   a barvu drží jen karty. */
+   a barvu drží jen karty.
+
+   V Pravidlech je důvod jiný: žádné karty tam nejsou, je to samý text
+   na prázdné ploše, a na ní se nasvícený roh četl jako kaz, ne jako světlo. */
 .app.bez-zare::after{opacity:0}
 
 /* Filmové zrno přes celou appku. Leží nad vším, co appka nakreslí, a nechytá
