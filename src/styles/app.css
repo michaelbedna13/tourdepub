@@ -791,7 +791,7 @@ html.rozmazat .obrazovka{filter:blur(5px)}
      spodní hranou, i když se sazba o kousek stáhne (viz --sazba). */
   margin-top:auto;font-family:var(--pismo);font-weight:700;
   font-size:calc(16.5px * var(--sazba,1));line-height:1.26;
-  letter-spacing:-.012em;text-transform:none;
+  letter-spacing:var(--prostrkani,-.012em);text-transform:none;
   /* Místo na dva řádky drží každá karta, i když má jméno na jeden. Jinak
      jednořádková jména klesla o dvacet bodů níž než dvouřádková a v mřížce
      po dvou vedle sebe neseděla žádná účaří. Takhle začínají všechna jména
@@ -807,8 +807,11 @@ html.rozmazat .obrazovka{filter:blur(5px)}
      jménu na malé kartě to nevypadá jako sazba, ale jako chyba. Zlom se dělá
      jen v mezerách; break-word zůstává jako poslední záchrana pro slovo,
      které se na řádek nevejde ani samo.
-     balance vyrovná délku řádků, ať na druhém nezůstane viset jedno slovo. */
-  hyphens:manual;overflow-wrap:break-word;text-wrap:balance;
+
+     Kam se zlomí, rozhoduje lib/sazba.ts — každý řádek je vlastní <span>.
+     balance to dřív dělal za nás, jenže pak se lámalo jinde, než kde se
+     měřilo, a stažení jména vycházelo na jiná čísla, než jaká se nakreslila. */
+  hyphens:manual;overflow-wrap:break-word;
 }
 /* Stav v rohu, ne v řádce pod jménem. Je to značka, ne ovládání: zapisuje
    se v detailu. Co se nehodí říct, se neřekne, takže na většině karet není

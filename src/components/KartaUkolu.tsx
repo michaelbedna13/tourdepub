@@ -1,5 +1,5 @@
 import type { Kategorie, Ukol } from "../lib/data";
-import { vazat } from "../lib/format";
+import { useSazbaJmena, vzorJmena } from "../lib/sazba";
 import { kolikrat, tym } from "../lib/stav";
 import { Ikona } from "./Ikona";
 import { Kresba, maKresbu } from "./Kresba";
@@ -29,14 +29,10 @@ export function KartaUkolu({ u, k, otevri }: Props) {
   const splneno = kolik > 0 && (opakovatelny ? kolik >= u.max : true);
   const postup = opakovatelny && kolik > 0 && !splneno ? `${kolik}/${u.max}` : null;
 
-  // Dlouhé jméno se o kousek stáhne, ať se vejde na dva řádky. „Rada za
-  // všechny prachy" má dvaadvacet znaků a jako jediné ze všech úkolů se
-  // lámalo na tři; delší jméno sice utáhne tenčí sazbu, ale třetí řádek
-  // ukousne kresbě dvacet bodů a karta vedle vypadá jako z jiné sady.
-  // Devatenáct je nejdelší jméno, co se na dva řádky vejde samo, takže se
-  // pod ním nic nemění. Dolní mez je kvůli tomu, aby se z opravdu dlouhého
-  // jména nestal drobnopis — tam radši pustíme třetí řádek.
-  const sazba = Math.max(0.85, Math.min(1, 19 / u.nazev.length));
+  // Lámání i případné stažení jména si spočítá lib/sazba.ts z naměřené
+  // šířky v tom písmu, které se opravdu načetlo. Odhad podle počtu znaků tu
+  // stál dřív a stahoval skoro dvakrát víc, než bylo potřeba.
+  const { radky, sazba, prostrkani } = useSazbaJmena(u.nazev);
 
   return (
     <div
@@ -63,8 +59,9 @@ export function KartaUkolu({ u, k, otevri }: Props) {
         {!maKresbu(u.id) && <Ikona jmeno={u.ikona ?? k.ikona} px={96} trida="ukol-karta-kresba" />}
       </div>
 
-      <h3 className="ukol-karta-nazev" style={{ "--sazba": sazba } as React.CSSProperties}>
-        {vazat(u.nazev)}
+      <h3 ref={vzorJmena} className="ukol-karta-nazev"
+        style={{ "--sazba": sazba, "--prostrkani": `${prostrkani}em` } as React.CSSProperties}>
+        {radky.map((r, i) => <span key={i}>{r}</span>)}
       </h3>
     </div>
   );
