@@ -1,4 +1,4 @@
-// Výchozí hospody a úkoly podle pravidel Tour de Pub – Brno edition.
+// Výchozí hospody a úkoly podle pravidel Tour de Pub, brněnské edice.
 // Tohle je jenom startovní sada. Jakmile se hra rozjede, drží si hospody i úkoly
 // vlastní kopii ve stavu (stav.js) a dají se upravovat přímo v appce.
 //

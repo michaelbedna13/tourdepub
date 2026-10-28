@@ -561,6 +561,28 @@ kde stojí potichu na 30 % krytí. V horní liště je nadpis obrazovky vlevo
 a vpravo tým s hamburgerem; na Hře nadpis chybí schválně — tam vede název
 hospody na hero kartě a dva titulky nad sebou by si konkurovaly.
 
+### Ikona v prohlížeči
+
+**Na ploše značka, v prohlížeči čárky.** Ikona na ploše má 180 bodů a značka
+je v ní čitelná. V prohlížeči má ikona šestnáct až osmačtyřicet a „TOUR DE
+PUB" se v nich slije do skvrny: ve vyhledávání Safari z toho zbylo `TOU`
+a kaňka pod tím.
+
+Malá ikona proto nese **čárky** (`carka` z `ikony.ts`): čtyři svislé a jedna
+přes ně, tedy to, co appka celý večer počítá. V šestnácti bodech se to pozná
+a nic jiného to nepřipomíná. Zkoušel se i půllitr (v šestnácti se zalije
+ouško) a koruna (čitelná, ale o appce nic neříká).
+
+Vedle SVG se generují i `ikona-48.png` a `ikona-96.png`, pro prohlížeče, co
+SVG ikonu ignorují. Všechno dělá `scripts/ikony-appky.mjs`.
+
+### Jméno
+
+`Tour de Pub | Brno`. Stálo tam „Tour de Pub — Brno edition", což je na
+řádku ve vyhledávání dlouhé a pomlčka se tam navíc plete s pomlčkou, kterou
+si prohlížeč sám doplňuje mezi jméno a adresu. Na ploše zůstává krátké
+`Tour de Pub`.
+
 ## Plochy a předěly
 
 Obsah před ozdobami. Plochy jsou **ploché** — žádné přechody, žádné zrno, žádné

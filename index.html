@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Tour de Pub — Brno edition</title>
+<title>Tour de Pub | Brno</title>
 <meta name="description" content="Zapisování čárek při Tour de Pub: devět brněnskejch špeluněk, úkoly a pořadí part.">
 <!-- Tmavé schéma se musí říct hlavičkou, ne až stylem. app.css se schválně
      načítá neblokujícím způsobem (media="print", viz stylNeblokuje() ve
@@ -38,8 +38,14 @@
 <link id="pismo-adobe" rel="stylesheet" href="https://use.typekit.net/thr1dyh.css"
   media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://use.typekit.net/thr1dyh.css"></noscript>
-<link rel="manifest" href="/manifest.json?v=2">
+<link rel="manifest" href="/manifest.json?v=3">
+<!-- Ikona v prohlížeči nese čárky, ne značku. V šestnácti až osmačtyřiceti
+     bodech se „TOUR DE PUB" slije do skvrny; ve vyhledávání Safari z toho
+     zbylo „TOU" a kaňka. PNG jsou tu pro prohlížeče, co SVG ikonu ignorují.
+     Na ploše zůstává značka: tam má ikona 180 bodů a je čitelná. -->
 <link rel="icon" href="/ikona.svg" type="image/svg+xml">
+<link rel="icon" href="/ikona-48.png" sizes="48x48" type="image/png">
+<link rel="icon" href="/ikona-96.png" sizes="96x96" type="image/png">
 <link rel="apple-touch-icon" href="/ikona-180.png">
 <!-- Úvodní obrazovky pro appku na ploše iPhonu. Bez nich ukáže iOS při
      spuštění jen prázdnou barvu. Generuje scripts/uvodni-obrazovky.mjs.
