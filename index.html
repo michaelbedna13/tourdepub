@@ -5,6 +5,26 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Tour de Pub | Brno</title>
 <meta name="description" content="Zapisování čárek při Tour de Pub: devět brněnskejch špeluněk, úkoly a pořadí part.">
+<!-- Náhled, když se odkaz pošle do zprávy. Bez og:image ukáže iMessage
+     i WhatsApp jen holý proužek s názvem. Adresy musí být ABSOLUTNÍ —
+     relativní cestu čtečky odkazů neumí doplnit.
+     Obrázek kreslí scripts/nahled.mjs; když se změní, posuň ?v=, protože
+     si ho Facebook, WhatsApp i iMessage drží v cache pěkně dlouho. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tour de Pub">
+<meta property="og:locale" content="cs_CZ">
+<meta property="og:title" content="Tour de Pub | Brno">
+<meta property="og:description" content="Zapisování čárek při Tour de Pub: devět brněnskejch špeluněk, úkoly a pořadí part.">
+<meta property="og:url" content="https://betelnarezba.cz/">
+<meta property="og:image" content="https://betelnarezba.cz/nahled.png?v=1">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Značka Tour de Pub a pět čárek">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tour de Pub | Brno">
+<meta name="twitter:description" content="Zapisování čárek při Tour de Pub: devět brněnskejch špeluněk, úkoly a pořadí part.">
+<meta name="twitter:image" content="https://betelnarezba.cz/nahled.png?v=1">
 <!-- Tmavé schéma se musí říct hlavičkou, ne až stylem. app.css se schválně
      načítá neblokujícím způsobem (media="print", viz stylNeblokuje() ve
      vite.config.ts), takže `color-scheme: dark` v něm dorazí až po prvním
