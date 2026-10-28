@@ -907,6 +907,15 @@ přetekla ven z odsazení karty: na dlaždici končila osm bodů od hrany,
 zatímco jméno pod ní mělo osmnáct, a v detailu lezla Šmelinářovi hlava ven
 přes horní hranu.
 
+**Kolik za úkol padne, nese přímo tlačítko** (`+2`). Stávala pod jménem ještě
+řádka „+2 čárky" a u jednořádkového jména visela v prázdnu uprostřed karty:
+dvě věci, co říkají to samé, a jedna z nich navíc tam, kde to vypadá jako
+chyba sazby. Tlačítko teď rovnou říká, co přidá, a drží spodní hranu karty,
+takže sedí stejně, ať má jméno jeden řádek nebo dva. Volné místo nad ním je
+prostě okraj, ne mezera mezi dvěma věcmi. Kolikrát z kolika (`2/5`) se ukáže
+vlevo jen u načatých opakovatelných úkolů; jinde by to byla řádka, co nic
+neříká.
+
 **Jméno a cena jsou jedna věc** — co to je a co za to padne — takže drží
 u sebe (6 bodů) a mezera je nad nimi (16), ne mezi nimi. Čtvereček je skoro
 dvakrát vyšší než řádka vedle něj, takže k těm šesti bodům přidá ještě svoje

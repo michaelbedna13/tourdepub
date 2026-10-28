@@ -29,9 +29,9 @@ export function KartaUkolu({ u, k, otevri }: Props) {
   const opakovatelny = u.max > 1;
   const splneno = kolik > 0 && (opakovatelny ? kolik >= u.max : true);
 
-  // Na dlaždici jen to nejkratší, co dává smysl. Strop („až 5") je v detailu;
-  // tady by se zalomil na tři řádky a ujedl místo jménu.
-  const zaCo = opakovatelny ? `+${u.body} za kus` : `+${u.body} ${sklonuj(u.body)}`;
+  // Kolikrát z kolika. Ukazuje se jen u opakovatelných úkolů, co už někdo
+  // načal: na ostatních kartách by to byla řádka, co nic neříká.
+  const postup = opakovatelny && kolik > 0 && !splneno ? `${kolik}/${u.max}` : null;
 
   function zapis(e: React.MouseEvent) {
     e.stopPropagation();
@@ -56,24 +56,24 @@ export function KartaUkolu({ u, k, otevri }: Props) {
         {!maKresbu(u.id) && <Ikona jmeno={u.ikona ?? k.ikona} px={96} trida="ukol-karta-kresba" />}
       </div>
 
-      {/* Jméno přes celou šířku, ať se neláme uprostřed slova; čtvereček až
-          u řádky s čárkami, jako na předloze. */}
       <h3 className="ukol-karta-nazev">{vazat(u.nazev)}</h3>
 
+      {/* Kolik za úkol padne, nese přímo tlačítko. Stávala pod jménem ještě
+          řádka „+2 čárky" a u jednořádkového jména visela v prázdnu uprostřed
+          karty — dvě věci, co říkají to samé, a jedna z nich navíc tam, kde
+          to vypadá jako chyba sazby. Takhle tlačítko rovnou říká, co přidá. */}
       <div className="ukol-karta-spodek">
-        <span className="ukol-karta-zaco cislo">
-          {opakovatelny && kolik > 0 && !splneno ? `${kolik}/${u.max} · ${zaCo}` : zaCo}
-        </span>
+        {postup && <span className="ukol-karta-postup cislo">{postup}</span>}
 
         {/* Hotový úkol už se zapsat nedá, tak z tlačítka zbude jen fajfka. */}
         {splneno ? (
           <span className="ukol-karta-box hotovo" aria-hidden="true">
-            <Ikona jmeno="check" px={17} />
+            <Ikona jmeno="check" px={18} />
           </span>
         ) : (
-          <button className="ukol-karta-box" onClick={zapis} disabled={!jdePridat(u, t)}
-            aria-label={`Zapsat ${u.nazev}`}>
-            <Ikona jmeno="plus" px={17} />
+          <button className="ukol-karta-box cislo" onClick={zapis} disabled={!jdePridat(u, t)}
+            aria-label={`Zapsat ${u.nazev}, ${u.body} ${sklonuj(u.body)}`}>
+            +{u.body}
           </button>
         )}
       </div>

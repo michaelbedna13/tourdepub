@@ -786,15 +786,14 @@ html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
    se čte odshora dolů jako jedna věc. */
 .ukol-karta-nazev{
   margin-top:16px;font-family:var(--pismo);font-weight:700;
-  /* O bod menší než dřív: v sedmnácti se „Rada za všechny prachy" lámala na
-     tři řádky, stlačila kresbu a cenu přitiskla k jménu. V šestnácti se delší
-     jména vejdou na dva. */
-  font-size:16px;line-height:1.25;letter-spacing:-.012em;text-transform:none;
+  font-size:16.5px;line-height:1.26;letter-spacing:-.012em;text-transform:none;
   /* Místo na dva řádky drží každá karta, i když má jméno na jeden. Jinak
      jednořádková jména klesla o dvacet bodů níž než dvouřádková a v mřížce
      po dvou vedle sebe neseděla žádná účaří. Takhle začínají všechna jména
      na stejné lince a řádka s cenou je na všech kartách taky stejně. */
-  min-height:2.5em;
+  /* Dva řádky drží každá karta, i když má jméno na jeden: v mřížce po dvou
+     vedle sebe pak začínají všechna jména na stejné lince. */
+  min-height:2.52em;
   /* Žádné dělení slov. Safari umí česky a opravdu dělilo — „Balení starý-ho
      kusu", „Tichá špeluň-ka", „Rada za vše-chny prachy" — a na dvouřádkovém
      jménu na malé kartě to nevypadá jako sazba, ale jako chyba. Zlom se dělá
@@ -803,20 +802,24 @@ html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
      balance vyrovná délku řádků, ať na druhém nezůstane viset jedno slovo. */
   hyphens:manual;overflow-wrap:break-word;text-wrap:balance;
 }
-/* Jméno a cena jsou jedna věc: co to je a co za to padne. Drží se proto
-   u sebe a mezera je nad nimi, ne mezi nimi. Čtvereček je skoro dvakrát
-   vyšší než řádka vedle něj, takže k šesti bodům okraje přidá ještě svoje
-   zarovnání na střed — s dvanácti to pod jménem zívalo víc než nad ním. */
-.ukol-karta-spodek{display:flex;align-items:center;justify-content:space-between;
-  gap:10px;margin-top:8px}
-.ukol-karta-zaco{min-width:0;font-family:var(--pismo);
-  font-size:var(--t-drobne);line-height:1.3;color:var(--text-3)}
-.ukol-karta.splneno .ukol-karta-zaco{color:currentColor;opacity:.72}
+/* Spodní řádka drží spodní hranu karty: tlačítko je v rohu vždycky stejně,
+   ať má jméno jeden řádek nebo dva. Volné místo nad ním je prostě okraj,
+   ne mezera mezi dvěma věcmi, takže se jako chyba sazby nečte. */
+.ukol-karta-spodek{display:flex;align-items:center;justify-content:flex-end;
+  gap:10px;margin-top:auto;padding-top:10px}
+/* Kolikrát z kolika. Jen u načatých opakovatelných úkolů. */
+.ukol-karta-postup{margin-right:auto;font-family:var(--pismo);
+  font-size:var(--t-drobne);color:var(--text-3)}
+.ukol-karta.splneno .ukol-karta-postup{color:currentColor;opacity:.72}
 /* Čtvercový je schválně — kolečka v appce odškrtávají, tohle přidává. */
+/* Tlačítko říká, co přidá. Čtvercové je schválně: kolečka v appce
+   odškrtávají, tohle přidává. */
 .ukol-karta-box{
-  flex:none;width:38px;height:38px;display:grid;place-items:center;
-  border-radius:12px;color:inherit;
-  box-shadow:inset 0 0 0 1.5px currentColor;opacity:.42;
+  flex:none;min-width:46px;height:40px;padding:0 12px;
+  display:grid;place-items:center;
+  border-radius:13px;color:inherit;
+  font-family:var(--nadpisy);font-weight:700;font-size:16px;letter-spacing:.01em;
+  box-shadow:inset 0 0 0 1.5px currentColor;opacity:.5;
   transition:opacity .16s,transform .13s var(--krok),background .16s;
 }
 .ukol-karta-box:active{transform:scale(.88)}
