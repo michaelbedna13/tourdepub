@@ -123,17 +123,48 @@ const KRESBY = {
 /** Co se opravdu zapisuje do src/lib/uvod-kresby.ts. */
 const POUZITE = ["opilec", "hodiny", "snek", "carky", "kotel"];
 
+/** Obálka kresby: nejmenší rámeček, do kterého se vejde inkoust.
+ *
+ *  Kreslí se do čtverce 0 0 100 100, jenže ho žádná kresba nevyplní celý
+ *  a každá jinak: čárky zabraly sedmdesát procent výšky, panák skoro všechno.
+ *  Na plakátu, kde mají všechny kresby stejně vysoký rámeček, se ten rozdíl
+ *  projevil jako jinak velká mezera pod kresbou — u čárek skoro dvakrát větší
+ *  než u panáka. S obálkou vyplní rámeček každá kresba na doraz a mezera pod
+ *  ní je všude stejná.
+ *
+ *  Počítá se ze VŠECH čísel v dráze, tedy i z řídicích bodů Bézierů. Ty
+ *  můžou trochu přesahovat skutečnou křivku, takže obálka vyjde o chlup
+ *  větší než samotný inkoust — což je na plakátu spíš dobře, kresba se
+ *  nedotýká hrany. Výstřižky („c") se nepočítají, ty leží uvnitř. */
+function obalka(vrstvy) {
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+  for (const [druh, d] of vrstvy) {
+    if (druh !== "i") continue;
+    const c = d.match(/-?\d+(?:\.\d+)?/g).map(Number);
+    for (let i = 0; i < c.length; i += 2) {
+      x1 = Math.min(x1, c[i]); x2 = Math.max(x2, c[i]);
+      y1 = Math.min(y1, c[i + 1]); y2 = Math.max(y2, c[i + 1]);
+    }
+  }
+  const o = 1; // kousek vzduchu, ať se obrys neotírá o hranu
+  const z = (n) => Math.round(n * 10) / 10;
+  return `${z(x1 - o)} ${z(y1 - o)} ${z(x2 - x1 + 2 * o)} ${z(y2 - y1 + 2 * o)}`;
+}
+
 const out = [];
 for (const [k, f] of Object.entries(KRESBY)) {
   if (!POUZITE.includes(k)) continue;
   nasad(11 + k.length * 17); // pevná náhodnost na kresbu, ať se změnou jedné nepřekreslí ostatní
-  out.push(`  ${k}: ${JSON.stringify(f())},`);
+  const vrstvy = f();
+  out.push(`  ${k}: { box: ${JSON.stringify(obalka(vrstvy))}, vrstvy: ${JSON.stringify(vrstvy)} },`);
 }
 writeFileSync(new URL("../src/lib/uvod-kresby.ts", import.meta.url),
   `// Čmáranice pro průpravu v úvodu: tlusté siluety s výstřižky, obrys křivý\n` +
   `// jako stříhaný tupýma nůžkama — ta samá ruka jako ikony, jen velké.\n` +
   `// Generuje scripts/kresli-uvod.mjs – needitovat ručně.\n` +
-  `// Vrstvy: "i" = papír (barva textu), "c" = výstřižek (průhledný). viewBox 0 0 100 100.\n` +
+  `// Vrstvy: "i" = papír (barva textu), "c" = výstřižek (průhledný).\n` +
+  `// box je obálka inkoustu, ne celý čtverec: kresby ho nevyplní stejně\n` +
+  `// a na plakátu by z toho byla pod každou jinak velká mezera.\n` +
   `import type { Vrstva } from "./ikony";\n\n` +
-  `export const UVOD_KRESBY = {\n${out.join("\n")}\n} satisfies Record<string, Vrstva[]>;\n`);
+  `export const UVOD_KRESBY = {\n${out.join("\n")}\n} satisfies Record<string, { box: string; vrstvy: Vrstva[] }>;\n`);
 console.log("src/lib/uvod-kresby.ts:", out.length, "kreseb (ve skriptu", Object.keys(KRESBY).length + ")");

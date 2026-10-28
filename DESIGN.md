@@ -738,14 +738,29 @@ plakátů; jenže se úvod odklikává po vteřinách a každá stránka tím sk
 jinam. Místo rytmu z toho byl zmatek. Jedna skladba se zapamatuje po první
 stránce a oko pak čte obsah, ne rozvržení.
 
-Dvě věci to drží opravdu na stejné lince:
+Čtyři věci to drží opravdu na stejné lince:
 
 - **Blok je ukotvený odshora, ne na střed.** Na střed se posouval podle
   délky textu pod ním, takže kresba i nadpis skákaly plakát od plakátu
   o pár desítek bodů.
-- **Kresba má pevný rámeček** (`min(31vh, 214px)`). Čmáranice nejsou
-  čtvercové, šnek je široký a čárky vysoké, takže bez rámečku si každá vzala
-  jinou výšku a nadpis pod ní jinou linku.
+- **Na vysokém displeji se posune o kus dolů**
+  (`padding-top: clamp(0px, (100dvh - 700px) * .42, 100px)`), ať pod ním
+  nezůstane čtvrtina obrazovky prázdná. Počítá to jen z výšky okna, takže se
+  posune na všech pěti plakátech stejně.
+- **Kresba má pevnou výšku** (`min(26vh, 186px)`), a měří se na výšku, ne na
+  šířku. Čmáranice mají každá jiný poměr a kdyby se měřily na šířku, byla by
+  každá jinak vysoká a mezera pod ní jinak velká. Smí se ale stáhnout
+  (`flex-shrink`), když text pod ní potřebuje víc místa: na krátkém okně je
+  to lepší než text podlezlý pod ceduli *Dál*.
+- **Kresby jsou ořezané na obálku inkoustu**, ne na čtverec, ve kterém se
+  kreslilo. Ten žádná nevyplnila celý a každá jinak: čárky zabraly sedmdesát
+  procent výšky, panák skoro všechno, takže i při stejně vysokém rámečku byla
+  mezera pod čárkami skoro dvakrát větší. Počítá to `obalka()`
+  v `scripts/kresli-uvod.mjs` ze všech čísel v dráze.
+
+**Mezery se smrskávají s výškou okna** (`clamp`). Napevno to bylo 24 a 56
+a na krátkém okně se delší text nevešel. Safari má dole plovoucí lištu, takže
+plakát má o osmdesát bodů míň, než se podle výšky displeje zdá.
 
 Barvu i inkoust nese stránka sama (`--papir`, `--inkoust`, viz `PRUPRAVA`
 v `Uvod.tsx`): dvě stránky jsou tmavé s krémovým inkoustem, dvě světlé

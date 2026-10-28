@@ -254,16 +254,19 @@ function Sipka({ zpet = false }: { zpet?: boolean }) {
 function Cmaranice({ id }: { id: keyof typeof UVOD_KRESBY }) {
   // useId vrací dvojtečky, které v url(#…) nefungují všude
   const maska = `uk${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
-  const vrstvy = UVOD_KRESBY[id];
-  if (!vrstvy) return null;
+  const kresba = UVOD_KRESBY[id];
+  if (!kresba) return null;
+  // viewBox je obálka inkoustu, ne celý čtverec, ve kterém se kreslilo: jinak
+  // by měla každá kresba jinak velkou mezeru pod sebou podle toho, kolik
+  // z čtverce zabrala (viz obalka() v scripts/kresli-uvod.mjs).
   return (
-    <svg className="uvod-cmaranice" viewBox="0 0 100 100" aria-hidden="true">
-      <mask id={maska} maskUnits="userSpaceOnUse" x="-10" y="-10" width="120" height="120">
-        {vrstvy.map(([druh, d], i) => (
+    <svg className="uvod-cmaranice" viewBox={kresba.box} aria-hidden="true">
+      <mask id={maska} maskUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="140">
+        {kresba.vrstvy.map(([druh, d], i) => (
           <path key={i} d={d} fill={druh === "i" ? "#FFFFFF" : "#000000"} />
         ))}
       </mask>
-      <rect x="-10" y="-10" width="120" height="120" fill="currentColor" mask={`url(#${maska})`} />
+      <rect x="-20" y="-20" width="140" height="140" fill="currentColor" mask={`url(#${maska})`} />
     </svg>
   );
 }

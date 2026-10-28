@@ -1279,8 +1279,11 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
      větší mezi kresbou a nadpisem, ať je poznat, co k čemu patří. */
   --uvod-okraj:28px;
   --uvod-sirka:430px;
-  --uvod-mezera-text:24px;
-  --uvod-mezera-blok:56px;
+  /* Mezery se smrskávají s výškou displeje. Napevno to bylo 24 a 56 a na
+     krátkém okně (Safari má dole plovoucí lištu, takže plakát má o osmdesát
+     bodů míň, než se zdá) se delší text nevešel a podlezl ceduli „Dál". */
+  --uvod-mezera-text:clamp(16px,2.6vh,24px);
+  --uvod-mezera-blok:clamp(30px,5.4vh,52px);
 
   position:fixed;inset:0;z-index:120;
   background:var(--podklad);color:var(--text);
@@ -1333,6 +1336,12 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
      plakátu o pár desítek bodů. Odshora drží obojí stejnou linku a plakáty
      se liší jenom tím, co je na nich napsané. */
   display:flex;flex-direction:column;justify-content:flex-start;
+  /* Na vysokém displeji se blok posune o kus dolů, ať pod ním nezůstane
+     čtvrtina obrazovky prázdná. Vzduch se tím rozdělí nad a pod, a protože
+     to počítá jen z výšky okna, posune se na všech pěti plakátech stejně —
+     na rozdíl od zarovnání na střed, co by každý plakát posunulo jinak
+     podle délky jeho textu. */
+  padding-top:clamp(0px,calc((100dvh - 700px) * .42),100px);
   animation:uvod-prichod .3s var(--krok) both;
 }
 /* Kresba drží střed a nepřeroste text: šířku má v procentech plakátu, aby
@@ -1340,11 +1349,17 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 /* Kresba má PEVNÝ rámeček, ať je na všech plakátech stejně velká a stejně
    vysoko. Čmáranice nejsou čtvercové (šnek je široký, čárky vysoké), takže
    bez rámečku si každá vzala jinou výšku a nadpis pod ní jinou linku. */
-.uvod-kresba{flex:none;height:min(31vh,214px);display:flex;
+/* Kresba má pevnou VÝŠKU, ať je na všech plakátech stejně velká a stejně
+   vysoko. Smí se ale stáhnout (flex-shrink), když text pod ní potřebuje
+   víc místa — na krátkém okně je to lepší než text podlezlý pod ceduli. */
+.uvod-kresba{flex:0 1 min(26vh,186px);min-height:84px;display:flex;
   align-items:center;justify-content:center;
   margin-bottom:var(--uvod-mezera-blok);color:var(--text)}
-.uvod-cmaranice{max-width:min(66%,250px);max-height:100%;
-  width:auto;height:auto;display:block}
+/* Výška plní rámeček, šířka se dopočítá. Čmáranice mají každá jiný poměr
+   (šnek je široký, hodiny vysoké) a kdyby se měřily na šířku, byla by každá
+   jinak vysoká a mezera pod ní jinak velká. */
+.uvod-cmaranice{height:100%;width:auto;max-width:100%;display:block}
+.uvod-telo{flex:none}
 
 .uvod-nadpis{
   margin:0;font-weight:700;-webkit-text-stroke:1px currentColor;
