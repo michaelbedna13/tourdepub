@@ -25,7 +25,7 @@ export const UVODNIK =
 export const ZAKLAD: Bod[] = [
   { stitek: "O co jde", text: "Nahrabat víc čárek než ty druhý partyje a urvat titul z Tour De Pub." },
   { stitek: "Vlezné do kotla", text: "Kilo na palici." },
-  { stitek: "Celej bank", text: "První parta bere všecko — všechny love só jejich." },
+  { stitek: "Celej bank", text: "První parta bere všecko. Všechny love só jejich." },
 ];
 
 /** Jak večer běží. */
@@ -57,8 +57,8 @@ const HALUZE = () =>
  *  z OBTIZNOST, takže se rozejít nemůžou. */
 export const bodovani = (hospod: number, shrnuti = false): Bod[] => [
   { stitek: "+1", text: "Za každou špeluňku, do který vlezete.", strop: `nejvíc ${hospod}` },
-  { stitek: "+1", text: "Za škopek ve štaci — stačí, když ho lupne aspoň půlka partyje.", strop: `nejvíc ${hospod}` },
+  { stitek: "+1", text: "Za škopek ve štaci. Stačí, když ho lupne aspoň půlka partyje.", strop: `nejvíc ${hospod}` },
   shrnuti
-    ? { stitek: "+1–3", text: `Za srandy, podle toho, jaká je to haluz: ${HALUZE()}.` }
-    : { stitek: "+1–3", text: "Za srandy, podle toho, jaká je to haluz:" },
+    ? { stitek: "+1 až 3", text: `Za srandy podle toho, jaká je to haluz: ${HALUZE()}.` }
+    : { stitek: "+1 až 3", text: "Za srandy podle toho, jaká je to haluz." },
 ];

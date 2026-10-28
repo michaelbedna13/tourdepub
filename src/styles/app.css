@@ -271,7 +271,17 @@ input,textarea,select{caret-color:var(--text)}
      zvlášť a u levého okraje po překreslení zůstával nerozostřený proužek. */
   transition:filter .18s var(--krok);
 }
-html.rozmazat .obrazovka{filter:blur(7px)}
+/* Rozostření a k tomu nepatrné roztažení do stran.
+   Karty galerie stojí dvacet bodů od hrany obrazovky a rozostření jim tu
+   hranu rozmázne jen asi čtrnáct bodů doleva, takže posledních pár bodů
+   u kraje zůstane holý podklad. Ostrý obraz to čte jako okraj stránky,
+   rozmazaný jako pruh, co „není rozmazaný". Roztažení o šest procent posune
+   levou hranu karty z dvaceti na jedenáct a její náběh tím dosáhne za hranu
+   obrazovky, takže žádný holý pruh nezbyde.
+   Jen vodorovně: svisle by se obsah při scrollu posunul (počátek je uprostřed
+   několikametrového sloupce) a rozmazané pozadí by při otevření poskočilo.
+   Na rozmazané ploše není roztažení o šest procent poznat. */
+html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
 /* ---------- horní hrana v appce z plochy ---------- */
 /* iOS 26 kreslí v appce přidané na plochu přes horní okraj webového pohledu
    systémové rozostření („scroll edge effect", liquid glass), aby stavová
@@ -839,7 +849,7 @@ html.rozmazat .obrazovka{filter:blur(7px)}
   max-height:min(620px,calc(100dvh - var(--vrch) - env(safe-area-inset-bottom) - 56px));
   display:flex;flex-direction:column;
   /* Jedno odsazení dokola, jako na dlaždici. */
-  padding:22px;border-radius:var(--r);
+  padding:24px;border-radius:var(--r);
   /* stejný odstín jako dlaždice, ze které se karta otevřela */
   background:color-mix(in srgb,var(--kat) 18%,var(--vrstva));color:var(--text);
   box-shadow:0 18px 50px rgba(0,0,0,.45);
@@ -862,7 +872,7 @@ html.rozmazat .obrazovka{filter:blur(7px)}
    sebe a ten horní nic nedělal. Záporný okraj ho vytáhne nad obrázek, až
    k hornímu okraji karty. */
 .detail-vrch{display:flex;align-items:flex-start;justify-content:space-between;
-  gap:14px;position:relative;z-index:1}
+  gap:18px;position:relative;z-index:1}
 /* To samé jako na dlaždici: doladěná kresba se zvětšuje transformem, tedy až
    po rozvržení. Bez téhle rezervy lezla Šmelinářovi hlava ven přes horní
    hranu karty a zleva se dotýkala okraje. */
@@ -890,25 +900,25 @@ html.rozmazat .obrazovka{filter:blur(7px)}
 
 /* Pevná mezera pod kresbou, ne „co zbyde". Dokud se text tlačil k dolní
    hraně, byla mezera na každém úkolu jinak velká. */
-.detail-text{margin-top:24px;position:relative;z-index:1}
+.detail-text{margin-top:32px;position:relative;z-index:1}
 .detail-nazev{flex:none;font-family:var(--pismo);font-weight:700;text-transform:none;
   font-size:clamp(23px,6.6vw,28px);line-height:1.14;letter-spacing:-.015em}
 /* Dlouhý popis se posouvá. Výška je pevná, aby karta s dvěma větami a karta
    s pěti nevypadaly jako dvě různá okna.
    pan-y vrací svislý tah prohlížeči; karta má touch-action:none kvůli švihu
    dolů a bez tohohle by se text nedal posunout vůbec. */
-.detail-telo{margin-top:12px;max-height:9.4em;
+.detail-telo{margin-top:16px;max-height:9.4em;
   overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;
   -webkit-overflow-scrolling:touch}
-.detail-popis{font-size:var(--t-text);line-height:1.6;color:var(--text-2)}
+.detail-popis{font-size:var(--t-text);line-height:1.7;color:var(--text-2)}
 .detail-karta.splneno .detail-popis{color:currentColor;opacity:.78}
-.detail-pozn{margin-top:10px;font-size:var(--t-drobne);line-height:1.55;color:var(--text-3)}
+.detail-pozn{margin-top:14px;font-size:var(--t-drobne);line-height:1.55;color:var(--text-3)}
 .detail-karta.splneno .detail-pozn{color:currentColor;opacity:.6}
-.detail-odznaky{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.detail-odznaky{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 
 /* Spodní řádka: obtížnost, co za to padne, a vpravo tiché drobnosti. */
-.detail-pata{display:flex;align-items:center;gap:10px;margin-top:18px;
-  padding-top:14px;border-top:1px solid var(--linka)}
+.detail-pata{display:flex;align-items:center;gap:12px;margin-top:26px;
+  padding-top:18px;border-top:1px solid var(--linka)}
 .detail-karta.splneno .detail-pata{border-color:rgba(0,0,0,.16)}
 .detail-zaco{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3)}
 .detail-karta.splneno .detail-zaco{color:currentColor;opacity:.72}
@@ -1203,52 +1213,44 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .rezim .drobne{opacity:.9}
 
 /* ---------- pravidla ---------- */
-/* Stránka k přečtení, ne k prolistování. Byly to odrážky s tučným jménem
-   a dvojtečkou, k tomu zvýrazněná slova uprostřed vět a číslovaný seznam —
-   dohromady text z Wordu, ne stránka. Teď to stojí na třech věcech: úvodní
-   odstavec, oddíly s nadpisem a v nich popisek NAD větou. */
+/* Skupiny řádek, ne odstavce. Nejdřív to byly odrážky s tučným názvem
+   a dvojtečkou a zvýrazněná slova uprostřed vět, pak popisky nad větami —
+   lepší, ale pořád zeď textu. Plocha s linkami mezi řádkami řekne, co k čemu
+   patří, dřív než se začne číst, a hodnota vpravo je tam, kde ji oko hledá.
+   Je to ta samá skladba jako v Nastavení o kus níž, takže se celá obrazovka
+   čte jedním způsobem. */
 
-/* Úvod je lead: větší písmo a volnější proklad, aby se dal přečíst jedním
-   dechem a bylo jasné, že je to řeč, ne pravidlo. */
-.pravidla-lead{font-size:var(--t-hlavni);line-height:1.72;color:var(--text-2)}
+/* Úvod je lead: větší písmo a volnější proklad, aby bylo jasné, že je to
+   řeč, ne pravidlo. */
+.pravidla-lead{font-size:var(--t-hlavni);line-height:1.72;color:var(--text-2);
+  margin-bottom:34px}
 
-.pr-oddil{margin-top:44px}
-/* Nadpis oddílu je značkové písmo, ne drobný popisek: na stránce, kde jsou
-   jen texty, musí být poznat předěl dřív, než se začne číst. Linka pod ním
-   dělá to, co na plakátu dělá bílé místo. */
-.pravidla h2{
-  margin:0 0 20px;padding-bottom:12px;
-  font-size:19px;color:var(--text);letter-spacing:.02em;
-  border-bottom:1px solid var(--linka);
+.pr-skupina{margin-top:32px}
+.pr-skupina:first-of-type{margin-top:0}
+/* Nadpis skupiny je tichý popisek nad plochou, jako v Nastavení. Velký
+   nadpis tu byl taky; vedle čtyř skupin pod sebou z toho byla čtyři
+   návěští a stránka vypadala rozkouskovaně. */
+.pravidla h2,.pr-skupina h2{
+  margin:0 0 12px;padding:0 4px;
+  font-size:var(--t-drobne);color:var(--text-3);letter-spacing:.06em;
 }
 
-.pr-body{display:flex;flex-direction:column;gap:22px;margin:0}
-/* Popisek je drobný a tichý, věta nese váhu. Opačně (tučné jméno
-   s dvojtečkou před větou) to vypadalo, že nejdůležitější na pravidle je
-   jeho jméno. */
-.pr-bod dt{
-  margin-bottom:6px;font-family:var(--pismo);font-weight:700;
-  font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);
+.pr-radek{display:flex;align-items:baseline;gap:14px;padding:16px var(--vnitrek)}
+.pr-radek-pred{flex:none;align-self:center}
+.pr-radek-telo{flex:1;min-width:0}
+.pr-radek-nazev{
+  display:block;font-family:var(--pismo);font-weight:700;font-size:var(--t-text);
+  line-height:1.5;color:var(--text);
 }
-.pr-bod dd{margin:0;font-size:var(--t-text);line-height:1.68;color:var(--text-2)}
-
-/* Hodnoty do sloupce vlevo, věty vpravo. Je na první pohled vidět, co kolik
-   nese, a oko nemusí lovit číslo uprostřed odstavce. */
-.pr-skore{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
-.pr-skore li{display:flex;gap:16px;align-items:baseline}
-.pr-skore-hodnota{
-  flex:none;width:48px;text-align:right;white-space:nowrap;
-  font-family:var(--nadpisy);font-weight:700;font-size:17px;
-  letter-spacing:.01em;color:var(--text);
+/* Dovětek (strop, upřesnění) je tichý a pod větou, ne v ní v závorce. */
+.pr-radek-popis{
+  display:block;margin-top:4px;font-family:var(--pismo);font-size:var(--t-drobne);
+  line-height:1.55;color:var(--text-2);
 }
-.pr-skore-text{flex:1;min-width:0;font-size:var(--t-text);line-height:1.68;color:var(--text-2)}
-/* Strop není součást věty, tak ani nestojí v ní: vlastní řádka, tiše. */
-.pr-skore-strop{display:block;margin-top:3px;font-size:var(--t-drobne);color:var(--text-3)}
-/* Stupnice haluzí patří pod třetí bod, ne na novou plochu — je proto
-   odsazená. Ne až pod jeho větu (o šířku sloupce s hodnotami): na telefonu
-   by se nejdelší řádka otřela o pravý okraj. */
-.legenda{display:flex;flex-direction:column;gap:12px;margin:16px 0 0 36px}
-.legenda-radek{display:flex;align-items:center;gap:12px;font-size:var(--t-text);color:var(--text-2)}
+.pr-radek-hodnota{
+  flex:none;font-family:var(--nadpisy);font-weight:700;font-size:17px;
+  color:var(--text);
+}
 
 /* ---------- úvod po spuštění ---------- */
 /* Průprava je plakát, ne obrazovka s nádechem barvy: podklad appky, jeden

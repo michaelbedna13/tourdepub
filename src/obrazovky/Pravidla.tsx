@@ -7,8 +7,8 @@ import { Obtiznost } from "../components/Obtiznost";
 import { Okno } from "../components/Okno";
 import { potvrdit } from "../components/Potvrzeni";
 import { OBTIZNOST } from "../lib/data";
-import { bodovani, JAK_SE_VALI, UVODNIK, ZAKLAD, type Bod } from "../lib/pravidla";
-import { sklonuj, vazat } from "../lib/format";
+import { bodovani, JAK_SE_VALI, UVODNIK, ZAKLAD } from "../lib/pravidla";
+import { vazat } from "../lib/format";
 import { nastavSpravce, sediKod, useSpravce } from "../lib/spravce";
 import { strop, tym, useStav, vynulujTym } from "../lib/stav";
 
@@ -35,45 +35,34 @@ export function Pravidla() {
     <>
       <Hlava nadpis="Pravidla" />
 
-      {/* Pravidla jsou k přečtení, ne k prolistování: úvodní odstavec, pak tři
-          oddíly, a v každém popisek nad větou. Dřív to byly odrážky s tučným
-          názvem a dvojtečkou a k tomu zvýrazněná slova uprostřed vět — text
-          z Wordu, ne stránka. */}
-      <div className="pravidla">
-        <p className="pravidla-lead">{vazat(UVODNIK)}</p>
+      {/* Pravidla jako skupiny řádek, ne jako odstavce textu. Byly to
+          odrážky s tučným názvem a dvojtečkou a k tomu zvýrazněná slova
+          uprostřed vět; pak popisky nad větami, což bylo lepší, ale pořád to
+          byla zeď textu. Skupina s linkami mezi řádkami říká, co k čemu
+          patří, dřív než se začne číst, a hodnota vpravo je tam, kde ji oko
+          čeká. */}
+      <p className="pravidla-lead">{vazat(UVODNIK)}</p>
 
-        <Oddil nadpis="Základ">
-          <Body body={ZAKLAD} />
-        </Oddil>
+      <Skupina nadpis="Základ">
+        {ZAKLAD.map((b) => <Radek key={b.stitek} nazev={b.stitek!} popis={b.text} />)}
+      </Skupina>
 
-        <Oddil nadpis="Jak se to valí">
-          <Body body={JAK_SE_VALI} />
-        </Oddil>
+      <Skupina nadpis="Jak se to valí">
+        {JAK_SE_VALI.map((b) => <Radek key={b.stitek} nazev={b.stitek!} popis={b.text} />)}
+      </Skupina>
 
-        {/* Čísla do sloupce vlevo, věty vpravo: je na první pohled vidět,
-            co kolik nese, a oko nemusí lovit hodnotu uprostřed odstavce. */}
-        <Oddil nadpis="Za co padají čárky">
-          <ul className="pr-skore">
-            {bodovani(s.hospody).map((b) => (
-              <li key={b.text}>
-                <span className="pr-skore-hodnota cislo">{b.stitek}</span>
-                <span className="pr-skore-text">
-                  {vazat(b.text)}
-                  {b.strop && <span className="pr-skore-strop">{vazat(b.strop)}</span>}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <div className="legenda">
-            {OBTIZNOST.map((o) => (
-              <div key={o.piva} className="legenda-radek">
-                <Obtiznost piva={o.piva} sNazvem={false} />
-                <span>{vazat(`${o.nazev} — ${o.piva} ${sklonuj(o.piva)}`)}</span>
-              </div>
-            ))}
-          </div>
-        </Oddil>
-      </div>
+      <Skupina nadpis="Za co padají čárky">
+        {bodovani(s.hospody).map((b) => (
+          <Radek key={b.text} nazev={b.text} popis={b.strop} hodnota={b.stitek} />
+        ))}
+      </Skupina>
+
+      <Skupina nadpis="Jaká je to haluz">
+        {OBTIZNOST.map((o) => (
+          <Radek key={o.piva} nazev={o.nazev} hodnota={`+${o.piva}`}
+            pred={<Obtiznost piva={o.piva} sNazvem={false} />} />
+        ))}
+      </Skupina>
 
       <div className="sekce">
         <div className="sekce-hlava"><h2>NASTAVENÍ</h2></div>
@@ -119,30 +108,32 @@ export function Pravidla() {
   );
 }
 
-/** Oddíl pravidel: nadpis s linkou pod sebou a obsah. Linka dělá to, co na
- *  plakátu dělá bílé místo — řekne, že tady začíná něco nového. */
-function Oddil({ nadpis, children }: { nadpis: string; children: React.ReactNode }) {
+/** Skupina pravidel: tichý nadpis nad plochou s řádkami. Je to ta samá
+ *  skladba jako v Nastavení o kus níž, takže se celá obrazovka čte stejně. */
+function Skupina({ nadpis, children }: { nadpis: string; children: React.ReactNode }) {
   return (
-    <section className="pr-oddil">
+    <section className="pr-skupina">
       <h2>{vazat(nadpis)}</h2>
-      {children}
+      <div className="vrstva radky">{children}</div>
     </section>
   );
 }
 
-/** Seznam pravidel: popisek nad větou, ne tučně a s dvojtečkou před ní.
- *  Popisek je drobný a tichý, věta nese váhu — opačně to vypadalo, že
- *  nejdůležitější na pravidle je jeho jméno. */
-function Body({ body }: { body: Bod[] }) {
+/** Jedna řádka: vlevo věta (a pod ní případně tichý dovětek), vpravo
+ *  hodnota. Hodnota je vpravo schválně: tam ji oko hledá a nemusí ji lovit
+ *  uprostřed odstavce. */
+function Radek({ nazev, popis, hodnota, pred }: {
+  nazev: string; popis?: string; hodnota?: string; pred?: React.ReactNode;
+}) {
   return (
-    <dl className="pr-body">
-      {body.map((b) => (
-        <div className="pr-bod" key={b.stitek ?? b.text}>
-          {b.stitek && <dt>{vazat(b.stitek)}</dt>}
-          <dd>{vazat(b.text)}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className="pr-radek">
+      {pred && <span className="pr-radek-pred">{pred}</span>}
+      <span className="pr-radek-telo">
+        <span className="pr-radek-nazev">{vazat(nazev)}</span>
+        {popis && <span className="pr-radek-popis">{vazat(popis)}</span>}
+      </span>
+      {hodnota && <span className="pr-radek-hodnota cislo">{hodnota}</span>}
+    </div>
   );
 }
 
@@ -157,7 +148,7 @@ function OknoSpravce({ zavri }: { zavri: () => void }) {
 
   return (
     <Okno nadpis="Režim správce" zavri={zavri}
-      pod="Odemkne úpravy úkolů a hospod. Je to zámek proti omylu, ne bezpečnost — kdo se podívá do zdrojáku, kód si přečte.">
+      pod="Odemkne úpravy úkolů a hospod. Je to zámek proti omylu, ne bezpečnost. Kdo se podívá do zdrojáku, kód si přečte.">
       <label className="pole">
         <span className="nazev">Kód</span>
         <input type="password" value={kod} autoComplete="off" enterKeyHint="done"

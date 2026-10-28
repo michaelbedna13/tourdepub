@@ -470,28 +470,29 @@ chyba vykreslení, ne jako nůžky.
 
 ## Pravidla
 
-Stránka k přečtení, ne k prolistování. Byly to odrážky s tučným jménem
-a dvojtečkou, k tomu **zvýrazněná slova uprostřed vět** a číslovaný seznam —
-dohromady text z Wordu, ne stránka. Stojí to teď na třech věcech:
+**Skupiny řádek, ne odstavce.** Nejdřív to byly odrážky s tučným názvem
+a dvojtečkou a k tomu zvýrazněná slova uprostřed vět, pak popisky nad větami.
+Lepší, ale pořád zeď textu. Plocha s linkami mezi řádkami řekne, co k čemu
+patří, dřív než se začne číst, a je to ta samá skladba jako v Nastavení
+o kus níž, takže se celá obrazovka čte jedním způsobem.
 
-- **Úvod je lead.** Větší písmo, volnější proklad; dá se přečíst jedním
-  dechem a je z něj jasné, že je to řeč, ne pravidlo.
-- **Oddíly mají pořádný nadpis.** Značkové písmo, krémový, s linkou pod
-  sebou. Na stránce, kde jsou jen texty, musí být poznat předěl dřív, než
-  se začne číst — drobný tichý popisek to nezvládl.
-- **Popisek stojí NAD větou**, drobný a tichý, a váhu nese věta. Opačně
-  (tučné jméno s dvojtečkou před větou) to vypadalo, že nejdůležitější na
-  pravidle je jeho jméno. Plakáty v úvodu sázejí pravidla stejně, takže
-  stránka a plakát mluví jedním hlasem.
-
-Bodování je **sloupec hodnot vlevo a věty vpravo**: je na první pohled vidět,
-co kolik nese, a oko nemusí lovit číslo uprostřed odstavce. Strop (`nejvíc 9`)
-má vlastní tichou řádku — není to součást věty, tak ani nestojí v ní.
-Stupnice haluzí patří pod třetí bod, takže je odsazená; ne až pod jeho větu,
-na telefonu by se nejdelší řádka otřela o pravý okraj.
+- **Nadpis skupiny je tichý popisek nad plochou**, ne velký nadpis. Velký tu
+  byl taky; vedle čtyř skupin pod sebou z toho byla čtyři návěští a stránka
+  vypadala rozkouskovaně.
+- **Hodnota je vpravo** (`+1`, `+2`). Tam ji oko hledá a nemusí ji lovit
+  uprostřed odstavce.
+- **Dovětek (strop) je pod větou**, tiše, ne v závorce uvnitř ní.
+- **Obtížnosti mají vlastní skupinu.** Dřív visely jako legenda pod třetím
+  bodem a nebylo jasné, jestli patří k němu, nebo k celé stránce.
+- **Úvod je lead**: větší písmo a volnější proklad, aby bylo jasné, že je to
+  řeč, ne pravidlo.
 
 **Zvýrazňování kusů vět (`duraz`) šlo z celé appky pryč.** Tučné slovo
 uprostřed odstavce nic nezdůrazní, jen to vypadá jako text z Wordu.
+
+**Pomlčky v textech appky nejsou.** Věta, co potřebuje pomlčku, se skoro
+vždycky dá rozdělit na dvě, a dvě krátké věty se čtou líp než jedna
+s vsuvkou.
 
 ## Navigace
 

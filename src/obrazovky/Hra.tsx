@@ -174,7 +174,10 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
           jako obrovský obrys a lezlo přes jméno i přes pruh trasy — karta
           z toho byla přeplácaná a nedalo se poznat, co je na ní hlavní.
           Tady nese tu samou informaci a nic nepřekrývá. */}
-      <div className="hero-nadocko">{cislo}. štace z {stav.hospody.length}</div>
+      {/* Jen pořadí. Kolikátá z kolika stálo vedle sebe a bylo to číslo navíc,
+          co nikdo nepotřebuje: kolik je štací dohromady, říká pruh trasy pod
+          jménem. */}
+      <div className="hero-nadocko">{cislo}. štace</div>
 
       {/* Vícedílné jméno se zlomí vždycky, i když by se vešlo na řádek:
           karty v pásu jsou stejně vysoké a jméno na nich má mít pokaždé
