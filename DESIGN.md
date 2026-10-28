@@ -92,18 +92,22 @@ kategorie.**
 | Tělo v luftě | `#F9A204` | `#151A20` |
 | Žranice a divadlo | `#E5331F` | `#F2E7CF` |
 
-Bydlí v `KATEGORIE` v `src/lib/data.ts` (`barva` a `naBarve`), ne v CSS:
+Bydlí v `KATEGORIE` v `src/lib/data.ts` (`barva` a `karta`), ne v CSS:
 kategorie se dají měnit v appce, takže barva patří k datům. Obrazovka si ji
 vezme jako `--kat` a dál se z ní míchá všechno ostatní (`color-mix`):
 
-- nasvícení pozadí shora (14 %, dolů se ztrácí),
 - dlaždice úkolů a karta detailu (18 % do vrstvy),
 - kresba na nich (55 % do textu),
-- tlačítko *Splněno* a počítadlo (36 %),
-- barevná plocha v průpravě (70 %).
+- tlačítko *Splněno* a počítadlo (36 %).
 
-Barva textu nemůže být pro všechny tři stejná: zelená a červená jsou tmavé,
-žlutá světlá. Proto má každá kategorie u sebe i `naBarve`.
+**Pozadí obrazovky kategorie barvu nenese.** Bylo nasvícené odstínem
+kategorie shora, jenže dvě plochy téže barvy nad sebou — podklad a karty —
+si vzájemně braly sílu a karty vycházely jako slabší verze pozadí. Na černé
+jdou nahlas. Barva je na kartách, a nikde jinde.
+
+Plná barva (`karta`) je zvlášť od barvy identity (`barva`): žlutá je na plochu
+pod krémový text moc světlá, tak má plnou verzi o dva stupně tmavší. Text je
+na všech třech krémový — jedna barva textu, ne tři.
 
 Dvě barvy jsou v obou soustavách stejné (`#F9A204`). Aby se významy nepletly,
 nestojí nikdy vedle sebe: na kartě kategorie není ani jeden štítek obtížnosti.
@@ -220,79 +224,95 @@ psacího fontu zkontroluj `ť ď ě ů ř Ú Š Č Ž Ň`; dělá to `scripts/st
 
 ## Rozostření horní hrany v appce z plochy
 
-iOS 26 kreslí v appce přidané na plochu přes horní okraj systémové rozostření
-(„liquid glass"), aby stavová lišta zůstala čitelná nad čímkoli, co pod ní
-projede. Obsah pod ním je rozmazaný — u nás značka a pilulka týmu, protože
-lišta appky začíná přesně tam. **V prohlížeči se to nekreslí**, takže stejná
-stránka je v Safari ostrá a z plochy ne.
+iOS 26 kreslí v appce přidané na plochu přes horní okraj webového pohledu
+systémové rozostření („scroll edge effect", liquid glass), aby stavová lišta
+zůstala čitelná nad čímkoli, co pod ní projede. **V prohlížeči se to
+nekreslí**, takže stejná stránka je v Safari ostrá a z plochy ne. Vypnout se
+to nedá — žádná meta ani vlastnost na to není, jen nativní appka si to umí
+zakázat.
 
-Vypnout se to nedá, žádná meta ani vlastnost na to není. WebKit ale efekt
-vynechá, když horní hranu zakrývá **pevná neprůhledná plocha**. Tou je
-`body::before`: pruh přes celou šířku, vysoký přesně jako `safe-area-inset-top`,
-`position: fixed`, jen v `@media (display-mode: standalone)`.
+Dlouho se to honilo přes obsah: neprůhledný pruh na `body::before`, zrušené
+`mix-blend-mode` na zrnu, jiný způsob rozmazání pod detailem. Nic z toho
+nepomohlo, protože se nehledalo tam, **co se rozmazává**. Rozostření je vidět
+jen na detailu, a horní pás appky byl plný detailu: filmové zrno
+(`.app::before`) je pevné, leží přes celou obrazovku včetně horní hrany a je
+to samá vysoká frekvence. Rozmazané zrno vedle ostrého je šmouha a tam, kde
+efekt končí, je z toho navíc poznat hrana.
 
-Dvě drobnosti, na kterých to stojí:
+Takže v `@media (display-mode: standalone)`:
 
-- `background-color: inherit`, ne pevná barva. V průpravě si `<body>`
-  přebarvuje podklad na barvu plakátu (`useBarvaOkoli`) a pruh to musí
-  převzít, jinak by nad červeným plakátem visel tmavý pás.
-- `z-index: 130`, tedy **nad průpravou** (120), aby horní hranu zakrýval
-  i během úvodu.
+- `--pruh` = `safe-area-inset-top` (nejmíň 50) **plus 28 bodů rezervy**;
+  rozostření sahá hlouběji než samotná stavová lišta.
+- `body::before` je pevný pás té výšky přes celou šířku v **plné barvě**.
+  Rozostřená plná barva je ta samá plná barva, takže po efektu nezbyde nic
+  k vidění.
+- Zrno (`.app::before`) začíná až pod pásem. Záře (`.app::after`) se nehýbe:
+  je to hladký přechod, na prvních desítkách bodů stejně na nule, a pás ji
+  tam překrývá.
+- `--vrch` (odsazení obrazovky) vychází z `--pruh`, takže obsah začíná osm
+  bodů pod ním. Plakáty úvodu se počítají ze stejného čísla.
 
-Kdyby to nestačilo, druhá cesta je přepnout
+Dvě věci, na kterých to stojí:
+
+- **Barva pásu není `--podklad`.** Je to `#2D2D25`, tedy barva, kterou appka
+  se zrnem na prvním řádku opravdu nakreslí (naměřeno (45,45,37)) — ta samá,
+  co stojí v `theme-color` v `index.html`. S čistým podkladem by na konci pásu
+  byl schod o dva stupně a šev tam, kde zrno začíná. Naměřeno v Chromiu:
+  řádek nad pásem (45,45,37), řádek pod ním (44,9/44,3) — pod jeden stupeň.
+  **Když se sáhne na zrno, přeměř obojí.**
+- **`z-index: 61`**, tedy nad zrnem (60) a **pod průpravou** (120). V průpravě
+  je horní pás plný podklad bez zrna — tam není co rozostřovat a pruh by nad
+  ním jen svítil o dva stupně vedle.
+
+WebKit navíc efekt vynechá úplně, když u horní hrany najde pevnou plochu přes
+celou šířku (přes 90 % šířky, přes 10 bodů vysokou) s plnou barvou, a tou
+barvou pak hranu vyplní (`LocalFrameView::fixedContainerEdges`). Pás tu
+podmínku splňuje. Není to zaručené — pravidla nejsou nikde popsaná a projekty,
+co to zkoušely, hlásí obojí — ale když to vyjde, je po efektu úplně, a když
+ne, rozmazává se plná barva. **Ověřit se to tady nedá: v kontejneru není
+WebKit a Chromium takový efekt nekreslí.**
+
+Kdyby to pořád nestačilo, poslední cesta je přepnout
 `apple-mobile-web-app-status-bar-style` z `black-translucent` na `default`:
-web view pak začíná až pod stavovou lištou a iOS nemá přes co kreslit.
-Stojí to ale obsah pod lištou a **appku je potřeba z plochy smazat a přidat
-znovu**, protože iOS si styl pamatuje z instalace.
+web view pak začíná až pod stavovou lištou. Stojí to obsah pod lištou
+a **appku je potřeba z plochy smazat a přidat znovu**, protože iOS si styl
+pamatuje z instalace.
 
 ## Pruh nad stránkou v prohlížeči
 
 Pruh nad stránkou kreslí Safari samo, **plnou barvou z `theme-color`** —
-obsah pod něj nejde, na rozdíl od appky z plochy. Teplá záře (`.app::after`)
-přitom byla u horní hrany nejsilnější, takže nad teplou appkou visel studený
-pruh a šev byl vidět přesně na hraně.
+obsah pod něj nejde, na rozdíl od appky z plochy. Dřív nad teplou appkou
+visel studený pruh a šev byl vidět přesně na hraně. Dvě věci se u té hrany
+potkávají a obě musí sedět:
 
-Řeší to **spočítaná záře**: střed je ve čtvrtině výšky a dohasne dřív, než
-se k horní hraně vrátí (`radial-gradient(140% 52% at 50% 24%, …,
-transparent 46%)` — vzdálenost k hraně je 46,15 % poloměru, konec je na
-46 %, takže u hrany vychází nula). První řádek stránky je tím čistý podklad,
-`theme-color` je ten samý `#2B2B23` a šev není kde vidět.
+- **Záře (`.app::after`) je u hrany na nule.** Je to svislý přechod a prvních
+  **76 bodů** je čistý podklad; teprve pak záře naskakuje a vrcholí kolem tří
+  set. Rovný začátek je v **bodech, ne v procentech výšky**: pruh nad stránkou
+  je vysoký pořád stejně, ať je telefon jakkoli dlouhý. Napoprvé to byl
+  kruhový přechod, u hrany spočítaný na nulu — jenže hned pod ní stoupal
+  strmě a oko to čte jako hranu, i když na samotné hraně barva sedí.
+- **`theme-color` je `#2D2D25`, ne `--podklad`.** Zrno leží i přes první
+  řádek a podklad o kousek zvedne (tečky jsou půl na půl, ale na tmavém
+  podkladu bílá přidá víc, než černá ubere). Naměřeno: (43,43,35) bez zrna,
+  (45,45,37) se zrnem. Dokud tam stál `#2B2B23`, byl mezi pruhem a stránkou
+  schod o dva stupně. **Platí to oběma směry: když se sáhne na zrno, přeměř
+  barvu.**
 
-Napoprvé to dělala **maska** (lineární přechod shora). Výsledek byl stejný,
-ale na iOS se tím celý ten pás dostal do vrstvy, kterou Safari vykresluje
-v nižším rozlišení: **logo a pilulka týmu pod ní byly rozmazané**, zbytek
-obrazovky ostrý. Spočítaný gradient dělá to samé a žádnou vrstvu navíc
-nepotřebuje.
+Dvě slepé uličky, obě vyzkoušené:
 
-Zkoušelo se i opačně — nechat záři a dát do `theme-color` spočítanou barvu
-prvního řádku (`#3A3421`, sedí na jednu hodnotu z 255). Šev to odstranilo,
-ale nad gradientem pak visel pruh jedné ploché barvy a jako pás to bylo
-poznat pořád. Plochu je potřeba srovnat na obou stranách, ne jen hranu.
-
-Průprava si pruh **přebarvuje na barvu stránky** (`useBarvaOkoli`
-v `Uvod.tsx`) — nad červeným plakátem by jinak visel tmavý pruh.
-
-Mění se přitom **obojí: `theme-color` i podklad `<html>` a `<body>`** —
-a `theme-color` se **nepřepisuje, ale vyměňuje celý prvek** (starý ven, nový
-dovnitř). Dvě slepé uličky, obě vyzkoušené na telefonu:
-
-- Přepsat `content` nestačí. Safari si barvu přečte při načtení a změny
-  atributu si nevšimne; pruh zůstal v barvě, která stála v `index.html`.
-- Přebarvit podklad `<html>` a `<body>` taky nestačí. Plakát je
-  `position:fixed` vrstva nad stránkou, takže podklad pod ním o jeho barvě
-  neví — jenže Safari si ten pruh stejně nebere odtud.
-
-Výměna celého prvku je to, na co Safari reaguje. Podklad se nastavuje
-s ním, protože nic nestojí a na jiných prohlížečích pomáhá.
-
-Je to `useLayoutEffect`, ne obyčejný efekt: ten běží až po vykreslení, takže
-by byl na každém přepnutí stránky jeden snímek se starou barvou pruhu.
-A vrací se **prázdný řetězec**, ne pevná barva, aby po konci zase platilo
-i pravidlo pro širokou obrazovku (`#1F1F19`).
+- **Maska na záři** (lineární přechod shora). Výsledek vypadal stejně, ale na
+  iOS se tím celý horní pás dostal do vrstvy, kterou Safari vykresluje
+  v nižším rozlišení: **logo a pilulka týmu pod ní byly rozmazané**, zbytek
+  obrazovky ostrý. Spočítaný přechod dělá to samé a žádnou vrstvu navíc
+  nepotřebuje. Ta samá příčina měla na svědomí i `mix-blend-mode` na zrnu.
+- **Nechat záři a dopočítat barvu prvního řádku do `theme-color`.** Šev to
+  odstranilo, ale nad gradientem pak visel pruh jedné ploché barvy a jako pás
+  to bylo poznat pořád. Plochu je potřeba srovnat na obou stranách, ne jen
+  hranu.
 
 V appce z plochy na tom nezáleží: tam je lišta průhledná
-(`apple-mobile-web-app-status-bar-style: black-translucent`) a obsah jde
-pod ni.
+(`apple-mobile-web-app-status-bar-style: black-translucent`), obsah jde pod
+ni a o horní hranu se stará pás z minulé kapitoly.
 
 ## Horní lišta
 
@@ -456,7 +476,8 @@ prvek. Proto na Hře zmizelo pořadí týmů, dokud hraje jedna parta: „vede, 
 
 Běží **po každém spuštění** a vždycky jde přeskočit. Je to Mišákovo zadání:
 appka se otvírá jednou za večer a úvod je kus té hry, ne překážka. *Přeskočit*
-je proto pořád na očích, od první vteřiny, a ťuknutí kamkoli posune dál.
+je proto pořád na očích, od první vteřiny, a listuje se ťuknutím do obrazovky:
+**vpravo dál, vlevo zpátky**.
 
 **1. Značka.** Při spuštění z plochy ukáže iOS obrázek z `public/uvodni/`, hned po
 něm naváže logo ve stránce (`#uvod` v `index.html`), aby bylo vidět dřív, než se
@@ -538,17 +559,16 @@ tmavá. Vypadá to přesně jako bliknutí staré tmavě modré palety, i když 
 appka nikde nemá. Proto ten poslední odkaz: použije se jen tehdy, když nic
 jiného nesedlo.
 
-**2. Průprava.** Čtyři stránky a na nich **shrnutí pravidel**: co se hraje,
-za co jsou čárky, co se trestá a co se vyhrává. Delší verze je na obrazovce
-Pravidla, sem patří jen to, co musí vědět každý, než se vyrazí.
+**2. Průprava.** Pět plakátů a na nich **pravidla, ne jejich převyprávění**:
+texty se berou z `src/lib/pravidla.ts`, odkud je čte i obrazovka Pravidla, tak
+se nemůžou rozejít. Jeden plakát = jedna kapitola a jedna kresba, co říká to
+samé: budík k času, šnek k loudání, čárky k bodování, kotel k banku.
 
 Stránka je **plakát**, ne obrazovka s nádechem barvy. Plná barva přes celou
 plochu, jeden inkoust na všechno a jedna velká čmáranice uprostřed. Nahoře
-značka a *Přeskočit*, dole proužky a *Dál* — **dvě řádky po dvou věcech**,
-každá drží obě hrany stránky. Dřív byly dole tři věci vedle sebe (proužky,
-Přeskočit, Dál) a číslo stránky nahoře; jenže proužky číslo stránky říkají
-taky, takže to bylo jednou navíc, a tři věci na jedné řádce se nedaly
-vyvážit. Pro čtečku zůstalo číslo v popisku proužků.
+značka a *Přeskočit*, dole šipka zpátky, proužky a *Dál*. Šipka vlevo si drží
+místo i na prvním plakátu, kde nemá kam vést — jinak by proužky uprostřed při
+každém listování poskočily. Pro čtečku je číslo stránky v popisku proužků.
 
 **Nadpis se měří na telefonu, ne v testu.** Písmo z Adobe se do testovacího
 prohlížeče nedostane a náhradní je užší, takže se nadpis lámal na dva řádky
@@ -619,12 +639,15 @@ Co se při kreslení ukázalo: odlesky skla ve škopku vedly přesně přes oči
 a pusu, takže buď sklo, nebo tvář — ne obojí. A oči vystřižené do koruny
 z ní udělaly kočku, takže koruna má místo obličeje kámen a čelenku.
 
-**Žádná stránka se nepřehodí sama** — dál se jde ťuknutím kamkoli na
-obrazovku, švihem do boku nebo popiskem *Dál* dole. Ten popisek **není
-tlačítko**: je to tichý text bez plochy, protože ťuknout jde stejně kamkoli
-a svítící pilulka dole by přetahovala pozornost z toho, co se má přečíst.
-Proužky dole říkají, kolik toho zbývá; úvod, u kterého není vidět konec,
-je otrava.
+**Žádná stránka se nepřehodí sama** — ťuká se do obrazovky: **vpravo dál,
+vlevo zpátky**. Hranice není v polovině, ale ve **dvou pětinách**: dopředu se
+jde pětkrát, zpátky málokdy, takže větší strana patří tomu častějšímu a kdo
+ťukne „někam doprostřed", protože chce dál, se netrefí zpátky.
+
+Cedule dole (*Dál*, šipka zpátky) **nejsou tlačítka**: je to tichý text bez
+plochy, protože ťuknout jde stejně do celé strany a svítící pilulka dole by
+přetahovala pozornost z toho, co se má přečíst. Proužky dole říkají, kolik
+toho zbývá; úvod, u kterého není vidět konec, je otrava.
 
 `.uvod` má **`touch-action: none`**. Bez toho si vodorovný tah vezme
 prohlížeč, `pointerup` se změní na `pointercancel` a švih mezi stránkami se
@@ -764,9 +787,12 @@ vypadalo, že přebilo číslo, které k nim patří. Naskočí až od první č
 na začátku večera nikdo nevede.
 
 Skladba je **převzatá z opravdové účtenky**: štítek a číslo dokladu nahoře,
-pod tím značka a město, heslo mezi lomítky, datum mezi přerušovanými čarami,
-položky s vodicími tečkami, tučný součet, čárky místo čárového kódu, červené
-„Díky!“ a dole patička. Číslo dokladu je **počet čárek na stole dohromady** —
+pod tím značka, heslo mezi lomítky, datum mezi přerušovanými čarami, položky
+s vodicími tečkami, součet a dole drobná patička. Položky začínají na stejné
+levé hraně jako jméno party — jméno je hlavička bloku, ne nadpis seznamu.
+Součet má nejsilnější linku z celé účtenky, ale pořád tečkovanou: plná čára
+tu byla jediná a vedle tří tečkovaných nad sebou vypadala jako podtržení
+z textového editoru. Číslo dokladu je **počet čárek na stole dohromady** —
 během večera naskakuje jako počítadlo na pokladně a je to pořád pravdivý údaj.
 Červená je `#E5331F` na velké texty; na drobné popisky by na krémovém papíru
 neudržela kontrast, tak je pro ně tmavší (`#B4220F`).

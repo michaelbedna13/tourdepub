@@ -89,6 +89,10 @@
      se přilepila hned na začátku a sjela o ten rozdíl dolů přes podnadpis.
      V prohlížeči to nebylo vidět, protože tam je safe-area nula. */
   --vrch:calc(env(safe-area-inset-top) + 18px);
+  /* Horní pás proti rozostření hrany na iOS 26 — jen v appce z plochy, viz
+     „horní hrana v appce z plochy". V prohlížeči je nula, aby se s ním dalo
+     počítat všude. */
+  --pruh:0px;
 
   /* Proklad velkých nadpisů. Česká verzálka nese háčky a čárky nad výškou
      písmen, takže u víceřádkového nadpisu sedí diakritika spodního řádku
@@ -251,11 +255,55 @@ input,textarea,select{caret-color:var(--text)}
   transition:filter .18s var(--krok);
 }
 html.rozmazat .obrazovka{filter:blur(7px)}
-/* Z plochy appka kreslí i pod stavovou lištu, a na telefonech, kde je
-   safe-area nula, by se nadpis schoval pod hodiny. Mění se token, ne
-   odsazení: musí se to propsat i do lišty. */
+/* ---------- horní hrana v appce z plochy ---------- */
+/* iOS 26 kreslí v appce přidané na plochu přes horní okraj webového pohledu
+   systémové rozostření („scroll edge effect", liquid glass), aby stavová
+   lišta zůstala čitelná nad čímkoli, co pod ní projede. Vypnout se to nedá,
+   žádná meta ani vlastnost na to není, a v prohlížeči se to nekreslí — proto
+   byla ta samá stránka v Safari ostrá a z plochy rozmazaná.
+
+   Rozostření je vidět jen tam, kde je co rozostřit. Náš horní pás byl plný
+   detailu: filmové zrno (.app::before) je pevné, leží přes celou obrazovku
+   včetně horní hrany a je to samá vysoká frekvence. Rozmazané zrno vedle
+   ostrého je šmouha a tam, kde rozostření končí, je z toho navíc poznat
+   hrana. Tohle se honilo přes obsah — neprůhledný pruh, zrušené míchání,
+   jiné rozmazání — a nemohlo to pomoct, protože se nehledalo tam, co se
+   rozmazává.
+
+   Takže: v appce z plochy začíná zrno (i záře) až PO pásu a sám pás je
+   plná barva. Rozostřená plná barva je ta samá plná barva, takže po efektu
+   nezbyde nic k vidění. Barva pásu NENÍ --podklad, ale barva, kterou appka
+   se zrnem na prvním řádku opravdu nakreslí (naměřeno (45,45,37)) — ta samá,
+   co stojí v theme-color v index.html. Kdyby to byl čistý podklad, byl by
+   na konci pásu schod o dva stupně a šev tam, kde zrno začíná. Když se sáhne
+   na zrno, přeměř obojí.
+
+   WebKit navíc efekt vynechá, když u horní hrany najde pevnou plochu přes
+   celou šířku s plnou barvou, a tou barvou hranu vyplní (FixedContainerEdges).
+   Pás tu podmínku splňuje, takže je šance, že se efekt nenakreslí vůbec.
+   Ověřit to tady nejde, Chromium ani WebKit v kontejneru takový efekt nemá.
+
+   z-index 61 je nad zrnem (60) a pod průpravou (120): v průpravě je horní
+   pás plný podklad bez zrna, tam není co rozostřovat a pruh by nad ním jen
+   svítil o dva stupně vedle.
+
+   Výška pásu drží i odsazení obrazovky: appka z plochy kreslí pod stavovou
+   lištu a na telefonech, kde je safe-area nula, by se nadpis schoval pod
+   hodiny. Dvacet osm bodů nad safe-area je rezerva — rozostření sahá hlouběji
+   než samotná lišta a kdyby pás byl kratší, zasáhlo by zrno pod ním. */
 @media (display-mode:standalone){
-  :root{--vrch:calc(max(env(safe-area-inset-top),50px) + 8px)}
+  :root{
+    --pruh:calc(max(env(safe-area-inset-top),50px) + 28px);
+    --vrch:calc(var(--pruh) + 8px);
+  }
+  body::before{
+    content:"";position:fixed;top:0;left:0;right:0;height:var(--pruh);
+    z-index:61;pointer-events:none;background-color:#2D2D25;
+  }
+  /* Zrno začíná až pod pásem, ať u horní hrany není co rozmazat. Záře se
+     nehýbe: je to hladký přechod, který je na prvních desítkách bodů stejně
+     na nule, a pás ji tam navíc překrývá. */
+  .app::before{top:var(--pruh)}
 }
 @keyframes obsah-prichod{
   from{opacity:0;transform:translateY(8px)}
@@ -600,26 +648,14 @@ html.rozmazat .obrazovka{filter:blur(7px)}
    tam nesou půllitry obtížnosti a dvě barevné soustavy vedle sebe by se pletly.
    Nadpis stojí pod lištou, ne v ní – do lišty se vedle pilulky týmu nevešel
    a ořezával se na „Kecy a …“. */
-/* Nasvícení obrazovky kategorie její barvou. Leží pod obsahem a dolů se
-   ztrácí — nahoře, kde je nadpis, má být nejvíc. */
-/* Lepivě, ne fixed. Jakmile má předek filtr (rozmazání obrazovky pod
-   otevřeným detailem), fixed se přepočítá na jeho box — tedy na celou výšku
-   obsahu a dovnitř okrajů — a z nasvícení by byl pruh s dírami po stranách.
-   Lepivé polohování filtr nezajímá a drží se u horní hrany stejně jako fixed.
-   Sám prvek je nulové výšky, aby nezabíral místo; kreslí jeho výstelka. */
-.kat-nasvit{position:sticky;top:0;height:0;z-index:0;pointer-events:none}
-.kat-nasvit::before{
-  content:"";position:absolute;top:0;left:50%;translate:-50% 0;
-  width:100vw;height:100dvh;
-  background:linear-gradient(to bottom,
-    color-mix(in srgb,var(--kat) 14%,transparent),
-    color-mix(in srgb,var(--kat) 4%,transparent) 36%,
-    transparent 62%);
-}
+/* Obrazovka kategorie zůstává v tmavé jak zbytek appky. Barvu nesou jen
+   dlaždice úkolů. Bylo tu nasvícení celé obrazovky odstínem kategorie, ale
+   dvě plochy téže barvy nad sebou — podklad a karty — si vzájemně brály sílu
+   a karty z toho vycházely jako slabší verze pozadí. Na černé jdou nahlas. */
 /* Hlavička kategorie. Jméno je jediná hlavička obrazovky, tak ať to tak
    vypadá: tučně, velké a s místem kolem sebe. Pod ním pruh, jak daleko
    kategorie je — barva kategorie tu nese skutečný údaj, ne ozdobu. */
-.kat-hlavicka{position:relative;z-index:1;margin:6px 0 30px}
+.kat-hlavicka{margin:6px 0 30px}
 .kat-titul{font-weight:700;font-size:clamp(30px,8.8vw,42px);
   letter-spacing:-.025em;overflow-wrap:break-word}
 .kat-postup{margin-top:10px;font-family:var(--pismo);font-size:var(--t-text);
@@ -860,7 +896,10 @@ html.rozmazat .obrazovka{filter:blur(7px)}
 .uc-tuzka{flex:none;width:34px;height:34px;display:grid;place-items:center;
   color:var(--inkoust);opacity:.5;margin-right:-8px}
 
-.uc-polozka,.uc-soucet{display:flex;align-items:baseline;gap:7px;padding-left:22px}
+/* Položky začínají tam, kde jméno party — žádné odsazení. Byly odsazené
+   o dvaadvacet bodů jako odrážky pod nadpisem, jenže na účtence je jméno
+   party hlavička bloku, ne nadpis seznamu: levá hrana má být jedna. */
+.uc-polozka,.uc-soucet{display:flex;align-items:baseline;gap:7px}
 .uc-polozka{opacity:.78}
 .uc-soucet{margin-top:4px;font-weight:700}
 /* Vodicí linka sedí na účaří, ne na půlce výšky písma: je to linka, na
@@ -868,7 +907,11 @@ html.rozmazat .obrazovka{filter:blur(7px)}
    Prázdná pružná buňka se při align-items:baseline srovná spodní hranou,
    takže stačí ji neposouvat. */
 .uc-tecky{flex:1;border-bottom:1px dotted rgba(21,26,32,.45)}
-.uc-soucet .uc-tecky{border-bottom:1px solid rgba(21,26,32,.5)}
+/* Součet má mít nejsilnější linku z celé účtenky, ale pořád tečkovanou:
+   plná čára tu byla jediná a vedle tří tečkovaných nad sebou vypadala jako
+   podtržení z textového editoru. Silnější tečky kreslí hustší tisk toho
+   samého razítka — dvojnásobná tlouštka dělá větší tečky i větší mezery. */
+.uc-soucet .uc-tecky{border-bottom:2px dotted rgba(21,26,32,.66)}
 .uc-kus{flex:none;font-family:inherit;font-variant-numeric:tabular-nums}
 
 /* Razítko sedí v řádce se jménem party. Přes položky leželo na vodicích
@@ -879,11 +922,11 @@ html.rozmazat .obrazovka{filter:blur(7px)}
 .uc-razitko svg{position:absolute;inset:0;width:100%;height:100%;fill:currentColor}
 .uc-razitko span{font-family:var(--nadpisy);font-size:11px;letter-spacing:.08em}
 
+/* Patička je jen ta drobná řádka. Stávalo nad ní velké „Brno Edition"
+   červeně — druhá značka pod značkou, a ta už je nahoře jako otisk. */
 .uc-paticka{text-align:center}
-.uc-diky{font-family:var(--nadpisy);margin-top:18px;font-size:24px;letter-spacing:.01em;line-height:1;
-  color:var(--tisk-cervena)}
 .uc-pata{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  margin-top:18px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.62}
+  margin-top:4px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.62}
 
 /* ---------- štítky a odškrtávátka ---------- */
 /* obtížnost: barva + půllitry + text, nikdy jen barva */
@@ -1034,7 +1077,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
 .uvod-obsah{
   position:absolute;inset:0;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;
-  padding:calc(env(safe-area-inset-top) + 22px) var(--uvod-okraj)
+  /* --pruh je v prohlížeči nula, z plochy je to horní pás (viz horní hrana
+     v appce z plochy); plakát musí začít až pod ním. */
+  padding:calc(max(env(safe-area-inset-top),var(--pruh)) + 22px) var(--uvod-okraj)
           calc(env(safe-area-inset-bottom) + 20px);
   /* o chvilku později než začne odcházet značka: prázdný snímek mezi nimi
      nevznikne, ale ani se nepřekrývají tak, že by text ležel přes logo */
@@ -1120,10 +1165,15 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   transition:background .25s var(--krok)}
 .uvod-tecka.bylo{background:color-mix(in srgb,var(--text) 46%,transparent)}
 .uvod-tecka.ted{background:var(--text)}
-/* Není to tlačítko: ťuká se kamkoli. Jen to říká, co se stane. */
+/* Nejsou to tlačítka: ťuká se do obrazovky, vlevo zpátky, vpravo dál.
+   Cedule jen říkají, co se stane, a drží čárky uprostřed. */
 .uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
   font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
   color:var(--text)}
+.uvod-zpet{display:flex;align-items:center;flex:none;color:var(--text);opacity:.4}
+/* Na prvním plakátu nemá kam vést, ale místo si drží — bez toho by čárky
+   uprostřed při listování poskakovaly. */
+.uvod-zpet.nikam{visibility:hidden}
 .uvod-sipka{width:24px;height:10px;flex:none}
 
 /* Na krátkém displeji se stáhne všechno naráz: menší nadpis, hustší text,

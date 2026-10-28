@@ -107,7 +107,6 @@ export function Uctenka({ poradi, hospod, ukolu, strop, prepni, uprav }: Props) 
 
       <div className="uc-cara" />
       <div className="uc-paticka">
-        <div className="uc-diky">Brno Edition</div>
         <div className="uc-pata">
           <span>{vazat(`max ${strop} ${sklonuj(strop)}`)}</span>
           <span>TOURDEPUB</span>

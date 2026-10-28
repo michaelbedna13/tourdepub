@@ -167,6 +167,25 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
     else setKde(kde + 1);
   }
 
+  function zpet() {
+    if (kde > 0) setKde(kde - 1);
+  }
+
+  /** Ťuknutí se dělí na strany: vlevo zpátky, vpravo dál. Žádná tlačítka
+   *  uprostřed — plakát má zůstat plakát a ruka drží telefon tak, že palec
+   *  dosáhne všude.
+   *
+   *  Hranice není v polovině, ale v dvou pětinách. Dopředu se jde pětkrát,
+   *  zpátky málokdy, takže větší strana patří tomu častějšímu; a kdo ťukne
+   *  „někam doprostřed", protože chce dál, se netrefí zpátky. */
+  const ZPET_DIL = 0.4;
+
+  function tuk(e: React.PointerEvent<HTMLDivElement>) {
+    const r = e.currentTarget.getBoundingClientRect();
+    if (e.clientX - r.left < r.width * ZPET_DIL) zpet();
+    else dal();
+  }
+
   const p = PLAKATY[Math.max(0, kde)];
   const posledni = kde + 1 === PLAKATY.length;
 
@@ -174,9 +193,9 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
     <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " jede" : " znacka"}`}
       role="dialog" aria-label="Úvod">
       {kde >= 0 && (
-        /* Ťuknutí kamkoli posune dál. Tlačítko dole je jen cedule, že to tak
-           funguje — na celé obrazovce se trefí líp než do slova. */
-        <div className="uvod-obsah" onPointerUp={dal}>
+        /* Ťuká se do obrazovky, ne do tlačítka: vpravo dál, vlevo zpátky.
+           Šipky dole jsou jen cedule, že to tak funguje. */
+        <div className="uvod-obsah" onPointerUp={tuk}>
           <div className="uvod-hlava">
             <Logo trida="uvod-znak" />
             {/* Přeskočit nesmí propadnout do ťuknutí pod sebou, jinak by
@@ -197,6 +216,11 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
           </div>
 
           <div className="uvod-spodek">
+            {/* Šipka zpátky drží svoje místo i na prvním plakátu, kde nemá
+                kam vést — jinak by čárky při každém listování poskočily. */}
+            <span className={`uvod-zpet${kde > 0 ? "" : " nikam"}`} aria-hidden="true">
+              <Sipka zpet />
+            </span>
             <div className="uvod-tecky" role="img"
               aria-label={`Plakát ${kde + 1} ze ${PLAKATY.length}`}>
               {PLAKATY.map((_, i) => (
@@ -205,15 +229,23 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
             </div>
             <span className="uvod-dal">
               {posledni ? "Jedeme na to" : "Dál"}
-              <svg className="uvod-sipka" viewBox="0 0 24 10" fill="none" stroke="currentColor"
-                strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M1 5h21M17 1l5 4-5 4" />
-              </svg>
+              <Sipka />
             </span>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+/** Šipka u cedulí dole. `zpet` ji překlopí doleva. */
+function Sipka({ zpet = false }: { zpet?: boolean }) {
+  return (
+    <svg className={`uvod-sipka${zpet ? " otocit" : ""}`} viewBox="0 0 24 10" fill="none"
+      stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true">
+      <path d="M1 5h21M17 1l5 4-5 4" />
+    </svg>
   );
 }
 

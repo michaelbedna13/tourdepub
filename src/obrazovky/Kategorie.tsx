@@ -39,12 +39,6 @@ export function Kategorie() {
 
   return (
     <>
-      {/* Celá obrazovka kategorie je v její barvě: nahoře se rozlije a dolů
-          se ztrácí. Dřív to byla jen čtyřpixelová čára nad nadpisem, kterou
-          člověk po dvou vteřinách přestal vnímat — a karty pod ní přitom
-          barvu nesly taky. Takhle je poznat, ve které kategorii jsem, dřív
-          než si přečtu nadpis. */}
-      <div className="kat-nasvit" style={{ "--kat": k.barva } as React.CSSProperties} />
       {/* V liště nadpis není. Stálo tam „Úkoly“, tedy kam vede šipka zpátky —
           dvě hlavičky nad sebou, z nichž ta horní nepatřila téhle obrazovce
           a brala nejlepší řádku. Šipka sama stačí. */}
