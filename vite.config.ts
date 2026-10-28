@@ -1,7 +1,9 @@
 import { defineConfig, type Plugin } from "vite";
 
-// Na GitHub Pages běží appka v podsložce /tourdepub/.
-// S vlastní doménou stačí nastavit VITE_BASE=/ při buildu.
+// Appka běží na vlastní doméně betelnarezba.cz v kořeni, takže nasazení
+// staví s VITE_BASE=/ (viz .github/workflows/nasazeni.yml). Záloha zůstává
+// na podsložku, ve které appka běžela na michaelbedna13.github.io — kdyby
+// se doména někdy pustila, stačí proměnnou z workflow vyndat.
 const base = process.env.VITE_BASE ?? "/tourdepub/";
 
 /** Styl appky nesmí blokovat první vykreslení.

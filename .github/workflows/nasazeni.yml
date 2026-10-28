@@ -25,7 +25,11 @@ jobs:
           cache: npm
       - run: npm ci
       # Údaje Supabase jsou v src/lib/nastaveni.ts – publishable klíč, do prohlížeče patří
+      # VITE_BASE=/ protože appka běží na vlastní doméně v kořeni, ne
+      # v podsložce /tourdepub/ jako na michaelbedna13.github.io.
       - run: npm run build
+        env:
+          VITE_BASE: /
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
