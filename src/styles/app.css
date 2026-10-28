@@ -324,31 +324,39 @@ html.rozmazat .obrazovka{filter:blur(5px)}
    lištu a na telefonech, kde je safe-area nula, by se nadpis schoval pod
    hodiny.
 
-   Pás byl dlouho o osmadvacet bodů vyšší než stavová lišta — rezerva pro
-   případ, že rozostření sahá hlouběji. Jenže spolu s odsazením obsahu z toho
-   nahoře bylo sto pět bodů, než začalo logo, a to je pětina displeje prázdná.
-   Rozmazává se hrana pohledu, tedy safe-area; plná deska má přesně její výšku
-   a prolnutí začíná hned pod ní. Rozostřené prolnutí je pořád to samé
-   prolnutí, takže i kdyby efekt sahal o pár bodů hlouběji, nemá co pokazit. */
+   Jak hluboko efekt sahá, se dá vyčíst z fotky obrazovky: zrno je šum, takže
+   stačí jet po svislici a počítat jeho rozptyl. Naměřeno na iPhonu se
+   safe-area 59 bodů — do 58 bodů rozptyl 0,2 (plochá deska, není co
+   rozmazat), od 59 do 90 stoupá z 0,3 na 1,3 (zrno tam je, ale rozmazané),
+   od 94 drží 4,0 (ostré zrno). Efekt končí šestatřicet bodů POD safe-area,
+   ne na ní.
+
+   Z toho plyne všechno ostatní. Nad tou hranicí nesmí být nic ostrého: ani
+   zrno, ani logo, ani pilulka týmu. Pokus zkrátit desku na safe-area (nahoře
+   bylo sto pět bodů prázdných a chtělo to zhubnout) skončil tím, že se
+   rozmazalo zrno i horní půlka loga. Hubne se tedy pod logem, kde žádný
+   efekt není. */
 @media (display-mode:standalone){
   :root{
-    /* Kam sahá systémové rozostření: přes stavovou lištu. Padesát bodů je
-       dno pro telefony, kde je safe-area nula. */
-    --cista:max(env(safe-area-inset-top),50px);
+    /* Kam sahá systémové rozostření. Padesát bodů je dno pro telefony,
+       kde je safe-area nula. */
+    --rozostreni:calc(max(env(safe-area-inset-top),50px) + 36px);
     /* Na kolika bodech se pás a zrno prolnou. Bez toho zrno začínalo naráz
        a i při přesně sedící barvě byla hrana poznat — ne jako schod
-       ve světlosti, ale jako hrana mezi hladkou plochou a zrnitou. */
-    --prolnuti:14px;
-    --pruh:calc(var(--cista) + var(--prolnuti));
-    /* Obsah začíná hned za prolnutím. Osm bodů navíc tu stávalo a nebylo
-       k čemu: pod prolnutím je už obyčejná stránka. */
-    --vrch:var(--pruh);
+       ve světlosti, ale jako hrana mezi hladkou plochou a zrnitou.
+       Prolnutí KONČÍ přesně na hranici efektu: nad ní je zrno pod závojem,
+       takže rozmazat se nemá co, a pod ní začíná ostré zrno bez závoje. */
+    --prolnuti:16px;
+    --pruh:var(--rozostreni);
+    /* Obsah začíná hned pod efektem. Osm bodů navíc tu stávalo a nebylo
+       k čemu. */
+    --vrch:var(--rozostreni);
   }
-  /* Plná deska přes rozmazávanou hranu. Pod sebou nemá nic, co by šlo
-     rozmazat. */
+  /* Plná deska. Sahá jen po začátek prolnutí, aby pod sebou neměla nic,
+     co by šlo rozmazat. */
   body::before{
     content:"";position:fixed;top:0;left:0;right:0;
-    height:var(--cista);
+    height:calc(var(--rozostreni) - var(--prolnuti));
     z-index:61;pointer-events:none;background-color:#2D2D25;
   }
   /* Prolnutí: ta samá barva, co se vytrácí do ztracena, a pod ní se zrno
@@ -357,7 +365,7 @@ html.rozmazat .obrazovka{filter:blur(5px)}
      přechodu by byl tmavý nádech. */
   body::after{
     content:"";position:fixed;left:0;right:0;
-    top:var(--cista);height:var(--prolnuti);
+    top:calc(var(--rozostreni) - var(--prolnuti));height:var(--prolnuti);
     z-index:61;pointer-events:none;
     background:linear-gradient(to bottom,#2D2D25,rgba(45,45,37,0));
   }
@@ -381,7 +389,7 @@ html.rozmazat .obrazovka{filter:blur(5px)}
      v prohlížeči. Takhle má záře svých prvních rovných 76 bodů až POD pásem,
      takže hned za jeho hranou je pořád čistý podklad se zrnem, tedy ta samá
      barva, a stoupat začne o kus níž, kde už žádná hrana není. */
-  .app::before{top:var(--cista)}
+  .app::before{top:calc(var(--rozostreni) - var(--prolnuti))}
   .app::after{top:var(--pruh)}
 }
 @keyframes obsah-prichod{
