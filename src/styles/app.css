@@ -133,51 +133,13 @@ body{
 /* Do polí se píše, tam označování musí zůstat – jinak nejde opravit překlep
    uprostřed názvu týmu nebo zadání úkolu. */
 input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
-/* Teplé světlo shora, chladnější odlesk zdola. Appka je skoro černá a bez
-   tohohle vypadala jako terminál, ne jako večer v hospodě — je to jediný
-   způsob, jak do ní dostat rozsah, aniž by se rozsvítila.
-   Leží NAD lištou (z-index 25, pod oknem): kdyby bylo pod ní, lišta by si
-   svůj kus světla zakryla vlastním podkladem a nahoře by vznikl šev.
-   Je to obyčejný přechod, žádné míchání barev – nic to nestojí.
+/* Teplé světlo tu bývalo: oranžová záře shora a chladnější odlesk zdola,
+   aby appka nevypadala jako terminál. Na obrazovkách s barevnými kartami
+   míchalo do barev (zelená pod ním táhla do olivové), na těch s holým textem
+   se nasvícený roh četl jako kaz, a kvůli tomu, co zbylo, se zhasínalo
+   podle adresy. Rozsah appce dává zrno a barvy karet, světlo pod nimi nikdo
+   nehledal. Je pryč celé, i s vypínačem. */
 
-   Patří appce, ne stránce. Když viselo na body, stihlo se při spuštění
-   vykreslit dřív než úvodní obrazovka a ta ho hned zakryla: na jeden snímek
-   nahoře blikla teplá záře a zmizela. Takhle je schované s celou appkou
-   (html.uvodni .app má visibility:hidden) a objeví se, až úvod odchází. */
-.app::after{
-  content:"";position:fixed;inset:0;z-index:25;pointer-events:none;
-  /* Svislý přechod, ne kruhový. Na nule u horní hrany to dokázal i kruhový,
-     jenže hned pod ní stoupal strmě — během třiceti bodů se podklad zvedl
-     o polovinu — a oko to čte jako hranu, i když na samotné hraně barva
-     sedí. Pruh, který si nad stránkou kreslí prohlížeč, je plochý; aby na
-     něj stránka navázala, musí být prvních pár desítek bodů plochých taky.
-
-     Proto rovný začátek v BODECH, ne v procentech výšky: pruh nad stránkou
-     je vysoký pořád stejně, ať je telefon jakkoli dlouhý. Prvních 76 bodů
-     je čistý podklad, pak záře teprve naskakuje a vrcholí kolem tří set.
-
-     Maskou by se to udělalo elegantněji, ale na iOS se tím celý horní pás
-     dostane do vrstvy, kterou Safari vykresluje v nižším rozlišení — logo
-     a pilulka týmu pod ní byly rozmazané. Spočítaný přechod dělá to samé
-     a žádnou vrstvu navíc nepotřebuje. */
-  background:
-    linear-gradient(to bottom,
-      transparent 76px,
-      rgba(249,162,4,.13) 300px,
-      rgba(249,162,4,.05) 58%,
-      transparent 80%),
-    linear-gradient(to top, rgba(216,86,14,.07), transparent 32%);
-  /* Na úkolech a v Pravidlech se zhasíná (.app.bez-zare). Přechodem, ne
-     střihem: mezi obrazovkami by to jinak cvaklo. */
-  transition:opacity .3s var(--krok);
-}
-/* Obrazovky úkolů nesou barvu kategorie na kartách a teplá záře jim do ní
-   míchala oranžovou — zelená pod ní táhla do olivové. Tady je podklad čistý
-   a barvu drží jen karty.
-
-   V Pravidlech je důvod jiný: žádné karty tam nejsou, je to samý text
-   na prázdné ploše, a na ní se nasvícený roh četl jako kaz, ne jako světlo. */
-.app.bez-zare::after{opacity:0}
 
 /* Filmové zrno přes celou appku. Leží nad vším, co appka nakreslí, a nechytá
    dotyk.
@@ -382,18 +344,8 @@ html.rozmazat .obrazovka{filter:blur(5px)}
   html.rozmazat body::before,html.rozmazat body::after{opacity:0}
   body::before,body::after{transition:opacity .18s var(--krok)}
 
-  /* Zrno i záře začínají až pod pásem.
-
-     Zrno proto, aby u horní hrany nebylo co rozmazat. Záře proto, že pás je
-     plná barva bez ní: kdyby záře začínala počítat od nuly obrazovky, pod
-     pásem už by stoupala a hned za jeho hranou by byla stránka o pár stupňů
-     světlejší. Pás by se tím četl jako samostatná deska, i když na samotné
-     hraně barva sedí — přesně ta past, co si vybrala svoje i u pruhu
-     v prohlížeči. Takhle má záře svých prvních rovných 76 bodů až POD pásem,
-     takže hned za jeho hranou je pořád čistý podklad se zrnem, tedy ta samá
-     barva, a stoupat začne o kus níž, kde už žádná hrana není. */
+  /* Zrno začíná až pod pásem, aby u horní hrany nebylo co rozmazat. */
   .app::before{top:calc(var(--rozostreni) - var(--prolnuti))}
-  .app::after{top:var(--pruh)}
 }
 @keyframes obsah-prichod{
   from{opacity:0;transform:translateY(8px)}
