@@ -271,6 +271,33 @@ html.rozmazat .obrazovka{filter:blur(5px)}
     --vrch:var(--rozostreni);
   }
 }
+/* ---------- telefon naležato ---------- */
+/* Appka je na výšku a jinak ji nechceme. Zamknout otáčení ale nejde:
+   v manifestu stojí orientation:portrait, Android se podle toho zařídí,
+   jenže iOS tuhle položku nečte a screen.orientation.lock() Safari nemá.
+   Takže cedule přes celou obrazovku.
+
+   Rozhoduje o tom CSS, ne JavaScript — žádný posluchač na otočení. Podmínka
+   je na šířku A nízké okno: notebook i iPad naležato mají místa dost a cedule
+   by na nich byla jen otrava. Pět set bodů je nad výškou telefonu naležato
+   (iPhone má kolem 390 až 430) a pod výškou okna tabletu.
+
+   z-index 200 je nad vším, co appka kreslí — nad průpravou (120), nad
+   plachtou detailu i nad rozcestníkem, který visí na <body>. */
+.natoc{display:none}
+@media (orientation:landscape) and (max-height:500px){
+  .natoc{
+    display:grid;align-content:center;justify-items:center;gap:14px;
+    position:fixed;inset:0;z-index:200;
+    padding:24px calc(env(safe-area-inset-left) + 32px)
+            24px calc(env(safe-area-inset-right) + 32px);
+    background:var(--podklad);text-align:center;
+  }
+  .natoc-logo{width:118px;height:auto;color:var(--text);opacity:.92}
+  .natoc h2{font-size:24px}
+  .natoc p{font-family:var(--pismo);font-size:var(--t-drobne);color:var(--text-3);
+    max-width:30ch;line-height:1.5}
+}
 @keyframes obsah-prichod{
   from{opacity:0;transform:translateY(8px)}
   to{opacity:1;transform:none}

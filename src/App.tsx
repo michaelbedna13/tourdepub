@@ -3,6 +3,7 @@ import { HashRouter, Outlet, Route, Routes, useLocation } from "react-router-dom
 import { PotvrzeniHost } from "./components/Potvrzeni";
 import { Ramy } from "./components/Ramy";
 import { FabMenu } from "./components/FabMenu";
+import { Natoc } from "./components/Natoc";
 import { Uvod } from "./components/Uvod";
 import { KATEGORIE } from "./lib/data";
 import { useSvih } from "./lib/svih";
@@ -26,6 +27,7 @@ export function App() {
 
   return (
     <HashRouter>
+      <Natoc />
       {uvod && <Uvod hotovo={() => setUvod(false)} />}
       <PotvrzeniHost />
       <Routes>
