@@ -104,6 +104,13 @@
      verzálky na jedničku jde v angličtině, u nás ne. */
   --radky-nadpis:1.16;
   --krok:cubic-bezier(.32,.72,0,1);
+  /* Křivka na ODCHOD. --krok je prudké zpomalení: skoro celá změna proběhne
+     v první pětině času a zbytek se plíží. Na příchod je to přesně ono —
+     věc přiletí a dosedne. Na odchod je to naopak to nejhorší, co jde
+     udělat: plachta zhasne za osmdesát milisekund, položky nad ní ještě
+     chvíli visí nad odkrytou appkou a oko to přečte jako probliknutí.
+     Odchod proto zrychluje: nejdřív se ani nehne, pak je rázem pryč. */
+  --krok-ven:cubic-bezier(.5,0,.9,.4);
   color-scheme:dark;
 }
 
@@ -1107,7 +1114,8 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
    „zavřít". Prolnou se a křížek se do místa dotočí, ať to není střih. */
 .fab-znak{grid-area:1/1;transition:opacity .18s var(--krok),rotate .26s var(--krok)}
 .fab-znak-krizek{opacity:0;rotate:0deg}
-.fab.otevreno{z-index:41}
+/* Nad plachtou po celou dobu, co nabídka žije — otevreno řídí jen kresbu. */
+.fab.nahore{z-index:41}
 .fab.otevreno .fab-znak-menu{opacity:0;rotate:-30deg}
 .fab.otevreno .fab-znak-krizek{opacity:1;rotate:45deg}
 
@@ -1120,7 +1128,9 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
     rgba(22,22,18,.52);
   animation:zjevit .22s var(--krok);
 }
-.fab-plachta.zavira{animation:zhasnout .24s var(--krok) forwards}
+/* Plachta hasne stejně dlouho, jako trvá odchod poslední položky, ať
+   nezhasne dřív a nenechá položky viset nad odkrytou appkou. */
+.fab-plachta.zavira{animation:zhasnout .3s var(--krok-ven) forwards}
 @keyframes zhasnout{to{opacity:0}}
 /* Nabídka stojí nad tlačítkem a je s ním zarovnaná pravou hranou, jak má
    FAB menu být — vyjíždí z něj, ne odněkud z prázdna. */
@@ -1151,7 +1161,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 /* Zavírání je rychlejší než otevírání a vrací se do tlačítka. Kratší proto,
    že při otevření se nabídka čte, kdežto při zavření už je rozhodnuto —
    čekat na doběh animace, co nikdo nesleduje, se tváří jako zasekaná appka. */
-.fab-radek.zavira{animation:fab-radek-odchod .2s var(--krok) forwards}
+.fab-radek.zavira{animation:fab-radek-odchod .22s var(--krok-ven) forwards}
 @keyframes fab-radek-prichod{
   from{opacity:0;transform:translate(14px,22px) scale(.82)}
 }

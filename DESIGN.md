@@ -436,6 +436,20 @@ to, co vybírá.
   počátek posunu i zmenšení je v pravém dolním rohu, takže položka vypadá,
   že se z kolečka vysunula. Při zavírání jde pořadí obráceně, od nejvzdálenější
   zpátky dolů — nabídka se do tlačítka vrací, ne že zhasne.
+- **Odchod má vlastní křivku** (`--krok-ven`). `--krok` je prudké zpomalení:
+  skoro celá změna proběhne v první pětině času a zbytek se plíží. Na příchod
+  je to přesně ono — věc přiletí a dosedne. Na odchod je to naopak to
+  nejhorší, co jde udělat: plachta zhasla za osmdesát milisekund, položky nad
+  ní ještě chvíli visely nad odkrytou appkou a oko to přečetlo jako
+  probliknutí. Odchod proto zrychluje: nejdřív se ani nehne, pak je rázem
+  pryč.
+- **Tlačítko drží z-index po celou dobu zavírání** (`.fab.nahore`). Dokud to
+  viselo na `.otevreno`, spadlo při prvním snímku zavírání pod plachtu
+  a červená na okamžik ztmavla.
+- **Nabídka se odklidí až po odchodu poslední položky.** Odklízelo se po
+  260 ms, jenže poslední dvě položky měly se zpožděním doběh na 344 — utly se
+  v půlce. Čas se teď počítá z délky odchodu a největšího zpoždění, ne
+  z oka.
 - **Zavírání je vlastní stav**, ne jen odebrání z DOMu. Dokud se nabídka jen
   odpojila, položky zmizely střihem a otevření bylo plynulé, kdežto zavření
   cuknutí. Zavírá se rychleji než otevírá (0,2 s proti 0,42 s): při otevření

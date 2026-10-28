@@ -30,10 +30,16 @@ const POLOZKY: { kam: string; popis: string; ikona: JmenoIkony; sedi: (cesta: st
  *
  *  Pět položek je v rozsahu, co komponenta snese (dva až šest), a žádná
  *  z nich není podstránka něčeho jiného, tak nemá co být schovaná hlouběji. */
-/** Jak dlouho se nabídka zavírá, než se odklidí. Drží se .fab-radek.zavira
- *  v app.css: poslední položka odchází se zpožděním, takže doběh je o ten
- *  stagger delší než samotná animace. */
-const ZAVRENI = 260;
+/** O kolik se zpozdí každá další položka. Při otevírání se jde od tlačítka
+ *  ven, při zavírání zpátky dolů. */
+const STAGGER = 36;
+const STAGGER_ZPET = 24;
+/** Jak dlouho trvá odchod jedné položky. Drží se .fab-radek.zavira v app.css. */
+const ODCHOD = 220;
+/** Kdy se nabídka smí odklidit z DOMu. MUSÍ být delší než odchod poslední
+ *  položky, tedy odchod + největší zpoždění — jinak se poslední dvě utnou
+ *  v půlce animace a je z toho probliknutí. */
+const ZAVRENI = ODCHOD + 4 * STAGGER_ZPET + 40;
 
 export function FabMenu() {
   const [otevreno, setOtevreno] = useState(false);
@@ -63,7 +69,11 @@ export function FabMenu() {
   return createPortal(
     <>
       <button type="button"
-        className={`fab${otevreno && !zavira ? " otevreno" : ""}`}
+        /* nahore drží tlačítko nad plachtou po CELOU dobu, co nabídka žije,
+           i během zavírání. Dokud to viselo na otevreno, spadlo tlačítko při
+           prvním snímku zavírání pod plachtu a červená na okamžik ztmavla —
+           to bylo to probliknutí. otevreno teď řídí jen kresbu v něm. */
+        className={`fab${otevreno ? " nahore" : ""}${otevreno && !zavira ? " otevreno" : ""}`}
         aria-expanded={otevreno} aria-haspopup="menu"
         aria-label={otevreno ? "Zavřít rozcestník" : "Rozcestník"}
         onClick={prepni}>
@@ -115,7 +125,7 @@ function Nabidka({ zavri, zavira }: { zavri: () => void; zavira: boolean }) {
                  stihne přečíst, co přibylo. Při zavírání jde pořadí obráceně,
                  od nejvzdálenější dolů k tlačítku: nabídka se do něj vrací,
                  ne že zhasne. */
-              style={{ animationDelay: `${(zavira ? i : POLOZKY.length - 1 - i) * 36}ms` }}
+              style={{ animationDelay: `${(zavira ? i * STAGGER_ZPET : (POLOZKY.length - 1 - i) * STAGGER)}ms` }}
               onClick={() => jdi(p.kam)}>
               <Ikona jmeno={p.ikona} px={19} />
               <span>{p.popis}</span>
