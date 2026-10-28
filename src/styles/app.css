@@ -705,7 +705,10 @@ html.rozmazat .obrazovka{filter:blur(7px)}
   position:relative;overflow:hidden;display:flex;flex-direction:column;
   /* Na výšku, v poměru 2:3. Kresba je na tomhle rozvržení to hlavní a na
      nízké kartě by na ni nezbylo místo; takhle jí patří horní polovina. */
-  aspect-ratio:2/3;padding:20px 18px 18px;text-align:left;cursor:pointer;
+  /* Jedno odsazení dokola. Bylo 20/18/18 a čtvereček dole vpravo tím seděl
+     blíž ke spodní hraně než jméno k levé — na kartě, co má čtyři prvky, je
+     každý nestejný okraj vidět. */
+  aspect-ratio:2/3;padding:18px;text-align:left;cursor:pointer;
   border-radius:var(--r);background:var(--vrstva);color:var(--text);
   transition:transform .14s var(--krok),background .25s var(--krok);
 }
@@ -721,7 +724,11 @@ html.rozmazat .obrazovka{filter:blur(7px)}
    v galerii, ať je kresba jakkoli vysoká.
    Barva je kategorie vytažená ke krémové: čistě krémová kresba na barevné
    kartě přebíjela jméno, čistě kategorie splývala s podkladem. */
-.ukol-karta-obraz{flex:1;min-height:0;display:grid;place-items:center;padding:6px 0 2px}
+/* Kresba má vlastní okraj uvnitř karty. Doladění (LADENI_KRESEB) umí kresbu
+   zvětšit až o šestnáct procent a zvětšuje se transformem, tedy PO rozvržení
+   — bez téhle rezervy přetekla ven z odsazení karty a končila osm bodů od
+   hrany, zatímco jméno pod ní mělo osmnáct. */
+.ukol-karta-obraz{flex:1;min-height:0;display:grid;place-items:center;padding:2px 9px 0}
 .ukol-karta-kresba{
   max-width:100%;max-height:100%;width:auto;height:auto;
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
@@ -732,7 +739,7 @@ html.rozmazat .obrazovka{filter:blur(7px)}
    ne v rohu nad kresbou: ruka ho tam má blíž, kresba nemusí uhýbat a karta
    se čte odshora dolů jako jedna věc. */
 .ukol-karta-nazev{
-  margin-top:14px;font-family:var(--pismo);font-weight:700;
+  margin-top:16px;font-family:var(--pismo);font-weight:700;
   font-size:17px;line-height:1.22;letter-spacing:-.012em;text-transform:none;
   /* Žádné dělení slov. Safari umí česky a opravdu dělilo — „Balení starý-ho
      kusu", „Tichá špeluň-ka", „Rada za vše-chny prachy" — a na dvouřádkovém
@@ -742,14 +749,18 @@ html.rozmazat .obrazovka{filter:blur(7px)}
      balance vyrovná délku řádků, ať na druhém nezůstane viset jedno slovo. */
   hyphens:manual;overflow-wrap:break-word;text-wrap:balance;
 }
+/* Jméno a cena jsou jedna věc: co to je a co za to padne. Drží se proto
+   u sebe a mezera je nad nimi, ne mezi nimi. Čtvereček je skoro dvakrát
+   vyšší než řádka vedle něj, takže k šesti bodům okraje přidá ještě svoje
+   zarovnání na střed — s dvanácti to pod jménem zívalo víc než nad ním. */
 .ukol-karta-spodek{display:flex;align-items:center;justify-content:space-between;
-  gap:8px;margin-top:8px}
+  gap:10px;margin-top:6px}
 .ukol-karta-zaco{min-width:0;font-family:var(--pismo);
   font-size:var(--t-drobne);line-height:1.3;color:var(--text-3)}
 .ukol-karta.splneno .ukol-karta-zaco{color:currentColor;opacity:.72}
 /* Čtvercový je schválně — kolečka v appce odškrtávají, tohle přidává. */
 .ukol-karta-box{
-  flex:none;width:40px;height:40px;display:grid;place-items:center;
+  flex:none;width:38px;height:38px;display:grid;place-items:center;
   border-radius:12px;color:inherit;
   box-shadow:inset 0 0 0 1.5px currentColor;opacity:.42;
   transition:opacity .16s,transform .13s var(--krok),background .16s;
@@ -808,7 +819,8 @@ html.rozmazat .obrazovka{filter:blur(7px)}
   min-height:300px;
   max-height:min(620px,calc(100dvh - var(--vrch) - env(safe-area-inset-bottom) - 56px));
   display:flex;flex-direction:column;
-  padding:20px 22px 18px;border-radius:var(--r);
+  /* Jedno odsazení dokola, jako na dlaždici. */
+  padding:22px;border-radius:var(--r);
   /* stejný odstín jako dlaždice, ze které se karta otevřela */
   background:color-mix(in srgb,var(--kat) 18%,var(--vrstva));color:var(--text);
   box-shadow:0 18px 50px rgba(0,0,0,.45);
@@ -831,10 +843,12 @@ html.rozmazat .obrazovka{filter:blur(7px)}
    sebe a ten horní nic nedělal. Záporný okraj ho vytáhne nad obrázek, až
    k hornímu okraji karty. */
 .detail-vrch{display:flex;align-items:flex-start;justify-content:space-between;
-  gap:12px;position:relative;z-index:1;margin-top:-6px}
+  gap:14px;position:relative;z-index:1}
+/* To samé jako na dlaždici: doladěná kresba se zvětšuje transformem, tedy až
+   po rozvržení. Bez téhle rezervy lezla Šmelinářovi hlava ven přes horní
+   hranu karty a zleva se dotýkala okraje. */
 .detail-obraz{width:152px;height:152px;display:grid;place-items:center;flex:none;
-  /* kresba smí mírně přetéct, když si přidá na velikosti */
-  overflow:visible}
+  padding:11px;overflow:visible}
 .detail-kresba{
   max-width:100%;max-height:100%;width:auto;height:auto;
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
@@ -844,7 +858,7 @@ html.rozmazat .obrazovka{filter:blur(7px)}
 /* Čtvereček místo data na předloze: co se s úkolem dá udělat. Čtvercový je
    schválně, stejně jako na dlaždici — kolečka v appce odškrtávají. */
 .detail-check{
-  flex:none;width:52px;height:52px;display:grid;place-items:center;
+  flex:none;width:50px;height:50px;display:grid;place-items:center;
   border-radius:15px;color:inherit;
   box-shadow:inset 0 0 0 1.6px currentColor;opacity:.42;
   transition:opacity .16s,transform .13s var(--krok),background .16s;

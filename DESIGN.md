@@ -819,6 +819,25 @@ dokud byla kresba velká — jinak vypadala každá karta jinak. Teď je kresba
 ukotvená nahoře, takže krátkému zadání sluší nízká karta líp než půl
 obrazovky prázdna.
 
+### Odsazení a rytmus
+
+Dlaždice i detail mají **jedno odsazení dokola** (18 a 22 bodů). Bylo
+nestejné — na dlaždici 20 nahoře, 18 po stranách i dole — a čtvereček dole
+vpravo tím seděl blíž ke spodní hraně než jméno k levé. Na kartě se čtyřmi
+prvky je každý nestejný okraj vidět.
+
+**Kresba má uvnitř vlastní okraj** (9 bodů na dlaždici, 11 v detailu).
+Doladění (`LADENI_KRESEB`) umí kresbu zvětšit až o šestnáct procent
+a zvětšuje se transformem, tedy **až po rozvržení** — bez té rezervy kresba
+přetekla ven z odsazení karty: na dlaždici končila osm bodů od hrany,
+zatímco jméno pod ní mělo osmnáct, a v detailu lezla Šmelinářovi hlava ven
+přes horní hranu.
+
+**Jméno a cena jsou jedna věc** — co to je a co za to padne — takže drží
+u sebe (6 bodů) a mezera je nad nimi (16), ne mezi nimi. Čtvereček je skoro
+dvakrát vyšší než řádka vedle něj, takže k těm šesti bodům přidá ještě svoje
+zarovnání na střed; s dvanácti to pod jménem zívalo víc než nad ním.
+
 ## Účtenka
 
 Pořadí part je **účtenka z hospody**. Stojí na dvou místech: na Týmech,
