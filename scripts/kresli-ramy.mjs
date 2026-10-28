@@ -41,7 +41,9 @@ function naPomer(d, w, h) {
   });
 }
 
-// Tvary karet: šířka a výška v bodech, jak vycházejí na telefonu.
+// Tvary karet: šířka, výška a rádius v bodech, jak vycházejí na telefonu.
+// Čtvrté číslo je síla střihu; vynechané znamená VLNA.
+const VLNA = { amp: 2.1, step: 16 };
 const KARTY = {
   hero:    [342, 330, 24],   // karta štace na Hře
   kat:     [342, 152, 24],   // karta kategorie na Úkolech
@@ -49,13 +51,17 @@ const KARTY = {
   ukol:    [165, 248, 24],   // dlaždice úkolu v galerii
   detail:  [340, 420, 24],   // detail úkolu
   lista:   [330,  64, 32],   // plovoucí rozcestník dole
+  // Kolečko má střih slabší a hustěji vzorkovaný oblouk: na malém kruhu
+  // dělala plná vlna boule, co vypadaly jako chyba vykreslení, ne jako nůžky.
+  fab:     [ 64,  64, 32, { amp: 1.1, step: 9, kroku: 14 }],
+  fabRadek:[210,  48, 24, { amp: 1.5, step: 13 }],
 };
 
 const out = [];
-for (const [jm, [w, h, r]] of Object.entries(KARTY)) {
+for (const [jm, [w, h, r, strih = VLNA]] of Object.entries(KARTY)) {
   nasad(31 + jm.length * 19); // pevná náhodnost na tvar
   // step je dlouhý schválně: střih nůžkami má po hraně pár vln, ne pilu
-  const d = cut(zakulacenyRam(w, h, r), { amp: 2.1, step: 16, tension: .5 });
+  const d = cut(zakulacenyRam(w, h, r, strih.kroku), { tension: .5, ...strih });
   out.push(`  ${jm}: "${naPomer(d, w, h)}",`);
 }
 writeFileSync(new URL("../src/lib/ramy.ts", import.meta.url),

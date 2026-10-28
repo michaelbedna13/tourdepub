@@ -1096,6 +1096,74 @@ html.rozmazat .rozcestnik{opacity:0;transform:translateY(12px);pointer-events:no
   white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:clip;
 }
 
+/* ---------- FAB menu ---------- */
+/* Kulaté tlačítko vpravo dole, co se rozbalí do nabídky akcí — FAB menu
+   z Material 3, co nahradilo starý „speed dial". Dva až šest příbuzných
+   úkonů nad tlačítkem, každý s ikonou a jménem, a tlačítko se při otevření
+   překlopí na křížek.
+
+   Patří do něj akce, ne obrazovky: po appce se chodí rozcestníkem.
+
+   Sedí nad rozcestníkem, ne vedle něj — dva plovoucí prvky na jedné řádce
+   by se praly o palec a o šířku. Barva je logová červená: je to jediná věc
+   na obrazovce, co má křičet, a žádná kategorie ji nenese jako plochu. */
+.fab{
+  /* Vpravo u sloupce appky, ne u okraje okna: na široké obrazovce je appka
+     uprostřed a tlačítko má patřit k ní. */
+  position:fixed;z-index:31;
+  right:max(var(--okraj), calc(50% - var(--sirka) / 2 + var(--okraj)));
+  bottom:calc(env(safe-area-inset-bottom) + 14px + var(--lista) + 2px);
+  width:60px;height:60px;display:grid;place-items:center;
+  border-radius:var(--pilulka);
+  background:var(--tisk-cervena,#E5331F);color:#FFF4E6;
+  box-shadow:0 10px 26px rgba(0,0,0,.45);
+  transition:transform .18s var(--krok),opacity .18s var(--krok);
+}
+.fab:active{transform:scale(.92)}
+/* Pod cizí vrstvou (detail úkolu, spodní okno) odejde stejně jako rozcestník:
+   zůstal by jako jediná ostrá věc nad rozmazanou appkou. Pod VLASTNÍ nabídkou
+   samozřejmě zůstat musí — tu zrovna drží. */
+html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-events:none}
+/* Plus se otočením stane křížkem: jedna kresba, žádné probliknutí dvou. */
+.fab-znak{transition:rotate .24s var(--krok)}
+.fab.otevreno{z-index:41}
+.fab.otevreno .fab-znak{rotate:45deg}
+
+.fab-plachta{
+  position:fixed;inset:0;z-index:40;touch-action:none;
+  background:
+    linear-gradient(to right,
+      rgba(12,12,9,.5), rgba(12,12,9,0) 16%,
+      rgba(12,12,9,0) 84%, rgba(12,12,9,.5)),
+    rgba(22,22,18,.52);
+  animation:zjevit .18s var(--krok);
+}
+/* Nabídka stojí nad tlačítkem a je s ním zarovnaná pravou hranou, jak má
+   FAB menu být — vyjíždí z něj, ne odněkud z prázdna. */
+.fab-nabidka{
+  position:absolute;
+  right:max(var(--okraj), calc(50% - var(--sirka) / 2 + var(--okraj)));
+  bottom:calc(env(safe-area-inset-bottom) + 14px + var(--lista) + 2px + 60px + 14px);
+  display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+}
+.fab-radek{
+  display:flex;align-items:center;gap:11px;
+  min-height:48px;padding:0 22px;border-radius:var(--pilulka);
+  background:var(--text);color:var(--podklad);
+  font-family:var(--pismo);font-weight:700;font-size:var(--t-text);
+  white-space:nowrap;
+  box-shadow:0 8px 20px rgba(0,0,0,.38);
+  animation:fab-radek-prichod .26s var(--krok) backwards;
+}
+.fab-radek:active{transform:scale(.95)}
+/* Co teď nejde, z nabídky nemizí — jen zhasne. Nabídka, co pokaždé mění
+   počet řádků, se nedá zapamatovat rukou. */
+.fab-radek:disabled{opacity:.42}
+.fab-radek .ikona{color:var(--podklad);opacity:.7}
+@keyframes fab-radek-prichod{
+  from{opacity:0;transform:translateY(14px) scale(.94)}
+}
+
 /* ---------- okno ---------- */
 .okno{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;
   /* Ztmavení a po stranách viněta, ze stejného důvodu jako u detailu úkolu:
@@ -1318,6 +1386,11 @@ html.rozmazat .rozcestnik{opacity:0;transform:translateY(12px);pointer-events:no
      i linku kreslí drop-shadow kopírující vystřižený tvar. */
   .rozcestnik-pas{clip-path:url(#ram-lista);box-shadow:none;
     filter:drop-shadow(0 10px 24px rgba(0,0,0,.42)) drop-shadow(0 0 .5px rgba(239,235,224,.16))}
+  /* FAB i jeho řádky jsou taky stříhané, ne kružítkové. */
+  .fab{clip-path:url(#ram-fab);box-shadow:none;
+    filter:drop-shadow(0 10px 26px rgba(0,0,0,.45))}
+  .fab-radek{clip-path:url(#ram-fabRadek);box-shadow:none;
+    filter:drop-shadow(0 8px 20px rgba(0,0,0,.38))}
 }
 
 @media (prefers-reduced-motion:reduce){

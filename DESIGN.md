@@ -436,6 +436,39 @@ hrany, ne u horní.
 - `--lista` drží výšku, o kterou se zvětší spodní odsazení obrazovky, ať
   poslední karta nekončí pod ním.
 
+## Rychlý zápis (FAB menu)
+
+Vpravo dole je **kulaté červené tlačítko**, co se rozbalí do nabídky tří
+úkonů: *Jsme v špeluňce*, *Škopek lupnutej*, *Další štace*. Je to **FAB menu
+z Material 3** — komponenta, co nahradila starý „speed dial": dva až šest
+příbuzných úkonů nad tlačítkem, každý s ikonou a jménem, a samo tlačítko se
+při otevření překlopí na křížek (plus se otočí o 45°, aby se tvar přelil
+a nepřeblikly dvě kresby).
+
+**Jsou to akce, ne obrazovky.** Chození po appce obstarává rozcestník dole;
+FAB je na to, co se dělá, ne kam se jde. Tyhle tři úkony se dělají každou
+štaci a šly jedině z Hry — kdo zrovna četl úkoly, musel se vracet.
+
+- **Dole vpravo**, nad rozcestníkem, ne vedle něj: dva plovoucí prvky na jedné
+  řádce by se praly o palec i o šířku. Nabídka se rozbaluje nahoru, takže si
+  prst nestíní to, co vybírá.
+- **Logová červená.** Je to jediná věc na obrazovce, co má křičet, a žádná
+  kategorie tu barvu nenese jako plochu.
+- **Co zrovna nejde, nemizí — jen zhasne.** Nabídka, co pokaždé mění počet
+  řádků, se nedá zapamatovat rukou.
+- **Položky naskakují jedna po druhé odspoda** (45 ms na řádek), ať oko stihne
+  přečíst, co přibylo.
+- **Visí na `<body>`, ne uvnitř `.app`.** Appka má vlastní vrstvení
+  (`position:relative; z-index:1`), takže cokoli uvnitř — i s `z-index:99` —
+  zůstane pod plachtou kreslenou nad ní; tlačítko se při otevření ztmavovalo
+  vlastní nabídkou.
+- **Pod cizí vrstvou odejde** stejně jako rozcestník. Pod vlastní nabídkou
+  zůstat musí, tu zrovna drží.
+
+Kolečko i řádky jsou stříhané nůžkama (`ram-fab`, `ram-fabRadek`), jen se
+slabším střihem: na malém kruhu dělala plná vlna boule, co vypadaly jako
+chyba vykreslení, ne jako nůžky.
+
 ## Navigace
 
 Dvě cesty na to samé: **švih do boku** a **hamburger vpravo nahoře**.
