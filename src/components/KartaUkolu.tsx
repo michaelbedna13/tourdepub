@@ -1,5 +1,5 @@
 import type { Kategorie, Ukol } from "../lib/data";
-import { useSazbaJmena, vzorJmena } from "../lib/sazba";
+import { vazat } from "../lib/format";
 import { kolikrat, tym } from "../lib/stav";
 import { Ikona } from "./Ikona";
 import { Kresba, maKresbu } from "./Kresba";
@@ -29,11 +29,6 @@ export function KartaUkolu({ u, k, otevri }: Props) {
   const splneno = kolik > 0 && (opakovatelny ? kolik >= u.max : true);
   const postup = opakovatelny && kolik > 0 && !splneno ? `${kolik}/${u.max}` : null;
 
-  // Lámání i případné stažení jména si spočítá lib/sazba.ts z naměřené
-  // šířky v tom písmu, které se opravdu načetlo. Odhad podle počtu znaků tu
-  // stál dřív a stahoval skoro dvakrát víc, než bylo potřeba.
-  const { radky, sazba, prostrkani } = useSazbaJmena(u.nazev);
-
   return (
     <div
       className={`ukol-karta${splneno ? " splneno" : ""}`}
@@ -59,10 +54,11 @@ export function KartaUkolu({ u, k, otevri }: Props) {
         {!maKresbu(u.id) && <Ikona jmeno={u.ikona ?? k.ikona} px={96} trida="ukol-karta-kresba" />}
       </div>
 
-      <h3 ref={vzorJmena} className="ukol-karta-nazev"
-        style={{ "--sazba": sazba, "--prostrkani": `${prostrkani}em` } as React.CSSProperties}>
-        {radky.map((r, i) => <span key={i}>{r}</span>)}
-      </h3>
+      {/* Jedna sazba na všech kartách, žádné dopočítávání. Nejdelší jméno má
+          devatenáct znaků a na dva řádky se vejde; kdyby někdy přibylo delší,
+          patří zkrátit jméno, ne zdrobnit písmo — menší jméno na jedné kartě
+          je mezi sousedy vidět na první pohled. */}
+      <h3 className="ukol-karta-nazev">{vazat(u.nazev)}</h3>
     </div>
   );
 }
