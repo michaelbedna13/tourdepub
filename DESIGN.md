@@ -935,6 +935,16 @@ co se na kartě dá udělat, takže se **celá karta chová jako jedno tlačítk
 Kresba tím dostala místo navíc (152 bodů místo 112) a je z dlaždice obrázek
 se jménem.
 
+**Dlouhé jméno se o kousek stáhne**, ať se vejde na dva řádky. „Rada za
+všechny prachy" má dvaadvacet znaků a jako jediné ze třiačtyřiceti úkolů se
+lámalo na tři; třetí řádek ukousne kresbě dvacet bodů a karta vedle vypadá
+jako z jiné sady. Sazba se násobí `19 / délka jména`, s dolní mezí 0,85:
+devatenáct je nejdelší jméno, co se na dva řádky vejde samo, takže se pod
+ním nic nemění, a u opravdu dlouhého jména radši pustíme třetí řádek než
+drobnopis. Jméno je proto ukotvené **odspodu** (`margin-top: auto`): volné
+místo karty se sbírá nad ním, takže poslední řádka sedí vždycky stejně
+vysoko nad spodní hranou, i když se sazba stáhne.
+
 **Jméno sedí u spodní hrany svého místa**, ne nahoře. Každá karta drží dva
 řádky, i když má jméno na jeden, takže vedle sebe končí všechna jména na
 stejné lince a od spodního okraje karty mají stejně daleko (naměřeno 23,2

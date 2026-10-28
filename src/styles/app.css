@@ -774,7 +774,8 @@ html.rozmazat .obrazovka{filter:blur(5px)}
    zarovnání na střed se tím měnila mezera mezi kresbou a jménem od karty ke
    kartě. Na spodní hraně má každá kresba k jménu stejně daleko a volné místo
    zůstane nahoře, kde ho kryje odsazení karty. */
-.ukol-karta-obraz{flex:0 1 152px;height:152px;display:grid;place-items:end center;padding:0 9px}
+.ukol-karta-obraz{flex:0 1 152px;height:152px;display:grid;place-items:end center;
+  padding:0 9px;margin-bottom:16px}
 .ukol-karta-kresba{
   max-width:100%;max-height:100%;width:auto;height:auto;
   color:color-mix(in srgb,var(--kat) 55%,var(--text));
@@ -785,8 +786,12 @@ html.rozmazat .obrazovka{filter:blur(5px)}
    ne v rohu nad kresbou: ruka ho tam má blíž, kresba nemusí uhýbat a karta
    se čte odshora dolů jako jedna věc. */
 .ukol-karta-nazev{
-  margin-top:18px;font-family:var(--pismo);font-weight:700;
-  font-size:16.5px;line-height:1.26;letter-spacing:-.012em;text-transform:none;
+  /* Odspodu, ne zafixovanou mezerou pod kresbou: volné místo karty se tím
+     sbírá NAD jméno, takže poslední řádka sedí vždycky stejně vysoko nad
+     spodní hranou, i když se sazba o kousek stáhne (viz --sazba). */
+  margin-top:auto;font-family:var(--pismo);font-weight:700;
+  font-size:calc(16.5px * var(--sazba,1));line-height:1.26;
+  letter-spacing:-.012em;text-transform:none;
   /* Místo na dva řádky drží každá karta, i když má jméno na jeden. Jinak
      jednořádková jména klesla o dvacet bodů níž než dvouřádková a v mřížce
      po dvou vedle sebe neseděla žádná účaří. Takhle začínají všechna jména
