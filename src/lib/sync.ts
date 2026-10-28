@@ -22,6 +22,9 @@ export interface StavSyncu {
 let klient: SupabaseClient | null = null;
 let rezim: Rezim = "ukazka";
 let naposledy: RadekTymu[] = [];
+// První čtení se slučuje vždycky, i když vyjde prázdné: může znamenat, že
+// ostatní své party mezitím smazali a naše uložená kopie je má zahodit.
+let prvniCteni = true;
 let cekaZapis = false;
 let chyba = "";
 
@@ -76,13 +79,43 @@ export async function spustSync() {
       .subscribe();
     rezim = "zivo";
     naZmenu(posliOpatrne);
-    // bez signálu zápis spadne; jak se síť vrátí, dopošle se
-    addEventListener("online", posliOpatrne);
+    // Živý kanál je hlavní cesta, ale sám nestačí. Když telefon zhasne nebo
+    // se appka přepne na pozadí, websocket umře — a co mezitím ostatní
+    // zapsali, se nedožene: realtime události rozesílá, nedoručené nedrží.
+    // Takže se při návratu k obrazovce (a při návratu signálu) čte znovu,
+    // a dokud se na appku někdo kouká, jede pomalý doptávací takt. Je to
+    // pojistka i pro případ, že by v Supabase nebyla tabulka v publikaci
+    // supabase_realtime — pak kanál mlčí a bez taktu by se nedělo nic.
+    document.addEventListener("visibilitychange", priNavratu);
+    addEventListener("online", priNavratu);
+    takt();
   } catch (e) {
     chyba = popisChyby(e);
     rezim = "chyba"; // nevadí, hra funguje dál lokálně
   }
   zmena();
+}
+
+/** Jak často se appka doptá serveru, i když živý kanál mlčí. Pětadvacet
+ *  vteřin: pořadí part není burza, a telefon v hospodě má jiné starosti
+ *  než držet spojení na milisekundy. */
+const TAKT = 25_000;
+let hodiny: ReturnType<typeof setInterval> | undefined;
+
+function takt() {
+  clearInterval(hodiny);
+  hodiny = undefined;
+  if (typeof document === "undefined" || document.visibilityState !== "visible") return;
+  hodiny = setInterval(() => { if (document.visibilityState === "visible") nacti(); }, TAKT);
+}
+
+/** Appka se vrátila na obrazovku nebo se vrátil signál: dohnat, co uteklo,
+ *  a dopsat, co se nestihlo odeslat. */
+function priNavratu() {
+  if (document.visibilityState !== "visible") { takt(); return; }
+  nacti();
+  posliOpatrne();
+  takt();
 }
 
 /** Zapisovat při každém ťuknutí by bylo zbytečně často, tak se to slučuje. */
@@ -112,8 +145,14 @@ async function nacti(): Promise<boolean> {
   try {
     const { data, error } = await klient.from(TABULKA).select("*").eq("hra", HRA);
     if (error) throw error;
-    naposledy = (data || []) as RadekTymu[];
-    slucZeServeru(naposledy); // uloz() uvnitř překreslí obrazovky
+    const nove = (data || []) as RadekTymu[];
+    // Doptávací takt běží pořád, ale většinou se nic nezměnilo. Slučovat
+    // a ukládat naprázdno každých pětadvacet vteřin by jen překreslovalo
+    // obrazovku pod rukama.
+    const jine = prvniCteni || JSON.stringify(nove) !== JSON.stringify(naposledy);
+    naposledy = nove;
+    prvniCteni = false;
+    if (jine) slucZeServeru(naposledy); // uloz() uvnitř překreslí obrazovky
     chyba = "";
     zmena();
     return true;
