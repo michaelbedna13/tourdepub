@@ -407,6 +407,35 @@ Nese tu samou informaci, nic nepřekrývá, a odpadlo s ním „4/9" u pruhu —
 jeden údaj dvakrát na jedné kartě. Pruh trasy je vlasový, šipky tišší.
 Zůstala jedna osa shora dolů: číslo → jméno → trasa → čas → zápis.
 
+## Rozcestník
+
+Pět obrazovek appky leží v **plovoucím rozcestníku dole** — ikona a jméno,
+pořád na očích, a je z něj vidět, kde člověk zrovna je.
+
+Předtím to byl hamburger v pravém horním rohu a rozcestí, co vyjelo zespodu.
+Dvě ťuknutí na každý přechod, a to první v tom nejhorším kusu obrazovky, jaký
+palec má. V hospodě se appka drží jednou rukou, v druhé je škopek — terče
+patří dolů. Apple to má v iOS 26 stejně: lišta plave nad obsahem u spodní
+hrany, ne u horní.
+
+- **Pět položek** je přesně na horní hranici toho, co se do lišty vejde (HIG
+  doporučuje tři až pět). Všech pět se ale používá celý večer a nic z toho
+  není podstránka něčeho jiného, takže nemá co být schované.
+- **Jména u ikon.** HIG to doporučuje a tady to platí dvojnásob: appku člověk
+  vidí potřetí v životě, v šeru a po pátém škopku. Trofej ani korbel samy
+  nikomu neřeknou „Týmy" a „Hospody". Jména se drží nadpisů obrazovek, ne
+  hantecu z úkolů — musí sedět slovo, které se objeví hned po ťuknutí.
+- **Plave, nelepí se.** Appka je papírová a tohle má být lísteček položený
+  přes ni, ne systémová lišta. Proto má taky obrys stříhaný nůžkama
+  (`ram-lista`) a stín pod sebou.
+- **Pod otevřenou vrstvou odejde dolů.** Leží nad obrazovkou, takže by se
+  jako jediná věc za plachtou nerozmazal — ostrý lísteček na rozmazaném
+  pozadí. A spodní okno vyjíždí přesně přes něj.
+- **Ťuknutí na obrazovku, na které už jsem, vyjede nahoru.** To samé dělá
+  iOS a na dlouhé galerii úkolů to ušetří půl minuty tahání.
+- `--lista` drží výšku, o kterou se zvětší spodní odsazení obrazovky, ať
+  poslední karta nekončí pod ním.
+
 ## Navigace
 
 Dvě cesty na to samé: **švih do boku** a **hamburger vpravo nahoře**.

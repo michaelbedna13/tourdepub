@@ -48,6 +48,7 @@ const KARTY = {
   katMala: [342, 112, 24],   // ta samá na Hře, nižší
   ukol:    [165, 248, 24],   // dlaždice úkolu v galerii
   detail:  [340, 420, 24],   // detail úkolu
+  lista:   [330,  64, 32],   // plovoucí rozcestník dole
 };
 
 const out = [];

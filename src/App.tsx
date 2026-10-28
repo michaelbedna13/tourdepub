@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { HashRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { PotvrzeniHost } from "./components/Potvrzeni";
 import { Ramy } from "./components/Ramy";
+import { Rozcestnik } from "./components/Rozcestnik";
 import { Uvod } from "./components/Uvod";
 import { KATEGORIE } from "./lib/data";
 import { useSvih } from "./lib/svih";
@@ -65,6 +66,7 @@ function Kostra() {
         key={pathname} ref={svih.vrstva}>
         <Outlet />
       </main>
+      <Rozcestnik />
     </div>
   );
 }
