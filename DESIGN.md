@@ -915,6 +915,13 @@ co se na kartě dá udělat, takže se **celá karta chová jako jedno tlačítk
 Kresba tím dostala místo navíc (152 bodů místo 112) a je z dlaždice obrázek
 se jménem.
 
+**Jméno sedí u spodní hrany svého místa**, ne nahoře. Každá karta drží dva
+řádky, i když má jméno na jeden, takže vedle sebe končí všechna jména na
+stejné lince a od spodního okraje karty mají stejně daleko (naměřeno 23,2
+bodu na všech). Zarovnané nahoru viselo jednořádkové jméno o dvacet bodů výš
+než dvouřádkové vedle něj a v mřížce po dvou to bylo první, čeho si oko
+všimlo.
+
 **Stav je v rohu, ne v řádce.** Splněný úkol má fajfku a celou kartu v barvě
 kategorie, načatý opakovatelný ukazuje kolikrát z kolika. Co se nehodí říct,
 se neřekne, takže na většině karet není v rohu nic.
@@ -965,6 +972,22 @@ neudržela kontrast, tak je pro ně tmavší (`#B4220F`).
 Pod otevřeným detailem nebo oknem se rozmaže **obsah** (`filter` na
 `.obrazovka`), ne podklad plachty. `backdrop-filter` si Safari vzorkuje zvlášť
 a po překreslení u kraje selhával.
+
+**Pět bodů, ne sedm.** Sedmi se z obrazovky stala barevná kaše a přechod do
+ní i z ní byl tím pádem vidět jako skok, ne jako rozostření. V pěti je pořád
+poznat, co je pod vrstvou, a ztišit to stačí.
+
+**Žádné roztažení.** Chvíli tu bylo `scaleX(1.06)`, aby náběh karet dosáhl až
+k hraně obrazovky. Jenže transform tu obrazovku sdílí s tahem do boku
+(`svih.ts` ho zapisuje rovnou do stylu), takže se nedal plynule přepínat
+a při zavírání skočil z 1,06 na 1 v jediném snímku. Okraje řeší viněta na
+plachtě, ta žádnou hranu nepotřebuje.
+
+**Vrstva, co odchází s vlastní animací, pouští rozostření hned**, ne až
+s odpojením z DOMu (`useRozmazanePozadi(aktivni)`). Nabídka rozcestníku žije
+ještě tři desetiny vteřiny potom, co je o jejím zavření rozhodnuto, a kdyby
+po celou tu dobu držela rozmazání, nová obrazovka by se pod ní vynořila
+rozmazaná a zaostřila až po ní. Dva přechody za sebou místo jednoho.
 
 U krajů se ale ukázalo něco, co není chyba prohlížeče: **karty galerie stojí
 dvacet bodů od hrany obrazovky**, rozostření jim tu hranu rozmázne na obě

@@ -275,19 +275,19 @@ input,textarea,select{caret-color:var(--text)}
   /* Pod otevřenou vrstvou se obrazovka rozmaže. Dělá to filtr na obsahu,
      ne backdrop-filter na plachtě: Safari si podklad pro backdrop vzorkuje
      zvlášť a u levého okraje po překreslení zůstával nerozostřený proužek. */
-  transition:filter .18s var(--krok);
+  transition:filter .24s var(--krok);
 }
-/* Rozostření a k tomu nepatrné roztažení do stran.
-   Karty galerie stojí dvacet bodů od hrany obrazovky a rozostření jim tu
-   hranu rozmázne jen asi čtrnáct bodů doleva, takže posledních pár bodů
-   u kraje zůstane holý podklad. Ostrý obraz to čte jako okraj stránky,
-   rozmazaný jako pruh, co „není rozmazaný". Roztažení o šest procent posune
-   levou hranu karty z dvaceti na jedenáct a její náběh tím dosáhne za hranu
-   obrazovky, takže žádný holý pruh nezbyde.
-   Jen vodorovně: svisle by se obsah při scrollu posunul (počátek je uprostřed
-   několikametrového sloupce) a rozmazané pozadí by při otevření poskočilo.
-   Na rozmazané ploše není roztažení o šest procent poznat. */
-html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
+/* Pod otevřenou vrstvou se obrazovka rozmaže. Pět bodů, ne sedm: sedmi se
+   z obrazovky stala barevná kaše a přechod do ní i z ní byl tím pádem vidět
+   jako skok, ne jako rozostření. V pěti je pořád poznat, co je pod vrstvou,
+   a ztišit to stačí.
+
+   Jen filtr, žádné roztažení. Chvíli tu bylo scaleX(1.06), aby náběh karet
+   dosáhl až k hraně obrazovky — jenže transform tu obrazovku sdílí s tahem
+   do boku (svih.ts ho zapisuje rovnou do stylu), takže se nedal plynule
+   přepínat: při zavírání skočil z 1,06 na 1 v jediném snímku. Okraje řeší
+   viněta na plachtě, ta žádnou hranu nepotřebuje. */
+html.rozmazat .obrazovka{filter:blur(5px)}
 /* ---------- horní hrana v appce z plochy ---------- */
 /* iOS 26 kreslí v appce přidané na plochu přes horní okraj webového pohledu
    systémové rozostření („scroll edge effect", liquid glass), aby stavová
@@ -791,9 +791,12 @@ html.rozmazat .obrazovka{filter:blur(7px);transform:scaleX(1.06)}
      jednořádková jména klesla o dvacet bodů níž než dvouřádková a v mřížce
      po dvou vedle sebe neseděla žádná účaří. Takhle začínají všechna jména
      na stejné lince a řádka s cenou je na všech kartách taky stejně. */
-  /* Dva řádky drží každá karta, i když má jméno na jeden: v mřížce po dvou
-     vedle sebe pak začínají všechna jména na stejné lince. */
-  min-height:2.52em;
+  /* Dva řádky drží každá karta, i když má jméno na jeden, a jméno v nich
+     sedí u SPODNÍ hrany. Vedle sebe tak končí všechna jména na stejné lince
+     a od spodního okraje karty mají stejně daleko. Zarovnané nahoru
+     jednořádkové jméno viselo o dvacet bodů výš než dvouřádkové vedle něj
+     a v mřížce po dvou to bylo první, čeho si oko všimlo. */
+  display:grid;align-content:end;min-height:2.52em;
   /* Žádné dělení slov. Safari umí česky a opravdu dělilo — „Balení starý-ho
      kusu", „Tichá špeluň-ka", „Rada za vše-chny prachy" — a na dvouřádkovém
      jménu na malé kartě to nevypadá jako sazba, ale jako chyba. Zlom se dělá

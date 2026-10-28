@@ -48,6 +48,10 @@ export function FabMenu() {
   // cuknutí.
   const [zavira, setZavira] = useState(false);
   const cas = useRef<number | undefined>(undefined);
+  // Rozostření drží jen dokud je nabídka otevřená. Při zavírání se pouští
+  // hned, ne až s odpojením z DOMu, takže obrazovka ostří ve stejnou chvíli,
+  // co se nabídka vrací do tlačítka — jeden pohyb místo dvou po sobě.
+  useRozmazanePozadi(otevreno && !zavira);
 
   useEffect(() => () => clearTimeout(cas.current), []);
 
@@ -90,9 +94,6 @@ export function FabMenu() {
 }
 
 function Nabidka({ zavri, zavira }: { zavri: () => void; zavira: boolean }) {
-  // Pozadí se rozmaže — to samé, co dělá detail úkolu. Nabídka nad ostrou
-  // appkou by byla jen další vrstva lístečků.
-  useRozmazanePozadi();
   const { pathname } = useLocation();
   const kam = useNavigate();
   const zavrit = useRef(zavri);

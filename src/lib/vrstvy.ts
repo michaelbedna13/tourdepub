@@ -16,14 +16,22 @@ const TRIDA = "rozmazat";
  *  takže zavření té horní nesmí rozmazání sundat. */
 let otevreno = 0;
 
-/** Po dobu života komponenty drží obrazovku pod ní rozmazanou. */
-export function useRozmazanePozadi() {
+/** Drží obrazovku pod sebou rozmazanou, dokud je `aktivni`.
+ *
+ *  Parametr je kvůli zavírání. Vrstva, co odchází s vlastní animací, žije
+ *  v DOMu ještě tři desetiny vteřiny potom, co je o ní rozhodnuto — a kdyby
+ *  po celou tu dobu držela rozmazání, nová obrazovka by se pod odcházející
+ *  nabídkou vynořila rozmazaná a zaostřila by až po ní. Dva přechody za
+ *  sebou místo jednoho. Takhle se rozostření pouští ve stejnou chvíli jako
+ *  odchod vrstvy a je z toho jeden pohyb. */
+export function useRozmazanePozadi(aktivni = true) {
   useEffect(() => {
+    if (!aktivni) return;
     otevreno++;
     document.documentElement.classList.add(TRIDA);
     return () => {
       otevreno = Math.max(0, otevreno - 1);
       if (!otevreno) document.documentElement.classList.remove(TRIDA);
     };
-  }, []);
+  }, [aktivni]);
 }
