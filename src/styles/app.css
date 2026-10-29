@@ -607,7 +607,9 @@ html.rozmazat .obrazovka{filter:blur(5px)}
 .kat-karta::after,.hero::after,.ukol-karta::after,.detail-karta::after{
   content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
   background-image:url("../assets/zrno-tisk.svg");background-size:150px 150px;
-  mix-blend-mode:multiply;opacity:.55;
+  /* Zrno samo má v sobě opacity 0.32, tohle je násobek navíc — dohromady
+     tedy kolem čtvrtiny. Bylo .55; na barvě karty to bylo moc potichu. */
+  mix-blend-mode:multiply;opacity:.8;
 }
 /* Tři barevné karty místo jednoho seznamu dvaceti tří úkolů. Barva není
    ozdoba: drží kategorii pohromadě přes celou appku. Text je tmavý, protože
