@@ -204,6 +204,26 @@ const KRESBY = {
     I(cut(stroke(36, 10, 34, 32, 6), { ...R, amp: .9 })),
     I(cut(stroke(54, 8, 56, 30, 6), { ...R, amp: .9 })),
   ],
+  // Přímej přenos: mikrofon s vlnkami. Vlnky jsou jen na jedné straně,
+  // jak u Řevu z JZD: kolem dokola z toho byl ježek.
+  prenos: () => [
+    I(cut(ell(46, 30, 17, 21, 22), { ...R, amp: 1 })),
+    C(cut(rect(31, 24, 61, 27, 1), JEMNE)),
+    C(cut(rect(31, 33, 61, 36, 1), JEMNE)),
+    I(cut(rect(41, 50, 51, 74, 2), { ...R, amp: .8 })),
+    I(cut(rect(30, 76, 62, 86, 3), { ...R, amp: .9 })),
+    I(cut(srpek(46, 30, 30, 6, -46, 46), { ...R, amp: .8, step: 5 })),
+  ],
+  // Královská delegace: koruna. Hroty musí zůstat ostré, proto nižší
+  // tension — vyhlazená koruna vypadala jako vlna.
+  delegace: () => [
+    I(cut([[14, 76], [19, 30], [34, 52], [50, 22], [66, 52], [81, 30], [86, 76]],
+          { ...H, tension: .25 })),
+    I(cut(rect(14, 72, 86, 90, 3), { ...R, amp: 1 })),
+    C(cut(ell(30, 64, 5, 5, 14), JEMNE)),
+    C(cut(ell(50, 60, 5, 5, 14), JEMNE)),
+    C(cut(ell(70, 64, 5, 5, 14), JEMNE)),
+  ],
   // Hospodský Národní: divadelní maska na tyčce
   narodni: () => [
     I(cut([[26, 14], [74, 14], [78, 44], [68, 68], [50, 80], [32, 68], [22, 44]], H)),
@@ -240,6 +260,37 @@ const KRESBY = {
     I(cut(rect(42, 56, 58, 72, 2), { ...R, amp: .9 })),
     I(cut(rect(30, 72, 70, 80, 2), { ...R, amp: .9 })),
     I(cut(rect(20, 80, 80, 94, 3), H)),
+  ],
+  // Kapela na placku: placka vykukuje z obalu. Samotná placka vyšla jako
+  // terč (a ten už má Bullseye), takže obal musí být vidět celý a hvězda
+  // na něm říká „tohle je přebal", ne „tohle je kolečko".
+  kapela: () => [
+    I(cut(ell(64, 54, 30, 30, 26), { ...R, amp: 1.1 })),
+    C(cut(ell(64, 54, 22, 22, 22), { ...R, amp: .8 })),
+    I(cut(ell(64, 54, 9, 9, 16), { ...R, amp: .7 })),
+    I(cut(rect(4, 20, 54, 88, 4), H)),
+    C(cut(star(29, 54, 15, 6.5), { ...R, amp: .8 })),
+  ],
+  // Dabing naživo: filmová klapka. Bublina by se pletla s Tichou špeluňkou
+  // i Veršovaným lokálem, ty už obě bublinu mají.
+  dabing: () => [
+    I(cut(rect(10, 40, 90, 88, 4), H)),
+    I(cut(rot(rect(8, 14, 92, 34, 2), -9, 50, 24), { ...R, amp: 1 })),
+    C(cut(rot(rect(26, 14, 34, 34, 1), -9, 50, 24), { ...R, amp: .7 })),
+    C(cut(rot(rect(50, 14, 58, 34, 1), -9, 50, 24), { ...R, amp: .7 })),
+    C(cut(rot(rect(74, 14, 82, 34, 1), -9, 50, 24), { ...R, amp: .7 })),
+  ],
+  // Trenér roku: stopky. Píšťalka se zkoušela dvakrát a pokaždé z ní byl
+  // v téhle velikosti šnek nebo flaška: tělo s náustkem splyne do jednoho
+  // kužele. Stopky mají korunku nahoře a ručičky uvnitř, takže se nedají
+  // splést ani s terčem Bullseye.
+  trener: () => [
+    I(cut(rect(43, 6, 57, 30, 2), { ...R, amp: .8 })),
+    I(cut(ell(50, 58, 33, 33, 26), H)),
+    C(cut(ell(50, 58, 25, 25, 24), { ...R, amp: .9 })),
+    I(cut(stroke(50, 58, 50, 38, 5), { ...R, amp: .7 })),
+    I(cut(stroke(50, 58, 66, 66, 5), { ...R, amp: .7 })),
+    I(cut(ell(50, 58, 5, 5, 14), JEMNE)),
   ],
   // Tácková galerie: dva tácky přes sebe, na předním čmáranice. Kulaté tácky
   // se slily v myší hlavu, tak jsou hranaté a pootočené jako na stole;

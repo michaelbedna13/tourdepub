@@ -148,9 +148,14 @@ function doplnUkoly(z: Stav, ulozeneZname: unknown) {
   const zname = new Set(Array.isArray(ulozeneZname) && ulozeneZname.length
     ? (ulozeneZname as string[])
     : PRVNICH_23);
+  // Co už v galerii leží, se nepřidává znovu. Bez téhle pojistky se každý
+  // úkol přidaný po PRVNÍCH_23 zdvojil každému, kdo má uložený stav ještě
+  // bez seznamu znameUkoly: ten seznam o něm neví, ale v ukolech ho má.
+  const uz = new Set(z.ukoly.map((u) => u.id));
   VYCHOZI_UKOLY.forEach((u, i) => {
     if (zname.has(u.id)) return;
     zname.add(u.id);
+    if (uz.has(u.id)) return;
     const pred = VYCHOZI_UKOLY[i - 1]?.id;
     const kam = pred ? z.ukoly.findIndex((x) => x.id === pred) : -1;
     if (kam >= 0) z.ukoly.splice(kam + 1, 0, { ...u });
