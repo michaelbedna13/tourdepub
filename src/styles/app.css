@@ -1273,12 +1273,12 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
      plakátu o pár desítek bodů. Odshora drží obojí stejnou linku a plakáty
      se liší jenom tím, co je na nich napsané. */
   display:flex;flex-direction:column;justify-content:flex-start;
-  /* Na vysokém displeji se blok posune o kus dolů, ať pod ním nezůstane
-     čtvrtina obrazovky prázdná. Vzduch se tím rozdělí nad a pod, a protože
-     to počítá jen z výšky okna, posune se na všech pěti plakátech stejně —
-     na rozdíl od zarovnání na střed, co by každý plakát posunulo jinak
-     podle délky jeho textu. */
-  padding-top:clamp(0px,calc((100dvh - 700px) * .42),100px);
+  /* Blok začíná hned pod značkou. Chvíli se na vysokém displeji posouval
+     o kus dolů (clamp až sto bodů), aby pod ním nezůstala čtvrtina obrazovky
+     prázdná — jenže tím se text dostal pod polovinu displeje a plakáty
+     s delším textem se naopak mačkaly k ceduli dole: naměřeno na 852 bodech
+     zbývalo pod textem 108 bodů na Courání a nula na Banku. Vzduch patří
+     dolů, ne nad kresbu. Mezeru pod značkou drží --uvod-mezera-blok. */
   animation:uvod-prichod .3s var(--krok) both;
 }
 /* Kresba drží střed a nepřeroste text: šířku má v procentech plakátu, aby
@@ -1289,7 +1289,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 /* Kresba má pevnou VÝŠKU, ať je na všech plakátech stejně velká a stejně
    vysoko. Smí se ale stáhnout (flex-shrink), když text pod ní potřebuje
    víc místa — na krátkém okně je to lepší než text podlezlý pod ceduli. */
-.uvod-kresba{flex:0 1 min(26vh,186px);min-height:84px;display:flex;
+.uvod-kresba{flex:0 1 min(31vh,228px);min-height:84px;display:flex;
   align-items:center;justify-content:center;
   margin-bottom:var(--uvod-mezera-blok);color:var(--text)}
 /* Výška plní rámeček, šířka se dopočítá. Čmáranice mají každá jiný poměr
@@ -1317,7 +1317,10 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .uvod-telo{
   margin:var(--uvod-mezera-text) 0 0;
   display:flex;flex-direction:column;gap:14px;
-  font-family:var(--pismo);font-size:var(--t-hlavni);line-height:1.65;
+  /* O stupeň menší než nadpisová velikost. Sedmnáct bodů dělalo z úvodníku
+     sedm řádků přes celou šířku a plakát se tím změnil ve zeď textu;
+     patnáct ho srovná na pět a nechá kresbě víc místa. */
+  font-family:var(--pismo);font-size:var(--t-text);line-height:1.62;
   color:var(--text-2);
 }
 .uvod-telo p{margin:0}
