@@ -21,6 +21,11 @@
   --vrstva:#33332B;
   --vrstva-2:#3C3C33;
 
+  /* Červená ze značky. Byla třikrát napsaná ručně (účtenka, rozcestník,
+     a v jednom místě pod překlepnutým jménem proměnné, takže se brala
+     náhradní hodnota), tak stojí na jednom místě. */
+  --cervena:#E5331F;
+
   /* text: krémová */
   --text:#F2E7CF;
   --text-2:rgba(242,231,207,.66);
@@ -900,7 +905,7 @@ html.rozmazat .obrazovka{filter:blur(5px)}
   --inkoust:var(--podklad);
   /* Červená z plakátu. Jasná je na velké texty (značka, DÍKY), na drobné
      popisky by na krémovém papíru nedržela kontrast, tak je pro ně tmavší. */
-  --tisk-cervena:#E5331F;
+  --tisk-cervena:var(--cervena);
   --tisk-cervena-drobne:#B4220F;
   position:relative;margin:4px 0 2px;
   background:var(--papir);color:var(--inkoust);
@@ -1066,7 +1071,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid var(--text);outline-of
   bottom:calc(env(safe-area-inset-bottom) + 16px);
   width:60px;height:60px;display:grid;place-items:center;
   border-radius:var(--pilulka);
-  background:var(--tisk-cervena,#E5331F);color:#FFF4E6;
+  background:var(--cervena);color:#FFF4E6;
   box-shadow:0 10px 26px rgba(0,0,0,.45);
   transition:transform .18s var(--krok),opacity .18s var(--krok);
 }
@@ -1121,7 +1126,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .fab-radek .ikona{color:var(--podklad);opacity:.7}
 /* Kde zrovna jsem. Nabídka se otevírá odkudkoli, takže musí umět říct i to,
    odkud — jinak je to pět stejných lístků. */
-.fab-radek.ted{background:var(--tisk,#E5331F);color:#FFF4E6}
+.fab-radek.ted{background:var(--cervena);color:#FFF4E6}
 .fab-radek.ted .ikona{color:inherit;opacity:1}
 /* Zavírání je rychlejší než otevírání a vrací se do tlačítka. Kratší proto,
    že při otevření se nabídka čte, kdežto při zavření už je rozhodnuto —
@@ -1299,6 +1304,11 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .uvod-telo{flex:none}
 
 .uvod-nadpis{
+  /* Červená. Plakát na ní stojí: kresba je krémová a nese tvar, nadpis
+     nese barvu značky. Celá kresba v červené se taky zkoušela, jenže pak
+     je plakát jedna velká rudá skvrna a appka za ním, kde je červená jen
+     na rozcestníku a účtence, vypadá jako odjinud. */
+  color:var(--cervena);
   margin:0;font-weight:700;-webkit-text-stroke:1px currentColor;
   /* Osm a půl procenta šířky: v Hagridu se nadpis při deseti lámal na tři
      řádky a vytlačil kresbu. Náhradní písmo je užší, takže v testech vyšly
@@ -1343,12 +1353,14 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   background:color-mix(in srgb,var(--text) 22%,transparent);
   transition:background .25s var(--krok)}
 .uvod-tecka.bylo{background:color-mix(in srgb,var(--text) 46%,transparent)}
-.uvod-tecka.ted{background:var(--text)}
+.uvod-tecka.ted{background:var(--cervena)}
 /* Nejsou to tlačítka: ťuká se do obrazovky, vlevo zpátky, vpravo dál.
    Cedule jen říkají, co se stane, a drží čárky uprostřed. */
 .uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
   font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--text)}
+  /* Červená jako nadpis: spodek plakátu tím drží s vrškem a cedule je
+     vidět dřív, než ji člověk hledá. */
+  color:var(--cervena)}
 .uvod-zpet{display:flex;align-items:center;flex:none;color:var(--text);opacity:.4}
 /* Na prvním plakátu nemá kam vést, ale místo si drží — bez toho by čárky
    uprostřed při listování poskakovaly. */
