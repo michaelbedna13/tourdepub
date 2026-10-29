@@ -1294,9 +1294,12 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 /* Kresba má pevnou VÝŠKU, ať je na všech plakátech stejně velká a stejně
    vysoko. Smí se ale stáhnout (flex-shrink), když text pod ní potřebuje
    víc místa — na krátkém okně je to lepší než text podlezlý pod ceduli. */
+/* Kresba je červená, nadpis a text krémové. Červenou na plakátu nese ten
+   největší tvar: ze všech zkoušených míst (nadpis, kresba, drobnosti dole)
+   je tohle to, co z plakátu udělá plakát. */
 .uvod-kresba{flex:0 1 min(31vh,228px);min-height:84px;display:flex;
   align-items:center;justify-content:center;
-  margin-bottom:var(--uvod-mezera-blok);color:var(--text)}
+  margin-bottom:var(--uvod-mezera-blok);color:var(--cervena)}
 /* Výška plní rámeček, šířka se dopočítá. Čmáranice mají každá jiný poměr
    (šnek je široký, hodiny vysoké) a kdyby se měřily na šířku, byla by každá
    jinak vysoká a mezera pod ní jinak velká. */
@@ -1304,11 +1307,6 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .uvod-telo{flex:none}
 
 .uvod-nadpis{
-  /* Červená. Plakát na ní stojí: kresba je krémová a nese tvar, nadpis
-     nese barvu značky. Celá kresba v červené se taky zkoušela, jenže pak
-     je plakát jedna velká rudá skvrna a appka za ním, kde je červená jen
-     na rozcestníku a účtence, vypadá jako odjinud. */
-  color:var(--cervena);
   margin:0;font-weight:700;-webkit-text-stroke:1px currentColor;
   /* Osm a půl procenta šířky: v Hagridu se nadpis při deseti lámal na tři
      řádky a vytlačil kresbu. Náhradní písmo je užší, takže v testech vyšly
@@ -1353,14 +1351,12 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   background:color-mix(in srgb,var(--text) 22%,transparent);
   transition:background .25s var(--krok)}
 .uvod-tecka.bylo{background:color-mix(in srgb,var(--text) 46%,transparent)}
-.uvod-tecka.ted{background:var(--cervena)}
+.uvod-tecka.ted{background:var(--text)}
 /* Nejsou to tlačítka: ťuká se do obrazovky, vlevo zpátky, vpravo dál.
    Cedule jen říkají, co se stane, a drží čárky uprostřed. */
 .uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
   font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  /* Červená jako nadpis: spodek plakátu tím drží s vrškem a cedule je
-     vidět dřív, než ji člověk hledá. */
-  color:var(--cervena)}
+  color:var(--text)}
 .uvod-zpet{display:flex;align-items:center;flex:none;color:var(--text);opacity:.4}
 /* Na prvním plakátu nemá kam vést, ale místo si drží — bez toho by čárky
    uprostřed při listování poskakovaly. */
