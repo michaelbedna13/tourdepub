@@ -249,16 +249,34 @@ const KRESBY = {
     I(cut(rect(30, 76, 70, 86, 3), { ...R, amp: .9 })),
     I(cut(rect(20, 86, 80, 96, 3), H)),
   ],
-  // Kapela na placku: deska. Obal za ní se slíval do jednoho flíčku,
-  // takže zbyla samotná placka: drážka u kraje, štítek a dírka.
-  kapela: () => [
-    I(cut(ell(50, 50, 42, 42, 28), H)),
-    C(cut(ell(50, 50, 36, 36, 26), { ...R, amp: .8 })),
-    I(cut(ell(50, 50, 33, 33, 26), H)),
-    C(cut(ell(50, 50, 15, 15, 18), { ...R, amp: .8 })),
-    I(cut(ell(50, 50, 12, 12, 16), { ...R, amp: .7 })),
-    C(cut(ell(50, 50, 3.5, 3.5, 12), JEMNE)),
-  ],
+  // Kapela na placku: čtyři chlapi na přechodu, jak na tom slavném obalu.
+  //
+  // Postavy i pruhy jsou ta samá barva, takže by se slily v jednu plochu.
+  // Každá postava proto dostane nejdřív obrys o pár bodů větší jako
+  // výstřižek a teprve do něj se nakreslí — kolem ní je tím pádem mezera
+  // a na přechodu je vidět. Vystřihnout rovnou postavy z pruhů nešlo:
+  // mezery mezi pruhy je rozsekaly a byla z toho mříž.
+  kapela: () => {
+    // Přechod leží jen v dolní třetině. Když vyplňoval celý čtverec, obrysy
+    // postav ho rozkrájely na drobky a vypadalo to, že stojí za mřížemi.
+    const pruhy = [60, 77, 94]
+      .map((y) => I(cut(rect(0, y, 100, y + 13, 2), { ...R, amp: .9 })));
+    const dily = [16, 38, 60, 82].flatMap((x, i) => {
+      const d = (i % 2) * 4;
+      return [
+        [ell(x, 13, 7, 7, 16), ell(x, 13, 10, 10, 16)],
+        [[[x - 8, 21], [x + 8, 21], [x + 6, 56], [x - 6, 56]],
+         [[x - 10, 19], [x + 10, 19], [x + 8, 59], [x - 8, 59]]],
+        [stroke(x - 2, 54, x - 5 - d, 90, 6), stroke(x - 2, 54, x - 5 - d, 93, 11)],
+        [stroke(x + 2, 54, x + 5 + d, 90, 6), stroke(x + 2, 54, x + 5 + d, 93, 11)],
+      ];
+    });
+    return [
+      ...pruhy,
+      ...dily.map(([, obal]) => C(cut(obal, { ...R, amp: .8 }))),
+      ...dily.map(([plny]) => I(cut(plny, { ...R, amp: .8 }))),
+    ];
+  },
   // Dabing naživo: filmová klapka. Bublina by se pletla s Tichou špeluňkou
   // i Veršovaným lokálem, ty už obě bublinu mají.
   dabing: () => [
