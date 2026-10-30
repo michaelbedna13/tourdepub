@@ -49,14 +49,18 @@ const KRESBY = {
     C(cut(stroke(34, 26, 66, 58, 10), { ...R, amp: .8 })),
     C(cut(stroke(66, 26, 34, 58, 10), { ...R, amp: .8 })),
   ],
-  // Rada nad zlato: žárovka
+  // Rada nad zlato: žárovka. Vlákno bylo dvě svislé čárky a četlo se jako
+  // oči, tak je teď do véčka, a kolem baňky jsou paprsky.
   rada: () => [
-    I(cut(ell(50, 40, 24, 26, 22), { ...R, amp: 1.1 })),
-    I(cut(rect(38, 62, 62, 78, 3), { ...R, amp: .9 })),
-    C(cut(rect(38, 67, 62, 71, 1), JEMNE)),
-    I(cut(rect(42, 78, 58, 90, 3), { ...R, amp: .9 })),
-    C(cut(stroke(44, 30, 44, 54, 5), { ...R, amp: .7 })),
-    C(cut(stroke(56, 30, 56, 54, 5), { ...R, amp: .7 })),
+    I(cut(ell(50, 44, 23, 25, 22), { ...R, amp: 1.1 })),
+    C(cut(stroke(42, 54, 50, 36, 5), { ...R, amp: .7 })),
+    C(cut(stroke(50, 36, 58, 54, 5), { ...R, amp: .7 })),
+    I(cut(rect(40, 66, 60, 80, 3), { ...R, amp: .9 })),
+    C(cut(rect(40, 71, 60, 74, 1), JEMNE)),
+    I(cut(rect(44, 80, 56, 90, 3), { ...R, amp: .9 })),
+    I(cut(stroke(16, 18, 25, 28, 6), { ...R, amp: .7 })),
+    I(cut(stroke(84, 18, 75, 28, 6), { ...R, amp: .7 })),
+    I(cut(stroke(50, 6, 50, 15, 6), { ...R, amp: .7 })),
   ],
   // Trapnej hókuspókus: cylindr a hvězdička
   hokuspokus: () => [
@@ -75,90 +79,93 @@ const KRESBY = {
     I(cut(ell(80, 68, 7, 7, 18), JEMNE)),
   ],
 
-  // ---------- Tělo v luftě ----------
-  // Srostlý budny: dvě nohy svázané k sobě
+  // Srostlý budny: dvě nohy svázané páskou s uzlem.
   budny: () => [
-    I(cut(stroke(34, 10, 30, 78, 13), { ...R, amp: .9 })),
-    I(cut(stroke(66, 10, 70, 78, 13), { ...R, amp: .9 })),
-    I(cut([[18, 76], [40, 74], [42, 92], [16, 92]], { ...R, amp: 1 })),
-    I(cut([[60, 74], [82, 76], [84, 92], [58, 92]], { ...R, amp: 1 })),
-    C(cut(rect(22, 42, 78, 50, 2), { ...R, amp: .8 })),
-    I(cut(ell(50, 46, 9, 9, 18), { ...R, amp: .8 })),
+    I(cut(rect(26, 10, 42, 74, 5), H)),
+    I(cut(rect(58, 10, 74, 74, 5), H)),
+    I(cut(rect(16, 74, 48, 88, 3), { ...R, amp: .9 })),
+    I(cut(rect(52, 74, 84, 88, 3), { ...R, amp: .9 })),
+    I(cut(rect(20, 42, 80, 58, 4), H)),
+    C(cut(rect(20, 48, 80, 52, 1), JEMNE)),
+    I(cut(ell(50, 50, 11, 11, 16), { ...R, amp: .8 })),
   ],
-  // Hajzlovej úlet: panáček a panenka na dveřích
+  // Hajzlovej úlet: cedule s panáčkem v sukni. Dveře s malou cedulkou měly
+  // to hlavní velké pár bodů; teď je cedule celá kresba.
   hajzl: () => [
-    hlava(28, 18, 11),
-    I(cut(rect(19, 32, 37, 62, 4), { ...R, amp: .9 })),
-    I(cut(stroke(24, 62, 22, 88, 8), { ...R, amp: .8 })),
-    I(cut(stroke(33, 62, 35, 88, 8), { ...R, amp: .8 })),
-    hlava(72, 18, 11),
-    I(cut([[72, 32], [86, 64], [58, 64]], { ...R, amp: 1, tension: .25 })),
-    I(cut(stroke(67, 64, 65, 88, 8), { ...R, amp: .8 })),
-    I(cut(stroke(77, 64, 79, 88, 8), { ...R, amp: .8 })),
+    I(cut(rect(16, 8, 84, 92, 8), H)),
+    C(cut(ell(50, 30, 11, 11, 18), { ...R, amp: .8 })),
+    C(cut([[33, 78], [42, 44], [58, 44], [67, 78]], { ...R, amp: .9, tension: .3 })),
   ],
-  // Pouliční pumpa: klik
+  // Pouliční pumpa: klik.
   pumpa: () => [
-    I(cut(stroke(16, 58, 72, 38, 15), H)),
-    hlava(82, 32, 12),
-    I(cut(stroke(66, 44, 70, 78, 9), { ...R, amp: .8 })),
-    I(cut(stroke(22, 56, 14, 80, 9), { ...R, amp: .8 })),
-    I(cut(rect(58, 78, 82, 88, 3), { ...R, amp: .9 })),
-    I(cut(rect(6, 78, 28, 88, 3), { ...R, amp: .9 })),
+    hlava(80, 32, 12),
+    I(cut([[16, 60], [70, 34], [76, 46], [22, 72]], H)),
+    I(cut(stroke(68, 46, 72, 82, 10), { ...R, amp: .8 })),
+    I(cut(stroke(22, 66, 14, 84, 10), { ...R, amp: .8 })),
+    I(cut(rect(58, 82, 84, 92, 3), { ...R, amp: .9 })),
+    I(cut(rect(4, 84, 30, 94, 3), { ...R, amp: .9 })),
   ],
-  // Živej taxál: bota, co se nedotkne země. Dvě postavičky nad sebou se
-  // v téhle velikosti slily do jednoho flíčku a nikdo z toho nepoznal,
-  // kdo koho nese.
+  // Živej taxál: taxikářská cedule na střeše. Bota nad zemí nebo dvě
+  // postavičky nad sebou se nepovedly ani jednou; tohle je předmět
+  // a jméno úkolu říká to samé.
   taxal: () => [
-    I(cut([[22, 30], [52, 28], [62, 44], [78, 50], [82, 62], [24, 64]], H)),
-    C(cut(stroke(30, 36, 30, 60, 5), { ...R, amp: .7 })),
-    I(cut(rect(30, 72, 48, 78, 2), { ...R, amp: .7 })),
-    I(cut(rect(56, 72, 74, 78, 2), { ...R, amp: .7 })),
-    I(cut(rect(8, 86, 92, 94, 3), { ...R, amp: 1 })),
+    I(cut(rect(14, 34, 86, 64, 8), H)),
+    C(cut(rect(22, 42, 35, 56, 1), JEMNE)),
+    C(cut(rect(44, 42, 57, 56, 1), JEMNE)),
+    C(cut(rect(66, 42, 79, 56, 1), JEMNE)),
+    I(cut(rect(28, 64, 72, 74, 3), { ...R, amp: .8 })),
   ],
-  // Vopičí lajna: po všech čtyřech
+  // Vopičí lajna: otisk dlaně a boty. Dvě stopy řeknou „ruce i nohy
+  // na zemi" rovnou, postavička po čtyřech vycházela jako čtyřnohý tvor.
   lajna: () => [
-    I(cut(rect(18, 34, 76, 52, 6), H)),
-    hlava(84, 42, 13),
-    I(cut(stroke(26, 52, 22, 84, 9), { ...R, amp: .8 })),
-    I(cut(stroke(44, 52, 46, 84, 9), { ...R, amp: .8 })),
-    I(cut(stroke(62, 52, 60, 84, 9), { ...R, amp: .8 })),
-    I(cut(stroke(74, 52, 78, 84, 9), { ...R, amp: .8 })),
+    I(cut(ell(28, 58, 17, 15, 20), H)),
+    I(cut(stroke(14, 48, 9, 28, 9), { ...R, amp: .8 })),
+    I(cut(stroke(24, 42, 22, 18, 9), { ...R, amp: .8 })),
+    I(cut(stroke(34, 42, 38, 18, 9), { ...R, amp: .8 })),
+    I(cut(stroke(43, 48, 51, 30, 9), { ...R, amp: .8 })),
+    I(cut(ell(75, 42, 15, 14, 20), H)),
+    I(cut(ell(77, 72, 12, 11, 18), H)),
   ],
-  // Řev jak z JZD: hlava z profilu s dokořán otevřenou hubou a vlnky zvuku.
+  // Řev jak z JZD: megafon. Hlava z profilu se pokaždé četla jako Pacman,
+  // tak je z toho předmět: úzký konec vlevo, hlásná trouba vpravo a vlnky.
   rev: () => [
-    I(cut(ell(32, 50, 27, 28, 24), H)),
-    C(cut([[30, 50], [62, 34], [62, 66]], { ...R, amp: 1, tension: .2 })),
-    C(cut(ell(24, 36, 6, 6, 16), JEMNE)),
-    I(cut(srpek(32, 50, 44, 7, -42, 42), { ...R, amp: .8, step: 5 })),
-    I(cut(srpek(32, 50, 60, 7, -36, 36), { ...R, amp: .8, step: 5 })),
+    I(cut(rect(10, 40, 36, 60, 4), H)),
+    I(cut([[34, 28], [72, 4], [72, 96], [34, 72]], H)),
+    C(cut(rect(38, 46, 70, 54, 2), JEMNE)),
+    I(cut(stroke(20, 60, 24, 86, 10), { ...R, amp: .8 })),
+    I(cut(srpek(78, 50, 12, 6, -46, 46), { ...R, amp: .8, step: 5 })),
+    I(cut(srpek(78, 50, 21, 6, -40, 40), { ...R, amp: .8, step: 5 })),
   ],
-  // Bullseye: šipka v terči
+  // Bullseye: terč se šipkou. Šipka měla hrot jako vlaječku, teď má
+  // tenký dřík a křidélka.
   bullseye: () => [
-    I(cut(ell(44, 54, 34, 34, 24), { ...R, amp: 1.2 })),
-    C(cut(ell(44, 54, 23, 23, 22), { ...R, amp: .9 })),
-    I(cut(ell(44, 54, 12, 12, 18), { ...R, amp: .8 })),
-    I(cut(stroke(52, 46, 90, 14, 8), { ...R, amp: .8 })),
-    I(cut([[82, 8], [96, 6], [92, 22]], { ...R, amp: .9, tension: .25 })),
+    I(cut(ell(42, 58, 34, 34, 26), { ...R, amp: 1.2 })),
+    C(cut(ell(42, 58, 23, 23, 22), { ...R, amp: .9 })),
+    I(cut(ell(42, 58, 11, 11, 18), { ...R, amp: .8 })),
+    I(cut(stroke(48, 52, 84, 18, 6), { ...R, amp: .7 })),
+    I(cut([[74, 8], [96, 6], [92, 28], [80, 22]], { ...R, amp: .9, tension: .25 })),
   ],
-  // Betelný bicák: škopek na natažené pazóře
+  // Betelný bicák: ohnutá pazóra. Nadloktí leží, předloktí stojí a hrb
+  // bicepsu je nad ním. Výstřižek v lokti tu byl a rozsekl paži na dva kusy,
+  // tak zbyl jen proužek na zápěstí.
   bicak: () => [
-    I(cut(rect(6, 60, 60, 76, 7), H)),
-    I(cut(ell(64, 68, 13, 13, 18), { ...R, amp: .9 })),
-    I(cut([[44, 16], [62, 14], [78, 16], [79, 32], [76, 46], [62, 49], [47, 46], [44, 32]], H)),
-    I(cut([[42, 16], [42, 8], [50, 4], [56, 8], [63, 3], [70, 7], [77, 4], [81, 10], [79, 18], [61, 21], [44, 19]], { ...R, amp: .9 })),
-    I(cut(ell(82, 30, 10, 10, 16), { ...R, amp: .9 })),
-    C(cut(ell(82, 30, 4.5, 5, 14), JEMNE)),
+    I(cut(rect(8, 64, 56, 86, 10), H)),
+    I(cut(ell(30, 60, 19, 16, 20), H)),
+    I(cut(rect(52, 20, 74, 86, 10), H)),
+    I(cut(ell(63, 17, 16, 14, 18), H)),
+    C(cut(rect(52, 32, 74, 36, 1), JEMNE)),
   ],
 
-  // ---------- Žranice a divadlo ----------
-  // Já su výčepní: pípa
+  // Já su výčepní: pípa nad škopkem. Samotná pípa se četla jako trubka,
+  // se škopkem pod ní je jasné, co se děje.
   vycepni: () => [
-    I(cut(rect(38, 10, 56, 42, 3), { ...R, amp: .9 })),
-    I(cut(rect(42, 42, 52, 58, 2), { ...R, amp: .8 })),
-    I(cut(stroke(56, 16, 84, 10, 8), { ...R, amp: .8 })),
-    I(cut(ell(87, 9, 8, 8, 16), JEMNE)),
-    I(cut(rect(43, 58, 51, 74, 2), { ...R, amp: .7 })),
-    I(cut([[28, 66], [66, 66], [62, 92], [32, 92]], H)),
+    I(cut(rect(30, 6, 44, 32, 3), { ...R, amp: .9 })),
+    I(cut(rect(44, 10, 74, 20, 3), { ...R, amp: .9 })),
+    I(cut(rect(32, 32, 42, 46, 2), { ...R, amp: .8 })),
+    I(cut([[24, 52], [62, 52], [58, 92], [28, 92]], H)),
+    I(cut(ell(68, 66, 12, 12, 18), { ...R, amp: .9 })),
+    C(cut(ell(68, 66, 6, 6, 14), JEMNE)),
+    C(cut(rect(24, 60, 62, 64, 1), JEMNE)),
   ],
   // Chlastací maturita: panák
   maturita: () => [
@@ -167,16 +174,15 @@ const KRESBY = {
     I(cut(rect(26, 74, 74, 88, 4), { ...R, amp: 1 })),
     I(cut(star(84, 18, 11, 4), { ...R, amp: .8, tension: .2 })),
   ],
-  // Falešnej jubilant: dort s jednou svíčkou. Jedna svíčka, ne věnec —
-  // ve dvaadvaceti bodech se z víc svíček stane hřeben.
+  // Falešnej jubilant: dort se svíčkou. Měkký dvoupatrový tvar vypadal
+  // jak hromada kamení, tak mají patra rovné boky a pod nimi je podnos.
   jubilant: () => [
-    I(cut([[50, 4], [57, 13], [55, 23], [45, 23], [43, 13]], { ...R, amp: .8 })),
-    I(cut(rect(45, 20, 55, 40, 2), { ...R, amp: .8 })),
-    I(cut(rect(22, 40, 78, 60, 5), H)),
-    C(cut(rect(22, 48, 78, 52, 1), JEMNE)),
-    I(cut(rect(13, 60, 87, 84, 6), H)),
-    C(cut(rect(13, 70, 87, 74, 1), JEMNE)),
-    I(cut(rect(6, 84, 94, 93, 4), { ...R, amp: .9 })),
+    I(cut(rect(26, 46, 74, 64, 3), H)),
+    I(cut(rect(16, 64, 84, 84, 3), H)),
+    I(cut(rect(8, 84, 92, 92, 2), { ...R, amp: 1 })),
+    C(cut(rect(16, 62, 84, 66, 1), JEMNE)),
+    I(cut(rect(47, 22, 53, 46, 2), { ...R, amp: .7 })),
+    I(cut([[50, 4], [58, 15], [50, 22], [42, 15]], { ...R, amp: .8, tension: .3 })),
   ],
   // Vrchní na zkoušku: motýlek. Podnos s půllitrem je zepředu jen ovál
   // a splyne s ostatními kresbami; motýlek je poznat i jako dlaždice.
@@ -232,14 +238,14 @@ const KRESBY = {
     C(cut(srpek(50, 50, 15, 5), { ...R, amp: .8, step: 5 })),
     I(cut(rect(45, 78, 55, 96, 2), { ...R, amp: .8 })),
   ],
-  // Brněnskej zloděj: ruka se lžičkou
+  // Brněnskej zloděj: lžička v kapse. Ruka se lžičkou vypadala jako lžička
+  // vedle flíčku; kapsa s lemem řekne, že se to někam schovává.
   zlodej: () => [
-    I(cut(ell(72, 18, 15, 19, 20), { ...R, amp: 1 })),
-    C(cut(ell(72, 18, 8, 11, 18), { ...R, amp: .7 })),
-    I(cut(rect(67, 34, 77, 62, 3), { ...R, amp: .8 })),
-    I(cut([[16, 56], [40, 50], [62, 56], [64, 76], [40, 84], [18, 78]], H)),
-    C(cut(stroke(28, 56, 26, 78, 5), { ...R, amp: .7 })),
-    C(cut(stroke(44, 53, 44, 80, 5), { ...R, amp: .7 })),
+    I(cut(ell(58, 16, 12, 15, 18), { ...R, amp: .9 })),
+    C(cut(ell(58, 16, 5, 7, 16), JEMNE)),
+    I(cut(rect(54, 28, 62, 56, 3), { ...R, amp: .8 })),
+    I(cut([[18, 40], [82, 40], [76, 92], [24, 92]], H)),
+    C(cut(rect(18, 48, 82, 54, 2), { ...R, amp: .8 })),
   ],
   // Fotka na hovno: foťák
   fotka: () => [
@@ -249,27 +255,26 @@ const KRESBY = {
     I(cut(ell(48, 56, 10, 10, 18), { ...R, amp: .8 })),
     C(cut(ell(78, 40, 6, 6, 16), JEMNE)),
   ],
-  // Živý sochy: figura na dvoustupňovém podstavci. Ruka nahoru a mezera mezi
-  // paží a trupem — bez ní se ruka slila do siluety a zbyl panák.
+  // Živý sochy: socha na stupňovitém podstavci.
   sochy: () => [
-    hlava(48, 16, 11),
-    I(cut([[40, 28], [58, 28], [61, 56], [37, 56]], H)),
-    I(cut(stroke(58, 32, 78, 12, 9), { ...R, amp: .9 })),
-    I(cut(stroke(38, 32, 26, 54, 8), { ...R, amp: .9 })),
-    C(cut(stroke(36, 38, 36, 56, 4), JEMNE)),
-    I(cut(rect(42, 56, 58, 72, 2), { ...R, amp: .9 })),
-    I(cut(rect(30, 72, 70, 80, 2), { ...R, amp: .9 })),
-    I(cut(rect(20, 80, 80, 94, 3), H)),
+    hlava(44, 18, 11),
+    I(cut(rect(35, 28, 53, 62, 5), H)),
+    I(cut(stroke(52, 34, 72, 14, 9), { ...R, amp: .8 })),
+    I(cut(stroke(36, 34, 24, 54, 9), { ...R, amp: .8 })),
+    I(cut(rect(37, 62, 44, 76, 3), { ...R, amp: .8 })),
+    I(cut(rect(46, 62, 53, 76, 3), { ...R, amp: .8 })),
+    I(cut(rect(22, 76, 68, 85, 3), { ...R, amp: 1 })),
+    I(cut(rect(12, 85, 78, 95, 3), H)),
   ],
-  // Kapela na placku: placka vykukuje z obalu. Samotná placka vyšla jako
-  // terč (a ten už má Bullseye), takže obal musí být vidět celý a hvězda
-  // na něm říká „tohle je přebal", ne „tohle je kolečko".
+  // Kapela na placku: obal vzadu, deska před ním. Když deska vykukovala
+  // zpoza obalu, četlo se to jako škopek s hvězdou.
   kapela: () => [
-    I(cut(ell(64, 54, 30, 30, 26), { ...R, amp: 1.1 })),
-    C(cut(ell(64, 54, 22, 22, 22), { ...R, amp: .8 })),
-    I(cut(ell(64, 54, 9, 9, 16), { ...R, amp: .7 })),
-    I(cut(rect(4, 20, 54, 88, 4), H)),
-    C(cut(star(29, 54, 15, 6.5), { ...R, amp: .8 })),
+    I(cut(rect(8, 8, 70, 70, 4), H)),
+    C(cut(star(33, 33, 15, 6.5), { ...R, amp: .8 })),
+    I(cut(ell(62, 62, 31, 31, 26), { ...R, amp: 1.1 })),
+    C(cut(ell(62, 62, 21, 21, 22), { ...R, amp: .8 })),
+    I(cut(ell(62, 62, 9, 9, 16), { ...R, amp: .7 })),
+    C(cut(ell(62, 62, 3.5, 3.5, 12), JEMNE)),
   ],
   // Dabing naživo: filmová klapka. Bublina by se pletla s Tichou špeluňkou
   // i Veršovaným lokálem, ty už obě bublinu mají.
@@ -292,16 +297,14 @@ const KRESBY = {
     I(cut(stroke(50, 58, 66, 66, 5), { ...R, amp: .7 })),
     I(cut(ell(50, 58, 5, 5, 14), JEMNE)),
   ],
-  // Tácková galerie: dva tácky přes sebe, na předním čmáranice. Kulaté tácky
-  // se slily v myší hlavu, tak jsou hranaté a pootočené jako na stole;
-  // mezi nimi je vystřižená spára, jinak je z nich jeden kus papíru.
+  // Tácková galerie: dva tácky přes sebe, na vrchním hvězda. Tři vedle
+  // sebe se v téhle velikosti slily do jedné kaše.
   tacky: () => [
-    I(cut(rot(rect(30, 12, 88, 70, 5), -13, 50, 50), H)),
-    C(cut(rot(rect(14, 24, 76, 86, 5), 9, 50, 50), { ...R, amp: .9 })),
-    I(cut(rot(rect(18, 28, 72, 82, 5), 9, 50, 50), H)),
-    C(cut(ell(36, 48, 4, 4, 14), JEMNE)),
-    C(cut(ell(55, 45, 4, 4, 14), JEMNE)),
-    C(cut(srpek(45, 58, 13, 4), { ...R, amp: .7, step: 5 })),
+    I(cut(rot(rect(14, 14, 70, 70, 5), -11, 42, 42), H)),
+    I(cut(rot(rect(30, 30, 90, 90, 5), 8, 60, 60), H)),
+    C(cut(rot(rect(34, 34, 86, 86, 4), 8, 60, 60), { ...R, amp: .8 })),
+    I(cut(rot(rect(38, 38, 82, 82, 4), 8, 60, 60), H)),
+    C(cut(star(60, 58, 17, 7.5), { ...R, amp: .8 })),
   ],
 };
 
