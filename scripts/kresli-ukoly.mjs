@@ -22,18 +22,13 @@ const JEMNE = { amp: .6, step: 3, tension: 0.42 };
 const hlava = (x, y, r) => I(cut(ell(x, y, r, r, 20), { ...R, amp: .9 }));
 
 const KRESBY = {
-  // ---------- Kecy a šméčka ----------
-  // Vyžebranej chudák: nastavená dlaň a v ní mince. Mince nad dlaní vypadala
-  // jako hlava a dlaň jako trup — z žebrání byla busta.
+  // Vyžebranej chudák: bankovka. Nastavená dlaň s mincí se četla jako
+  // ruka s dírou — mince uprostřed dlaně zmizela, ať byla jakkoli velká.
   chudak: () => [
-    I(cut(stroke(28, 46, 26, 16, 11), { ...R, amp: .8 })),
-    I(cut(stroke(43, 44, 42, 12, 11), { ...R, amp: .8 })),
-    I(cut(stroke(58, 44, 59, 12, 11), { ...R, amp: .8 })),
-    I(cut(stroke(73, 46, 75, 16, 11), { ...R, amp: .8 })),
-    I(cut(stroke(22, 54, 8, 40, 11), { ...R, amp: .8 })),
-    I(cut(rect(16, 44, 86, 80, 9), H)),
-    C(cut(ell(51, 62, 13, 13, 22), { ...R, amp: .8 })),
-    I(cut(ell(51, 62, 5, 5, 16), JEMNE)),
+    I(cut(rect(6, 28, 94, 74, 4), H)),
+    C(cut(ell(50, 51, 15, 16, 20), { ...R, amp: .9 })),
+    C(cut(ell(16, 51, 5, 5, 14), JEMNE)),
+    C(cut(ell(84, 51, 5, 5, 14), JEMNE)),
   ],
   // Balení starýho kusu: srdce. Růže se nepovedla ani jednou — soustředné
   // kroužky uprostřed květu vyšly jako terč a oblouky zase jako obličej.
@@ -121,12 +116,15 @@ const KRESBY = {
     I(cut(stroke(57, 46, 62, 12, 11), { ...R, amp: .8 })),
     I(cut(stroke(70, 52, 81, 28, 11), { ...R, amp: .8 })),
   ],
-  // Řev jak z JZD: megafon. Zadní krček byl díl navíc, kužel ho nepotřebuje.
+  // Řev jak z JZD: kravská hlava. Megafon ani hlava z profilu se nečetly,
+  // a tohle navíc sedí na jméno úkolu.
   rev: () => [
-    I(cut([[16, 34], [64, 6], [64, 94], [16, 66]], H)),
-    I(cut(stroke(26, 64, 30, 90, 11), { ...R, amp: .8 })),
-    I(cut(srpek(70, 50, 13, 7, -46, 46), { ...R, amp: .8, step: 5 })),
-    I(cut(srpek(70, 50, 23, 7, -40, 40), { ...R, amp: .8, step: 5 })),
+    I(cut([[22, 32], [78, 32], [82, 60], [68, 84], [32, 84], [18, 60]], H)),
+    I(cut(stroke(26, 36, 10, 20, 10), { ...R, amp: .8 })),
+    I(cut(stroke(74, 36, 90, 20, 10), { ...R, amp: .8 })),
+    C(cut(ell(37, 50, 6, 6, 14), JEMNE)),
+    C(cut(ell(63, 50, 6, 6, 14), JEMNE)),
+    C(cut(ell(50, 71, 15, 9, 18), { ...R, amp: .8 })),
   ],
   // Bullseye: terč se šipkou. Šipka měla hrot jako vlaječku, teď má
   // tenký dřík a křidélka.
@@ -137,12 +135,14 @@ const KRESBY = {
     I(cut(stroke(48, 52, 84, 18, 6), { ...R, amp: .7 })),
     I(cut([[74, 8], [96, 6], [92, 28], [80, 22]], { ...R, amp: .9, tension: .25 })),
   ],
-  // Betelný bicák: nadloktí i s hrbem bicepsu je jeden tvar, předloktí
-  // druhý, pěst třetí. Ze čtyř dílů přes sebe byl flíček.
+  // Betelný bicák: činka. Paže se zkoušela čtyřikrát, pokaždé z ní byl
+  // flíček; předmět, co znamená sílu, se pozná na první pohled.
   bicak: () => [
-    I(cut([[6, 62], [34, 48], [56, 58], [56, 90], [6, 90]], H)),
-    I(cut(rect(54, 16, 78, 90, 10), H)),
-    I(cut(ell(66, 14, 16, 13, 18), H)),
+    I(cut(rect(8, 28, 30, 72, 5), H)),
+    I(cut(rect(70, 28, 92, 72, 5), H)),
+    I(cut(rect(26, 42, 74, 58, 4), H)),
+    C(cut(rect(30, 34, 36, 66, 1), JEMNE)),
+    C(cut(rect(64, 34, 70, 66, 1), JEMNE)),
   ],
 
   // Já su výčepní: pípa nad škopkem. Samotná pípa se četla jako trubka,
@@ -227,12 +227,11 @@ const KRESBY = {
     C(cut(srpek(50, 50, 15, 5), { ...R, amp: .8, step: 5 })),
     I(cut(rect(45, 78, 55, 96, 2), { ...R, amp: .8 })),
   ],
-  // Brněnskej zloděj: lžička. Kapsa pod ní byla tvar navíc a četla se
-  // jako bedna.
+  // Brněnskej zloděj: lžička. Výstřižek v misce z ní dělal zrcátko,
+  // tak je miska plná a krček úzký.
   zlodej: () => [
-    I(cut(ell(50, 26, 21, 25, 22), H)),
-    C(cut(ell(50, 26, 11, 14, 18), { ...R, amp: .8 })),
-    I(cut(rect(43, 46, 57, 92, 5), H)),
+    I(cut(ell(50, 24, 19, 23, 22), H)),
+    I(cut(rect(44, 44, 56, 94, 6), H)),
   ],
   // Fotka na hovno: foťák
   fotka: () => [
@@ -242,22 +241,23 @@ const KRESBY = {
     I(cut(ell(48, 56, 10, 10, 18), { ...R, amp: .8 })),
     C(cut(ell(78, 40, 6, 6, 16), JEMNE)),
   ],
-  // Živý sochy: socha s rukou nahoru na podstavci. Nohy a druhá paže se
-  // ve zmenšení slily do trupu.
+  // Živý sochy: busta. Panáček na desce vypadal jako panáček na desce;
+  // hlava s rameny na podstavci je socha i bez vysvětlování.
   sochy: () => [
-    hlava(46, 22, 13),
-    I(cut([[33, 34], [59, 34], [63, 74], [29, 74]], H)),
-    I(cut(stroke(58, 38, 78, 18, 10), { ...R, amp: .8 })),
-    I(cut(rect(12, 74, 80, 90, 4), H)),
+    I(cut(ell(50, 26, 17, 19, 22), H)),
+    I(cut([[28, 46], [72, 46], [78, 76], [22, 76]], H)),
+    I(cut(rect(30, 76, 70, 86, 3), { ...R, amp: .9 })),
+    I(cut(rect(20, 86, 80, 96, 3), H)),
   ],
-  // Kapela na placku: obal a deska. Obě plochy jsou ze stejné barvy,
-  // takže se bez mezery kolem desky slily v jeden flíček s dírou.
+  // Kapela na placku: deska. Obal za ní se slíval do jednoho flíčku,
+  // takže zbyla samotná placka: drážka u kraje, štítek a dírka.
   kapela: () => [
-    I(cut(rect(6, 8, 62, 64, 4), H)),
-    C(cut(ell(62, 62, 37, 37, 26), { ...R, amp: .9 })),
-    I(cut(ell(62, 62, 33, 33, 26), H)),
-    C(cut(ell(62, 62, 14, 14, 18), { ...R, amp: .8 })),
-    I(cut(ell(62, 62, 5, 5, 14), { ...R, amp: .7 })),
+    I(cut(ell(50, 50, 42, 42, 28), H)),
+    C(cut(ell(50, 50, 36, 36, 26), { ...R, amp: .8 })),
+    I(cut(ell(50, 50, 33, 33, 26), H)),
+    C(cut(ell(50, 50, 15, 15, 18), { ...R, amp: .8 })),
+    I(cut(ell(50, 50, 12, 12, 16), { ...R, amp: .7 })),
+    C(cut(ell(50, 50, 3.5, 3.5, 12), JEMNE)),
   ],
   // Dabing naživo: filmová klapka. Bublina by se pletla s Tichou špeluňkou
   // i Veršovaným lokálem, ty už obě bublinu mají.
