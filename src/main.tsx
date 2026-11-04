@@ -4,6 +4,7 @@ import "./styles/pisma.css";
 import "./styles/app.css";
 import { App } from "./App";
 import { Zachrana } from "./components/Zachrana";
+import { hlidejNovouVerzi } from "./lib/aktualizace";
 
 // chová se jako appka: přibližování dvěma prsty nic nepřinese a jen rozhodí
 // rozložení (iOS ignoruje user-scalable=no, proto i gesta)
@@ -20,6 +21,10 @@ if ("serviceWorker" in navigator) {
     .catch(() => {});
   if (window.caches) caches.keys().then((k) => k.forEach((x) => caches.delete(x))).catch(() => {});
 }
+
+// Appka z plochy se při otevření jen probudí a jede dál se starou verzí;
+// tohle ji při návratu do popředí přenačte, když je venku nová.
+hlidejNovouVerzi();
 
 /** Počká na styl appky.
  *
