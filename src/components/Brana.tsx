@@ -10,6 +10,7 @@ import { vazat } from "../lib/format";
 import { aktualniUcet, dejKlienta, prihlasBranou } from "../lib/prihlaseni";
 import { odkryjSpravce } from "../lib/spravce";
 import { Logo } from "./Logo";
+import { odklidZnacku, pockejNaZnacku } from "./Uvod";
 
 export function Brana() {
   const [heslo, setHeslo] = useState("");
@@ -18,6 +19,14 @@ export function Brana() {
 
   // Klient se stahuje zvlášť. Ať je v ruce, než se dopíše heslo.
   useEffect(() => { dejKlienta().catch(() => {}); }, []);
+
+  // Pořadí při prvním spuštění: animace značky, heslo, teprve pak úvod
+  // (Mišák). Brána proto značku odklidí sama, stejně jako to jinak dělá úvod.
+  useEffect(() => {
+    let platne = true;
+    pockejNaZnacku().then(() => { if (platne) odklidZnacku(); });
+    return () => { platne = false; };
+  }, []);
 
   async function vstup(e: FormEvent) {
     e.preventDefault();

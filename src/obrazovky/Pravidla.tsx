@@ -11,7 +11,7 @@ import { bodovani, JAK_SE_VALI, UVODNIK, ZAKLAD } from "../lib/pravidla";
 import { vazat } from "../lib/format";
 import { odhlas, useUcet } from "../lib/prihlaseni";
 import { useSpravce, vypniSpravce, zapniSpravce } from "../lib/spravce";
-import { strop, tym, useStav, vynulujTym } from "../lib/stav";
+import { rozesliSeznamy, stav, strop, tym, useStav, vynulujTym } from "../lib/stav";
 
 /** Pravidla a nastavení. Režim správce se zapíná tady, ať se na hlavních
  *  obrazovkách neplete do hry. */
@@ -23,6 +23,16 @@ export function Pravidla() {
   const [okno, setOkno] = useState<"zadne" | "zapnout" | "vypnout" | "odhlasit">("zadne");
   const s = strop();
   const t = tym();
+
+  /** Hospody a úkoly z tohohle telefonu všem. Na srovnání, když má každý
+   *  telefon jiné (appka z plochy a Safari mají na iPhonu oddělenou paměť). */
+  async function rozesli() {
+    if (!spravce) return;
+    const ok = await potvrdit("Rozeslat hospody a úkoly?",
+      `Všechny telefony dostanou ${stav.hospody.length} hospod a ${stav.ukoly.length} úkolů z tohohle telefonu. Jejich vlastní seznamy se přepíšou.`,
+      "Rozeslat");
+    if (ok) rozesliSeznamy();
+  }
 
   async function vynuluj() {
     if (!spravce) return; // zámek i tady, ne jen schované tlačítko – je to nevratné
@@ -78,6 +88,14 @@ export function Pravidla() {
             </div>
             <Ikona jmeno={spravce ? "check" : "zamek"} px={18} />
           </button>
+          {spravce && (
+            <button className="radek" onClick={rozesli}>
+              <div className="radek-telo">
+                <div className="radek-nazev">Rozeslat hospody a úkoly</div>
+                <div className="radek-pod">{vazat("Všechny telefony dostanou seznam z tohohle. Úpravy se rozesílají samy, tohle je na srovnání.")}</div>
+              </div>
+            </button>
+          )}
           {spravce && (
             <button className="radek" onClick={vynuluj}>
               <div className="radek-telo">

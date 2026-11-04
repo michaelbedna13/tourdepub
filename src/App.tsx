@@ -23,6 +23,8 @@ if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 export function App() {
   // Úvod běží po každém spuštění a vždycky jde přeskočit – takhle to chtěl Mišák.
   // Appka se pod ním už kreslí a připojuje, takže po doběhnutí je hned hotová.
+  // Kdo ještě nezadal heslo, má pořadí: značka, heslo, úvod. Úvod proto čeká,
+  // dokud je venku, a značku mezitím odklidí brána.
   const [uvod, setUvod] = useState(true);
 
   // Živé pořadí jede až pod přihlášeným účtem; bez něj server do tabulky
@@ -37,7 +39,7 @@ export function App() {
   return (
     <HashRouter>
       <Natoc />
-      {uvod && <Uvod hotovo={() => setUvod(false)} />}
+      {uvod && !venku && <Uvod hotovo={() => setUvod(false)} />}
       <PotvrzeniHost />
       {venku ? <Brana /> : <Routes>
         <Route element={<Kostra />}>

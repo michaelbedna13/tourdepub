@@ -11,6 +11,10 @@ export const SUPABASE_KEY: string = "sb_publishable_dL451QgRqYCR-BFwGTHOzg_1IXdr
 // Proto má tabulka předponu, ať se neplete s ostatními.
 export const TABULKA = "tourdepub_tymy";
 
+// Hospody a úkoly hry: jeden řádek na hru, společný pro všechny telefony.
+// Zapisuje jen správce. Viz supabase/party.sql.
+export const TABULKA_HRY = "tourdepub_hra";
+
 // Název hry. Když byste chtěli hrát víckrát, změň ho a ročníky se nebudou míchat.
 export const HRA = "brno-2026";
 

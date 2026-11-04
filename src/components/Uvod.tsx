@@ -45,8 +45,8 @@ const PLAKATY = PRIBEH.map((k, i) => ({ ...k, id: KRESBY_KAPITOL[i] }));
 const ZNACKA_ODCHOD = 600;
 
 /** Pošle značku z index.html pryč. Nechat ji tam by znamenalo krémové logo
- *  přes celou appku. */
-function odklidZnacku() {
+ *  přes celou appku. Volá ji úvod, a když se jde přes heslo, brána. */
+export function odklidZnacku() {
   const u = document.getElementById("uvod");
   if (!u) return;
   u.classList.add("odchazi");
@@ -101,21 +101,30 @@ function nactiPisma(): Promise<unknown> {
   }
 }
 
+/** Počká, až se značka z index.html dokreslí a písma dorazí. Úvod i brána
+ *  s heslem pak značku odklidí na stejném místě. */
+export function pockejNaZnacku(): Promise<unknown> {
+  const pockej = (ms: number) => new Promise((h) => setTimeout(h, ms));
+  return Promise.all([
+    pockej(Math.max(ZNACKA_PO_STARTU, ZNACKA_NEJMIN - performance.now())),
+    Promise.race([nactiPisma(), pockej(PISMA_NEJVIC)]),
+  ]);
+}
+
 export function Uvod({ hotovo }: { hotovo: () => void }) {
-  // -1 = ještě svítí značka z index.html, 0+ = pořadí plakátu
-  const [kde, setKde] = useState(-1);
+  // -1 = ještě svítí značka z index.html, 0+ = pořadí plakátu.
+  // Když se šlo přes heslo, značku už odklidila brána a úvod začíná rovnou
+  // prvním plakátem: jinak by jedno vykreslení prosvítala appka.
+  const [kde, setKde] = useState(() => (document.getElementById("uvod") ? -1 : 0));
   const [zavira, setZavira] = useState(false);
 
   // Značka odejde, až se čárky dokreslily a písma jsou opravdu načtená.
   // Značka a první plakát se prolnou přes sebe — kdyby jedna odešla dřív,
   // než druhý přijde, byl by mezi nimi prázdný snímek.
   useEffect(() => {
+    if (!document.getElementById("uvod")) return;
     let platne = true;
-    const pockej = (ms: number) => new Promise((h) => setTimeout(h, ms));
-    Promise.all([
-      pockej(Math.max(ZNACKA_PO_STARTU, ZNACKA_NEJMIN - performance.now())),
-      Promise.race([nactiPisma(), pockej(PISMA_NEJVIC)]),
-    ]).then(() => { if (!platne) return; odklidZnacku(); setKde(0); });
+    pockejNaZnacku().then(() => { if (!platne) return; odklidZnacku(); setKde(0); });
     return () => { platne = false; };
   }, []);
 

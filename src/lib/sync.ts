@@ -4,9 +4,9 @@
 // připojuje až po zadání hesla hry. Nepřihlášeného server do tabulky nepustí.
 import { useSyncExternalStore } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni";
+import { SUPABASE_URL, SUPABASE_KEY, TABULKA, TABULKA_HRY, HRA } from "./nastaveni";
 import { aktualniUcet, dejKlienta } from "./prihlaseni";
-import { stav, naZmenu, kOdeslani, knihaRadku, poOdeslani, slucZeServeru, type RadekTymu } from "./stav";
+import { stav, naZmenu, kOdeslani, knihaRadku, poOdeslani, slucZeServeru, prevezmiSeznamy, seznamyKOdeslani, seznamyOdeslany, type RadekHry, type RadekTymu } from "./stav";
 import * as K from "./kniha";
 
 /** ukazka = jen tenhle telefon · pripojuji · zivo · chyba = nepodařilo se */
@@ -76,6 +76,8 @@ export async function spustSync() {
     await posli();
     klient
       .channel(`tourdepub-${HRA}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: TABULKA_HRY, filter: `hra=eq.${HRA}` },
+          () => { nacti(); })
       .on("postgres_changes", { event: "*", schema: "public", table: TABULKA, filter: `hra=eq.${HRA}` },
           () => { nacti(); })
       .subscribe();
@@ -147,6 +149,7 @@ async function posli(): Promise<boolean> {
     // ty, které mají v telefonu něco, co na serveru ještě není (neodeslano).
     // Cizí týmy, které sem jen přitekly, se neposílají: tenhle telefon k nim
     // nic nepřidal.
+    await posliSeznamy();
     for (const t of stav.tymy.filter((x) => x.vlastni && x.neodeslano)) await posliTym(t.id);
     return true;
   } catch (e) {
@@ -165,6 +168,25 @@ async function posli(): Promise<boolean> {
     odesila = false;
     if (znova) { znova = false; posliOpatrne(); }
   }
+}
+
+/** Chybí na serveru tabulka s hospodami a úkoly? Pak appka běží jako
+ *  dřív (seznamy jen v telefonu) a neotravuje chybou. */
+let bezTabulkyHry = false;
+const chybiTabulka = (e: { code?: string; message?: string } | null) =>
+  !!e && (e.code === "PGRST205" || e.code === "42P01" || /schema cache|does not exist/i.test(e.message || ""));
+
+/** Správce změnil hospody nebo úkoly: pošle celý seznam. Upravuje jen
+ *  správce, takže stačí „poslední vyhrává“; hráčům to server ani nedovolí. */
+async function posliSeznamy() {
+  if (!klient || bezTabulkyHry || aktualniUcet() !== "spravce" || !stav.seznamyNeodeslano) return;
+  const odeslane = seznamyKOdeslani();
+  const upraveno = new Date().toISOString();
+  const { data, error } = await klient.from(TABULKA_HRY)
+    .upsert({ hra: HRA, ...odeslane, upraveno }, { onConflict: "hra" }).select();
+  if (chybiTabulka(error)) { bezTabulkyHry = true; return; }
+  if (error) throw error;
+  seznamyOdeslany((data?.[0] as RadekHry | undefined)?.upraveno || upraveno, odeslane);
 }
 
 /** Kolikrát to telefon zkusí, když mu někdo pořád zapisuje pod rukama. */
@@ -245,6 +267,13 @@ async function nacti(): Promise<boolean> {
     // i tam, kde žádná není, každý telefon by sloučil, uložil a odeslal,
     // a ostatní by na to zase odpověděli: dva telefony by si přehazovaly
     // tabulku pořád dokola.
+    // Hospody a úkoly napřed: body týmů se z nich počítají.
+    if (!bezTabulkyHry) {
+      const h = await klient.from(TABULKA_HRY).select("*").eq("hra", HRA).maybeSingle();
+      if (chybiTabulka(h.error)) bezTabulkyHry = true;
+      else if (h.error) throw h.error;
+      else if (h.data) prevezmiSeznamy(h.data as RadekHry, aktualniUcet() === "spravce");
+    }
     const { data, error } = await klient.from(TABULKA).select("*").eq("hra", HRA).order("id");
     if (error) throw error;
     const nove = (data || []) as RadekTymu[];

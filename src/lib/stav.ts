@@ -58,6 +58,20 @@ export interface Stav {
    *  Díky tomu se nový úkol z data.ts doplní i do rozehrané hry, a zároveň
    *  se nevrátí ten, který si parta smazala. */
   znameUkoly: string[];
+  /** Hospody a úkoly jsou společné pro celou hru (tabulka tourdepub_hra).
+   *  Správce je mění tady a appka je pošle; ostatní je převezmou. Tohle je
+   *  razítko poslední změny (místní nebo převzaté ze serveru) a příznak,
+   *  že místní změna správce ještě na serveru není. */
+  seznamyUpraveno?: string | null;
+  seznamyNeodeslano?: boolean;
+}
+
+/** Hospody a úkoly ze serveru (tabulka tourdepub_hra). */
+export interface RadekHry {
+  hra: string;
+  hospody: Hospoda[];
+  ukoly: Ukol[];
+  upraveno: string;
 }
 
 /** Co se o týmu posílá na server. */
@@ -387,12 +401,20 @@ export function posunHospodu(o: number) {
   if (cil) nastavHospodu(cil.id);
 }
 
+/** Hospody nebo úkoly se změnily v tomhle telefonu (správce). Pošle se to
+ *  ostatním, viz posliSeznamy() v sync.ts. */
+function zmenaSeznamu() {
+  stav.seznamyNeodeslano = true;
+  stav.seznamyUpraveno = new Date().toISOString();
+}
+
 export function pridejHospodu(nazev: string) {
   stav.hospody.push({
     id: noveId(),
     nazev: nazev.trim().slice(0, 60) || "Nová špeluňka",
   });
   srovnejStace(stav);
+  zmenaSeznamu();
   uloz();
 }
 
@@ -400,20 +422,17 @@ export function upravHospodu(id: string, nazev: string) {
   const h = stav.hospody.find((x) => x.id === id);
   if (!h) return;
   h.nazev = nazev.trim().slice(0, 60) || h.nazev;
+  zmenaSeznamu();
   uloz();
 }
 
 export function smazHospodu(id: string): boolean {
   if (stav.hospody.length <= 1) return false;
   stav.hospody = stav.hospody.filter((h) => h.id !== id);
-  // zápisy k té hospodě i štace týmů, co v ní stály, musí jít s ní
-  for (const t of stav.tymy) {
-    delete t.prichod[id];
-    delete t.prichodCas[id];
-    delete t.skopek[id];
-    delete t.zlodej[id];
-    if (t.hospoda === id) t.hospoda = stav.hospody[0]?.id || null;
-  }
+  // Zápisy k té hospodě zůstávají v knize, jen se nepočítají (rozpad bere
+  // jen hospody, které jsou v seznamu). Štace, co v ní stály, se posunou.
+  srovnejStace(stav);
+  zmenaSeznamu();
   uloz();
   return true;
 }
@@ -424,6 +443,7 @@ export function posunHospoduVPoradi(id: string, o: number) {
   if (i < 0 || j < 0 || j >= stav.hospody.length) return;
   const [h] = stav.hospody.splice(i, 1);
   stav.hospody.splice(j, 0, h);
+  zmenaSeznamu();
   uloz();
 }
 
@@ -458,6 +478,7 @@ export function pridejNovyUkol(data: KonceptUkolu): Ukol {
     vlastni: true,
   };
   stav.ukoly.push(u);
+  zmenaSeznamu();
   uloz();
   return u;
 }
@@ -471,14 +492,59 @@ export function upravUkol(id: string, zmeny: KonceptUkolu) {
   if (zmeny.popis != null) u.popis = zmeny.popis.trim().slice(0, 400);
   if (zmeny.kat != null) u.kat = zmeny.kat;
   u.body = u.max > 1 ? 1 : u.piva;
-  // kdyby se strop snížil pod už zapsaný počet, zápisy se ořežou
-  for (const t of stav.tymy) if (t.ukoly[id] > u.max) t.ukoly[id] = u.max;
+  // kdyby se strop snížil pod už zapsaný počet, počítá se jen do stropu
+  // (rozpad bere min(počet, max)); zápis v knize zůstává
+  zmenaSeznamu();
   uloz();
 }
 
 export function smazUkol(id: string) {
   stav.ukoly = stav.ukoly.filter((u) => u.id !== id);
-  for (const t of stav.tymy) delete t.ukoly[id];
+  zmenaSeznamu();
+  uloz();
+}
+
+/** Správce: pošli hospody a úkoly z tohohle telefonu všem (i když se nic
+ *  neměnilo). Na srovnání, když má každý telefon jiné. */
+export function rozesliSeznamy() {
+  zmenaSeznamu();
+  uloz();
+}
+
+/** Je seznam ze serveru použitelný? Ze serveru může přijít cokoli. */
+function platneSeznamy(r: Partial<RadekHry> | null | undefined): r is RadekHry {
+  return !!r && Array.isArray(r.hospody) && r.hospody.length > 0 && Array.isArray(r.ukoly)
+    && r.hospody.every((h) => h && typeof h.id === "string" && typeof h.nazev === "string")
+    && r.ukoly.every((u) => u && typeof u.id === "string" && typeof u.nazev === "string" && typeof u.max === "number");
+}
+
+/** Převezme hospody a úkoly ze serveru. Výjimka: správce má v telefonu
+ *  novější změnu, která ještě neodešla; ta vyhraje a pošle se. U hráče se
+ *  na místní změny nehledí (upravovat smí jen správce), převezme se vždy. */
+export function prevezmiSeznamy(r: Partial<RadekHry> | null | undefined, jsemSpravce: boolean) {
+  if (!platneSeznamy(r)) return;
+  if (jsemSpravce && stav.seznamyNeodeslano && casZmeny(stav.seznamyUpraveno) > casZmeny(r.upraveno)) return;
+  const stejne = JSON.stringify(stav.hospody) === JSON.stringify(r.hospody)
+    && JSON.stringify(stav.ukoly) === JSON.stringify(r.ukoly);
+  stav.seznamyNeodeslano = false;
+  stav.seznamyUpraveno = r.upraveno;
+  if (stejne) return;
+  stav.hospody = r.hospody;
+  stav.ukoly = r.ukoly;
+  // Výchozí úkoly z data.ts, které správce smazal, se nesmí vrátit při
+  // dalším spuštění (doplnUkoly): všechny výchozí už byly nabídnuté.
+  stav.znameUkoly = [...new Set([...stav.znameUkoly, ...VYCHOZI_UKOLY.map((u) => u.id)])];
+  srovnejStace(stav);
+  uloz();
+}
+
+/** Co poslat na server, a potvrzení, že to tam je. */
+export const seznamyKOdeslani = () => ({ hospody: stav.hospody, ukoly: stav.ukoly });
+export function seznamyOdeslany(upraveno: string, odeslane: { hospody: Hospoda[]; ukoly: Ukol[] }) {
+  // Mezitím (během čekání na server) mohl správce změnit další věc.
+  const zmeneno = JSON.stringify(seznamyKOdeslani()) !== JSON.stringify(odeslane);
+  stav.seznamyNeodeslano = zmeneno;
+  if (!zmeneno) stav.seznamyUpraveno = upraveno;
   uloz();
 }
 
@@ -492,8 +558,10 @@ export function body(t = tym()): number {
 export function rozpad(t = tym()): Rozpad {
   if (!t) return { dochazka: 0, skopky: 0, ukoly: 0, splneno: 0, makacky: 0 };
   return {
-    dochazka: Object.values(t.prichod).filter(Boolean).length,
-    skopky: Object.values(t.skopek).filter(Boolean).length,
+    // jen hospody, které jsou v seznamu: zápis ke smazané hospodě se
+    // nepočítá (v knize zůstává, kdyby se vrátila)
+    dochazka: stav.hospody.filter((h) => t.prichod[h.id]).length,
+    skopky: stav.hospody.filter((h) => t.skopek[h.id]).length,
     ukoly: Object.entries(t.ukoly).reduce((c, [id, k]) => {
       const u = ukolPodleId(id);
       return u ? c + Math.min(k, u.max) * u.body : c;

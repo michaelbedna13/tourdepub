@@ -149,3 +149,48 @@ begin
     alter publication supabase_realtime add table public.tourdepub_tymy;
   end if;
 end $$;
+
+-- HOSPODY A ÚKOLY HRY.
+-- Dřív si je každý telefon držel jen u sebe a appka z plochy a Safari na
+-- tom samém iPhonu měly každá jiné (iOS jim dává oddělené úložiště). Teď je
+-- jeden seznam tady: čtou ho všichni přihlášení, zapisuje jen správce.
+create table if not exists public.tourdepub_hra (
+  hra       text primary key,
+  hospody   jsonb not null,
+  ukoly     jsonb not null,
+  upraveno  timestamptz not null default now(),
+  constraint tourdepub_hra_meze check (
+    char_length(hra) <= 40
+    and jsonb_typeof(hospody) = 'array' and jsonb_typeof(ukoly) = 'array'
+    and jsonb_array_length(hospody) between 1 and 60
+    and jsonb_array_length(ukoly) <= 300
+    and pg_column_size(hospody) <= 65536
+    and pg_column_size(ukoly) <= 262144
+  )
+);
+
+alter table public.tourdepub_hra enable row level security;
+
+revoke all on public.tourdepub_hra from anon, authenticated;
+grant select, insert, update on public.tourdepub_hra to authenticated;
+
+drop policy if exists "hraci ctou seznamy" on public.tourdepub_hra;
+create policy "hraci ctou seznamy" on public.tourdepub_hra for select to authenticated
+  using ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') in ('hrac', 'spravce'));
+
+drop policy if exists "spravce zaklada seznamy" on public.tourdepub_hra;
+create policy "spravce zaklada seznamy" on public.tourdepub_hra for insert to authenticated
+  with check ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') = 'spravce');
+
+drop policy if exists "spravce upravuje seznamy" on public.tourdepub_hra;
+create policy "spravce upravuje seznamy" on public.tourdepub_hra for update to authenticated
+  using ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') = 'spravce')
+  with check ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') = 'spravce');
+
+do $$
+begin
+  if not exists (select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'tourdepub_hra') then
+    alter publication supabase_realtime add table public.tourdepub_hra;
+  end if;
+end $$;
