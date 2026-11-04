@@ -137,17 +137,27 @@ function panak({ trup, ruce = [], nohy = [], dlane = [], chodidla = [], hlava: h
 const zrcadli = (vrstvy, o = 50) => vrstvy.map(([druh, d]) => [druh,
   d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${Math.round((2 * o - x) * 10) / 10} ${y}`)]);
 
-/** Škopek s pěnou a uchem. (x, y) je střed sklenice, uhel ji naklání. */
-function skopek(x, y, uhel = 0, m = 1) {
-  const u = (pts) => umisti(pts, x, y, uhel, m);
+/** Škopek s pěnou a uchem. (x, y) je střed sklenice, uhel ji naklání,
+ *  strana říká, na které straně je ucho (1 vpravo, -1 vlevo). */
+function skopek(x, y, uhel = 0, strana = 1) {
+  const u = (pts) => umisti(pts, x, y, uhel);
   return [
-    I(cut(u(ell(5.4, 0, 3.8, 3.8, 14)), PRST)),
-    C(cut(u(ell(5.6, 0, 1.9, 1.9, 10)), PRST)),
+    I(cut(u(ell(5.4 * strana, 0, 3.8, 3.8, 14)), PRST)),
+    C(cut(u(ell(5.6 * strana, 0, 1.9, 1.9, 10)), PRST)),
     I(cut(u(rect(-4.2, -5, 4.2, 6.5, 1.2)), PRST)),
     I(cut(u(ell(0, -5.4, 5.4, 2.6, 16)), PRST)),
     C(cut(u(tah([[-1.6, -1.5], [-1.6, 4.2]], 1.2)), PRST)),
     C(cut(u(tah([[1.4, -1.5], [1.4, 4.2]], 1.2)), PRST)),
   ];
+}
+
+/** Škopek držený ZA UCHO. (hx, hy) je konec ruky; sklenice se posadí tak,
+ *  aby ruka chytala vnější oblouk ucha a díra v uchu zůstala vidět.
+ *  Dřív ruka končila uprostřed sklenice a panáci drželi škopek jak
+ *  kelímek; ucho trčelo na druhou stranu do vzduchu. */
+function skopekVRuce(hx, hy, uhel = 0, strana = 1) {
+  const a = (uhel * Math.PI) / 180, d = 8.6 * strana;
+  return skopek(hx - d * Math.cos(a), hy - d * Math.sin(a), uhel, strana);
 }
 
 /** Krátké čárky kolem něčeho: ťuknutí, záblesk, kapky. */
@@ -169,19 +179,19 @@ const KRESBY = {
     return [
       ...panak({
         trup: posun([[26, 36], [27, 49], [29, 62]]),
-        ruce: [posun([[27, 43], [37, 42], [46, 33]]), posun([[26, 45], [18, 51], [24, 58]])],
+        ruce: [posun([[27, 43], [36, 42], [44, 34]]), posun([[26, 45], [18, 51], [24, 58]])],
         nohy: [posun([[29, 61], [23, 76], [20, 90]]), posun([[29, 61], [36, 75], [38, 90]])],
         chodidla: [[levy(20), 91, 185], [levy(38), 91, -5]], hlava: -6,
       }),
-      ...skopek(levy(48), 29, 22),
+      ...skopekVRuce(levy(44), 34, -18, -1),
       ...zrcadli([
         ...panak({
           trup: posun([[27, 37], [27, 50], [28, 63]]),
-          ruce: [posun([[28, 44], [37, 43], [46, 33]]), posun([[26, 46], [18, 40], [13, 31]])],
+          ruce: [posun([[28, 44], [37, 43], [44, 34]]), posun([[26, 46], [18, 40], [13, 31]])],
           nohy: [posun([[28, 62], [20, 72], [22, 86], [18, 91]]), posun([[28, 62], [34, 76], [34, 90]])],
           chodidla: [[levy(17), 92, 190], [levy(34), 91, -10]], dlane: [[levy(12), 29, -110]], hlava: -2,
         }),
-        ...skopek(levy(48), 29, 22),
+        ...skopekVRuce(levy(44), 34, -18, -1),
       ]),
       ...jiskry(50, 22, 5, 11, [-90, -130, -50]),
     ];
@@ -202,7 +212,7 @@ const KRESBY = {
       nohy: [[[44, 62], [49, 76], [54, 90]], [[44, 62], [44, 77], [37, 91]]],
       chodidla: [[55, 91, -5], [37, 92, 185]], hlava: 6,
     }),
-    ...skopek(31, 31, -14),
+    ...skopekVRuce(33, 36, 14, 1),
   ],
 
   // Žádný courání: panák běží, předklon, škopek před sebou, pěna
@@ -215,10 +225,10 @@ const KRESBY = {
       nohy: [[[42, 60], [56, 67], [54, 83]], [[42, 60], [34, 73], [22, 79]]],
       chodidla: [[54, 84, 5], [21, 79, 230]], dlane: [[34, 40, 230]], hlava: 18,
     }),
-    ...skopek(73, 42, 12),
-    I(cut(ell(80, 31, 2.2, 2.2, 10), PRST)),
-    I(cut(ell(85, 36, 1.6, 1.6, 10), PRST)),
-    I(cut(ell(76, 26, 1.5, 1.5, 10), PRST)),
+    ...skopekVRuce(69, 45, -8, -1),
+    I(cut(ell(84, 32, 2.2, 2.2, 10), PRST)),
+    I(cut(ell(89, 37, 1.6, 1.6, 10), PRST)),
+    I(cut(ell(80, 27, 1.5, 1.5, 10), PRST)),
   ],
 
   // Čárky na tabuli: hospodská tabule, čárky jsou vystřižené jako křída.
@@ -242,7 +252,7 @@ const KRESBY = {
       chodidla: [[24, 92, 185], [44, 92, -5]], hlava: -12,
     }),
     I(cut(rect(60, 44, 66, 49, 1), PRST)),
-    ...skopek(18, 65, -6),
+    ...skopekVRuce(20, 62, 4, 1),
   ],
 
   // Konečná: vítěz ve skoku, ruce do V, v jedné pohár vysoko nad hlavou.
