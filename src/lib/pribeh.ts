@@ -34,7 +34,7 @@ export const PRIBEH: Kapitola[] = [
   },
   {
     nadpis: ["Za co", "padaj čárky"],
-    text: "Čárka padá za každou špeluňku, kam vlezete, a další, když v ní aspoň půlka partyje lupne škopek. Nejvíc se ale nahrabe za srandy z úkolů, od brnkaček po betelný makačky. Čím větší haluz, tím víc čárek.",
+    text: "Čárka padá za každou špeluňku, kam vlezete, a další, když v ní aspoň půlka partyje lupne škopek. Nejvíc se ale nahrabe za srandy, od brnkaček po betelný makačky. Čím větší haluz, tím víc čárek.",
   },
   {
     nadpis: ["Kdo bere", "kotel"],
