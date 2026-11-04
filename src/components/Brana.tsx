@@ -8,7 +8,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { vazat } from "../lib/format";
 import { dejKlienta, prihlas } from "../lib/prihlaseni";
-import { Ikona } from "./Ikona";
 import { Logo } from "./Logo";
 
 export function Brana() {
@@ -35,23 +34,18 @@ export function Brana() {
     <main className="brana">
       <Logo trida="brana-logo" />
       <h1 className="brana-nadpis">Heslo hry</h1>
-      <p className="brana-text">{vazat("Tour de Pub je jen pro partu. Heslo ti řekne ten, kdo celej tah vede.")}</p>
       <form onSubmit={vstup} noValidate>
-        <label className="pole">
-          <span className="nazev">Heslo</span>
-          {/* Viditelné písmo, ne tečky. Heslo hry zná celá parta a píše se
-              v hospodě; vidět, co člověk naťukal, ušetří půlku omylů. */}
-          <input type="text" value={heslo} name="heslo-hry"
-            autoComplete="off" autoCapitalize="none" autoCorrect="off" spellCheck={false}
-            enterKeyHint="go" aria-invalid={chyba ? true : undefined}
-            onChange={(e) => { setHeslo(e.target.value); setChyba(""); }} />
-          {chyba && <span className="poznamka spatne brana-chyba" role="alert">{vazat(chyba)}</span>}
-        </label>
+        {/* Viditelné písmo, ne tečky. Heslo hry zná celá parta a píše se
+            v hospodě; vidět, co člověk naťukal, ušetří půlku omylů. */}
+        <input type="text" value={heslo} name="heslo-hry" aria-label="Heslo hry"
+          autoComplete="off" autoCapitalize="none" autoCorrect="off" spellCheck={false}
+          enterKeyHint="go" aria-invalid={chyba ? true : undefined}
+          onChange={(e) => { setHeslo(e.target.value); setChyba(""); }} />
+        {chyba && <span className="poznamka spatne brana-chyba" role="alert">{vazat(chyba)}</span>}
         <button className="tl hlavni" type="submit" disabled={ceka || !heslo.trim()}>
-          <Ikona jmeno="check" px={19} /> {ceka ? "Ověřuju…" : "Pustit dál"}
+          {ceka ? "Ověřuju…" : "Pustit dál"}
         </button>
       </form>
-      <p className="brana-pod">{vazat("Stačí jednou, telefon si to pamatuje.")}</p>
     </main>
   );
 }
