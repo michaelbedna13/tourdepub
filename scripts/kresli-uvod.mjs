@@ -138,26 +138,37 @@ const zrcadli = (vrstvy, o = 50) => vrstvy.map(([druh, d]) => [druh,
   d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${Math.round((2 * o - x) * 10) / 10} ${y}`)]);
 
 /** Škopek s pěnou a uchem. (x, y) je střed sklenice, uhel ji naklání,
- *  strana říká, na které straně je ucho (1 vpravo, -1 vlevo). */
-function skopek(x, y, uhel = 0, strana = 1) {
-  const u = (pts) => umisti(pts, x, y, uhel);
+ *  strana říká, na které straně je ucho (1 vpravo, -1 vlevo), m zvětšuje.
+ *  Ucho je oblouk do D, ne kolečko: kolečko vedle sklenice se četlo jako
+ *  bublina, a hlavně se za něj nedalo viditelně chytit. */
+function skopek(x, y, uhel = 0, strana = 1, m = 1) {
+  const z = (pts) => pts.map(([a, b]) => [a * strana, b]);
+  const u = (pts) => umisti(z(pts), x, y, uhel, m);
   return [
-    I(cut(u(ell(5.4 * strana, 0, 3.8, 3.8, 14)), PRST)),
-    C(cut(u(ell(5.6 * strana, 0, 1.9, 1.9, 10)), PRST)),
-    I(cut(u(rect(-4.2, -5, 4.2, 6.5, 1.2)), PRST)),
-    I(cut(u(ell(0, -5.4, 5.4, 2.6, 16)), PRST)),
-    C(cut(u(tah([[-1.6, -1.5], [-1.6, 4.2]], 1.2)), PRST)),
-    C(cut(u(tah([[1.4, -1.5], [1.4, 4.2]], 1.2)), PRST)),
+    I(cut(u([[3, -3.8], [7.6, -4.2], [10, -1.8], [10, 2.6], [7.6, 5], [3, 4.8]]), PRST)),
+    C(cut(u([[3.8, -1.8], [6.6, -2], [7.6, -.2], [7.5, 2], [6.6, 2.9], [3.8, 2.9]]), PRST)),
+    I(cut(u(rect(-4.4, -5, 4.4, 7, 1.2)), PRST)),
+    I(cut(u(ell(0, -5.4, 5.6, 2.7, 16)), PRST)),
+    C(cut(u(tah([[-1.7, -1.5], [-1.7, 4.6]], 1.2)), PRST)),
+    C(cut(u(tah([[1.5, -1.5], [1.5, 4.6]], 1.2)), PRST)),
   ];
 }
 
-/** Škopek držený ZA UCHO. (hx, hy) je konec ruky; sklenice se posadí tak,
- *  aby ruka chytala vnější oblouk ucha a díra v uchu zůstala vidět.
- *  Dřív ruka končila uprostřed sklenice a panáci drželi škopek jak
- *  kelímek; ucho trčelo na druhou stranu do vzduchu. */
-function skopekVRuce(hx, hy, uhel = 0, strana = 1) {
-  const a = (uhel * Math.PI) / 180, d = 8.6 * strana;
-  return skopek(hx - d * Math.cos(a), hy - d * Math.sin(a), uhel, strana);
+/** Škopek držený ZA UCHO. (hx, hy) je konec ruky, tam je pěst: sedí na
+ *  vnějším oblouku ucha, palec leží navrch, a mezi pěstí a sklem zůstává
+ *  vidět díra. Tak je jasné, že panák drží ucho.
+ *  Napřed ruka končila uprostřed sklenice (držel to jak kelímek), potom
+ *  jen vrůstala do malého kolečka a úchop nebyl vidět ani tak. */
+function skopekVRuce(hx, hy, uhel = 0, strana = 1, m = 1.25) {
+  const a = (uhel * Math.PI) / 180, dx = 10.6 * strana * m, dy = .6 * m;
+  const cx = hx - (dx * Math.cos(a) - dy * Math.sin(a)), cy = hy - (dx * Math.sin(a) + dy * Math.cos(a));
+  const u = (pts) => umisti(pts.map(([p, q]) => [p * strana, q]), cx, cy, uhel, m);
+  return [
+    ...skopek(cx, cy, uhel, strana, m),
+    // pěst přes vnější oblouk ucha a palec přes horní hranu
+    I(cut(u(ell(10.6, .6, 2.6, 3.4, 14)), PRST)),
+    I(cut(u(tah([[10, -2], [7.4, -4.6]], [2.2, 1.6])), PRST)),
+  ];
 }
 
 /** Krátké čárky kolem něčeho: ťuknutí, záblesk, kapky. */
@@ -179,19 +190,19 @@ const KRESBY = {
     return [
       ...panak({
         trup: posun([[26, 36], [27, 49], [29, 62]]),
-        ruce: [posun([[27, 43], [36, 42], [44, 34]]), posun([[26, 45], [18, 51], [24, 58]])],
+        ruce: [posun([[27, 43], [33, 42], [38, 35]]), posun([[26, 45], [18, 51], [24, 58]])],
         nohy: [posun([[29, 61], [23, 76], [20, 90]]), posun([[29, 61], [36, 75], [38, 90]])],
         chodidla: [[levy(20), 91, 185], [levy(38), 91, -5]], hlava: -6,
       }),
-      ...skopekVRuce(levy(44), 34, -18, -1),
+      ...skopekVRuce(levy(38), 35, -10, -1),
       ...zrcadli([
         ...panak({
           trup: posun([[27, 37], [27, 50], [28, 63]]),
-          ruce: [posun([[28, 44], [37, 43], [44, 34]]), posun([[26, 46], [18, 40], [13, 31]])],
+          ruce: [posun([[28, 44], [34, 43], [38, 35]]), posun([[26, 46], [18, 40], [13, 31]])],
           nohy: [posun([[28, 62], [20, 72], [22, 86], [18, 91]]), posun([[28, 62], [34, 76], [34, 90]])],
           chodidla: [[levy(17), 92, 190], [levy(34), 91, -10]], dlane: [[levy(12), 29, -110]], hlava: -2,
         }),
-        ...skopekVRuce(levy(44), 34, -18, -1),
+        ...skopekVRuce(levy(38), 35, -10, -1),
       ]),
       ...jiskry(50, 22, 5, 11, [-90, -130, -50]),
     ];
