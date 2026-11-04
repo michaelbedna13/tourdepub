@@ -242,27 +242,29 @@ const KRESBY = {
     I(cut(ell(80, 27, 1.5, 1.5, 10), PRST)),
   ],
 
-  // Čárky na tabuli: hospodská tabule, čárky jsou vystřižené jako křída.
-  // Panák k ní natahuje ruku a dotahuje škrt přes pětku; ruka má kolem
-  // sebe spáru, jinak by se na tabuli ztratila.
+  // Čárky na tabuli: hospodská tabule jako rám s tmavou plochou, čárky
+  // jsou křída (papír). Napřed byla tabule plná a čárky vystřižené; ruka
+  // přes ni pak potřebovala spáru a kolem ní zůstalo prázdno, co nedávalo
+  // smysl. Na tmavé ploše je ruka s křídou vidět sama od sebe.
   zed: () => [
-    I(cut(rect(54, 12, 100, 64, 2.5), { amp: .6, step: 4, tension: .42 })),
+    I(cut(rect(54, 10, 100, 64, 2.5), { amp: .6, step: 4, tension: .42 })),
+    C(cut(rect(58.5, 14.5, 95.5, 59.5, 1.5), { amp: .4, step: 4, tension: .42 })),
     I(cut(tah([[60, 64], [57, 92]], 3.4), PRST)),
     I(cut(tah([[94, 64], [97, 92]], 3.4), PRST)),
-    C(cut(tah([[66, 22], [65, 54]], [3.6, 3.2]), PRST)),
-    C(cut(tah([[74, 21], [74, 54]], [3.6, 3.2]), PRST)),
-    C(cut(tah([[82, 21], [83, 54]], [3.6, 3.2]), PRST)),
-    C(cut(tah([[90, 22], [91, 54]], [3.6, 3.2]), PRST)),
-    C(cut(tah([[63, 47], [94, 27]], [3.2, 3.6]), PRST)),
-    C(cut(tah([[33, 44], [48, 47], [62, 47]], 9.5), TAH)),
-    C(cut(ell(64, 47, 6.5, 6.5, 14), PRST)),
+    I(cut(tah([[69, 21], [68, 53]], [3.4, 3]), PRST)),
+    I(cut(tah([[76, 20], [76, 53]], [3.4, 3]), PRST)),
+    I(cut(tah([[83, 20], [84, 53]], [3.4, 3]), PRST)),
+    I(cut(tah([[90, 21], [91, 53]], [3.4, 3]), PRST)),
+    I(cut(tah([[66, 46], [93, 27]], [3, 3.4]), PRST)),
     ...panak({
       trup: [[31, 37], [32, 50], [34, 63]],
-      ruce: [[[32, 44], [46, 47], [60, 47]], [[31, 46], [24, 54], [20, 62]]],
+      ruce: [[[32, 44], [46, 47], [62, 47]], [[31, 46], [24, 54], [20, 62]]],
       nohy: [[[34, 62], [27, 77], [24, 91]], [[34, 62], [41, 77], [44, 91]]],
       chodidla: [[24, 92, 185], [44, 92, -5]], hlava: -12,
     }),
-    I(cut(rect(60, 44, 66, 49, 1), PRST)),
+    // pěst s křídou na začátku škrtu
+    I(cut(ell(63, 47, 2.8, 3, 12), PRST)),
+    I(cut(tah([[64, 47], [67, 45.5]], 2), PRST)),
     ...skopekVRuce(20, 62, 4, 1),
   ],
 

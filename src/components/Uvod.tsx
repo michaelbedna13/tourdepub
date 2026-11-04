@@ -131,7 +131,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
     // teď, ať je vidět, jak se úvod vytrácí, a ne až po střihu
     document.documentElement.classList.remove("uvodni");
     setZavira(true);
-    setTimeout(hotovo, ZAVRENI);
+    setTimeout(() => { hotovo(); postrcStranku(); }, ZAVRENI);
   }
 
   function dal() {
@@ -207,6 +207,23 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
       )}
     </div>
   );
+}
+
+/** Postrčí stránku o bod a zpátky.
+ *
+ *  Appka z plochy na iPhonu po zmizení úvodu (vrstva přes celou obrazovku)
+ *  zůstala celá posunutá dolů o výšku stavového řádku a srovnala se až po
+ *  prvním dotyku. Na Mišákově screenshotu: pilulka týmu na 156 bodech před
+ *  dotykem, 97 po něm, má být 95; posun 59 až 61 bodů, safe-area nahoře
+ *  je 59. Dotyk nedělá nic jiného, než že iOS přepočítá posun stránky,
+ *  a to samé udělá posunutí o bod tam a zpátky. Je to chyba WebKitu
+ *  v režimu z plochy, v prohlížeči se to neděje a v Chromiu se nedá
+ *  napodobit, takže ověřit to jde jen na telefonu. */
+function postrcStranku() {
+  requestAnimationFrame(() => {
+    window.scrollTo(0, 1);
+    window.scrollTo(0, 0);
+  });
 }
 
 /** Šipka u cedulí dole. `zpet` ji překlopí doleva. */
