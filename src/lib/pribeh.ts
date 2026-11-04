@@ -13,29 +13,31 @@
 // sem kouknout ručně: čísla tu jsou napsaná slovy, ne natažená z pravidel.
 
 export interface Kapitola {
-  nadpis: string;
+  /** Nadpis vždycky na dva řádky, zlomený natvrdo: pět plakátů za sebou
+   *  stojí stejně a nadpis neskáče mezi jedním a dvěma řádky. */
+  nadpis: [string, string];
   text: string;
 }
 
 export const PRIBEH: Kapitola[] = [
   {
-    nadpis: "Sraz ve štatlu",
-    text: "Šest večer, zoncna zalezla a ve štatlu se schází parta ogarů a holek, co to v palici nemají vypatlaný. Každej hodí kilo do kotla, rozdělíte se do dvou až tří partyjí a první škopek se ťukne na zdar.",
+    nadpis: ["Sraz", "ve štatlu"],
+    text: "Šest večer, zoncna zalezla a ve štatlu se schází parta ogarů a holek. Každej hodí kilo do kotla, parta se rozdělí na dvě až tři partyje a první škopek se ťukne na zdar.",
   },
   {
-    nadpis: "Na trase",
-    text: "Pak se valí od jedný špeluňky k druhý, celou trasu přes štatl až do dvou do rána. Co se zvrtne potom, už se do čárek nepočítá. Ani když je to ta nejlepší historka večera.",
+    nadpis: ["Od špeluňky", "ke špeluňce"],
+    text: "Pak se valí od jedný špeluňky k druhý, přes celej štatl až do dvou do rána. Co se zvrtne potom, se do čárek nepočítá, i kdyby to byla nejlepší historka večera.",
   },
   {
-    nadpis: "Žádný courání",
-    text: "Na každou štaci máte tak tři čtvrtě hodiny. Kdo se fest loudá a ostatní na něj musí venku čumět, ten v té špeluňce za srandy čárku nedostane. Takže dopít a mazat dál.",
+    nadpis: ["Žádný", "courání"],
+    text: "Na každou štaci máte zhruba tři čtvrtě hodiny. Kdo se fest loudá a ostatní na něj musí venku čumět, nedostane v tý špeluňce za srandy ani čárku. Takže dopít a mazat dál.",
   },
   {
-    nadpis: "Za co čárky",
-    text: "Čárka padá za každou špeluňku, kam vlezete, a další za škopek, co v ní lupne aspoň půlka partyje. Nejvíc se ale nahrabe za srandy. Úkoly nosíte v kapse, od brnkaček po betelný makačky, a čím větší haluz, tím víc čárek.",
+    nadpis: ["Za co", "padaj čárky"],
+    text: "Čárka padá za každou špeluňku, kam vlezete, a další, když v ní aspoň půlka partyje lupne škopek. Nejvíc se ale nahrabe za srandy z úkolů, od brnkaček po betelný makačky. Čím větší haluz, tím víc čárek.",
   },
   {
-    nadpis: "Konečná",
-    text: "Ve dvě ráno se sečtou čárky. Partyje, co jich nahrabala nejvíc, bere titul Tour De Pub i celej kotel, všechny love só jejich. Ty ostatní si odnesou aspoň historky na celej rok.",
+    nadpis: ["Kdo bere", "kotel"],
+    text: "Ve dvě ráno se sečtou čárky. Partyja, co jich nahrabala nejvíc, bere titul Tour De Pub i celej kotel, všechny love só její. Ostatní si odnesou aspoň historky na celej rok.",
   },
 ];

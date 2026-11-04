@@ -193,7 +193,10 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
               Nadpis a text nahoře, panák dole nad lištou: čte se shora
               a kresba je tečka na konci, ne překážka před textem. */}
           <div className="uvod-list" key={kde}>
-            <h1 className="uvod-nadpis">{vazat(p.nadpis)}</h1>
+            <h1 className="uvod-nadpis">
+              <span>{vazat(p.nadpis[0])}</span>
+              <span>{vazat(p.nadpis[1])}</span>
+            </h1>
             <p className="uvod-telo">{vazat(p.text)}</p>
             <div className="uvod-kresba"><Cmaranice id={p.id} /></div>
           </div>

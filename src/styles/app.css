@@ -1229,7 +1229,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   /* Nadpis nezačíná hned pod značkou: trocha vzduchu nad ním z něj dělá
      titulek plakátu, ne řádek pod logem. */
   --uvod-nad-nadpisem:clamp(8px,6vh,72px);
-  --uvod-text:20px;
+  --uvod-text:17px;
   --uvod-kresba:min(196px,28vh);
   --uvod-pod-panakem:clamp(16px,8vh,90px);
 
@@ -1286,18 +1286,21 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 }
 .uvod-nadpis{
   flex:none;margin:var(--uvod-nad-nadpisem) 0 0;
-  /* O chlup tučnější než čtyřstovka. Kit má jen 400 a 700, a v sedmistovce
-     se široké verzálky Hagridu slévají; tenký obtah přidá zhruba to, co by
-     byla pětistovka. Na telefonu z plochy ho Mišák chtěl „malilinko" víc. */
-  font-weight:400;-webkit-text-stroke:.6px currentColor;font-size:clamp(34px,11vw,46px);line-height:1.02;letter-spacing:-.02em;
-  /* vyrovná délku řádků, ať nezůstane na posledním jedno slovo */
-  text-wrap:balance;
+  /* Tučnější než čtyřstovka. Kit má jen 400 a 700, a v sedmistovce se
+     široké verzálky Hagridu slévají; obtah přidá, co by byla pětistovka až
+     šestistovka. Bylo 0,6 px, Mišák chtěl ještě o něco tučněji. */
+  font-weight:400;-webkit-text-stroke:1.2px currentColor;font-size:clamp(34px,11vw,46px);line-height:1.02;letter-spacing:-.01em;
 }
+/* Dva řádky natvrdo (pribeh.ts): každý řádek je blok a nezalomí se, ať
+   jsou všechny nadpisy na dva řádky, ne jednou na jeden a jednou na tři. */
+.uvod-nadpis span{display:block;white-space:nowrap}
 /* Jeden odstavec v plné krémové. Byl šedý (66 %) a v patnácti bodech, vedle
-   velkého nadpisu se ztrácel; v hospodě po pár pivech se nedal přečíst. */
+   velkého nadpisu se ztrácel; pak dvacítka, a ta vedle nadpisu přes dva
+   řádky křičela stejně jako on. Sedmnáctka v plné krémové se dá přečíst
+   a nadpis zůstane nadpisem. */
 .uvod-telo{
   flex:none;margin:var(--uvod-mezera-text) 0 0;
-  font-family:var(--pismo);font-size:var(--uvod-text);line-height:1.4;
+  font-family:var(--pismo);font-size:var(--uvod-text);line-height:1.45;
   color:var(--text);text-wrap:pretty;
 }
 /* Panák stojí uprostřed volného místa pod textem. Vlevo dole na liště
@@ -1351,7 +1354,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 /* Opravdu malý displej (iPhone SE v Safari má okno kolem 550): tam už se
    zmenší i písmo a panák. */
 @media (max-height:640px){
-  .uvod{--uvod-text:18px;--uvod-kresba:min(150px,22vh)}
+  .uvod{--uvod-text:16px;--uvod-kresba:min(150px,22vh)}
   .uvod-nadpis{font-size:clamp(30px,9.5vw,38px)}
 }
 
