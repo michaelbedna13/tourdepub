@@ -252,8 +252,10 @@ html.rozmazat .obrazovka{filter:blur(5px) brightness(.55)}
    .fab-plachta). Podklad appky ztmavne o stejný kus, jinak by u krajů,
    kam rozostření obsahu nedosáhne, zůstal světlejší pruh. Dřív ho
    schovávala viněta na plachtě. */
-.app{transition:background-color .24s var(--krok)}
-html.rozmazat .app{background-color:color-mix(in srgb,var(--podklad) 55%,#000)}
+.app,html,body{transition:background-color .24s var(--krok)}
+/* Ztmavne i podklad stránky: z něj (a z theme-color, ten přepíná
+   lib/vrstvy.ts) si Safari natírá pruh u stavového řádku. */
+html.rozmazat,html.rozmazat body,html.rozmazat .app{background-color:color-mix(in srgb,var(--podklad) 55%,#000)}
 /* ---------- horní hrana v appce z plochy ---------- */
 /* iOS 26 kreslí v appce přidané na plochu přes horní okraj webového pohledu
    systémové rozostření („scroll edge effect", liquid glass), aby stavová

@@ -12,6 +12,21 @@
 import { useEffect } from "react";
 
 const TRIDA = "rozmazat";
+
+/** Barva pruhu nad stránkou v Safari, když je otevřená vrstva. Je to podklad
+ *  appky ztmavený stejně jako obsah pod vrstvou (--podklad 55 % do černé,
+ *  viz html.rozmazat v app.css). Safari si pruh u stavového řádku natírá
+ *  barvou z theme-color a podkladu stránky; s obsahem ztmaveným a pruhem
+ *  v původní #2B2B23 tam nahoře svítil světlý plný blok. */
+const TMAVA = "#181813";
+let puvodni: string | null = null;
+
+function pruh(tmavy: boolean) {
+  const m = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (!m) return;
+  if (puvodni === null) puvodni = m.content;
+  m.content = tmavy ? TMAVA : puvodni;
+}
 /** Kolik vrstev je zrovna otevřených. Okno se dá otevřít nad detailem,
  *  takže zavření té horní nesmí rozmazání sundat. */
 let otevreno = 0;
@@ -29,9 +44,13 @@ export function useRozmazanePozadi(aktivni = true) {
     if (!aktivni) return;
     otevreno++;
     document.documentElement.classList.add(TRIDA);
+    pruh(true);
     return () => {
       otevreno = Math.max(0, otevreno - 1);
-      if (!otevreno) document.documentElement.classList.remove(TRIDA);
+      if (!otevreno) {
+        document.documentElement.classList.remove(TRIDA);
+        pruh(false);
+      }
     };
   }, [aktivni]);
 }
