@@ -89,7 +89,9 @@ export function Uctenka({ poradi, hospod, ukolu, strop, prepni, uprav }: Props) 
             {i === 0 && p.body > 0 && (
               <span className="uc-razitko" aria-hidden="true">
                 <svg viewBox="0 0 172 60"><path d={RAZITKO} fillRule="evenodd" /></svg>
-                <span>VEDE</span>
+                {/* „Vedou“, ne „vede“: týmy jsou parta lidí v množném
+                    čísle (Zevloni, Hokynáři), „Zevloni vede“ nesedí. */}
+                <span>VEDOU</span>
               </span>
             )}
             {uprav && (
