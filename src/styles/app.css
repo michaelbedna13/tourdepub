@@ -1286,17 +1286,15 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 }
 .uvod-nadpis{
   flex:none;margin:var(--uvod-nad-nadpisem) 0 0;
-  /* Tloušťka: obtah 0,6 a pak 1,2 px na čtyřstovce byl Mišákovi pořád
-     málo, tak je tu skutečná sedmistovka (A). Varianty B a C jsou dočasně
-     na vyzkoušení přes ?nadpis=b / ?nadpis=c, viz VARIANTA_NADPISU.
+  /* Tloušťka: čtyřstovka s obtahem 2 px. Obtah 0,6 a pak 1,2 px byl
+     Mišákovi málo; ze tří variant na telefonu (sedmistovka, čtyřstovka
+     s obtahem 2 px, Black) vybral tuhle.
      Řádkování 1,02 bylo na verzálky s diakritikou málo: háček v Ň druhého
      řádku narážel do prvního (Mišákův screenshot, „Od špeluňky ke špeluňce“).
      Písmo o chlup menší (10,5 vw místo 11), ať se tučnější „Od špeluňky“
      vejde: v 400 s obtahem měl řádek na telefonu 296 z 337 bodů. */
-  font-weight:700;font-size:clamp(32px,10.5vw,44px);line-height:1.14;letter-spacing:0;
+  font-weight:400;-webkit-text-stroke:2px currentColor;font-size:clamp(32px,10.5vw,44px);line-height:1.14;letter-spacing:.01em;
 }
-.uvod[data-nadpis="b"] .uvod-nadpis{font-weight:400;-webkit-text-stroke:2px currentColor;letter-spacing:.01em}
-.uvod[data-nadpis="c"] .uvod-nadpis{font-family:"hagrid-black",var(--nadpisy);font-weight:900;font-size:clamp(30px,9.4vw,40px)}
 /* Dva řádky natvrdo (pribeh.ts): každý řádek je blok, ať jsou všechny
    nadpisy na dva řádky. Zalomit se uvnitř smí: kdyby se tučný řez na úzkém
    telefonu nevešel, je lepší třetí řádek než useknuté písmeno. */

@@ -39,19 +39,6 @@ const ZAVRENI = 300;
 const KRESBY_KAPITOL = ["sraz", "hospoda", "beh", "zed", "vitez"] as const;
 const PLAKATY = PRIBEH.map((k, i) => ({ ...k, id: KRESBY_KAPITOL[i] }));
 
-/** DOČASNÉ: varianta tloušťky nadpisu na vyzkoušení na telefonu
- *  (?nadpis=b nebo ?nadpis=c v adrese). Hagrid se v testech nenačte, takže
- *  se tloušťka nedá vybrat ze screenshotu odsud. Až Mišák vybere, přepínač
- *  pryč a vybraná varianta do .uvod-nadpis. */
-const VARIANTA_NADPISU = (() => {
-  try {
-    const v = new URLSearchParams(location.search).get("nadpis");
-    return v === "b" || v === "c" ? v : "a";
-  } catch {
-    return "a";
-  }
-})();
-
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
  *  nadvakrát (nejdřív logo, pak podklad), tohle je obojí dohromady.
  *  Drží se #uvod.odchazi v index.html. */
@@ -189,7 +176,6 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
 
   return (
     <div className={`uvod${zavira ? " zavira" : ""}${kde >= 0 ? " jede" : " znacka"}`}
-      data-nadpis={VARIANTA_NADPISU}
       role="dialog" aria-label="Úvod">
       {kde >= 0 && (
         /* Ťuká se do obrazovky, ne do tlačítka: vpravo dál, vlevo zpátky.
