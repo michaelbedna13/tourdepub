@@ -1,6 +1,6 @@
 # Tour de Pub — Brno edition
 
-Web ke hře: devět brněnskejch špeluněk, 23 úkolů a počítání čárek.
+Web ke hře: betelná řežba přes brněnský špeluňky, srandy za čárky a kotel pro vítěze.
 Staví se na mobil do ruky v hospodě — velké terče, vysoký kontrast, hlavní akce dole
 na dosah palce. Na počítači stojí uprostřed na ploše.
 
