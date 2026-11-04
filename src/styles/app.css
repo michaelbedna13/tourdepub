@@ -1231,6 +1231,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   --uvod-nad-nadpisem:clamp(8px,6vh,72px);
   --uvod-text:22px;
   --uvod-kresba:min(196px,25vh);
+  --uvod-pod-panakem:clamp(16px,8vh,90px);
 
   position:fixed;inset:0;z-index:120;
   background:var(--podklad);color:var(--text);
@@ -1262,14 +1263,14 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .uvod-hlava{flex:none;display:flex;align-items:center;justify-content:space-between;
   gap:16px;width:100%;max-width:var(--uvod-sirka);padding-bottom:var(--uvod-mezera-blok)}
 .uvod-znak{height:30px;width:auto;display:block;color:var(--text)}
-/* Přeskočit je slovo, ne verzálková cedulka: podtržené jako odkaz, ať je
-   jasné, že se na to dá ťuknout. */
+/* Přeskočit je tiché slovo v rohu. Podtržené v plné krémové vedle značky
+   vážilo skoro tolik co nadpis a s lištou dole plakát zavíralo do rámečku.
+   Terč zůstává 44 bodů, jen písmo je drobné. */
 .uvod-preskocit{min-height:44px;padding:0 14px;margin:-10px -14px;
-  font-size:15px;color:var(--text);opacity:.8;touch-action:manipulation;
-  text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
-.uvod-preskocit:active{opacity:1}
+  font-size:13px;color:var(--text-3);touch-action:manipulation}
+.uvod-preskocit:active{color:var(--text)}
 
-/* Plakát: nadpis a souvislý odstavec nahoře, panák dole vlevo nad lištou.
+/* Plakát: nadpis a souvislý odstavec nahoře, panák pod nimi.
    Podle plakátů Wosetu, které Mišák poslal: velký text zarovnaný vlevo,
    kresba malá a stranou, hodně vzduchu. Dřív byla kresba nahoře uprostřed,
    pod ní nadpis a drobný šedý text rozsekaný na štítky. Četlo se to jako
@@ -1296,36 +1297,43 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   font-family:var(--pismo);font-size:var(--uvod-text);line-height:1.34;
   color:var(--text);text-wrap:pretty;
 }
-/* Panák stojí na liště. Výšku má pevnou, ať je na všech plakátech stejně
+/* Panák stojí uprostřed volného místa pod textem. Vlevo dole na liště
+   dělal se spodkem roh, který plakát zavíral; uprostřed kolem sebe má
+   vzduch ze všech stran. Výšku má pevnou, ať je na všech plakátech stejně
    velký, ale smí se stáhnout, když delší text potřebuje místo: na krátkém
    okně je to lepší než text podlezlý pod ceduli. */
 .uvod-kresba{
-  flex:0 1 var(--uvod-kresba);min-height:96px;margin-top:auto;
+  /* Ukotvený odspodu na pevnou vzdálenost, ne na střed volného místa:
+     na střed se posouval podle délky textu (510 vs 524 bodů na 852)
+     a při listování poskakoval. */
+  flex:0 1 var(--uvod-kresba);min-height:96px;margin:auto 0 var(--uvod-pod-panakem);
   padding-top:var(--uvod-mezera-text);
-  display:flex;align-items:flex-end;justify-content:flex-start;color:var(--cervena);
+  display:flex;align-items:center;justify-content:center;color:var(--cervena);
 }
 /* Výška plní rámeček, šířka se dopočítá: panák je pokaždé stejně vysoký,
    ať drží cokoli vedle sebe. */
 .uvod-cmaranice{height:100%;width:auto;max-width:100%;display:block}
 
-/* Spodek: kolikátý plakát vlevo, cedule „ťukni dál" vpravo. */
+/* Spodek: zpátky vlevo, kolikátý plakát uprostřed, dál vpravo. Všechno
+   drobné a ztlumené. Plné krémové čárky a „Dál" v patnácti bodech dělaly
+   ze spodku druhou hlavičku a plakát nedýchal. */
 .uvod-spodek{flex:none;display:flex;align-items:center;justify-content:space-between;
-  gap:14px;width:100%;max-width:var(--uvod-sirka);padding-top:var(--uvod-mezera-blok)}
-.uvod-tecky{display:flex;gap:6px;flex:none}
-.uvod-tecka{width:22px;height:4px;border-radius:2px;
-  background:color-mix(in srgb,var(--text) 22%,transparent);
+  gap:14px;width:100%;max-width:var(--uvod-sirka);padding-top:12px}
+.uvod-tecky{display:flex;gap:5px;flex:none}
+.uvod-tecka{width:5px;height:5px;border-radius:50%;
+  background:color-mix(in srgb,var(--text) 18%,transparent);
   transition:background .25s var(--krok)}
-.uvod-tecka.bylo{background:color-mix(in srgb,var(--text) 46%,transparent)}
-.uvod-tecka.ted{background:var(--text)}
+.uvod-tecka.bylo{background:color-mix(in srgb,var(--text) 34%,transparent)}
+.uvod-tecka.ted{background:var(--text-2)}
 /* Nejsou to tlačítka: ťuká se do obrazovky, vlevo zpátky, vpravo dál.
-   Cedule jen říkají, co se stane, a drží čárky uprostřed. */
-.uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
-  font-size:15px;color:var(--text)}
-.uvod-zpet{display:flex;align-items:center;flex:none;color:var(--text);opacity:.4}
-/* Na prvním plakátu nemá kam vést, ale místo si drží — bez toho by čárky
+   Cedule jen říkají, co se stane. */
+.uvod-dal{display:flex;align-items:center;gap:7px;flex:none;
+  font-size:13px;color:var(--text-2)}
+.uvod-zpet{display:flex;align-items:center;flex:none;color:var(--text-3)}
+/* Na prvním plakátu nemá kam vést, ale místo si drží, jinak by tečky
    uprostřed při listování poskakovaly. */
 .uvod-zpet.nikam{visibility:hidden}
-.uvod-sipka{width:24px;height:10px;flex:none}
+.uvod-sipka{width:18px;height:8px;flex:none}
 
 /* Na krátkém displeji se stáhne všechno naráz: menší nadpis, menší text,
    menší panák. Pořád to dýchá, jen míň. */

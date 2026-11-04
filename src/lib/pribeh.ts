@@ -20,22 +20,22 @@ export interface Kapitola {
 export const PRIBEH: Kapitola[] = [
   {
     nadpis: "Sraz ve štatlu",
-    text: "Šest večer, zoncna zalezla a ve štatlu se schází parta ogarů a holek, co to v palici nemají vypatlaný. Každej hodí kilo do kotla, rozpadnete se do dvou až tří partyjí a začíná betelná řežba.",
+    text: "Šest večer, zoncna zalezla a ve štatlu se schází parta ogarů a holek, co to v palici nemají vypatlaný. Každej hodí kilo do kotla, rozdělíte se do dvou až tří partyjí a první škopek se ťukne na zdar.",
   },
   {
     nadpis: "Na trase",
-    text: "Před váma je trasa přes brněnský špeluňky, jedna za druhou. Valí se to celej večer až do dvou do rána. Co se zvrtne potom, to už nikdo nepočítá. Ani čárky.",
+    text: "Pak se valí od jedný špeluňky k druhý, celou trasu přes štatl až do dvou do rána. Co se zvrtne potom, už se do čárek nepočítá. Ani když je to ta nejlepší historka večera.",
   },
   {
     nadpis: "Žádný courání",
-    text: "Na každou štaci máte tak tři čtvrtě hodiny, pak se zvedá kotva. Kdo se loudá jak šnek a ty druhý na něj musí čumět, nemá v té špeluňce za srandy ani čárku.",
+    text: "Na každou štaci máte tak tři čtvrtě hodiny. Kdo se fest loudá a ostatní na něj musí venku čumět, ten v té špeluňce za srandy čárku nedostane. Takže dopít a mazat dál.",
   },
   {
-    nadpis: "Čárky na zeď",
-    text: "Čárka padá za každou špeluňku, kam vlezete, a za škopek, co lupne aspoň půlka partyje. Ty nejlepší ale padají za srandy: v appce čekají úkoly od brnkačky po betelnou makačku a čím větší haluz, tím víc čárek.",
+    nadpis: "Za co čárky",
+    text: "Čárka padá za každou špeluňku, kam vlezete, a další za škopek, co v ní lupne aspoň půlka partyje. Nejvíc se ale nahrabe za srandy. Úkoly nosíte v kapse, od brnkaček po betelný makačky, a čím větší haluz, tím víc čárek.",
   },
   {
-    nadpis: "Celej bank",
-    text: "Ve dvě ráno se sečte, kdo má na zdi nejvíc čárek. Ta partyje bere titul Tour De Pub i celej kotel, všechny love só jejich. Ostatní si aspoň můžou říct, že to byla betelná řežba.",
+    nadpis: "Konečná",
+    text: "Ve dvě ráno se sečtou čárky. Partyje, co jich nahrabala nejvíc, bere titul Tour De Pub i celej kotel, všechny love só jejich. Ty ostatní si odnesou aspoň historky na celej rok.",
   },
 ];

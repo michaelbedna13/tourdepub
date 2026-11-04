@@ -33,10 +33,10 @@ const PISMA_NEJVIC = 2500;
 const ZAVRENI = 300;
 
 /** Pět plakátů, pět kapitol jednoho večera (lib/pribeh.ts). Ke každé
- *  patří panák, co ji hraje: tančí na srazu, drží budík, táhne šneka,
- *  píše čárky, opírá se o pytel. Kresby jdou ve stejném pořadí jako
- *  kapitoly. */
-const KRESBY_KAPITOL = ["tanec", "cajk", "courani", "zapis", "bank"] as const;
+ *  patří panák, co ji hraje: ťuká si škopkem, visí na lucerně, běží
+ *  s pivem, píše čárky na tabuli, skáče s pohárem. Kresby jdou ve stejném
+ *  pořadí jako kapitoly. */
+const KRESBY_KAPITOL = ["sraz", "lucerna", "beh", "zed", "vitez"] as const;
 const PLAKATY = PRIBEH.map((k, i) => ({ ...k, id: KRESBY_KAPITOL[i] }));
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází

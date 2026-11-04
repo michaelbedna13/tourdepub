@@ -12,7 +12,7 @@
 //
 // Spuštění: node scripts/kresli-uvod.mjs (bez závislostí; náhodnost je pevná)
 import { writeFileSync } from "node:fs";
-import { nasad, cut, ell, rect, rot, srpek as usmev, stroke } from "./cary.mjs";
+import { nasad, cut, ell, rect, rot, srpek as usmev, star, stroke } from "./cary.mjs";
 
 const I = (d) => ["i", d], C = (d) => ["c", d];
 // Mírnější kymácení než u ikon. Amplituda je v souřadnicích čtverce, takže
@@ -111,104 +111,159 @@ function chodidlo(x, y, smer) {
 
 const kus = (pts, w = 4.6) => I(cut(tah(pts, w), TAH));
 
+/** Hlava nasazená na krk: spočítá, kam dát horní hranu obličeje, aby brada
+ *  seděla přesně na (kx, ky) i při naklonění. */
+function hlavaK(kx, ky, uhel = -9, m = 1.45) {
+  const a = (uhel * Math.PI) / 180, bx = 3 * m, by = 19 * m;
+  return hlava(kx - (bx * Math.cos(a) - by * Math.sin(a)), ky - (bx * Math.sin(a) + by * Math.cos(a)), uhel, m);
+}
+
+/** Celý panák z polohy. Body jsou absolutní; trup = [krk, …, kyčel].
+ *  ruce/nohy = lomené čáry, dlane/chodidla = [x, y, směr]. */
+function panak({ trup, ruce = [], nohy = [], dlane = [], chodidla = [], hlava: h = -9 }) {
+  const [kx, ky] = trup[0];
+  return [
+    ...nohy.map((n) => kus(n, [5.6, 5.2, 4.8, 4.4].slice(0, n.length))),
+    ...chodidla.flatMap(([x, y, sm]) => chodidlo(x, y, sm)),
+    kus(trup, [5, 5.2, 5.4, 5.6].slice(0, trup.length)),
+    ...ruce.map((r) => kus(r, [4.6, 4.3, 4, 3.7].slice(0, r.length))),
+    ...dlane.flatMap(([x, y, sm]) => dlan(x, y, sm)),
+    ...hlavaK(kx, ky, h),
+  ];
+}
+
+/** Zrcadlí vrstvy kolem svislé osy x = o. Dráhy z cut() jsou samé dvojice
+ *  čísel, takže stačí přepsat každé x. */
+const zrcadli = (vrstvy, o = 50) => vrstvy.map(([druh, d]) => [druh,
+  d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${Math.round((2 * o - x) * 10) / 10} ${y}`)]);
+
+/** Škopek s pěnou a uchem. (x, y) je střed sklenice, uhel ji naklání. */
+function skopek(x, y, uhel = 0, m = 1) {
+  const u = (pts) => umisti(pts, x, y, uhel, m);
+  return [
+    I(cut(u(ell(5.4, 0, 3.8, 3.8, 14)), PRST)),
+    C(cut(u(ell(5.6, 0, 1.9, 1.9, 10)), PRST)),
+    I(cut(u(rect(-4.2, -5, 4.2, 6.5, 1.2)), PRST)),
+    I(cut(u(ell(0, -5.4, 5.4, 2.6, 16)), PRST)),
+    C(cut(u(tah([[-1.6, -1.5], [-1.6, 4.2]], 1.2)), PRST)),
+    C(cut(u(tah([[1.4, -1.5], [1.4, 4.2]], 1.2)), PRST)),
+  ];
+}
+
+/** Krátké čárky kolem něčeho: ťuknutí, záblesk, kapky. */
+const jiskry = (x, y, r1, r2, uhly, w = 2.2) =>
+  uhly.map((st) => { const a = (st * Math.PI) / 180;
+    return I(cut(tah([[x + Math.cos(a) * r1, y + Math.sin(a) * r1], [x + Math.cos(a) * r2, y + Math.sin(a) * r2]], [w, w * .7]), PRST)); });
+
 // Z těchhle se do appky dostane jen to, co je v POUZITE. Zbytek zůstává
 // tady jako zdroj: kreslilo se to pro starou průpravu přes čtyři plakáty
 // a může se to hodit, ale vozit čtyři nepoužité kresby v balíku je zbytečné.
 const KRESBY = {
 
-  // Jak se to valí: panák drží budík na natažené ruce, druhou má v bok.
-  // Ručičky ukazujou šest a dvě, tedy ten cajk, o kterém kapitola je.
-  cajk: () => [
-    kus([[42, 35], [43, 47], [46, 62]], [5, 5.2, 5.6]),
-    kus([[43, 43], [55, 40], [66, 37]], [4.6, 4.4, 4]),
-    kus([[42, 45], [33, 51], [39, 59]], [4.6, 4.2, 4]),
-    kus([[46, 61], [40, 76], [36, 90]], [5.6, 5.2, 4.6]),
-    ...chodidlo(36, 91, 185),
-    kus([[46, 61], [54, 76], [58, 90]], [5.6, 5.2, 4.6]),
-    ...chodidlo(58, 91, -5),
-    ...hlava(35, 10, -9, 1.45),
-    I(cut(ell(74, 13, 5.5, 4.5, 14), PRST)),
-    I(cut(ell(92, 13, 5.5, 4.5, 14), PRST)),
-    C(cut(ell(83, 30, 16, 16, 24), TAH)),
-    I(cut(ell(83, 30, 14, 14, 24), { amp: .5, step: 3, tension: .42 })),
-    C(cut(tah([[83, 30], [83, 40]], [2.6, 2]), PRST)),
-    C(cut(tah([[83, 30], [91, 25]], [2.6, 2]), PRST)),
-    ...dlan(68, 36, -10, 5),
-  ],
-
-  // Žádný courání: panák táhne šneka na šňůře. Dva tvary od sebe,
-  // spojené jen tenkou čárou, takže se nic neslije.
-  courani: () => [
-    kus([[66, 34], [63, 48], [59, 62]], [5, 5.2, 5.6]),
-    kus([[64, 42], [74, 49], [82, 45]], [4.6, 4.2, 3.8]),
-    ...dlan(84, 44, -30, 5),
-    kus([[63, 44], [53, 51], [44, 56]], [4.6, 4.2, 3.8]),
-    kus([[59, 61], [69, 75], [74, 89]], [5.6, 5.2, 4.6]),
-    ...chodidlo(74, 90, -5),
-    kus([[59, 61], [52, 75], [45, 87]], [5.6, 5.2, 4.6]),
-    ...chodidlo(45, 88, 175),
-    ...hlava(59, 10, -4, 1.45),
-    I(cut(ell(42, 57, 2.6, 2.6, 10), PRST)),
-    // šňůra: prověšená, tenká, ať je jasné, že to táhne
-    I(cut(tah([[42, 57], [36, 66], [31, 72], [28, 76]], 1.7), PRST)),
-    // šnek
-    I(cut([[0, 92], [5, 85], [18, 82], [28, 80], [33, 84], [32, 90], [24, 93], [6, 94]], { amp: .6, step: 3, tension: .42 })),
-    I(cut(tah([[29, 81], [32, 70]], [2.6, 2]), PRST)),
-    I(cut(tah([[26, 81], [25, 71]], [2.6, 2]), PRST)),
-    I(cut(ell(32.4, 69, 2, 2, 10), PRST)),
-    I(cut(ell(25, 70, 2, 2, 10), PRST)),
-    C(cut(ell(14, 76, 14, 14, 22), TAH)),
-    I(cut(ell(14, 76, 12, 12, 22), { amp: .5, step: 3, tension: .42 })),
-    C(cut(ell(14, 76, 8, 8, 18), PRST)),
-    I(cut(ell(14, 76, 5, 5, 16), PRST)),
-    C(cut(ell(14, 76, 1.8, 1.8, 10), PRST)),
-  ],
-
-  // Bodování: panák dělá křídou poslední čárku přes pětku na zdi.
-  zapis: () => [
-    kus([[31, 35], [32, 48], [34, 62]], [5, 5.2, 5.6]),
-    kus([[32, 43], [45, 47], [57, 48]], [4.6, 4.2, 3.8]),
-    ...dlan(59, 48, -15, 5),
-    kus([[31, 46], [25, 55], [23, 64]], [4.6, 4.2, 3.6]),
-    ...dlan(22, 66, 105),
-    kus([[34, 61], [27, 76], [23, 90]], [5.6, 5.2, 4.6]),
-    ...chodidlo(23, 91, 185),
-    kus([[34, 61], [41, 76], [44, 90]], [5.6, 5.2, 4.6]),
-    ...chodidlo(44, 91, -5),
-    ...hlava(24, 10, -9, 1.45),
-    I(cut(tah([[70, 18], [69, 58]], [5, 4.4]), TAH)),
-    I(cut(tah([[78, 17], [78, 58]], [5, 4.4]), TAH)),
-    I(cut(tah([[86, 17], [87, 58]], [5, 4.4]), TAH)),
-    I(cut(tah([[94, 18], [96, 58]], [5, 4.4]), TAH)),
-    C(cut(tah([[100, 26], [63, 48]], 8.5), TAH)),
-    I(cut(tah([[100, 26], [63, 48]], [4.4, 5]), TAH)),
-  ],
-
-  // Celej bank: panák se opírá o pytel prachů. Ten je jeho.
-  bank: () => {
-    const T = (pts) => pts.map(([x, y]) => [48 + x * .56, 40 + y * .56]);
+  // Sraz: dva panáci si ťukají škopkem. Druhý je zrcadlo prvního, ale
+  // v jiné poloze, ať to nevypadá jako odraz v okně. Stojí od sebe tak,
+  // aby se vějíře vlasů nedotkly, a škopky se potkají mezi nima.
+  sraz: () => {
+    const levy = (x) => x - 8;
+    const posun = (body) => body.map(([x, y]) => [levy(x), y]);
     return [
-      I(cut(T(ell(40, 12, 11, 9, 18)), PRST)),
-      I(cut(T(ell(61, 10, 10, 8, 18)), PRST)),
-      I(cut(T(rect(34, 18, 67, 32, 4)), PRST)),
-      C(cut(T(rect(32, 24, 69, 28, 2)), PRST)),
-      I(cut(T([[38, 30], [20, 43], [11, 62], [14, 80], [30, 93], [50, 96],
-               [70, 93], [86, 80], [89, 62], [80, 43], [63, 30]]), { amp: .9, step: 4, tension: .42 })),
-      C(cut(T(ell(50, 60, 13, 12, 20)), PRST)),
-      I(cut(T(ell(50, 60, 8, 7, 18)), PRST)),
-      // spára kolem panáka, kde se o pytel opírá
-      C(cut(tah([[33, 43], [45, 47], [56, 66]], 8), TAH)),
-      kus([[31, 35], [32, 48], [34, 62]], [5, 5.2, 5.6]),
-      kus([[33, 43], [45, 47], [55, 64]], [4.6, 4.2, 3.8]),
-      ...dlan(56, 67, 80, 5),
-      kus([[31, 46], [22, 52], [28, 59]], [4.6, 4.2, 4]),
-      kus([[34, 61], [27, 76], [23, 90]], [5.6, 5.2, 4.6]),
-      ...chodidlo(23, 91, 185),
-      kus([[34, 61], [40, 76], [42, 90]], [5.6, 5.2, 4.6]),
-      ...chodidlo(42, 91, -5),
-      ...hlava(24, 10, -9, 1.45),
+      ...panak({
+        trup: posun([[26, 36], [27, 49], [29, 62]]),
+        ruce: [posun([[27, 43], [37, 42], [46, 33]]), posun([[26, 45], [18, 51], [24, 58]])],
+        nohy: [posun([[29, 61], [23, 76], [20, 90]]), posun([[29, 61], [36, 75], [38, 90]])],
+        chodidla: [[levy(20), 91, 185], [levy(38), 91, -5]], hlava: -6,
+      }),
+      ...skopek(levy(48), 29, 22),
+      ...zrcadli([
+        ...panak({
+          trup: posun([[27, 37], [27, 50], [28, 63]]),
+          ruce: [posun([[28, 44], [37, 43], [46, 33]]), posun([[26, 46], [18, 40], [13, 31]])],
+          nohy: [posun([[28, 62], [20, 72], [22, 86], [18, 91]]), posun([[28, 62], [34, 76], [34, 90]])],
+          chodidla: [[levy(17), 92, 190], [levy(34), 91, -10]], dlane: [[levy(12), 29, -110]], hlava: -2,
+        }),
+        ...skopek(levy(48), 29, 22),
+      ]),
+      ...jiskry(50, 22, 5, 11, [-90, -130, -50]),
     ];
   },
+
+  // Na trase: panák visí na lucerně se škopkem v ruce, nohy zakřížené.
+  // Lucerna je štatl v noci: jedna čára, rameno a stínítko. Stojí tak
+  // daleko, aby jí vějíř vlasů nepíchal do obličeje; ruka ji drží.
+  lucerna: () => [
+    I(cut(tah([[84, 98], [84, -2]], [4.4, 3.4]), TAH)),
+    I(cut(tah([[84, -1], [85, -8], [91, -11], [100, -10]], [3.2, 3, 2.8, 2.6]), TAH)),
+    I(cut([[94, -9], [106, -9], [109, 0], [91, 0]], { amp: .4, step: 3, tension: .42 })),
+    I(cut(rect(77, 94, 91, 99, 1.5), PRST)),
+    ...jiskry(100, 1, 5, 10, [60, 90, 120], 1.8),
+    ...panak({
+      trup: [[50, 37], [47, 50], [44, 63]],
+      ruce: [[[51, 43], [62, 40], [74, 41], [84, 44]], [[49, 45], [40, 44], [33, 36]]],
+      nohy: [[[44, 62], [49, 76], [54, 90]], [[44, 62], [44, 77], [37, 91]]],
+      chodidla: [[55, 91, -5], [37, 92, 185]], hlava: 6,
+    }),
+    ...skopek(31, 31, -14),
+  ],
+
+  // Žádný courání: panák běží, předklon, škopek před sebou, pěna
+  // odlétá. Čárky za ním říkají, že to valí.
+  beh: () => [
+    ...[[[4, 42], [20, 42]], [[0, 54], [18, 54]], [[8, 66], [22, 66]]].map((t) => I(cut(tah(t, [2.8, 2]), PRST))),
+    ...panak({
+      trup: [[52, 36], [47, 49], [42, 61]],
+      ruce: [[[51, 43], [60, 50], [69, 45]], [[49, 45], [40, 50], [35, 42]]],
+      nohy: [[[42, 60], [56, 67], [54, 83]], [[42, 60], [34, 73], [22, 79]]],
+      chodidla: [[54, 84, 5], [21, 79, 230]], dlane: [[34, 40, 230]], hlava: 18,
+    }),
+    ...skopek(73, 42, 12),
+    I(cut(ell(80, 31, 2.2, 2.2, 10), PRST)),
+    I(cut(ell(85, 36, 1.6, 1.6, 10), PRST)),
+    I(cut(ell(76, 26, 1.5, 1.5, 10), PRST)),
+  ],
+
+  // Čárky na tabuli: hospodská tabule, čárky jsou vystřižené jako křída.
+  // Panák k ní natahuje ruku a dotahuje škrt přes pětku; ruka má kolem
+  // sebe spáru, jinak by se na tabuli ztratila.
+  zed: () => [
+    I(cut(rect(54, 12, 100, 64, 2.5), { amp: .6, step: 4, tension: .42 })),
+    I(cut(tah([[60, 64], [57, 92]], 3.4), PRST)),
+    I(cut(tah([[94, 64], [97, 92]], 3.4), PRST)),
+    C(cut(tah([[66, 22], [65, 54]], [3.6, 3.2]), PRST)),
+    C(cut(tah([[74, 21], [74, 54]], [3.6, 3.2]), PRST)),
+    C(cut(tah([[82, 21], [83, 54]], [3.6, 3.2]), PRST)),
+    C(cut(tah([[90, 22], [91, 54]], [3.6, 3.2]), PRST)),
+    C(cut(tah([[63, 47], [94, 27]], [3.2, 3.6]), PRST)),
+    C(cut(tah([[33, 44], [48, 47], [62, 47]], 9.5), TAH)),
+    C(cut(ell(64, 47, 6.5, 6.5, 14), PRST)),
+    ...panak({
+      trup: [[31, 37], [32, 50], [34, 63]],
+      ruce: [[[32, 44], [46, 47], [60, 47]], [[31, 46], [24, 54], [20, 62]]],
+      nohy: [[[34, 62], [27, 77], [24, 91]], [[34, 62], [41, 77], [44, 91]]],
+      chodidla: [[24, 92, 185], [44, 92, -5]], hlava: -12,
+    }),
+    I(cut(rect(60, 44, 66, 49, 1), PRST)),
+    ...skopek(18, 65, -6),
+  ],
+
+  // Konečná: vítěz ve skoku, ruce do V, v jedné pohár vysoko nad hlavou.
+  // Stín pod ním říká, že je ve vzduchu.
+  vitez: () => [
+    I(cut(ell(48, 99, 15, 1.8, 18), PRST)),
+    ...panak({
+      trup: [[48, 40], [47, 53], [48, 66]],
+      ruce: [[[47, 46], [37, 37], [27, 27]], [[49, 46], [62, 38], [76, 26]]],
+      nohy: [[[48, 65], [39, 73], [41, 86]], [[48, 65], [58, 71], [62, 84]]],
+      chodidla: [[41, 87, 170], [62, 85, 10]], dlane: [[26, 25, -130]], hlava: -8,
+    }),
+    // pohár: kalich, dvě ucha, noha a podstavec; drží ho za podstavec
+    I(cut(ell(70, 2, 3.6, 3.6, 12), PRST)), C(cut(ell(70, 2, 1.8, 1.8, 10), PRST)),
+    I(cut(ell(90, 2, 3.6, 3.6, 12), PRST)), C(cut(ell(90, 2, 1.8, 1.8, 10), PRST)),
+    I(cut([[70, -3], [90, -3], [88, 5], [83, 10], [77, 10], [72, 5]], { amp: .4, step: 3, tension: .42 })),
+    C(cut(star(80, 2.5, 3.6, 1.6, 5), PRST)),
+    I(cut(tah([[80, 9], [80, 16]], 3), PRST)),
+    I(cut(rect(74, 15, 86, 19.5, 1.2), PRST)),
+    I(cut(tah([[76, 26], [79, 19]], 3.6), PRST)),
+  ],
 
   // Betelná řežba: panák, co to roztočil. Předloha od Mišáka skoro tah
   // po tahu: ruka nahoru s roztaženou dlaní, druhá dolů, nohy v podřepu.
@@ -336,7 +391,7 @@ const KRESBY = {
 };
 
 /** Co se opravdu zapisuje do src/lib/uvod-kresby.ts. */
-const POUZITE = ["tanec", "cajk", "courani", "zapis", "bank"];
+const POUZITE = ["sraz", "lucerna", "beh", "zed", "vitez"];
 
 /** Obálka kresby: nejmenší rámeček, do kterého se vejde inkoust.
  *
