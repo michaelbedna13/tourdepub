@@ -14,8 +14,13 @@ export const TABULKA = "tourdepub_tymy";
 // Název hry. Když byste chtěli hrát víckrát, změň ho a ročníky se nebudou míchat.
 export const HRA = "brno-2026";
 
-// Kód, kterým se odemknou úpravy úkolů a hospod. Kdo ho nezadá, může jenom hrát.
-// POZOR: je to zámek proti omylu a zvědavosti, ne bezpečnost. Web je veřejný
-// a statický, takže kdo se podívá do zdrojáku, kód si přečte. Na partu kamarádů
-// to stačí; kdyby mělo jít o víc, musela by přibýt opravdová práva v databázi.
-export const ADMIN_KOD = "sladek";
+// Přihlášení. Do hry se pouští jen ten, kdo zná heslo hry; heslo neověřuje
+// appka, ale Supabase Auth, takže ve zdrojáku není k přečtení. Jsou to dva
+// účty v projektu osobni-aplikace a obě adresy jsou jen jména účtů, pošta
+// na ně nechodí:
+//  - společný účet hráčů: heslo hry zná celá parta,
+//  - účet správce: odemkne úpravy úkolů a hospod a jako jediný smí mazat týmy.
+// Kdo smí co, rozhoduje role v app_metadata účtu („hrac“ / „spravce“), na kterou
+// se ptají pravidla v supabase/party.sql. Tu prohlížeč změnit neumí.
+export const EMAIL_HRACE = "tourdepub-hrac@betelnarezba.cz";
+export const EMAIL_SPRAVCE = "tourdepub-spravce@betelnarezba.cz";

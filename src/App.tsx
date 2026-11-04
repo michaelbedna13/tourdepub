@@ -5,9 +5,11 @@ import { Ramy } from "./components/Ramy";
 import { FabMenu } from "./components/FabMenu";
 import { Natoc } from "./components/Natoc";
 import { Uvod } from "./components/Uvod";
+import { Brana } from "./components/Brana";
 import { KATEGORIE } from "./lib/data";
 import { useSvih } from "./lib/svih";
-import { spustSync } from "./lib/sync";
+import { useUcet } from "./lib/prihlaseni";
+import { spustSync, zastavSync } from "./lib/sync";
 import { Hospody } from "./obrazovky/Hospody";
 import { Hra } from "./obrazovky/Hra";
 import { Kategorie } from "./obrazovky/Kategorie";
@@ -23,14 +25,21 @@ export function App() {
   // Appka se pod ním už kreslí a připojuje, takže po doběhnutí je hned hotová.
   const [uvod, setUvod] = useState(true);
 
-  useEffect(() => { spustSync(); }, []);
+  // Živé pořadí jede až pod přihlášeným účtem; bez něj server do tabulky
+  // nepustí. Bez nastaveného serveru běží appka jen z telefonu jako dřív.
+  const ucet = useUcet();
+  const venku = ucet === "venku";
+  useEffect(() => {
+    if (ucet === "hrac" || ucet === "spravce") spustSync();
+    else zastavSync();
+  }, [ucet]);
 
   return (
     <HashRouter>
       <Natoc />
       {uvod && <Uvod hotovo={() => setUvod(false)} />}
       <PotvrzeniHost />
-      <Routes>
+      {venku ? <Brana /> : <Routes>
         <Route element={<Kostra />}>
           <Route index element={<Hra />} />
           <Route path="ukoly" element={<Ukoly />} />
@@ -41,7 +50,7 @@ export function App() {
           {/* stará adresa z oblíbených nebo překlep – ať to nespadne na prázdnou stránku */}
           <Route path="*" element={<Hra />} />
         </Route>
-      </Routes>
+      </Routes>}
     </HashRouter>
   );
 }

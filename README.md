@@ -25,7 +25,8 @@ src/components/         Ikona, Čárky, Obtížnost, Hlava, Menu, Okno, Úvod, �
 src/lib/stav.ts         týmy, hospody, úkoly, bodování a ukládání
 src/lib/data.ts         VÝCHOZÍ hospody a úkoly (startovní sada, dál se mění v appce)
 src/lib/sync.ts         živé pořadí přes Supabase (volitelné)
-src/lib/nastaveni.ts    klíče k Supabase, název tabulky, název hry a kód správce
+src/lib/nastaveni.ts    klíče k Supabase, název tabulky, název hry a účty hry
+src/lib/prihlaseni.ts   přihlášení heslem hry a heslem správce (Supabase Auth)
 src/lib/format.ts       skloňování a vázání krátkých slov
 src/lib/ikony.ts        ZÁSTUPNÉ — generuje scripts/kresli-ikony.mjs, needitovat ručně
 src/lib/logo.ts         ZÁSTUPNÉ — generuje scripts/prevod-loga.py, needitovat ručně
@@ -51,13 +52,17 @@ k ničemu. Stejně je na tom `sync.ts` (`useSync()`) a `spravce.ts` (`useSpravce
 
 ### Kdo smí upravovat
 
-Hra je otevřená — kdo přijde na odkaz, vybere si tým a hraje. **Úpravy úkolů
-a hospod se objeví až po zadání kódu** v Pravidlech → Režim správce. Kód je
-`ADMIN_KOD` v `src/lib/nastaveni.ts`, uloží se v prohlížeči a přežije zavření.
+Při prvním spuštění chce appka **heslo hry**. Je to heslo společného účtu party
+v Supabase Auth, ověřuje ho server, ne appka, a telefon si přihlášení pamatuje.
+Bez něj server do tabulky nikoho nepustí (pravidla v `supabase/party.sql`).
 
-Je to zámek proti omylu, **ne bezpečnost**. Web je statický a veřejný, takže kdo
-se podívá do zdrojáku, kód si přečte. Brání tomu, aby někdo omylem přepsal úkoly
-uprostřed hry. Kdyby mělo jít o víc, musela by přibýt opravdová práva v databázi.
+**Úpravy úkolů a hospod a mazání týmů** odemkne v Pravidlech → Režim správce
+**heslo správce**, druhý účet. Mazat týmy na serveru dovolí pravidla jen jemu,
+ať appka ukazuje cokoli. Vypnutí režimu správce účet neodhlásí, jen schová úpravy.
+
+Hesla se mění v Supabase → Authentication → Users. Kdo už je přihlášený, zůstane
+přihlášený i po změně hesla; vyhodit všechny jde přes „Sign out user" u účtu.
+V Pravidlech je i „Odhlásit tenhle telefon" (odhlásí jen ten telefon, ne celou partu).
 
 Mezi obrazovkami se chodí **švihem do boku** nebo hamburgerem vpravo nahoře.
 Uvnitř kategorie vede švih na další kategorii, ne na jinou obrazovku. Pět
@@ -183,10 +188,9 @@ nepomíchá, a za jeden večer se tří part nedotkne ani okraje půlgigového l
 2. Vlož celý obsah `supabase/party.sql` a dej **Run**. Skript jde pustit
    i opakovaně, nic nerozbije.
 
-   **Nevynechávej řádek s `grant`.** Samotná RLS pravidla nestačí — role `anon`,
-   pod kterou jede klíč v prohlížeči, musí mít k tabulce přístup, jinak vrátí
-   Supabase `42501 permission denied`. Tabulka založená přes Table Editor to
-   dostane sama, založená přes SQL ne.
+   Skript tabulku zavře pro nepřihlášené. Do hry se pak dostane jen účet
+   s rolí `hrac` nebo `spravce`; jak účty založit a roli jim dát, je
+   v komentáři u pravidel přímo ve skriptu.
 3. Ověř v **Table Editor**, že přibyla tabulka `tourdepub_tymy`.
 4. V **Settings → API** zkopíruj *Project URL* a klíč a vlož je do `src/lib/nastaveni.ts`:
 
@@ -197,9 +201,8 @@ export const SUPABASE_KEY = "eyJ...";
 
 4. Nahraj a každá parta si otevře stejnou adresu.
 
-Klíč `anon` je určený do prohlížeče, takže ho klidně nahraj do repozitáře.
-Tabulka je ale otevřená komukoli s odkazem — je to na jeden večer mezi známými.
-Kdyby to mělo viset na internetu dýl, přidej přihlášení.
+Klíč je určený do prohlížeče, takže ho klidně nahraj do repozitáře. Data chrání
+přihlášení a pravidla v databázi, ne utajený klíč. Hesla do repozitáře nepatří.
 
 `HRA` v `src/lib/nastaveni.ts` odděluje ročníky. Příští rok ji změň, ať se party nemíchají
 s letošními. `TABULKA` se mění jen tehdy, když by ti jméno kolidovalo s něčím vlastním.

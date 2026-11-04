@@ -1,43 +1,58 @@
-// Režim správce. Odemkne úpravy úkolů a hospod, ostatní můžou jenom hrát.
+// Režim správce. Odemkne úpravy úkolů a hospod a mazání týmů.
 //
-// POZOR: je to zámek proti omylu, ne bezpečnost. Web je statický a veřejný,
-// takže kdo se podívá do zdrojáku, kód si přečte. Na partu kamarádů to stačí –
-// brání tomu, aby někdo omylem přepsal úkoly uprostřed hry.
+// Dřív to byl kód napsaný ve zdrojáku, takže si ho mohl přečíst kdokoli.
+// Teď je to přihlášení účtem správce: heslo ověřuje Supabase a mazat týmy
+// na serveru dovolí pravidla jen tomuhle účtu, ať appka ukazuje cokoli.
+//
+// Vypnutí režimu správce účet neodhlásí, jen schová úpravy. Správce je
+// zároveň hráč, a kdyby se odhlásil, musel by zadávat heslo hry. Zapnout
+// znova jde zase jen s heslem správce.
 import { useSyncExternalStore } from "react";
-import { ADMIN_KOD } from "./nastaveni";
+import { prihlas, useUcet } from "./prihlaseni";
 
-const KLIC = "tourdepub-spravce";
+const KLIC = "tourdepub-spravce-schovany";
 
 function nacti(): boolean {
   try {
-    return localStorage.getItem(KLIC) === ADMIN_KOD;
+    return localStorage.getItem(KLIC) === "1";
   } catch {
     return false;
   }
 }
 
-let zapnuto = nacti();
+let schovany = nacti();
 const posluchaci = new Set<() => void>();
 
-export function nastavSpravce(stav: boolean) {
-  zapnuto = stav;
+function nastavSchovany(stav: boolean) {
+  schovany = stav;
   try {
-    if (stav) localStorage.setItem(KLIC, ADMIN_KOD);
+    if (stav) localStorage.setItem(KLIC, "1");
     else localStorage.removeItem(KLIC);
   } catch {
-    // bez úložiště se režim jen nezapamatuje do dalšího spuštění
+    // bez úložiště se to jen nezapamatuje do dalšího spuštění
   }
   posluchaci.forEach((f) => f());
 }
 
-/** Sedí zadaný kód? */
-export const sediKod = (kod: string) => kod === ADMIN_KOD;
+/** Ověří heslo správce na serveru a zapne režim. Vrací prázdný řetězec,
+ *  když to prošlo, jinak větu pro člověka. */
+export async function zapniSpravce(heslo: string): Promise<string> {
+  const chyba = await prihlas("spravce", heslo);
+  if (!chyba) nastavSchovany(false);
+  return chyba;
+}
+
+export function vypniSpravce() {
+  nastavSchovany(true);
+}
 
 /** Je zapnutý režim správce? Obrazovka se překreslí, když se to změní. */
 export function useSpravce(): boolean {
-  return useSyncExternalStore(
+  const ucet = useUcet();
+  const skryto = useSyncExternalStore(
     (f) => { posluchaci.add(f); return () => posluchaci.delete(f); },
-    () => zapnuto,
-    () => zapnuto,
+    () => schovany,
+    () => schovany,
   );
+  return ucet === "spravce" && !skryto;
 }

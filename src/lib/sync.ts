@@ -1,10 +1,11 @@
 // Živé pořadí přes Supabase. Je to doplněk, ne podmínka: bez nastavení (nebo bez signálu)
 // hra běží dál z telefonu a v Týmech jsou vidět jen ty místní.
-// Klient se nahrává až když je co připojovat (dynamický import), ať se kvůli něčemu,
-// co nemusí být zapnuté, nestahuje ke každému spuštění sto kilobajtů.
+// Čte a zapisuje se pod přihlášeným účtem (lib/prihlaseni.ts), takže se
+// připojuje až po zadání hesla hry. Nepřihlášeného server do tabulky nepustí.
 import { useSyncExternalStore } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni";
+import { dejKlienta } from "./prihlaseni";
 import { stav, naZmenu, kOdeslani, slucZeServeru, casZmeny, type RadekTymu } from "./stav";
 
 /** ukazka = jen tenhle telefon · pripojuji · zivo · chyba = nepodařilo se */
@@ -63,8 +64,7 @@ export async function spustSync() {
   rezim = "pripojuji";
   zmena();
   try {
-    const { createClient } = await import("@supabase/supabase-js");
-    klient = createClient(SUPABASE_URL, SUPABASE_KEY);
+    klient = await dejKlienta();
     // První čtení musí projít, jinak bychom se tvářili připojeně a nic by se nesdílelo.
     // Typicky tu spadne chybějící tabulka nebo špatný klíč – to se musí poznat.
     if (!(await nacti())) {
@@ -112,6 +112,7 @@ let hodiny: ReturnType<typeof setInterval> | undefined;
 function takt() {
   clearInterval(hodiny);
   hodiny = undefined;
+  if (!klient) return; // odhlášeno: není komu se doptávat
   if (typeof document === "undefined" || document.visibilityState !== "visible") return;
   hodiny = setInterval(() => { if (document.visibilityState === "visible") nacti(); }, TAKT);
 }
@@ -226,9 +227,10 @@ function popisChyby(e: unknown): string {
   // klíč neplatí nebo je starý
   if (kod === "PGRST301" || kod === "401" || /JWT|api key|Invalid authentication/i.test(zprava))
     return "Klíč neplatí. Zkontroluj SUPABASE_KEY v src/lib/nastaveni.ts proti Settings → API v Supabase.";
-  // čtení zakázané pravidly
+  // Server nepustil. Od zavedení hesla to znamená hlavně „nejsi přihlášený“
+  // (nebo účet nemá roli), ne rozbitou tabulku.
   if (kod === "42501" || /row-level security|permission denied/i.test(zprava))
-    return "Pravidla (RLS) nepouští ke čtení. Spusť v Supabase znovu část se zásadami z supabase/party.sql.";
+    return "Server tě nepustil. Odhlas se v Pravidlech a přihlas se znova heslem hry.";
   // Spojení neprošlo. Tohle jediné nastane i během hry, a to u party v hospodě,
   // ne u toho, kdo appku stavěl — proto se nikam neposílá do zdrojáků. Podrobnost
   // (adresa projektu, DNS) je v konzoli, kdyby to byla opravdu špatná adresa.
@@ -262,13 +264,24 @@ export async function smazTymZeServeru(id: string) {
   }
 }
 
-/** Zkusit se připojit znovu, aniž by se načítala celá stránka. */
-export async function zkusZnovu() {
+/** Odpojí živé pořadí. Volá se po odhlášení: bez účtu by každé čtení
+ *  i zápis jen narážely na pravidla a hlásily chybu. */
+export function zastavSync() {
   // starý kanál zavřít, jinak by vedle nového dál poslouchal
   klient?.removeAllChannels();
   klient = null;
+  clearInterval(hodiny);
+  hodiny = undefined;
   rezim = "ukazka";
   chyba = "";
+  naposledy = [];
+  prvniCteni = true;
   spusteno = false;
+  zmena();
+}
+
+/** Zkusit se připojit znovu, aniž by se načítala celá stránka. */
+export async function zkusZnovu() {
+  zastavSync();
   await spustSync();
 }

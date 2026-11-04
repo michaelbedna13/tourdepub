@@ -9,7 +9,8 @@ import { potvrdit } from "../components/Potvrzeni";
 import { OBTIZNOST } from "../lib/data";
 import { bodovani, JAK_SE_VALI, UVODNIK, ZAKLAD } from "../lib/pravidla";
 import { vazat } from "../lib/format";
-import { nastavSpravce, sediKod, useSpravce } from "../lib/spravce";
+import { odhlas, useUcet } from "../lib/prihlaseni";
+import { useSpravce, vypniSpravce, zapniSpravce } from "../lib/spravce";
 import { strop, tym, useStav, vynulujTym } from "../lib/stav";
 
 /** Pravidla a nastavení. Režim správce se zapíná tady, ať se na hlavních
@@ -17,8 +18,9 @@ import { strop, tym, useStav, vynulujTym } from "../lib/stav";
 export function Pravidla() {
   useStav();
   const spravce = useSpravce();
+  const ucet = useUcet();
   const kam = useNavigate();
-  const [okno, setOkno] = useState<"zadne" | "zapnout" | "vypnout">("zadne");
+  const [okno, setOkno] = useState<"zadne" | "zapnout" | "vypnout" | "odhlasit">("zadne");
   const s = strop();
   const t = tym();
 
@@ -84,6 +86,14 @@ export function Pravidla() {
               </div>
             </button>
           )}
+          {(ucet === "hrac" || ucet === "spravce") && (
+            <button className="radek" onClick={() => setOkno("odhlasit")}>
+              <div className="radek-telo">
+                <div className="radek-nazev">Odhlásit tenhle telefon</div>
+                <div className="radek-pod">{vazat("Příště bude chtít heslo hry. Ostatních se to netýká.")}</div>
+              </div>
+            </button>
+          )}
         </div>
       </div>
 
@@ -97,8 +107,19 @@ export function Pravidla() {
         <Okno nadpis="Vypnout režim správce" pod="Úpravy úkolů a hospod se zase schovají."
           zavri={() => setOkno("zadne")}>
           <div className="okno-akce">
-            <button className="tl hlavni" onClick={() => { nastavSpravce(false); setOkno("zadne"); }}>
+            <button className="tl hlavni" onClick={() => { vypniSpravce(); setOkno("zadne"); }}>
               <Ikona jmeno="check" px={19} /> Vypnout
+            </button>
+            <button className="tl tise" onClick={() => setOkno("zadne")}>Zpátky</button>
+          </div>
+        </Okno>
+      )}
+      {okno === "odhlasit" && (
+        <Okno nadpis="Odhlásit telefon" pod="Čárky v telefonu zůstanou. Živé pořadí se zastaví, dokud nezadáš heslo hry."
+          zavri={() => setOkno("zadne")}>
+          <div className="okno-akce">
+            <button className="tl hlavni" onClick={() => { setOkno("zadne"); odhlas(); }}>
+              <Ikona jmeno="check" px={19} /> Odhlásit
             </button>
             <button className="tl tise" onClick={() => setOkno("zadne")}>Zpátky</button>
           </div>
@@ -138,26 +159,35 @@ function Radek({ nazev, popis, hodnota, pred }: {
 }
 
 function OknoSpravce({ zavri }: { zavri: () => void }) {
-  const [kod, setKod] = useState("");
-  const [spatne, setSpatne] = useState(false);
+  const [heslo, setHeslo] = useState("");
+  const [chyba, setChyba] = useState("");
+  const [ceka, setCeka] = useState(false);
 
-  function odemkni() {
-    if (sediKod(kod)) { nastavSpravce(true); zavri(); }
-    else setSpatne(true);
+  // Heslo ověřuje Supabase, ne appka: ve zdrojáku není.
+  async function odemkni() {
+    if (!heslo || ceka) return;
+    setCeka(true);
+    const c = await zapniSpravce(heslo);
+    setCeka(false);
+    if (c) setChyba(c);
+    else zavri();
   }
 
   return (
     <Okno nadpis="Režim správce" zavri={zavri}
-      pod="Odemkne úpravy úkolů a hospod. Je to zámek proti omylu, ne bezpečnost. Kdo se podívá do zdrojáku, kód si přečte.">
+      pod="Odemkne úpravy úkolů a hospod a mazání týmů. Heslo správce ověřuje server.">
       <label className="pole">
-        <span className="nazev">Kód</span>
-        <input type="password" value={kod} autoComplete="off" enterKeyHint="done"
-          onChange={(e) => { setKod(e.target.value); setSpatne(false); }}
+        <span className="nazev">Heslo správce</span>
+        <input type="password" value={heslo} autoComplete="current-password" enterKeyHint="done"
+          autoCapitalize="none" autoCorrect="off" spellCheck={false}
+          onChange={(e) => { setHeslo(e.target.value); setChyba(""); }}
           onKeyDown={(e) => { if (e.key === "Enter") odemkni(); }} />
-        {spatne && <span className="poznamka spatne" style={{ padding: 0 }}>Tenhle kód nesedí.</span>}
+        {chyba && <span className="poznamka spatne" style={{ padding: 0 }} role="alert">{vazat(chyba)}</span>}
       </label>
       <div className="okno-akce">
-        <button className="tl hlavni" onClick={odemkni}><Ikona jmeno="check" px={19} /> Odemknout</button>
+        <button className="tl hlavni" onClick={odemkni} disabled={ceka || !heslo}>
+          <Ikona jmeno="check" px={19} /> {ceka ? "Ověřuju…" : "Odemknout"}
+        </button>
         <button className="tl tise" onClick={zavri}>Zpátky</button>
       </div>
     </Okno>

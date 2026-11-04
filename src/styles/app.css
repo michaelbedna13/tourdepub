@@ -1161,6 +1161,9 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .prazdno .ikona{margin:0 auto 12px;color:var(--text-3)}
 .poznamka{font-size:var(--t-drobne);color:var(--text-3);line-height:1.55;
   margin-top:10px;padding:0 2px;display:block}
+/* Chybová poznámka. .spatne je v souboru výš, tak ji .poznamka přebíjela
+   a „Tohle heslo nesedí“ svítilo stejně tlumeně jako nápověda. */
+.poznamka.spatne{color:var(--spatne)}
 .rezim{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;border-radius:var(--r-sm);
   background:var(--vrstva);font-size:var(--t-drobne);color:var(--text-2);margin-bottom:22px;line-height:1.55}
 .rezim .ikona{color:var(--text-3);margin-top:2px}
@@ -1412,3 +1415,23 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   /* na širší obrazovce se vejde celá karta i náhled další */
   .hero{flex-basis:calc(100% - 56px)}
 }
+
+/* ---------- brána: heslo hry ----------
+   Obrazovka místo appky, ne vrstva přes ni (vrstva s barvou by v Safari
+   natřela blok pod lištou). Sloupec stojí ve spodní polovině, kde na něj
+   dosáhne palec; nahoře je jen značka a vzduch, takže zóna, kterou iOS
+   z plochy rozmazává (--rozostreni), zůstane prázdná. */
+.brana{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  max-width:var(--sirka);margin:0 auto;min-height:100dvh;
+  padding:calc(var(--vrch) + 24px) var(--okraj) calc(env(safe-area-inset-bottom) + 40px);
+  background:var(--podklad);
+  animation:zjevit .3s var(--krok)}
+.brana-logo{display:block;width:132px;height:auto;color:var(--cervena);margin:0 0 auto}
+.brana-nadpis{font-size:32px;margin:40px 0 10px}
+.brana-text{color:var(--text-2);font-size:var(--t-text);line-height:1.55;margin:0 0 26px;max-width:32ch}
+.brana form{display:block}
+.brana .pole{margin-bottom:12px}
+.brana-chyba{padding:0;margin-top:9px}
+.brana-pod{color:var(--text-3);font-size:var(--t-drobne);text-align:center;margin:14px 0 0}
