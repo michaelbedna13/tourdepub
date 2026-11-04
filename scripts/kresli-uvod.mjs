@@ -176,6 +176,57 @@ const jiskry = (x, y, r1, r2, uhly, w = 2.2) =>
   uhly.map((st) => { const a = (st * Math.PI) / 180;
     return I(cut(tah([[x + Math.cos(a) * r1, y + Math.sin(a) * r1], [x + Math.cos(a) * r2, y + Math.sin(a) * r2]], [w, w * .7]), PRST)); });
 
+/** Hospoda: přízemní budova se sedlovou střechou, okno s křížem, dveře
+ *  a vývěsní štít se škopkem na rameni. x je levá hrana zdi, zem je y,
+ *  na kterém budova stojí,
+ *  m zvětšuje, strana = 1 štít vlevo (hospoda stojí vpravo a štít visí
+ *  směrem k panákovi), -1 zrcadlově. Kreslí se v místních souřadnicích
+ *  0…40 × 0…44 (štít a střecha přesahují do minusu). */
+const ZEM = 92;
+
+function hospodaTvar(x, zem, m = 1, strana = 1) {
+  const W = 40;
+  const y = zem - 44 * m;
+  const t = (pts) => pts.map(([a, b]) => [x + (strana > 0 ? a : W - a) * m, y + b * m]);
+  const ZED = { amp: .5, step: 4, tension: .42 };
+  // škopek ve štítu jako výstřižek: střed štítu je v místních (-9.5, 20)
+  const sx = x + (strana > 0 ? -9.5 : W + 9.5) * m - 1.6 * m, sy = y + 20.4 * m;
+  const mug = skopek(sx, sy, 0, 1, .5 * m).map(([d, p]) => [d === "i" ? "c" : "i", p]);
+  return [
+    I(cut(t(rect(0, 8, W, 44, 1)), ZED)),
+    I(cut(t([[-3, 10], [20, -6], [43, 10]]), ZED)),
+    I(cut(t(rect(28, -6, 33, 4, .8)), PRST)),
+    C(cut(t(rect(4, 16, 17, 29, 1.2)), PRST)),
+    I(cut(t(tah([[10.5, 16], [10.5, 29]], 1.6)), PRST)),
+    I(cut(t(tah([[4, 22.5], [17, 22.5]], 1.6)), PRST)),
+    C(cut(t(rect(23, 20, 35, 44, 5)), PRST)),
+    I(cut(t(ell(32.5, 33, 1, 1, 8)), JEMNE)),
+    I(cut(t(tah([[0, 10], [-16, 10]], 2.2)), PRST)),
+    I(cut(t(tah([[-3, 10], [-3, 13]], 1)), PRST)),
+    I(cut(t(tah([[-15, 10], [-15, 13]], 1)), PRST)),
+    I(cut(t(rect(-19, 13, 0, 28, 1.5)), PRST)),
+    ...mug,
+  ];
+}
+
+/** Panák, co jde: krok, předklon, škopek v ruce před sebou, druhá ruka
+ *  máchá dozadu. x posouvá celou postavu (40 = střed čtverce), nahoru =
+ *  škopek zvedá nad hlavu (odchází z hospody a připíjí). */
+function panakJde(x, nahoru = false) {
+  const y = 0;
+  const p = (body) => body.map(([a, b]) => [a + x - 40, b + y]);
+  const vrstvy = [
+    ...panak({
+      trup: p([[40, 37], [39, 50], [38, 63]]),
+      ruce: [nahoru ? p([[40, 44], [47, 37], [52, 27]]) : p([[40, 44], [48, 49], [55, 45]]), p([[39, 45], [32, 52], [28, 59]])],
+      nohy: [p([[38, 62], [45, 75], [50, 90]]), p([[38, 62], [32, 76], [26, 89]])],
+      chodidla: [[x + 10, 91 + y, -5], [x - 15, 90 + y, 200]], dlane: [[x - 13, 61 + y, 110]], hlava: 10,
+    }),
+    ...(nahoru ? skopekVRuce(x + 12, 27 + y, -20, -1) : skopekVRuce(x + 15, 45 + y, -8, -1)),
+  ];
+  return vrstvy;
+}
+
 // Z těchhle se do appky dostane jen to, co je v POUZITE. Zbytek zůstává
 // tady jako zdroj: kreslilo se to pro starou průpravu přes čtyři plakáty
 // a může se to hodit, ale vozit čtyři nepoužité kresby v balíku je zbytečné.
@@ -226,62 +277,29 @@ const KRESBY = {
     ...skopekVRuce(33, 36, 14, 1),
   ],
 
-  // Od špeluňky ke špeluňce: panák se opírá o zeď hospody se škopkem
-  // v ruce, nohy zakřížené. Dřív se opíral o lucernu (viz lucerna výš),
-  // Mišák chtěl hospodu. Póza je stejná, ruka teď sahá na zeď. Hospoda se
-  // musí číst jako předmět i ve sto bodech: dveře, okno a škopek na štítu.
+  // Od špeluňky ke špeluňce: panák jde po štatlu se škopkem v ruce od
+  // hospody k hospodě. Dřív visel na lucerně; Mišák chtěl hospodu, a pak
+  // ať se o ni neopírá. Hospoda je přízemní budova, ne vysoký domek: štít
+  // se škopkem na rameni, dveře, okno. Ve sto bodech se čtou předměty,
+  // takže hospodu dělá štít se škopkem, ne tvar domu.
   hospoda: () => {
-    const V = process.env.VARIANTA || "a";
-    const ZED = { amp: .6, step: 4, tension: .42 };
-    const panakUZdi = [
-      ...panak({
-        trup: [[50, 37], [47, 50], [44, 63]],
-        ruce: [[[51, 43], [62, 40], [74, 41], [84, 44]], [[49, 45], [40, 44], [33, 36]]],
-        nohy: [[[44, 62], [49, 76], [54, 90]], [[44, 62], [44, 77], [37, 91]]],
-        chodidla: [[55, 91, -5], [37, 92, 185]], hlava: 6,
-      }),
-      ...skopekVRuce(33, 36, 14, 1),
-    ];
+    // Výchozí je B: od jedný hospody k druhý, jak říká nadpis kapitoly.
+    // A (jde k hospodě) a C (vychází a připíjí) přes VARIANTA=a / c.
+    const V = process.env.VARIANTA || "b";
+    // Všechno stojí na jedné zemi (y 92, kde má panák chodidla); hospoda
+    // se staví od země nahoru, ať nevisí ve vzduchu.
     if (V === "b") return [
-      // rovná fasáda, římsa, markýza s pruhy, cedule se škopkem, výloha
-      I(cut(rect(84, 14, 120, 98, 1), ZED)),
-      I(cut(rect(81, 11, 123, 16, 1), PRST)),
-      C(cut(rect(90, 21, 114, 34, 1.5), PRST)),
-      ...skopek(100, 27.5, 0, 1, .6),
-      I(cut([[80, 40], [124, 40], [127, 51], [77, 51]], PRST)),
-      ...[88, 96, 104, 112].map((x) => C(cut(tah([[x, 42], [x + .6, 49]], 2.8), PRST))),
-      C(cut(rect(88, 56, 104, 76, 1.5), PRST)),
-      ...skopek(94.5, 66, 0, 1, .75),
-      C(cut(rect(107, 58, 117, 98, 3.5), PRST)),
-      ...panakUZdi,
+      ...hospodaTvar(-2, ZEM, .8, -1),
+      ...panakJde(72),
+      ...hospodaTvar(124, ZEM, 1.1, 1),
     ];
     if (V === "c") return [
-      // domek s otevřenými dveřmi a cedulí nade dveřmi
-      I(cut(rect(84, 30, 118, 98, 1), ZED)),
-      I(cut([[79, 32], [101, 10], [123, 32]], ZED)),
-      I(cut(rect(108, 13, 114, 25, 1), PRST)),
-      C(cut(rect(91, 39, 113, 52, 1.5), PRST)),
-      ...skopek(100, 45.5, 0, 1, .6),
-      C(cut(rect(95, 60, 110, 98, 2), PRST)),
-      I(cut([[110, 60], [119, 55], [119, 99], [110, 98]], PRST)),
-      ...panakUZdi,
+      ...hospodaTvar(0, ZEM, 1.15, -1),
+      ...panakJde(98, true),
     ];
     return [
-      // domek se sedlovou střechou, okno s křížem, dveře, štít se škopkem
-      I(cut(rect(84, 26, 118, 98, 1), ZED)),
-      I(cut([[79, 28], [101, 6], [123, 28]], ZED)),
-      I(cut(rect(108, 9, 114, 21, 1), PRST)),
-      C(cut(rect(88, 38, 103, 55, 1.5), PRST)),
-      I(cut(tah([[95.5, 38], [95.5, 55]], 1.8), PRST)),
-      I(cut(tah([[88, 46.5], [103, 46.5]], 1.8), PRST)),
-      C(cut(rect(97, 66, 112, 98, 5), PRST)),
-      I(cut(ell(109, 83, 1.3, 1.3, 8), JEMNE)),
-      I(cut(tah([[118, 33], [131, 33]], 2.4), PRST)),
-      I(cut(tah([[120, 33], [120, 38]], 1.1), PRST)),
-      I(cut(tah([[129, 33], [129, 38]], 1.1), PRST)),
-      I(cut(rect(116, 37, 133, 53, 1.5), PRST)),
-      ...skopek(122.5, 45.5, 0, 1, .62).map(([d, x]) => [d === "i" ? "c" : "i", x]),
-      ...panakUZdi,
+      ...panakJde(28),
+      ...hospodaTvar(80, ZEM, 1.15, 1),
     ];
   },
 
