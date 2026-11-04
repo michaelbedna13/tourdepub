@@ -1356,7 +1356,10 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
    menší než z plochy. Teď se tam jen stáhne mezera nad nadpisem a pod
    panákem a všechno ostatní zůstává jako z plochy. */
 @media (max-height:780px){
-  .uvod{--uvod-nad-nadpisem:clamp(4px,2.5vh,24px);--uvod-pod-panakem:clamp(8px,2.5vh,24px)}
+  /* Mezera nad nadpisem jen 2,5 vh (18 b. v Safari) posadila text těsně pod
+     značku a mezi textem a panákem zůstal prázdný pás 121 bodů (Mišákův
+     screenshot). 7 vh dá v Safari 49 b., skoro jako z plochy (51). */
+  .uvod{--uvod-nad-nadpisem:clamp(8px,7vh,56px);--uvod-pod-panakem:clamp(8px,2.5vh,24px)}
 }
 /* Opravdu malý displej (iPhone SE v Safari má okno kolem 550): tam už se
    zmenší i písmo a panák. */
