@@ -242,30 +242,27 @@ const KRESBY = {
     I(cut(ell(80, 27, 1.5, 1.5, 10), PRST)),
   ],
 
-  // Čárky na tabuli: hospodská tabule jako rám s tmavou plochou, čárky
-  // jsou křída (papír). Napřed byla tabule plná a čárky vystřižené; ruka
-  // přes ni pak potřebovala spáru a kolem ní zůstalo prázdno, co nedávalo
-  // smysl. Na tmavé ploše je ruka s křídou vidět sama od sebe.
+  // Čárky na tabuli: plná tabule s vystřiženými čárkami a panák na ni
+  // ukazuje z kousku dál. Napřed na ni sahal křídou a ruka přes tabuli
+  // potřebovala spáru, kolem které zůstalo prázdno bez smyslu. Pak se
+  // zkoušela tabule jako rám s křídou; Mišák chtěl jednodušší cestu:
+  // panáka odsunout, ať ukazuje z dálky a na tabuli vůbec nesahá.
   zed: () => [
-    I(cut(rect(54, 10, 100, 64, 2.5), { amp: .6, step: 4, tension: .42 })),
-    C(cut(rect(58.5, 14.5, 95.5, 59.5, 1.5), { amp: .4, step: 4, tension: .42 })),
-    I(cut(tah([[60, 64], [57, 92]], 3.4), PRST)),
+    I(cut(rect(56, 12, 100, 64, 2.5), { amp: .6, step: 4, tension: .42 })),
+    I(cut(tah([[62, 64], [59, 92]], 3.4), PRST)),
     I(cut(tah([[94, 64], [97, 92]], 3.4), PRST)),
-    I(cut(tah([[69, 21], [68, 53]], [3.4, 3]), PRST)),
-    I(cut(tah([[76, 20], [76, 53]], [3.4, 3]), PRST)),
-    I(cut(tah([[83, 20], [84, 53]], [3.4, 3]), PRST)),
-    I(cut(tah([[90, 21], [91, 53]], [3.4, 3]), PRST)),
-    I(cut(tah([[66, 46], [93, 27]], [3, 3.4]), PRST)),
+    C(cut(tah([[67, 21], [66, 54]], [3.6, 3.2]), PRST)),
+    C(cut(tah([[75, 20], [75, 54]], [3.6, 3.2]), PRST)),
+    C(cut(tah([[83, 20], [84, 54]], [3.6, 3.2]), PRST)),
+    C(cut(tah([[91, 21], [92, 54]], [3.6, 3.2]), PRST)),
+    C(cut(tah([[62, 47], [96, 26]], [3.2, 3.6]), PRST)),
     ...panak({
-      trup: [[31, 37], [32, 50], [34, 63]],
-      ruce: [[[32, 44], [46, 47], [62, 47]], [[31, 46], [24, 54], [20, 62]]],
-      nohy: [[[34, 62], [27, 77], [24, 91]], [[34, 62], [41, 77], [44, 91]]],
-      chodidla: [[24, 92, 185], [44, 92, -5]], hlava: -12,
+      trup: [[25, 37], [26, 50], [28, 63]],
+      ruce: [[[26, 44], [36, 41], [45, 36]], [[25, 46], [18, 54], [14, 62]]],
+      nohy: [[[28, 62], [21, 77], [18, 91]], [[28, 62], [35, 77], [38, 91]]],
+      chodidla: [[18, 92, 185], [38, 92, -5]], dlane: [[47, 35, -25]], hlava: -12,
     }),
-    // pěst s křídou na začátku škrtu
-    I(cut(ell(63, 47, 2.8, 3, 12), PRST)),
-    I(cut(tah([[64, 47], [67, 45.5]], 2), PRST)),
-    ...skopekVRuce(20, 62, 4, 1),
+    ...skopekVRuce(14, 62, 4, 1),
   ],
 
   // Konečná: vítěz ve skoku, ruce do V, v jedné pohár vysoko nad hlavou.
