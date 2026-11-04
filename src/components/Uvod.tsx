@@ -16,8 +16,7 @@
 // a značka pod ní prosvítá — teprve s prvním se #uvod odklidí.
 import { useEffect, useId, useRef, useState } from "react";
 import { vazat } from "../lib/format";
-import { UVOD_BANK, UVOD_COURANI, UVOD_VALI, UVODNIK, uvodBodovani } from "../lib/pravidla";
-import { stav } from "../lib/stav";
+import { PRIBEH } from "../lib/pribeh";
 import { UVOD_KRESBY } from "../lib/uvod-kresby";
 import { Logo } from "./Logo";
 
@@ -33,28 +32,12 @@ const PISMA_NEJVIC = 2500;
 /** Jak dlouho se úvod vytrácí, než se odklidí. */
 const ZAVRENI = 300;
 
-interface Plakat {
-  /** Klíč kresby v UVOD_KRESBY. */
-  id: keyof typeof UVOD_KRESBY;
-  nadpis: string;
-  /** Jeden souvislý odstavec. Žádné štítky ani body pod sebou. */
-  text: string;
-}
-
-/** Pět plakátů. Nejsou to moje věty: text se bere z lib/pravidla.ts, odkud
- *  čte i obrazovka Pravidla. Úvod tedy neříká „něco jako pravidla", ale
- *  přímo je — a když se jedno změní, změní se obojí.
- *
- *  Jeden plakát = jedna kapitola pravidel a jeden panák, co ji hraje:
- *  tančí, drží budík, táhne šneka, píše čárky, opírá se o pytel. Text je
- *  souvislý odstavec (viz konec lib/pravidla.ts), ne pravidla se štítky. */
-const PLAKATY: Plakat[] = [
-  { id: "tanec", nadpis: "Betelná řežba", text: UVODNIK },
-  { id: "cajk", nadpis: "Jak se to valí", text: UVOD_VALI },
-  { id: "courani", nadpis: "Žádný courání", text: UVOD_COURANI },
-  { id: "zapis", nadpis: "Bodování", text: uvodBodovani(stav.hospody.length) },
-  { id: "bank", nadpis: "Celej bank", text: UVOD_BANK },
-];
+/** Pět plakátů, pět kapitol jednoho večera (lib/pribeh.ts). Ke každé
+ *  patří panák, co ji hraje: tančí na srazu, drží budík, táhne šneka,
+ *  píše čárky, opírá se o pytel. Kresby jdou ve stejném pořadí jako
+ *  kapitoly. */
+const KRESBY_KAPITOL = ["tanec", "cajk", "courani", "zapis", "bank"] as const;
+const PLAKATY = PRIBEH.map((k, i) => ({ ...k, id: KRESBY_KAPITOL[i] }));
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
  *  nadvakrát (nejdřív logo, pak podklad), tohle je obojí dohromady.

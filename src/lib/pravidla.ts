@@ -2,12 +2,11 @@
 //
 // Stála dřív rozepsaná přímo v obrazovce Pravidla. Jenže je říká i úvod,
 // a dvě kopie téhož textu se dřív nebo později rozejdou — změní se jedna
-// a druhá o tom neví. Tady je zdroj; obrazovka i úvod si je jen vykreslí.
+// a druhá o tom neví. Tady je zdroj pro obrazovku Pravidel. Úvod je od
+// teď příběh (lib/pribeh.ts) a pravidla jen naznačuje.
 //
 // Mluví to hantecem a tak to má zůstat: appka, kde se jinde píše o betelný
 // řežbě a vypatlaný palici, nemůže mít pravidla psaná jako příbalový leták.
-
-import { OBTIZNOST } from "./data";
 
 export interface Bod {
   /** Popisek nad větou — čeho se pravidlo týká. */
@@ -40,11 +39,6 @@ export const COURANI: Bod = {
 };
 export const JAK_SE_VALI: Bod[] = [CAJK, PARTYJE, COURANI];
 
-/** Stupnice haluzí vypsaná do řádky: „brnkačka 1, větší haluz 2…".
- *  Čte se z OBTIZNOST, takže čísla nemůžou utéct tomu, co appka počítá. */
-const HALUZE = () =>
-  OBTIZNOST.map((o) => `${o.nazev.toLowerCase()} ${o.piva}`).join(", ");
-
 /** Za co padají čárky. Strop se odvíjí od počtu štací, takže se předává.
  *
  *  Štítek je tady hodnota, ne jméno pravidla: na obrazovce Pravidel z toho
@@ -55,19 +49,3 @@ export const bodovani = (hospod: number): Bod[] => [
   { stitek: "+1", text: "Za škopek ve štaci. Stačí, když ho lupne aspoň půlka partyje.", strop: `nejvíc ${hospod}` },
   { stitek: "+1 až 3", text: "Za srandy podle toho, jaká je to haluz." },
 ];
-
-/* Plakáty úvodu. Každý je jeden souvislý odstavec, ne pravidla pod sebou se
-   štítkama. Rozsekané na „Časovej cajk / Partyje" to vypadalo jako formulář
-   a oko skákalo mezi drobnýma popiskama a větama; plakát se má přečíst
-   jedním dechem. Obrazovka Pravidel je na hledání, tam štítky zůstávají.
-   Věty jsou poskládané z týchž kusů, takže se obojí nerozejde: kde se dá,
-   bere se text přímo z bodů výš, čísla z OBTIZNOST a z počtu štací. */
-export const UVOD_VALI = `${CAJK.text} ${PARTYJE.text}`;
-export const UVOD_COURANI = COURANI.text;
-export const uvodBodovani = (hospod: number) =>
-  `Za každou špeluňku, do který vlezete, padá čárka. Další je za škopek ve štaci, ` +
-  `stačí, když ho lupne aspoň půlka partyje. Obojí jednou na štaci, takže nejvíc ${hospod}. ` +
-  `K tomu jedna až tři za srandy podle toho, jaká je to haluz: ${HALUZE()}.`;
-export const UVOD_BANK =
-  `Jde o to nahrabat víc čárek než ty druhý partyje a urvat titul z Tour De Pub. Do kotla se hodí kilo na palici ` +
-  `a první parta bere celej bank. Všechny love só jejich.`;
