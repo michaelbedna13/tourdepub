@@ -1419,17 +1419,18 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 /* ---------- brána: heslo hry ----------
    Obrazovka místo appky, ne vrstva přes ni (vrstva s barvou by v Safari
    natřela blok pod lištou). Značka, nadpis, pole a tlačítko stojí v jednom
-   sloupci na středu ve spodní části, kde na ně dosáhne palec; nahoře je
-   jen vzduch, takže zóna, kterou iOS z plochy rozmazává (--rozostreni),
-   zůstane prázdná. Žádné vysvětlující texty: heslo dá ten, kdo tah vede. */
+   sloupci uprostřed obrazovky (Mišák vybral ze tří rozložení). Zóna, kterou
+   iOS z plochy rozmazává (--rozostreni), je v --vrch, takže na ni sloupec
+   nevyleze ani na malém telefonu. Žádné vysvětlující texty: heslo dá ten,
+   kdo tah vede. */
 .brana{
   position:relative;z-index:1;
-  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
   max-width:var(--sirka);margin:0 auto;min-height:100dvh;
-  padding:calc(var(--vrch) + 24px) var(--okraj) calc(env(safe-area-inset-bottom) + 56px);
+  padding:calc(var(--vrch) + 24px) var(--okraj) calc(env(safe-area-inset-bottom) + 24px);
   background:var(--podklad);text-align:center;
   animation:zjevit .3s var(--krok)}
-.brana-logo{display:block;width:120px;height:auto;color:var(--text)}
+.brana-logo{display:block;width:200px;height:auto;color:var(--text)}
 .brana-nadpis{font-size:32px;font-weight:700;margin:30px 0 26px}
 .brana form{display:flex;flex-direction:column;gap:12px;width:100%}
 .brana input{text-align:center}
