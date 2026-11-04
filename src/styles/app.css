@@ -240,6 +240,14 @@ input,textarea,select{caret-color:var(--text)}
    přepínat: při zavírání skočil z 1,06 na 1 v jediném snímku. Okraje řeší
    viněta na plachtě, ta žádnou hranu nepotřebuje. */
 html.rozmazat .obrazovka{filter:blur(5px) brightness(.55)}
+/* Obsah zůstává ve vlastní vrstvě pořád, ne jen pod otevřenou nabídkou.
+   iPhone ho pro rozostření přesune do samostatné vrstvy a po zavření ho
+   vykreslí zpátky do stránky; přitom ho zaokrouhlí o kousek jinak a logo
+   s pilulkou týmu nahoře po zavření menu cukly. V Chromiu je hlavička před
+   menu i po něm na pixel stejná, je to jen vykreslování na iOS. Vrstva,
+   která zůstává, nemá co přepínat. Uvnitř .obrazovka nic pevného ani
+   lepivého není, takže to nic jiného neovlivní. */
+.obrazovka{will-change:filter}
 /* Ztmavení je filtr na obsahu, ne vrstva přes obrazovku (proč, viz
    .fab-plachta). Podklad appky ztmavne o stejný kus, jinak by u krajů,
    kam rozostření obsahu nedosáhne, zůstal světlejší pruh. Dřív ho
