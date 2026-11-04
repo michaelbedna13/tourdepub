@@ -53,11 +53,11 @@ interface Plakat {
  *  courání má plakát celý pro sebe, aby se nemuselo tlačit vedle cajku
  *  a partyjí. */
 const PLAKATY: Plakat[] = [
-  { id: "opilec", nadpis: "Betelná řežba", text: UVODNIK },
-  { id: "hodiny", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
-  { id: "snek", nadpis: "Žádný courání", text: COURANI.text },
-  { id: "carky", nadpis: "Bodování", body: bodovani(stav.hospody.length, true) },
-  { id: "pytel", nadpis: "Celej bank", body: ZAKLAD },
+  { id: "tanec", nadpis: "Betelná řežba", text: UVODNIK },
+  { id: "cajk", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
+  { id: "courani", nadpis: "Žádný courání", text: COURANI.text },
+  { id: "zapis", nadpis: "Bodování", body: bodovani(stav.hospody.length, true) },
+  { id: "bank", nadpis: "Celej bank", body: ZAKLAD },
 ];
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
