@@ -107,14 +107,25 @@ const KRESBY = {
     C(cut(rect(66, 42, 79, 56, 1), JEMNE)),
     I(cut(rect(28, 64, 72, 74, 3), { ...R, amp: .8 })),
   ],
-  // Vopičí lajna: jeden otisk dlaně. Dlaň i bota vedle sebe byly dva tvary
-  // a ten druhý vycházel jako dvě hrudky.
+  // Vopičí lajna: opičí hlava. Otisk dlaně se za opici nevydával, bylo
+  // to prostě „ruka". Hlava s velkýma ušima po stranách a vystřiženým
+  // obličejem do tvaru buráku je opice na první pohled; oči a nozdry
+  // jsou v obličeji zase papír.
   lajna: () => [
-    I(cut(ell(50, 64, 23, 20, 22), H)),
-    I(cut(stroke(30, 52, 21, 26, 11), { ...R, amp: .8 })),
-    I(cut(stroke(43, 46, 40, 12, 11), { ...R, amp: .8 })),
-    I(cut(stroke(57, 46, 62, 12, 11), { ...R, amp: .8 })),
-    I(cut(stroke(70, 52, 81, 28, 11), { ...R, amp: .8 })),
+    I(cut(ell(15, 52, 13, 14, 18), { ...R, amp: .9 })),
+    I(cut(ell(85, 52, 13, 14, 18), { ...R, amp: .9 })),
+    C(cut(ell(15, 53, 6, 7, 14), JEMNE)),
+    C(cut(ell(85, 53, 6, 7, 14), JEMNE)),
+    I(cut(ell(50, 50, 32, 36, 26), H)),
+    I(cut([[38, 16], [44, 6], [50, 14], [56, 5], [62, 16]], { ...R, amp: .7, tension: .3 })),
+    C(cut(ell(39, 45, 11, 12, 18), JEMNE)),
+    C(cut(ell(61, 45, 11, 12, 18), JEMNE)),
+    C(cut(ell(50, 66, 21, 15, 22), JEMNE)),
+    I(cut(ell(40, 46, 4, 4.6, 12), JEMNE)),
+    I(cut(ell(60, 46, 4, 4.6, 12), JEMNE)),
+    I(cut(ell(45, 61, 2.2, 1.8, 10), JEMNE)),
+    I(cut(ell(55, 61, 2.2, 1.8, 10), JEMNE)),
+    I(cut(srpek(50, 63, 12, 3.4, 30, 150), JEMNE)),
   ],
   // Řev jak z JZD: kravská hlava. Megafon ani hlava z profilu se nečetly,
   // a tohle navíc sedí na jméno úkolu.
@@ -126,15 +137,24 @@ const KRESBY = {
     C(cut(ell(63, 50, 6, 6, 14), JEMNE)),
     C(cut(ell(50, 71, 15, 9, 18), { ...R, amp: .8 })),
   ],
-  // Bullseye: terč se šipkou. Šipka měla hrot jako vlaječku, teď má
-  // tenký dřík a křidélka.
-  bullseye: () => [
-    I(cut(ell(42, 58, 34, 34, 26), { ...R, amp: 1.2 })),
-    C(cut(ell(42, 58, 23, 23, 22), { ...R, amp: .9 })),
-    I(cut(ell(42, 58, 11, 11, 18), { ...R, amp: .8 })),
-    I(cut(stroke(48, 52, 84, 18, 6), { ...R, amp: .7 })),
-    I(cut([[74, 8], [96, 6], [92, 28], [80, 22]], { ...R, amp: .9, tension: .25 })),
-  ],
+  // Bullseye: terč a šipka zapíchnutá do středu. Šipka měla napřed hrot
+  // jako vlaječku a potom velký trojúhelník venku na konci dříku, takže
+  // letěla z terče pryč a celé to vypadalo jako znak ♂. Teď hrot mizí
+  // v černém středu, dřík vede šikmo ven a na konci má letky do V,
+  // jak to u šipek je.
+  bullseye: () => {
+    const osa = (t, k = 0) => [42 + t * .707 + k * .707, 58 - t * .707 + k * .707];
+    return [
+      I(cut(ell(42, 58, 34, 34, 26), { ...R, amp: 1.2 })),
+      C(cut(ell(42, 58, 23, 23, 22), { ...R, amp: .9 })),
+      I(cut(ell(42, 58, 11, 11, 18), { ...R, amp: .8 })),
+      // spára kolem šipky přes vnější kruh, ať se šipka neslije s terčem
+      C(cut([osa(10, -6.5), osa(40, -6.5), osa(40, 6.5), osa(10, 6.5)], JEMNE)),
+      I(cut([osa(4, -3), osa(26, -4.5), osa(26, 4.5), osa(4, 3)], { ...R, amp: .6 })),
+      I(cut([osa(26, -1.6), osa(46, -1.6), osa(46, 1.6), osa(26, 1.6)], { ...R, amp: .4 })),
+      I(cut([osa(42, -1), osa(52, -10), osa(62, -10), osa(58, 0), osa(62, 10), osa(52, 10), osa(42, 1)], { ...R, amp: .5, tension: .25 })),
+    ];
+  },
   // Betelný bicák: činka. Paže se zkoušela čtyřikrát, pokaždé z ní byl
   // flíček; předmět, co znamená sílu, se pozná na první pohled.
   bicak: () => [
