@@ -5,7 +5,7 @@
 import { useSyncExternalStore } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni";
-import { stav, naZmenu, kOdeslani, slucZeServeru, type RadekTymu } from "./stav";
+import { stav, naZmenu, kOdeslani, slucZeServeru, casZmeny, type RadekTymu } from "./stav";
 
 /** ukazka = jen tenhle telefon · pripojuji · zivo · chyba = nepodařilo se */
 export type Rezim = "ukazka" | "pripojuji" | "zivo" | "chyba";
@@ -53,6 +53,7 @@ export function useSync(): StavSyncu {
 }
 
 let spusteno = false;
+let prihlaseno = false;
 
 export async function spustSync() {
   if (spusteno) return;
@@ -78,7 +79,15 @@ export async function spustSync() {
           () => { nacti(); })
       .subscribe();
     rezim = "zivo";
-    naZmenu(posliOpatrne);
+    // Posluchači se přihlašují jen poprvé. „Zkusit znovu" prochází tudy
+    // znovu a každé kolo by jinak přidalo další sadu: po třech pokusech by
+    // se při návratu do appky četlo třikrát naráz.
+    if (!prihlaseno) {
+      prihlaseno = true;
+      naZmenu(posliOpatrne);
+      document.addEventListener("visibilitychange", priNavratu);
+      addEventListener("online", priNavratu);
+    }
     // Živý kanál je hlavní cesta, ale sám nestačí. Když telefon zhasne nebo
     // se appka přepne na pozadí, websocket umře — a co mezitím ostatní
     // zapsali, se nedožene: realtime události rozesílá, nedoručené nedrží.
@@ -86,8 +95,6 @@ export async function spustSync() {
     // a dokud se na appku někdo kouká, jede pomalý doptávací takt. Je to
     // pojistka i pro případ, že by v Supabase nebyla tabulka v publikaci
     // supabase_realtime — pak kanál mlčí a bez taktu by se nedělo nic.
-    document.addEventListener("visibilitychange", priNavratu);
-    addEventListener("online", priNavratu);
     takt();
   } catch (e) {
     chyba = popisChyby(e);
@@ -130,7 +137,14 @@ async function posli(): Promise<boolean> {
   try {
     // Posílají se jen týmy, se kterými někdo opravdu pracuje. Tým, co si appka
     // založila sama a nikdo se ho nedotkl, zůstane jen v telefonu.
-    const k = stav.tymy.filter((t) => t.vlastni);
+    //
+    // A jen ty, které jsou tady novější než to, co naposledy přišlo ze
+    // serveru. Dřív šly nahoru všechny týmy v telefonu, i cizí, které sem
+    // jen přitekly: kdo ťukl čárku, poslal s ní i svou kopii ostatních part.
+    // Když byla ta kopie o chlup starší (druhá parta zrovna zapsala), upsert
+    // jí na serveru přepsal novější zápis. A smazaný tým z jiného telefonu
+    // vracel zpátky, dokud se o smazání nedozvěděl.
+    const k = stav.tymy.filter((t) => t.vlastni && jeNovejsi(t, naposledy.find((r) => r.id === t.id)));
     if (!k.length) return true;
     // hra se přidává až tady: kOdeslani() popisuje tým, do které hry patří
     // je věc připojení. Bez něj zápis spadne — sloupec je not null a appka
@@ -159,10 +173,22 @@ async function posli(): Promise<boolean> {
   }
 }
 
+/** Je tým v telefonu novější než jeho řádek na serveru? Tým, který na
+ *  serveru ještě není, je novější vždycky. */
+function jeNovejsi(t: { upraveno: string | null }, naServeru?: RadekTymu): boolean {
+  if (!naServeru) return true;
+  return casZmeny(t.upraveno) > casZmeny(naServeru.upraveno);
+}
+
 async function nacti(): Promise<boolean> {
   if (!klient) return false;
   try {
-    const { data, error } = await klient.from(TABULKA).select("*").eq("hra", HRA);
+    // Seřazené podle id. Bez pořadí vrací Postgres řádky tak, jak zrovna
+    // leží, a po každém zápisu leží jinak. Porovnání níž by pak hlásilo změnu
+    // i tam, kde žádná není, každý telefon by sloučil, uložil a odeslal,
+    // a ostatní by na to zase odpověděli: dva telefony by si přehazovaly
+    // tabulku pořád dokola.
+    const { data, error } = await klient.from(TABULKA).select("*").eq("hra", HRA).order("id");
     if (error) throw error;
     const nove = (data || []) as RadekTymu[];
     // Doptávací takt běží pořád, ale většinou se nic nezměnilo. Slučovat
@@ -224,16 +250,22 @@ function popisChyby(e: unknown): string {
 export async function smazTymZeServeru(id: string) {
   if (!klient) return;
   try {
-    await klient.from(TABULKA).delete().eq("id", id);
+    // Supabase chybu vrací, ne vyhazuje. Dřív se tu nekontrolovala, takže
+    // nepovedené smazání vypadalo jako povedené a tým se při dalším čtení
+    // ze serveru vrátil.
+    const { error } = await klient.from(TABULKA).delete().eq("id", id);
+    if (error) throw error;
     naposledy = naposledy.filter((t) => t.id !== id);
     zmena();
-  } catch {
-    // nevadí, místní stav je už bez něj
+  } catch (e) {
+    console.warn("Tour de Pub: tým se ze serveru smazat nepodařilo.", e);
   }
 }
 
 /** Zkusit se připojit znovu, aniž by se načítala celá stránka. */
 export async function zkusZnovu() {
+  // starý kanál zavřít, jinak by vedle nového dál poslouchal
+  klient?.removeAllChannels();
   klient = null;
   rezim = "ukazka";
   chyba = "";

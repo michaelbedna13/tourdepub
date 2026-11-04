@@ -77,12 +77,6 @@ export interface Rozpad {
 /** Druhy čárek, které se nabíhají v každé špeluňce. */
 export type Zaklad = "prichod" | "skopek";
 
-/** Barvy part. Všechny jsou z palety appky, ne vedle ní: červená a žlutá
- *  z kategorií, zelená a mořská jako jejich zesvětlené varianty (sytá zeleň
- *  se na tmavém nepřečte), krémová z loga a tmavá zeleň z loga jako šestá.
- *  Dvě zeleně vedle sebe vadit nemusí — liší se světlostí natolik, že se
- *  jako tečka o devíti pixelech nespletou; losos z obtížnosti by se naopak
- *  s červenou pral. */
 const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 
 /** `vlastni` říká, jestli tým někdo opravdu založil. Appka si žádný
@@ -423,14 +417,8 @@ export function smazUkol(id: string) {
 /* ---------- bodování ---------- */
 
 export function body(t = tym()): number {
-  if (!t) return 0;
-  const zaDochazku = Object.values(t.prichod).filter(Boolean).length;
-  const zaSkopky = Object.values(t.skopek).filter(Boolean).length;
-  const zaUkoly = Object.entries(t.ukoly).reduce((soucet, [id, kolik]) => {
-    const u = ukolPodleId(id);
-    return u ? soucet + Math.min(kolik, u.max) * u.body : soucet;
-  }, 0);
-  return zaDochazku + zaSkopky + zaUkoly;
+  const r = rozpad(t);
+  return r.dochazka + r.skopky + r.ukoly;
 }
 
 export function rozpad(t = tym()): Rozpad {
@@ -540,7 +528,10 @@ export function uberUkol(u: Ukol): boolean {
 export function vynulujTym(id = stav.tymId) {
   const t = stav.tymy.find((x) => x.id === id);
   if (!t) return;
-  Object.assign(t, { prichod: {}, skopek: {}, ukoly: {}, zlodej: {}, hospoda: stav.hospody[0]?.id || null });
+  // prichodCas taky: bez něj by po vynulování zůstávaly časy příchodů
+  // k hospodám, kde parta podle stavu nikdy nebyla
+  Object.assign(t, { prichod: {}, prichodCas: {}, skopek: {}, ukoly: {}, zlodej: {},
+    hospoda: stav.hospody[0]?.id || null });
   dotknuto(t);
   uloz();
 }
@@ -562,6 +553,11 @@ export function kOdeslani(t: Tym): RadekTymu {
   };
 }
 
+/** Razítko změny jako číslo. Porovnávat ho jako text nejde: telefon píše
+ *  „…10:00:00.123Z", Postgres vrací „…10:00:00.123+00:00" a někdy bez
+ *  tisícin, takže by o novějším rozhodovalo pořadí znaků, ne čas. */
+export const casZmeny = (r: string | null | undefined): number => (r ? Date.parse(r) || 0 : 0);
+
 /** Sloučí týmy ze serveru do místních. Novější razítko vyhrává; tým, který
  *  ze serveru zmizel, zmizí i tady, pokud tam někdy byl. */
 export function slucZeServeru(radky: RadekTymu[]) {
@@ -578,7 +574,7 @@ export function slucZeServeru(radky: RadekTymu[]) {
     };
     const mistni = stav.tymy.find((t) => t.id === r.id);
     if (!mistni) stav.tymy.push({ id: r.id, ...zeServeru });
-    else if (!mistni.upraveno || (r.upraveno && r.upraveno > mistni.upraveno))
+    else if (casZmeny(r.upraveno) > casZmeny(mistni.upraveno))
       Object.assign(mistni, zeServeru);
     else mistni.bylNaServeru = true;
   }

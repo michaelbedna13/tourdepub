@@ -1,7 +1,8 @@
+import { OBTIZNOST } from "../lib/data";
 import { Ikona } from "./Ikona";
 
-export const NAZVY_OBTIZNOSTI: Record<1 | 2 | 3, string> =
-  { 1: "Brnkačka", 2: "Větší haluz", 3: "Betelná makačka" };
+/* Názvy obtížností byly napsané dvakrát: tady a v OBTIZNOST v data.ts,
+   odkud je bere formulář úkolu i Pravidla. Teď jen tam. */
 
 interface Props {
   piva: 1 | 2 | 3;
@@ -17,7 +18,7 @@ export function Obtiznost({ piva, sNazvem = true }: Props) {
       <span className="piva">
         {Array.from({ length: piva }, (_, i) => <Ikona key={i} jmeno="piva" px={13} />)}
       </span>
-      {sNazvem && NAZVY_OBTIZNOSTI[piva]}
+      {sNazvem && OBTIZNOST.find((o) => o.piva === piva)?.nazev}
     </span>
   );
 }
