@@ -299,16 +299,16 @@ const KRESBY = {
     ...skopekVRuce(33, 36, 14, 1),
   ],
 
-  // Od špeluňky ke špeluňce: panák jde se škopkem ke sklepní hospodě.
+  // Od špeluňky ke špeluňce: panák jde se škopkem k sudu.
   // Dřív visel na lucerně. Mišák chtěl hospodu, pak ať se o ni neopírá,
   // a domky se střechou a komínem (hospodaTvar) byly „hnusný“: četly se
   // jako dětská kresba domu. Hospoda je proto předmět, ne dům, stejně
   // jako tabule u čárek: velký plochý tvar s ostře vystřiženým detailem.
-  // Výchozí B: masivní zeď s klenutým vchodem, kameny kolem klenby
-  // a vývěsní štít se škopkem. A (rozcestník se dvěma šipkami a škopky)
-  // a C (pivní sud s pípou) přes VARIANTA=a / c.
+  // Mišák vybral C: pivní sud s obručemi a pípou, ke kterému panák jde.
+  // A (rozcestník se dvěma šipkami a škopky) a B (zeď s klenutým vchodem
+  // a štítem) zůstávají přes VARIANTA=a / b.
   hospoda: () => {
-    const V = process.env.VARIANTA || "b";
+    const V = process.env.VARIANTA || "c";
     const PLOCHA = { amp: .6, step: 4, tension: .42 };
     if (V === "b") return [
       // klenutý vchod do sklepní hospody: masivní zeď, v ní vystřižená
