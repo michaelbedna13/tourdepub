@@ -152,8 +152,21 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
    *  „někam doprostřed", protože chce dál, se netrefí zpátky. */
   const ZPET_DIL = 0.4;
 
+  /** Pás se značkou a Přeskočit nahoře. Ťuknutí do jeho pravé půlky
+   *  zavírá úvod, i když mine samotné tlačítko.
+   *
+   *  Mišák: na iPhonu Přeskočit nefungovalo. V Chromiu se to napodobit
+   *  nedá, tlačítko tam dostane ťuknutí a úvod zavře. Takže se na to, komu
+   *  Safari ťuknutí přidělí, nespoléhá: rozhoduje plakát podle místa,
+   *  stejně jako u Dál a Zpátky, které na telefonu fungují. Drobné slovo
+   *  v rohu je terč, který se po pár pivech snadno mine; netrefené ťuknutí
+   *  dřív padlo do pravé části plakátu a posunulo dál místo zavření. */
+  const hlava = useRef<HTMLDivElement>(null);
+
   function tuk(e: React.PointerEvent<HTMLDivElement>) {
     const r = e.currentTarget.getBoundingClientRect();
+    const h = hlava.current?.getBoundingClientRect();
+    if (h && e.clientY <= h.bottom && e.clientX - r.left >= r.width / 2) { zavri(); return; }
     if (e.clientX - r.left < r.width * ZPET_DIL) zpet();
     else dal();
   }
@@ -168,12 +181,11 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
         /* Ťuká se do obrazovky, ne do tlačítka: vpravo dál, vlevo zpátky.
            Šipky dole jsou jen cedule, že to tak funguje. */
         <div className="uvod-obsah" onPointerUp={tuk}>
-          <div className="uvod-hlava">
+          <div className="uvod-hlava" ref={hlava}>
             <Logo trida="uvod-znak" />
-            {/* Přeskočit nesmí propadnout do ťuknutí pod sebou, jinak by
-                posunulo dál a teprve pak zavřelo. */}
+            {/* Ťuknutí sem řeší tuk() podle místa (viz hlava výš). Tlačítko
+                zůstává kvůli klávesnici a čtečce; click nepropadne dál. */}
             <button className="uvod-preskocit" type="button"
-              onPointerUp={(e) => { e.stopPropagation(); zavri(); }}
               onClick={(e) => { e.stopPropagation(); zavri(); }}>Přeskočit</button>
           </div>
 
