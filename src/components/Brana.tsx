@@ -1,4 +1,4 @@
-// Brána: heslo hry při prvním spuštění. Pak si ho telefon pamatuje
+// Brána: heslo hry (nebo heslo správce) při prvním spuštění. Pak si ho telefon pamatuje
 // (přihlášení drží Supabase v localStorage a samo ho obnovuje).
 //
 // Není to vrstva přes appku, ale obrazovka místo ní: vrstva přes celou
@@ -7,7 +7,8 @@
 // stejně nemá co ukazovat.
 import { useEffect, useState, type FormEvent } from "react";
 import { vazat } from "../lib/format";
-import { dejKlienta, prihlas } from "../lib/prihlaseni";
+import { aktualniUcet, dejKlienta, prihlasBranou } from "../lib/prihlaseni";
+import { odkryjSpravce } from "../lib/spravce";
 import { Logo } from "./Logo";
 
 export function Brana() {
@@ -25,9 +26,10 @@ export function Brana() {
     if (!h || ceka) return;
     setCeka(true);
     setChyba("");
-    const c = await prihlas("hrac", h);
+    const c = await prihlasBranou(h);
     setCeka(false);
     if (c) setChyba(c);
+    else if (aktualniUcet() === "spravce") odkryjSpravce();
   }
 
   return (

@@ -88,23 +88,43 @@ export function dejKlienta(): Promise<SupabaseClient> {
 /** Přihlásí telefon. Vrací prázdný řetězec, když to prošlo, jinak větu
  *  pro člověka. */
 export async function prihlas(kdo: Role, heslo: string): Promise<string> {
+  return (await zkus(kdo, heslo)).chyba;
+}
+
+/** Brána bere obě hesla. Mišák do ní na telefonu zadal heslo správce
+ *  a dostal „Tohle heslo nesedí“, přitom je to heslo, které pustí ještě
+ *  dál. Zkusí se tedy heslo hry, a když server řekne, že nesedí, ještě
+ *  heslo správce. Jiná chyba (bez signálu, moc pokusů) se hlásí hned. */
+export async function prihlasBranou(heslo: string): Promise<string> {
+  const hrac = await zkus("hrac", heslo);
+  if (!hrac.spatneHeslo) return hrac.chyba;
+  const spravce = await zkus("spravce", heslo);
+  return spravce.spatneHeslo ? hrac.chyba : spravce.chyba;
+}
+
+async function zkus(kdo: Role, heslo: string): Promise<{ chyba: string; spatneHeslo: boolean }> {
   try {
     const k = await dejKlienta();
     const { data, error } = await k.auth.signInWithPassword({
       email: kdo === "spravce" ? EMAIL_SPRAVCE : EMAIL_HRACE,
       password: heslo,
     });
-    if (error) return popisChyby(error, kdo);
+    if (error) return { chyba: popisChyby(error, kdo), spatneHeslo: jeSpatneHeslo(error) };
     const r = roleZ(data.user);
     if (r !== kdo && !(kdo === "hrac" && r === "spravce")) {
       await odhlas();
-      return "Účet nemá v Tour de Pub roli. Zkontroluj app_metadata v Supabase.";
+      return { chyba: "Účet nemá v Tour de Pub roli. Zkontroluj app_metadata v Supabase.", spatneHeslo: false };
     }
     nastav(r!);
-    return "";
+    return { chyba: "", spatneHeslo: false };
   } catch (e) {
-    return popisChyby(e, kdo);
+    return { chyba: popisChyby(e, kdo), spatneHeslo: false };
   }
+}
+
+function jeSpatneHeslo(e: unknown): boolean {
+  const o = e as { code?: string; message?: string };
+  return o?.code === "invalid_credentials" || /invalid login credentials/i.test(o?.message || "");
 }
 
 /** Odhlásí jen tenhle telefon.
@@ -126,7 +146,7 @@ export async function odhlas() {
 function popisChyby(e: unknown, kdo: Role): string {
   const o = e as { status?: number; code?: string; message?: string; name?: string };
   const zprava = o?.message || String(e);
-  if (o?.code === "invalid_credentials" || /invalid login credentials/i.test(zprava))
+  if (jeSpatneHeslo(e))
     return kdo === "spravce" ? "Tohle heslo správce nesedí." : "Tohle heslo nesedí.";
   if (o?.status === 429 || /rate limit/i.test(zprava))
     return "Moc pokusů za sebou. Chvilku počkej a zkus to znova.";

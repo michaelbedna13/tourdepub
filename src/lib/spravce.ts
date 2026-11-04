@@ -46,6 +46,12 @@ export function vypniSpravce() {
   nastavSchovany(true);
 }
 
+/** Kdo zadá heslo správce rovnou do brány, chce být správce, i kdyby
+ *  si režim na tomhle telefonu dřív vypnul. */
+export function odkryjSpravce() {
+  nastavSchovany(false);
+}
+
 /** Je zapnutý režim správce? Obrazovka se překreslí, když se to změní. */
 export function useSpravce(): boolean {
   const ucet = useUcet();
