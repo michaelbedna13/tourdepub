@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { body, prepniTym, stav, tym, useStav } from "../lib/stav";
+import { useSpravce } from "../lib/spravce";
 import { Ikona } from "./Ikona";
 import { Logo } from "./Logo";
 import { Okno } from "./Okno";
@@ -29,6 +30,8 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
   useStav();
   const [okno, setOkno] = useState<"zadne" | "prepinac" | "novy">("zadne");
   const t = tym();
+  // Týmy zakládá jen správce; hráč si jen vybírá, za koho zapisuje.
+  const spravce = useSpravce();
 
   return (
     <>
@@ -70,13 +73,13 @@ export function Hlava({ nadpis, drobne, zpet }: Props) {
             ))}
           </div>
           <div className="okno-akce">
-            <button className="tl" onClick={() => setOkno("novy")}><Ikona jmeno="plus" px={18} /> Přidat tým</button>
+            {spravce && <button className="tl" onClick={() => setOkno("novy")}><Ikona jmeno="plus" px={18} /> Přidat tým</button>}
             <button className="tl tise" onClick={() => setOkno("zadne")}>Zpátky</button>
           </div>
         </Okno>
       )}
 
-      {okno === "novy" && <OknoTymu zavri={() => setOkno("zadne")} />}
+      {okno === "novy" && spravce && <OknoTymu zavri={() => setOkno("zadne")} />}
     </>
   );
 }

@@ -56,9 +56,12 @@ Při prvním spuštění chce appka **heslo hry**. Je to heslo společného úč
 v Supabase Auth, ověřuje ho server, ne appka, a telefon si přihlášení pamatuje.
 Bez něj server do tabulky nikoho nepustí (pravidla v `supabase/party.sql`).
 
-**Úpravy úkolů a hospod a mazání týmů** odemkne v Pravidlech → Režim správce
-**heslo správce**, druhý účet. Mazat týmy na serveru dovolí pravidla jen jemu,
-ať appka ukazuje cokoli. Vypnutí režimu správce účet neodhlásí, jen schová úpravy.
+Hráči si jen vybírají, za který tým zapisují, a zapisují čárky, úkoly a štace.
+**Zakládání, přejmenování a mazání týmů a úpravy úkolů a hospod** odemkne
+v Pravidlech → Režim správce **heslo správce**, druhý účet. Heslo správce jde
+zadat i rovnou do brány. Zakládat, přejmenovat a mazat týmy dovolí server jen
+správci, ať appka ukazuje cokoli. Vypnutí režimu správce účet neodhlásí, jen
+schová úpravy.
 
 Hesla se mění v Supabase → Authentication → Users. Kdo už je přihlášený, zůstane
 přihlášený i po změně hesla; vyhodit všechny jde přes „Sign out user" u účtu.

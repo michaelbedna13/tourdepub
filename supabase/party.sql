@@ -52,8 +52,10 @@ alter table public.tourdepub_tymy enable row level security;
 -- Dřív byla tabulka otevřená roli anon, tedy komukoli s adresou projektu
 -- a veřejným klíčem z prohlížeče: číst, přepisovat i mazat čárky všem.
 -- Teď pouští jen přihlášené účty, které mají v app_metadata roli Tour de Pub:
---   tourdepub = 'hrac'     společný účet party (heslo hry), čte a zapisuje
---   tourdepub = 'spravce'  účet správce, navíc smí mazat týmy
+--   tourdepub = 'hrac'     společný účet party (heslo hry): čte a zapisuje
+--                          čárky, úkoly a štace do existujících týmů
+--   tourdepub = 'spravce'  účet správce: navíc zakládá, přejmenovává
+--                          a maže týmy
 -- Samotné „je přihlášený" by nestačilo: projekt sdílí osobní appka, a kdyby
 -- v Auth zůstala zapnutá registrace, přihlásit by se mohl kdokoli.
 -- app_metadata umí měnit jen server, ne prohlížeč.
@@ -82,14 +84,43 @@ drop policy if exists "hraci ctou" on public.tourdepub_tymy;
 create policy "hraci ctou" on public.tourdepub_tymy for select to authenticated
   using ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') in ('hrac', 'spravce'));
 
+-- Zakládá jen správce. Pozor: upsert je pro Postgres insert i u řádku,
+-- který existuje, takže hráčova appka posílá update (viz sync.ts).
 drop policy if exists "hraci zakladaji" on public.tourdepub_tymy;
-create policy "hraci zakladaji" on public.tourdepub_tymy for insert to authenticated
-  with check ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') in ('hrac', 'spravce'));
+drop policy if exists "spravce zaklada" on public.tourdepub_tymy;
+create policy "spravce zaklada" on public.tourdepub_tymy for insert to authenticated
+  with check ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') = 'spravce');
 
 drop policy if exists "hraci upravuji" on public.tourdepub_tymy;
 create policy "hraci upravuji" on public.tourdepub_tymy for update to authenticated
   using ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') in ('hrac', 'spravce'))
   with check ((select auth.jwt() -> 'app_metadata' ->> 'tourdepub') in ('hrac', 'spravce'));
+
+-- Přejmenovat tým (nebo ho přesunout do jiné hry) smí jen správce.
+-- RLS neumí porovnat starou a novou hodnotu sloupce, proto spoušť.
+-- Dotýká se jen požadavků přes API (anon / authenticated); SQL Editor
+-- a service role v Supabase jdou dál.
+create or replace function public.tourdepub_hlidej_tym()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if coalesce(auth.role(), '') in ('anon', 'authenticated')
+     and coalesce(auth.jwt() -> 'app_metadata' ->> 'tourdepub', '') <> 'spravce'
+     and (new.nazev is distinct from old.nazev or new.hra is distinct from old.hra or new.id is distinct from old.id)
+  then
+    raise exception 'Přejmenovat tým smí jen správce' using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists tourdepub_hlidej_tym on public.tourdepub_tymy;
+create trigger tourdepub_hlidej_tym before update on public.tourdepub_tymy
+  for each row execute function public.tourdepub_hlidej_tym();
+
+revoke execute on function public.tourdepub_hlidej_tym() from public, anon, authenticated;
 
 -- Smazaný tým zmizí ostatním z pořadí i s čárkami. To smí jen správce,
 -- appka to hráčům ani nenabízí, ale rozhoduje tohle pravidlo.

@@ -5,7 +5,7 @@
 import { useSyncExternalStore } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni";
-import { dejKlienta } from "./prihlaseni";
+import { aktualniUcet, dejKlienta } from "./prihlaseni";
 import { stav, naZmenu, kOdeslani, slucZeServeru, casZmeny, type RadekTymu } from "./stav";
 
 /** ukazka = jen tenhle telefon · pripojuji · zivo · chyba = nepodařilo se */
@@ -156,6 +156,24 @@ async function posli(): Promise<boolean> {
     // Posílá se prázdná, ať nemusí nikdo sahat do databáze; nová tabulka
     // z supabase/party.sql už ji povinnou nemá a časem může zmizet.
     const radky = k.map((t) => ({ ...kOdeslani(t), hra: HRA, barva: "" }));
+
+    // Zakládat a přejmenovávat týmy smí jen správce, a hlídá to server:
+    // hráčův insert odmítne pravidlo, přejmenování spoušť. Upsert je pro
+    // Postgres insert i u řádku, který už existuje, takže hráč posílá
+    // update jen do týmů, které na serveru jsou, a bez jména. Tým, který
+    // na serveru není (třeba založený ve starší verzi), zůstane hráči jen
+    // v telefonu, ať appka neplive chybu při každé čárce.
+    if (aktualniUcet() !== "spravce") {
+      const naServeru = new Set(naposledy.map((r) => r.id));
+      const vysledky = await Promise.all(radky
+        .filter((r) => naServeru.has(r.id))
+        .map(({ id, nazev: _jmeno, ...zbytek }) =>
+          klient!.from(TABULKA).update(zbytek).eq("id", id)));
+      const chybny = vysledky.find((v) => v.error);
+      if (chybny?.error) throw chybny.error;
+      return true;
+    }
+
     const { error } = await klient.from(TABULKA).upsert(radky);
     if (error) throw error;
     return true;

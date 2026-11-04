@@ -6,6 +6,7 @@ import { PruhSyncu } from "../components/PruhSyncu";
 import { Uctenka } from "../components/Uctenka";
 import { vazat } from "../lib/format";
 import { poradiTymu, prepniTym, stav, strop, useStav } from "../lib/stav";
+import { useSpravce } from "../lib/spravce";
 
 /** Kdo jak stojí. Ťuknutím se přepne, za koho se na tomhle telefonu zapisuje —
  *  jeden telefon klidně zapisuje všem partám. */
@@ -15,6 +16,8 @@ export function Tymy() {
   const [novy, setNovy] = useState(false);
   const poradi = poradiTymu();
   const s = strop();
+  // Zakládat a upravovat týmy smí jen správce (hlídá to i server).
+  const spravce = useSpravce();
 
   return (
     <>
@@ -28,15 +31,17 @@ export function Tymy() {
         ukolu={stav.ukoly.length}
         strop={s.celkem}
         prepni={prepniTym}
-        uprav={setUprava}
+        uprav={spravce ? setUprava : undefined}
       />
 
-      <div className="sekce">
-        <button className="tl" onClick={() => setNovy(true)}><Ikona jmeno="plus" px={18} /> Přidat tým</button>
-      </div>
+      {spravce && (
+        <div className="sekce">
+          <button className="tl" onClick={() => setNovy(true)}><Ikona jmeno="plus" px={18} /> Přidat tým</button>
+        </div>
+      )}
 
-      {novy && <OknoTymu zavri={() => setNovy(false)} />}
-      {uprava && <OknoTymu id={uprava} zavri={() => setUprava(null)} />}
+      {novy && spravce && <OknoTymu zavri={() => setNovy(false)} />}
+      {uprava && spravce && <OknoTymu id={uprava} zavri={() => setUprava(null)} />}
     </>
   );
 }

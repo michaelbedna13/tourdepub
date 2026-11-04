@@ -4,6 +4,7 @@ import { KartyKategorii } from "../components/KartyKategorii";
 import { Ikona } from "../components/Ikona";
 import { OknoTymu } from "../components/OknoTymu";
 import { PruhSyncu } from "../components/PruhSyncu";
+import { useSpravce } from "../lib/spravce";
 import { Uctenka } from "../components/Uctenka";
 import { ZAKLAD, type Hospoda } from "../lib/data";
 import { barvaStace } from "../lib/barva";
@@ -218,13 +219,23 @@ function HeroKarta({ h, cislo, aktivni }: { h: Hospoda; cislo: number; aktivni: 
   );
 }
 
-/** Hra bez týmu: jedna věta a tlačítko, co ho založí. */
+/** Hra bez týmu. Správce ho tu rovnou založí; hráč počká, až nějaký
+ *  bude: týmy zakládá jen správce a ke hráčům přitečou ze serveru. */
 function PrazdnaHra() {
   const [novy, setNovy] = useState(false);
+  const spravce = useSpravce();
+  if (!spravce)
+    return (
+      <>
+        <Hlava nadpis="Hra" />
+        <PruhSyncu />
+        <div className="prazdno">Zatím tu není žádnej tým.</div>
+      </>
+    );
   return (
     <>
       <Hlava nadpis="Hra" />
-      <div className="prazdno">Nejdřív si založ tým, pak se dá zapisovat.</div>
+      <div className="prazdno">Nejdřív založ tým, pak se dá zapisovat.</div>
       <div className="sekce">
         <button className="tl hlavni" onClick={() => setNovy(true)}>
           <Ikona jmeno="plus" px={18} /> Založit tým

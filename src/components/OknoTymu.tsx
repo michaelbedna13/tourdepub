@@ -12,12 +12,11 @@ interface Props {
   zavri: () => void;
 }
 
-/** Formulář týmu: jenom jméno. Tým jde upravovat z každého telefonu,
- *  protože se na server posílá celý jeho stav, ne jen výsledek. */
+/** Formulář týmu: jenom jméno. Otevírá ho jen správce; zakládat
+ *  a přejmenovávat týmy hráčům nedovolí ani server. */
 export function OknoTymu({ id, zavri }: Props) {
-  // Mazat smí jenom správce. Založit a přejmenovat partu smí kdokoli — to se
-  // dělá na začátku večera a nedá se tím nic ztratit. Smazání bere i čárky,
-  // a to ostatním, ne jen sobě: maže se i ze serveru.
+  // Založit, přejmenovat i smazat tým smí jen správce. Hráči jen vybírají,
+  // za koho zapisují, a zapisují.
   const spravce = useSpravce();
   const novy = !id;
   const t = id ? stav.tymy.find((x) => x.id === id) : undefined;
@@ -26,6 +25,7 @@ export function OknoTymu({ id, zavri }: Props) {
   if (!novy && !t) return null;
 
   function uloz() {
+    if (!spravce) { zavri(); return; }
     const jmeno = nazev.trim().slice(0, 40);
     if (novy) prepniTym(pridejTym(jmeno || "Nová parta").id);
     else upravTym(id!, { nazev: jmeno || "Bez názvu" });
