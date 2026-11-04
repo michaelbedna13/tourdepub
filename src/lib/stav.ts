@@ -118,16 +118,24 @@ function zarizeni(): string {
 }
 const JA = zarizeni();
 
-/** Přepočítá pole týmu z knihy. */
+/** Přepočítá pole týmu z knihy. Štaci (t.hospoda) nechá být: tu si drží
+ *  každý telefon sám, viz nastavHospodu. */
 function prepocti(t: Tym, hospody: Hospoda[] = stav.hospody) {
   Object.assign(t, K.vyloz(t.kniha));
-  if (!t.hospoda || !hospody.some((h) => h.id === t.hospoda)) t.hospoda = hospody[0]?.id || null;
+  if (!t.hospoda || !hospody.some((h) => h.id === t.hospoda)) t.hospoda = kdeStoji(t, hospody);
+}
+
+/** Kam postavit tým, který telefon vidí poprvé: do poslední hospody, kde
+ *  má parta příchod, jinak do první. */
+function kdeStoji(t: Pick<Tym, "prichod">, hospody: Hospoda[]): string | null {
+  const posledni = [...hospody].reverse().find((h) => t.prichod[h.id]);
+  return (posledni || hospody[0])?.id || null;
 }
 
 /** Kniha z řádku ze serveru. Řádek zapsaný starší verzí appky knihu nemá,
  *  pak se složí z polí s razítkem řádku. */
 export function knihaRadku(r: RadekTymu): K.Kniha {
-  return K.jeKniha(r.stav?.kniha) ? r.stav.kniha : K.zeStarehoTvaru(r.stav, casZmeny(r.upraveno));
+  return K.precti(r.stav?.kniha, casZmeny(r.upraveno)) ?? K.zeStarehoTvaru(r.stav, casZmeny(r.upraveno));
 }
 
 /** Označí tým za používaný a orazítkuje změnu. */
@@ -250,8 +258,12 @@ function nacti(): Stav {
     if (!t.prichodCas) t.prichodCas = {};
     // Stav z doby před knihou zápisů: kniha se složí z polí a tým se pošle,
     // ať se sloučí se serverem. Sloučení je bezpečné i opakovaně.
-    if (!K.jeKniha(t.kniha)) {
+    const k = K.precti(t.kniha, casZmeny(t.upraveno));
+    if (!k) {
       t.kniha = K.zeStarehoTvaru(t, casZmeny(t.upraveno));
+      t.neodeslano = !!t.vlastni;
+    } else if (k !== t.kniha) {
+      t.kniha = k; // kniha v1 → v2
       t.neodeslano = !!t.vlastni;
     }
     if (t.neodeslano === undefined) t.neodeslano = false;
@@ -318,7 +330,7 @@ export const tym = (): Tym | undefined => stav.tymy.find((t) => t.id === stav.ty
 
 export function pridejTym(nazev: string): Tym {
   const t = novyTym(nazev);
-  K.nastavHospodu(t.kniha, stav.hospody[0]?.id || null, JA);
+  t.hospoda = stav.hospody[0]?.id || null;
   prepocti(t);
   t.upraveno = new Date().toISOString();
   stav.tymy.push(t);
@@ -361,12 +373,12 @@ export const indexHospody = (t = tym()): number => {
   return i < 0 ? 0 : i;
 };
 
+/** Posune štaci. Jen v tomhle telefonu: nikam se neposílá a ostatním
+ *  z party se obrazovka nepohne. Kde kdo zapisuje, si řídí každý sám. */
 export function nastavHospodu(id: string) {
   const t = tym();
   if (!t || t.hospoda === id) return;
-  dotknuto(t);
-  K.nastavHospodu(t.kniha, id, JA);
-  prepocti(t);
+  t.hospoda = id;
   uloz();
 }
 
@@ -585,7 +597,8 @@ export function vynulujTym(id = stav.tymId) {
   // Vynuluje se v knize, ne smazáním polí: smazané by druhý telefon při
   // sloučení vrátil. Co mezitím přidá jiný telefon, zůstane (viz vynuluj).
   dotknuto(t);
-  K.vynuluj(t.kniha, stav.hospody[0]?.id || null, JA);
+  K.vynuluj(t.kniha, JA);
+  t.hospoda = stav.hospody[0]?.id || null;
   prepocti(t);
   uloz();
 }
@@ -598,13 +611,16 @@ export function vynulujTym(id = stav.tymId) {
 export function kOdeslani(t: Tym, kniha: K.Kniha = t.kniha): RadekTymu {
   const v: Tym = { ...t, kniha };
   prepocti(v);
+  // Sloupec hospoda: kam parta naposledy dorazila (příchod), ne štace,
+  // na kterou se zrovna kouká tenhle telefon.
+  const dorazila = stav.hospody.findIndex((h) => h.id === kdeStoji(v, stav.hospody));
   return {
     id: t.id,
     nazev: t.nazev || "Bezejmenná parta",
-    hospoda: indexHospody(v) + 1,
+    hospoda: Math.max(0, dorazila) + 1,
     body: body(v),
     rozpad: rozpad(v),
-    stav: { hospoda: v.hospoda, prichod: v.prichod, prichodCas: v.prichodCas,
+    stav: { hospoda: stav.hospody[dorazila]?.id ?? null, prichod: v.prichod, prichodCas: v.prichodCas,
             skopek: v.skopek, ukoly: v.ukoly, zlodej: v.zlodej, kniha },
     upraveno: new Date().toISOString(),
   };
@@ -627,7 +643,11 @@ export function poOdeslani(id: string, odeslana: K.Kniha, nazev: string) {
 /** Razítko změny jako číslo. Porovnávat ho jako text nejde: telefon píše
  *  „…10:00:00.123Z", Postgres vrací „…10:00:00.123+00:00" a někdy bez
  *  tisícin, takže by o novějším rozhodovalo pořadí znaků, ne čas. */
-export const casZmeny = (r: string | null | undefined): number => (r ? Date.parse(r) || 0 : 0);
+// Deklarace funkce, ne const: volá ji nacti() při startu modulu, tedy dřív,
+// než by se const pod ní stihla zavést (ReferenceError a appka nenaběhne).
+export function casZmeny(r: string | null | undefined): number {
+  return r ? Date.parse(r) || 0 : 0;
+}
 
 /** Sloučí týmy ze serveru do místních. Novější razítko vyhrává; tým, který
  *  ze serveru zmizel, zmizí i tady, pokud tam někdy byl. */
@@ -639,7 +659,7 @@ export function slucZeServeru(radky: RadekTymu[]) {
     const mistni = stav.tymy.find((t) => t.id === r.id);
     if (!mistni) {
       const t: Tym = { ...novyTym(r.nazev, true), id: r.id, upraveno: r.upraveno,
-        bylNaServeru: true, kniha: k, neodeslano: false };
+        bylNaServeru: true, kniha: k, neodeslano: false, hospoda: null };
       prepocti(t);
       stav.tymy.push(t);
       continue;

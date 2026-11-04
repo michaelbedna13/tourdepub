@@ -5,12 +5,18 @@
 // první i s čárkou, kterou první telefon zrovna přidal: čárka se ztratila.
 //
 // Kniha se proto neslučuje „celá za celou", ale po položkách, a dvě knihy
-// jdou sloučit v libovolném pořadí a kolikrát chceš se stejným výsledkem:
-//  - příchod, škopek, zloděj a štace jsou hodnoty s časem a telefonem.
-//    Vyhrává novější zápis TÉ JEDNÉ položky. Když jeden telefon zapíše
-//    škopek a druhý příchod, zůstane obojí.
-//  - úkoly si každý telefon počítá zvlášť (kolik přidal, kolik ubral)
-//    a platí součet. Dva lidi, co naráz odškrtnou pivo, jsou dvě piva.
+// jdou sloučit v libovolném pořadí a kolikrát chceš se stejným výsledkem.
+// Každá položka (příchod v té hospodě, škopek, zloděj, počet u úkolu) je
+// hodnota s časem a telefonem a vyhrává novější zápis TÉ JEDNÉ položky.
+// Když jeden telefon zapíše škopek a druhý příchod, zůstane obojí.
+//
+// U úkolů se zapisuje stav, ne přírůstek: kdo vidí 1 a ťukne +, zapíše
+// „mají být 2“. Když totéž udělá naráz kamarád z party, jsou to pořád 2,
+// ne 3. Mišák nechtěl, aby se body zdvojovaly. (Sčítání přírůstků bylo
+// v první verzi knihy, v1; převede se, viz zKnihyV1.)
+//
+// Štace v knize není: kde parta stojí, si drží každý telefon sám, ať
+// posunutí štace na jednom telefonu nepřehodí obrazovku ostatním.
 //
 // Modul nemá žádné závislosti, ať jde vyzkoušet samostatně.
 
@@ -21,18 +27,16 @@ export type Zarizeni = string;
 export type Zapis<T> = [T, number, Zarizeni];
 
 export interface Kniha {
-  v: 1;
-  hospoda: Zapis<string | null> | null;
+  v: 2;
   prichod: Record<string, Zapis<boolean>>;
   skopek: Record<string, Zapis<boolean>>;
   zlodej: Record<string, Zapis<boolean>>;
-  /** id úkolu → telefon → [kolikrát přidal, kolikrát ubral] */
-  ukoly: Record<string, Record<Zarizeni, [number, number]>>;
+  /** id úkolu → kolikrát splněno */
+  ukoly: Record<string, Zapis<number>>;
 }
 
 /** To, co z knihy čte zbytek appky (stejný tvar jako dřív na Tym). */
 export interface Vyklad {
-  hospoda: string | null;
   prichod: Record<string, boolean>;
   prichodCas: Record<string, number>;
   skopek: Record<string, boolean>;
@@ -43,7 +47,7 @@ export interface Vyklad {
 export type Prepinac = "prichod" | "skopek" | "zlodej";
 
 export const prazdnaKniha = (): Kniha =>
-  ({ v: 1, hospoda: null, prichod: {}, skopek: {}, zlodej: {}, ukoly: {} });
+  ({ v: 2, prichod: {}, skopek: {}, zlodej: {}, ukoly: {} });
 
 /** Je zápis b novější než a? Při shodném čase rozhodne jméno telefonu,
  *  ať oba telefony vyberou totéž. */
@@ -56,32 +60,20 @@ function slucZapis<T>(a: Zapis<T> | null | undefined, b: Zapis<T> | null | undef
   return novejsi(a, b) ? b : a;
 }
 
-function slucMapu(a: Record<string, Zapis<boolean>>, b: Record<string, Zapis<boolean>>) {
-  const v: Record<string, Zapis<boolean>> = { ...a };
+function slucMapu<T>(a: Record<string, Zapis<T>>, b: Record<string, Zapis<T>>) {
+  const v: Record<string, Zapis<T>> = { ...a };
   for (const k of Object.keys(b)) v[k] = slucZapis(a[k], b[k])!;
   return v;
 }
 
 /** Sloučí dvě knihy. Na pořadí ani opakování nezáleží. */
 export function sluc(a: Kniha, b: Kniha): Kniha {
-  const ukoly: Kniha["ukoly"] = {};
-  for (const id of new Set([...Object.keys(a.ukoly), ...Object.keys(b.ukoly)])) {
-    const x = a.ukoly[id] || {};
-    const y = b.ukoly[id] || {};
-    const m: Record<Zarizeni, [number, number]> = {};
-    for (const z of new Set([...Object.keys(x), ...Object.keys(y)])) {
-      // Každý telefon jen přičítá do svých dvou čísel, takže větší je novější.
-      m[z] = [Math.max(x[z]?.[0] || 0, y[z]?.[0] || 0), Math.max(x[z]?.[1] || 0, y[z]?.[1] || 0)];
-    }
-    ukoly[id] = m;
-  }
   return {
-    v: 1,
-    hospoda: slucZapis(a.hospoda, b.hospoda),
+    v: 2,
     prichod: slucMapu(a.prichod, b.prichod),
     skopek: slucMapu(a.skopek, b.skopek),
     zlodej: slucMapu(a.zlodej, b.zlodej),
-    ukoly,
+    ukoly: slucMapu(a.ukoly, b.ukoly),
   };
 }
 
@@ -90,38 +82,23 @@ export function sluc(a: Kniha, b: Kniha): Kniha {
  *  opožďuje, prohrálo se zápisem, který zrovna opravuje. */
 const casPo = (pred?: Zapis<unknown> | null) => Math.max(Date.now(), (pred?.[1] ?? 0) + 1);
 
-export function nastavHospodu(k: Kniha, id: string | null, ja: Zarizeni) {
-  k.hospoda = [id, casPo(k.hospoda), ja];
-}
-
 export function nastavPrepinac(k: Kniha, druh: Prepinac, klic: string, hodnota: boolean, ja: Zarizeni) {
   k[druh][klic] = [hodnota, casPo(k[druh][klic]), ja];
 }
 
-export const pocet = (k: Kniha, id: string): number =>
-  Object.values(k.ukoly[id] || {}).reduce((s, [plus, minus]) => s + plus - minus, 0);
+export const pocet = (k: Kniha, id: string): number => Math.max(0, k.ukoly[id]?.[0] || 0);
 
-/** Přidá (+1) nebo ubere (-1) úkol za tenhle telefon. */
+/** Přidá (+1) nebo ubere (-1) úkol: zapíše, kolik má být. */
 export function pricti(k: Kniha, id: string, o: 1 | -1, ja: Zarizeni) {
-  const m = (k.ukoly[id] ??= {});
-  const z = (m[ja] ??= [0, 0]);
-  if (o > 0) z[0]++;
-  else z[1]++;
+  k.ukoly[id] = [Math.max(0, pocet(k, id) + o), casPo(k.ukoly[id]), ja];
 }
 
-/** Vynuluje tým. Úkoly se nesmažou (smazané číslo by druhý telefon při
- *  sloučení vrátil), ale tenhle telefon ubere tolik, kolik je zrovna
- *  zapsáno. Co druhý telefon přidá mezitím, zůstane. */
-export function vynuluj(k: Kniha, prvniHospoda: string | null, ja: Zarizeni) {
+/** Vynuluje tým. Nic se nemaže (smazanou položku by druhý telefon při
+ *  sloučení vrátil), všechno se přepíše na „ne“ a nulu. */
+export function vynuluj(k: Kniha, ja: Zarizeni) {
   for (const druh of ["prichod", "skopek", "zlodej"] as const)
     for (const klic of Object.keys(k[druh])) if (k[druh][klic][0]) nastavPrepinac(k, druh, klic, false, ja);
-  for (const id of Object.keys(k.ukoly)) {
-    const n = pocet(k, id);
-    const z = ((k.ukoly[id] ??= {})[ja] ??= [0, 0]);
-    if (n > 0) z[1] += n;
-    else if (n < 0) z[0] -= n;
-  }
-  nastavHospodu(k, prvniHospoda, ja);
+  for (const id of Object.keys(k.ukoly)) if (pocet(k, id) > 0) k.ukoly[id] = [0, casPo(k.ukoly[id]), ja];
 }
 
 /** Co v knize stojí, ve tvaru, se kterým počítá zbytek appky. */
@@ -136,32 +113,51 @@ export function vyloz(k: Kniha): Vyklad {
     if (n > 0) ukoly[id] = n;
   }
   return {
-    hospoda: k.hospoda?.[0] ?? null,
     prichod: zapnute(k.prichod), prichodCas, skopek: zapnute(k.skopek),
     zlodej: zapnute(k.zlodej), ukoly,
   };
 }
 
 /** Kniha z tvaru, který se ukládal a posílal před knihou. Položky dostanou
- *  čas `cas` (razítko týmu) a telefon „stare“; počty úkolů jsou všechny
- *  připsané tomuhle jménu, takže se dva převody téhož týmu nesečtou. */
+ *  čas `cas` (razítko týmu) a telefon „stare“. Dva převody téhož týmu dají
+ *  totéž, takže se nic nesečte. */
 export function zeStarehoTvaru(s: Partial<Vyklad> | null | undefined, cas: number): Kniha {
   const k = prazdnaKniha();
   const ja = "stare";
   if (!s) return k;
-  if (s.hospoda) k.hospoda = [s.hospoda, cas, ja];
   for (const druh of ["prichod", "skopek", "zlodej"] as const)
     for (const [klic, ano] of Object.entries(s[druh] || {}))
       if (ano) k[druh][klic] = [true, druh === "prichod" ? (s.prichodCas?.[klic] ?? cas) : cas, ja];
   for (const [id, n] of Object.entries(s.ukoly || {}))
-    if (n > 0) k.ukoly[id] = { [ja]: [n, 0] };
+    if (n > 0) k.ukoly[id] = [n, cas, ja];
   return k;
 }
 
-/** Je kniha platná? Ze serveru může přijít cokoli. */
-export const jeKniha = (x: unknown): x is Kniha =>
-  !!x && typeof x === "object" && (x as Kniha).v === 1
-  && typeof (x as Kniha).prichod === "object" && typeof (x as Kniha).ukoly === "object";
+/** Kniha z čehokoli, co přijde ze serveru nebo z úložiště: platná v2,
+ *  první verze knihy (v1, úkoly jako součty přírůstků) nebo starý tvar
+ *  bez knihy. Vrací null, když kniha není. */
+export function precti(x: unknown, cas: number): Kniha | null {
+  if (!x || typeof x !== "object") return null;
+  const o = x as { v?: number; ukoly?: Record<string, unknown> };
+  if (o.v === 2 && typeof o.ukoly === "object") return x as Kniha;
+  if (o.v === 1 && typeof o.ukoly === "object") return zKnihyV1(x as KnihaV1, cas);
+  return null;
+}
+
+/** První verze knihy počítala úkoly jako součet přírůstků z telefonů. */
+interface KnihaV1 {
+  prichod: Record<string, Zapis<boolean>>; skopek: Record<string, Zapis<boolean>>;
+  zlodej: Record<string, Zapis<boolean>>; ukoly: Record<string, Record<string, [number, number]>>;
+}
+function zKnihyV1(s: KnihaV1, cas: number): Kniha {
+  const k = prazdnaKniha();
+  k.prichod = { ...s.prichod }; k.skopek = { ...s.skopek }; k.zlodej = { ...s.zlodej };
+  for (const [id, m] of Object.entries(s.ukoly || {})) {
+    const n = Object.values(m).reduce((c, [plus, minus]) => c + plus - minus, 0);
+    if (n > 0) k.ukoly[id] = [n, cas, "stare"];
+  }
+  return k;
+}
 
 /** Stejný obsah bez ohledu na pořadí klíčů (JSON ze serveru je jinak seřazený). */
 export function stejne(a: unknown, b: unknown): boolean {
