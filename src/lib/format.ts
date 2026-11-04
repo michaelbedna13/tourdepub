@@ -66,6 +66,8 @@ export function naDvaRadky(text: string): string[] {
 // a to by zůstalo nesvázané.
 const KRATKA = /(^|[\s([„"'—])([ksvzouaiKSVZOUAI])[ \t]+/g;
 
+const CISLO = /(\d)[ \t]+(?=\p{L})/gu;
+
 /** Sváže krátká slova nedělitelnou mezerou s dalším slovem. */
 export function vazat(text: string): string {
   let drive: string;
@@ -74,5 +76,8 @@ export function vazat(text: string): string {
     drive = t;
     t = t.replace(KRATKA, "$1$2\u00A0");
   } while (t !== drive);
-  return t;
+  // Číslo se neodtrhne od slova za ním: „45 / minut" na dvou řádcích se
+  // čte jako dvě věci. A jméno hry se nezlomí vůbec, „Tour / De Pub" na
+  // plakátu úvodu vypadalo jako překlep.
+  return t.replace(CISLO, "$1\u00A0").replace(/Tour De Pub/g, "Tour\u00A0De\u00A0Pub");
 }

@@ -1224,8 +1224,13 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   /* Mezery se smrskávají s výškou displeje. Napevno to bylo 24 a 56 a na
      krátkém okně (Safari má dole plovoucí lištu, takže plakát má o osmdesát
      bodů míň, než se zdá) se delší text nevešel a podlezl ceduli „Dál". */
-  --uvod-mezera-text:clamp(16px,2.6vh,24px);
-  --uvod-mezera-blok:clamp(30px,5.4vh,52px);
+  --uvod-mezera-text:clamp(14px,2.4vh,22px);
+  --uvod-mezera-blok:clamp(20px,3.6vh,36px);
+  /* Nadpis nezačíná hned pod značkou: trocha vzduchu nad ním z něj dělá
+     titulek plakátu, ne řádek pod logem. */
+  --uvod-nad-nadpisem:clamp(8px,6vh,72px);
+  --uvod-text:22px;
+  --uvod-kresba:min(196px,25vh);
 
   position:fixed;inset:0;z-index:120;
   background:var(--podklad);color:var(--text);
@@ -1257,91 +1262,51 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .uvod-hlava{flex:none;display:flex;align-items:center;justify-content:space-between;
   gap:16px;width:100%;max-width:var(--uvod-sirka);padding-bottom:var(--uvod-mezera-blok)}
 .uvod-znak{height:30px;width:auto;display:block;color:var(--text)}
+/* Přeskočit je slovo, ne verzálková cedulka: podtržené jako odkaz, ať je
+   jasné, že se na to dá ťuknout. */
 .uvod-preskocit{min-height:44px;padding:0 14px;margin:-10px -14px;
-  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--text);opacity:.55;touch-action:manipulation}
-.uvod-preskocit:active{opacity:.9}
+  font-size:15px;color:var(--text);opacity:.8;touch-action:manipulation;
+  text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.uvod-preskocit:active{opacity:1}
 
-/* Plakát. Mřížka drží vodorovné rozmístění, svisle se skládá v pořadí,
-   které si určí skladba. Celý blok je vycentrovaný mezi lištou a spodkem,
-   takže volné místo se rozdělí nad něj a pod něj stejným dílem. */
-/* Všech pět plakátů stojí stejně: kresba nahoře uprostřed, pod ní nadpis
-   a text. Bylo tu pět různých skladeb (kresba vpravo dole, vlevo dole, přes
-   celou šířku…) a mělo to být střídání jako v knize plakátů; jenže se to
-   odklikává po vteřinách a každá stránka tím skočila jinam. Místo rytmu
-   z toho byl zmatek. Jedna skladba se zapamatuje po první stránce a oko pak
-   čte obsah, ne rozvržení. */
+/* Plakát: nadpis a souvislý odstavec nahoře, panák dole vlevo nad lištou.
+   Podle plakátů Wosetu, které Mišák poslal: velký text zarovnaný vlevo,
+   kresba malá a stranou, hodně vzduchu. Dřív byla kresba nahoře uprostřed,
+   pod ní nadpis a drobný šedý text rozsekaný na štítky. Četlo se to jako
+   formulář a pod textem zůstávalo přes dvě stě bodů prázdna, kdežto takhle
+   prázdno leží mezi textem a panákem, kde dělá rámeček.
+
+   Všech pět stojí stejně. Pět různých skladeb se tu už zkoušelo a odklikává
+   se to po vteřinách, takže každá stránka skočila jinam. */
 .uvod-list{
   flex:1;min-height:0;width:100%;max-width:var(--uvod-sirka);
-  /* Odshora, ne na střed. Na střed se celý blok posouval podle toho, jak
-     dlouhý byl text pod ním, takže kresba i nadpis skákaly plakát od
-     plakátu o pár desítek bodů. Odshora drží obojí stejnou linku a plakáty
-     se liší jenom tím, co je na nich napsané. */
-  display:flex;flex-direction:column;justify-content:flex-start;
-  /* Blok začíná hned pod značkou. Chvíli se na vysokém displeji posouval
-     o kus dolů (clamp až sto bodů), aby pod ním nezůstala čtvrtina obrazovky
-     prázdná — jenže tím se text dostal pod polovinu displeje a plakáty
-     s delším textem se naopak mačkaly k ceduli dole: naměřeno na 852 bodech
-     zbývalo pod textem 108 bodů na Courání a nula na Banku. Vzduch patří
-     dolů, ne nad kresbu. Mezeru pod značkou drží --uvod-mezera-blok. */
+  display:flex;flex-direction:column;
   animation:uvod-prichod .3s var(--krok) both;
 }
-/* Kresba drží střed a nepřeroste text: šířku má v procentech plakátu, aby
-   vedle sebe vypadaly stejně velké, a strop ve výšce kvůli nízkým displejům. */
-/* Kresba má PEVNÝ rámeček, ať je na všech plakátech stejně velká a stejně
-   vysoko. Čmáranice nejsou čtvercové (šnek je široký, čárky vysoké), takže
-   bez rámečku si každá vzala jinou výšku a nadpis pod ní jinou linku. */
-/* Kresba má pevnou VÝŠKU, ať je na všech plakátech stejně velká a stejně
-   vysoko. Smí se ale stáhnout (flex-shrink), když text pod ní potřebuje
-   víc místa — na krátkém okně je to lepší než text podlezlý pod ceduli. */
-/* Kresba je červená, nadpis a text krémové. Červenou na plakátu nese ten
-   největší tvar: ze všech zkoušených míst (nadpis, kresba, drobnosti dole)
-   je tohle to, co z plakátu udělá plakát. */
-.uvod-kresba{flex:0 1 min(31vh,228px);min-height:84px;display:flex;
-  align-items:center;justify-content:center;
-  margin-bottom:var(--uvod-mezera-blok);color:var(--cervena)}
-/* Výška plní rámeček, šířka se dopočítá. Čmáranice mají každá jiný poměr
-   (šnek je široký, hodiny vysoké) a kdyby se měřily na šířku, byla by každá
-   jinak vysoká a mezera pod ní jinak velká. */
-.uvod-cmaranice{height:100%;width:auto;max-width:100%;display:block}
-.uvod-telo{flex:none}
-
 .uvod-nadpis{
-  margin:0;font-weight:700;-webkit-text-stroke:1px currentColor;
-  /* Osm a půl procenta šířky: v Hagridu se nadpis při deseti lámal na tři
-     řádky a vytlačil kresbu. Náhradní písmo je užší, takže v testech vyšly
-     dva řádky a vypadalo to v pořádku — měřeno až na telefonu. */
-  font-size:clamp(28px,8.5vw,42px);line-height:1.1;letter-spacing:-.03em;
+  flex:none;margin:var(--uvod-nad-nadpisem) 0 0;
+  font-weight:400;font-size:clamp(34px,11vw,46px);line-height:1.02;letter-spacing:-.02em;
   /* vyrovná délku řádků, ať nezůstane na posledním jedno slovo */
   text-wrap:balance;
 }
-/* Tělo plakátu: buď jeden odstavec, nebo pravidla pod sebou. Mezi nimi je
-   mezera, uvnitř volný proklad — čte se to na plakátu, ne v seznamu. */
-/* Tichý dovětek má vlastní řádku, stejně jako na obrazovce Pravidel. V řádce
-   za větou potřeboval oddělovač a pomlčka na to byla to jediné, co se tam
-   vešlo; tahle ji nepotřebuje. */
-.pravidlo-strop{display:block;margin-top:2px;font-size:var(--t-drobne);
-  color:var(--text-3)}
+/* Jeden odstavec v plné krémové. Byl šedý (66 %) a v patnácti bodech, vedle
+   velkého nadpisu se ztrácel; v hospodě po pár pivech se nedal přečíst. */
 .uvod-telo{
-  margin:var(--uvod-mezera-text) 0 0;
-  display:flex;flex-direction:column;gap:14px;
-  /* O stupeň menší než nadpisová velikost. Sedmnáct bodů dělalo z úvodníku
-     sedm řádků přes celou šířku a plakát se tím změnil ve zeď textu;
-     patnáct ho srovná na pět a nechá kresbě víc místa. */
-  font-family:var(--pismo);font-size:var(--t-text);line-height:1.62;
-  color:var(--text-2);
+  flex:none;margin:var(--uvod-mezera-text) 0 0;
+  font-family:var(--pismo);font-size:var(--uvod-text);line-height:1.34;
+  color:var(--text);text-wrap:pretty;
 }
-.uvod-telo p{margin:0}
-/* Štítek stojí NAD větou, ne před ní. V řádce za ním chyběla interpunkce
-   a četlo se to jako rozjetá věta („Časovej cajk Valí se to od šesti"),
-   s dvojtečkou zase jako heslo z Wordu. Vlastní řádka to řeší obojí — a je
-   to ta samá sazba jako na obrazovce Pravidel, takže plakát a stránka mluví
-   stejně. U hodnot (+1) se to nedělí: tam je štítek číslo, ne jméno. */
-.uvod-telo b{display:block;color:var(--text);font-weight:700;
-  font-size:11px;letter-spacing:.13em;text-transform:uppercase;
-  color:var(--text-3);margin-bottom:4px}
-.uvod-telo .cena b{display:inline;font-size:inherit;letter-spacing:inherit;
-  text-transform:none;color:var(--text);margin:0}
+/* Panák stojí na liště. Výšku má pevnou, ať je na všech plakátech stejně
+   velký, ale smí se stáhnout, když delší text potřebuje místo: na krátkém
+   okně je to lepší než text podlezlý pod ceduli. */
+.uvod-kresba{
+  flex:0 1 var(--uvod-kresba);min-height:96px;margin-top:auto;
+  padding-top:var(--uvod-mezera-text);
+  display:flex;align-items:flex-end;justify-content:flex-start;color:var(--cervena);
+}
+/* Výška plní rámeček, šířka se dopočítá: panák je pokaždé stejně vysoký,
+   ať drží cokoli vedle sebe. */
+.uvod-cmaranice{height:100%;width:auto;max-width:100%;display:block}
 
 /* Spodek: kolikátý plakát vlevo, cedule „ťukni dál" vpravo. */
 .uvod-spodek{flex:none;display:flex;align-items:center;justify-content:space-between;
@@ -1355,21 +1320,18 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 /* Nejsou to tlačítka: ťuká se do obrazovky, vlevo zpátky, vpravo dál.
    Cedule jen říkají, co se stane, a drží čárky uprostřed. */
 .uvod-dal{display:flex;align-items:center;gap:9px;flex:none;
-  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--text)}
+  font-size:15px;color:var(--text)}
 .uvod-zpet{display:flex;align-items:center;flex:none;color:var(--text);opacity:.4}
 /* Na prvním plakátu nemá kam vést, ale místo si drží — bez toho by čárky
    uprostřed při listování poskakovaly. */
 .uvod-zpet.nikam{visibility:hidden}
 .uvod-sipka{width:24px;height:10px;flex:none}
 
-/* Na krátkém displeji se stáhne všechno naráz: menší nadpis, hustší text,
-   menší mezery. Pořád to dýchá, jen míň. */
-@media (max-height:690px){
-  .uvod{--uvod-mezera-blok:32px;--uvod-mezera-text:16px}
-  .uvod-nadpis{font-size:clamp(25px,7.2vw,32px)}
-  .uvod-telo{font-size:var(--t-text);line-height:1.6;gap:11px}
-  .uvod-cmaranice{max-height:26vh}
+/* Na krátkém displeji se stáhne všechno naráz: menší nadpis, menší text,
+   menší panák. Pořád to dýchá, jen míň. */
+@media (max-height:760px){
+  .uvod{--uvod-text:19px;--uvod-kresba:min(150px,22vh)}
+  .uvod-nadpis{font-size:clamp(30px,9.5vw,38px)}
 }
 
 @keyframes uvod-prichod{

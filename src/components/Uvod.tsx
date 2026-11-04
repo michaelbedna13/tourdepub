@@ -1,10 +1,9 @@
-// Úvod po každém spuštění: značka se složí písmeno po písmenu, pak čtyři
-// plakáty, kterými se proklikává.
+// Úvod po každém spuštění: značka se složí písmeno po písmenu, pak pět
+// plakátů, kterými se proklikává.
 //
-// Každý plakát stojí na stejné mřížce — šest sloupců, jeden žlab — a liší
-// se tím, kde na ní kresba a text leží. Mřížka drží rytmus, rozmístění dělá
-// rozdíl: čtyři stejně poskládané obrazovky za sebou vypadají jako formulář,
-// a plakáty se mají střídat.
+// Všech pět stojí stejně: nadpis a souvislý odstavec nahoře, panák dole
+// nad lištou. Rozdíl mezi nimi dělá jen to, co je na nich napsané a co
+// panák zrovna dělá.
 //
 // Nikam se to neposouvá samo. Dřív to byla patnáctivteřinová znělka a než
 // se dočetla věta, obrazovka byla pryč; teď se ťuká dál a kdo to zná, dá
@@ -17,11 +16,10 @@
 // a značka pod ní prosvítá — teprve s prvním se #uvod odklidí.
 import { useEffect, useId, useRef, useState } from "react";
 import { vazat } from "../lib/format";
-import { bodovani, COURANI, PARTYJE, CAJK, UVODNIK, ZAKLAD, type Bod } from "../lib/pravidla";
+import { UVOD_BANK, UVOD_COURANI, UVOD_VALI, UVODNIK, uvodBodovani } from "../lib/pravidla";
 import { stav } from "../lib/stav";
 import { UVOD_KRESBY } from "../lib/uvod-kresby";
 import { Logo } from "./Logo";
-import { Pravidlo } from "./Pravidlo";
 
 /** Nejmíň takhle dlouho zůstane značka od načtení stránky. */
 const ZNACKA_NEJMIN = 1700;
@@ -39,25 +37,23 @@ interface Plakat {
   /** Klíč kresby v UVOD_KRESBY. */
   id: keyof typeof UVOD_KRESBY;
   nadpis: string;
-  /** Jeden odstavec, nebo seznam pravidel. Vždycky jedno z toho. */
-  text?: string;
-  body?: Bod[];
+  /** Jeden souvislý odstavec. Žádné štítky ani body pod sebou. */
+  text: string;
 }
 
 /** Pět plakátů. Nejsou to moje věty: text se bere z lib/pravidla.ts, odkud
  *  čte i obrazovka Pravidla. Úvod tedy neříká „něco jako pravidla", ale
  *  přímo je — a když se jedno změní, změní se obojí.
  *
- *  Jeden plakát = jedna kapitola pravidel a jedna kresba, co říká to samé:
- *  budík k času, šnek k loudání, čárky k bodování, kotel k banku. Dlouhé
- *  courání má plakát celý pro sebe, aby se nemuselo tlačit vedle cajku
- *  a partyjí. */
+ *  Jeden plakát = jedna kapitola pravidel a jeden panák, co ji hraje:
+ *  tančí, drží budík, táhne šneka, píše čárky, opírá se o pytel. Text je
+ *  souvislý odstavec (viz konec lib/pravidla.ts), ne pravidla se štítky. */
 const PLAKATY: Plakat[] = [
   { id: "tanec", nadpis: "Betelná řežba", text: UVODNIK },
-  { id: "cajk", nadpis: "Jak se to valí", body: [CAJK, PARTYJE] },
-  { id: "courani", nadpis: "Žádný courání", text: COURANI.text },
-  { id: "zapis", nadpis: "Bodování", body: bodovani(stav.hospody.length, true) },
-  { id: "bank", nadpis: "Celej bank", body: ZAKLAD },
+  { id: "cajk", nadpis: "Jak se to valí", text: UVOD_VALI },
+  { id: "courani", nadpis: "Žádný courání", text: UVOD_COURANI },
+  { id: "zapis", nadpis: "Bodování", text: uvodBodovani(stav.hospody.length) },
+  { id: "bank", nadpis: "Celej bank", text: UVOD_BANK },
 ];
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
@@ -198,20 +194,13 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
               onClick={(e) => { e.stopPropagation(); zavri(); }}>Přeskočit</button>
           </div>
 
-          {/* key: každý plakát přijede jako nový, ne že se přepíše text */}
+          {/* key: každý plakát přijede jako nový, ne že se přepíše text.
+              Nadpis a text nahoře, panák dole nad lištou: čte se shora
+              a kresba je tečka na konci, ne překážka před textem. */}
           <div className="uvod-list" key={kde}>
-            <div className="uvod-kresba"><Cmaranice id={p.id} /></div>
             <h1 className="uvod-nadpis">{vazat(p.nadpis)}</h1>
-            <div className="uvod-telo">
-              {p.text && <p>{vazat(p.text)}</p>}
-              {/* Bodování nese v štítku hodnotu (+1), ne jméno pravidla — ta
-                  zůstává v řádce s větou, zbytek má štítek nad sebou. */}
-              {p.body?.map((b) => (
-                <p key={b.stitek ?? b.text} className={b.strop || b.stitek?.startsWith("+") ? "cena" : undefined}>
-                  <Pravidlo bod={b} />
-                </p>
-              ))}
-            </div>
+            <p className="uvod-telo">{vazat(p.text)}</p>
+            <div className="uvod-kresba"><Cmaranice id={p.id} /></div>
           </div>
 
           <div className="uvod-spodek">

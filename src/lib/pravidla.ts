@@ -49,16 +49,25 @@ const HALUZE = () =>
  *
  *  Štítek je tady hodnota, ne jméno pravidla: na obrazovce Pravidel z toho
  *  je sloupec čísel vlevo a věta vpravo, takže je na první pohled vidět, co
- *  kolik nese. Strop je zvlášť, aby nemusel viset v závorce uprostřed věty.
- *
- *  `shrnuti` je pro úvod: na obrazovce Pravidel pod třetím bodem následuje
- *  legenda s půllitry, kdežto na plakátu by dvojtečka visela do prázdna,
- *  tak se stupnice dopíše rovnou do věty. Čísla jsou v obou případech
- *  z OBTIZNOST, takže se rozejít nemůžou. */
-export const bodovani = (hospod: number, shrnuti = false): Bod[] => [
+ *  kolik nese. Strop je zvlášť, aby nemusel viset v závorce uprostřed věty. */
+export const bodovani = (hospod: number): Bod[] => [
   { stitek: "+1", text: "Za každou špeluňku, do který vlezete.", strop: `nejvíc ${hospod}` },
   { stitek: "+1", text: "Za škopek ve štaci. Stačí, když ho lupne aspoň půlka partyje.", strop: `nejvíc ${hospod}` },
-  shrnuti
-    ? { stitek: "+1 až 3", text: `Za srandy podle toho, jaká je to haluz: ${HALUZE()}.` }
-    : { stitek: "+1 až 3", text: "Za srandy podle toho, jaká je to haluz." },
+  { stitek: "+1 až 3", text: "Za srandy podle toho, jaká je to haluz." },
 ];
+
+/* Plakáty úvodu. Každý je jeden souvislý odstavec, ne pravidla pod sebou se
+   štítkama. Rozsekané na „Časovej cajk / Partyje" to vypadalo jako formulář
+   a oko skákalo mezi drobnýma popiskama a větama; plakát se má přečíst
+   jedním dechem. Obrazovka Pravidel je na hledání, tam štítky zůstávají.
+   Věty jsou poskládané z týchž kusů, takže se obojí nerozejde: kde se dá,
+   bere se text přímo z bodů výš, čísla z OBTIZNOST a z počtu štací. */
+export const UVOD_VALI = `${CAJK.text} ${PARTYJE.text}`;
+export const UVOD_COURANI = COURANI.text;
+export const uvodBodovani = (hospod: number) =>
+  `Za každou špeluňku, do který vlezete, padá čárka. Další je za škopek ve štaci, ` +
+  `stačí, když ho lupne aspoň půlka partyje. Obojí jednou na štaci, takže nejvíc ${hospod}. ` +
+  `K tomu jedna až tři za srandy podle toho, jaká je to haluz: ${HALUZE()}.`;
+export const UVOD_BANK =
+  `Jde o to nahrabat víc čárek než ty druhý partyje a urvat titul z Tour De Pub. Do kotla se hodí kilo na palici ` +
+  `a první parta bere celej bank. Všechny love só jejich.`;
