@@ -25,6 +25,13 @@ create table if not exists public.tourdepub_tymy (
 -- pro tabulky založené dřív, než sloupec existoval
 alter table public.tourdepub_tymy add column if not exists stav jsonb not null default '{}'::jsonb;
 
+-- Pořadové číslo zápisu. Telefon zapisuje jen „pokud je tam pořád verze N“
+-- a zvedne ji o jednu; když mezitím zapsal jiný telefon, nic se nezapíše
+-- a telefon si stáhne nový stav, sloučí ho se svým (src/lib/kniha.ts)
+-- a zkusí to znova. Díky tomu můžou za jeden tým zapisovat dva telefony
+-- naráz a žádná čárka se neztratí.
+alter table public.tourdepub_tymy add column if not exists verze int not null default 0;
+
 -- Barva party z appky zmizela (tým je jméno, ne barva), ale sloupec tu zůstal
 -- povinný a shazoval každý zápis: appka se tvářila připojeně a na server
 -- se přitom nikdy nic nedostalo. Zápis ji teď posílá prázdnou, tohle je pro

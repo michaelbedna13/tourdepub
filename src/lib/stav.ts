@@ -9,6 +9,7 @@
 // přihlásí přes useStav(). Kopírovat při každé čárce celý stav by tu bylo k ničemu.
 import { useSyncExternalStore } from "react";
 import { VYCHOZI_HOSPODY, VYCHOZI_UKOLY, type Hospoda, type Ukol } from "./data";
+import * as K from "./kniha";
 
 const KLIC = "tourdepub";
 const VERZE = 2;
@@ -36,6 +37,14 @@ export interface Tym {
   ukoly: Record<string, number>;
   /** Id hospody → odsud už parta něco šlohla (Brněnskej zloděj). */
   zlodej: Record<string, boolean>;
+  /** Kniha zápisů (lib/kniha.ts): z ní se pole výš počítají a ona se
+   *  slučuje se serverem po položkách, takže za jeden tým můžou zapisovat
+   *  dva telefony naráz a nic se neztratí. Pole výš jsou jen výklad. */
+  kniha: K.Kniha;
+  /** Má tenhle telefon v knize něco, co na serveru ještě není? */
+  neodeslano: boolean;
+  /** Správce tým přejmenoval a server o tom ještě neví. */
+  prejmenovano?: boolean;
 }
 
 export interface Stav {
@@ -62,8 +71,12 @@ export interface RadekTymu {
   hospoda: number;
   body: number;
   rozpad: Rozpad;
-  stav: Pick<Tym, "hospoda" | "prichod" | "prichodCas" | "skopek" | "ukoly" | "zlodej">;
+  stav: Pick<Tym, "hospoda" | "prichod" | "prichodCas" | "skopek" | "ukoly" | "zlodej"> & { kniha?: K.Kniha };
   upraveno: string;
+  /** Pořadové číslo zápisu na serveru. Zapisuje se jen „pokud je tam pořád
+   *  verze N“; když mezitím zapsal někdo jiný, telefon si stáhne nový stav,
+   *  sloučí ho se svým a zkusí to znova. Viz posli() v sync.ts. */
+  verze?: number;
 }
 
 export interface Rozpad {
@@ -85,14 +98,43 @@ const noveId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.rand
  *  a při načtení se zahodí, viz nacti(). */
 export function novyTym(nazev = "", vlastni = true): Tym {
   return { id: noveId(), nazev, vlastni, upraveno: null, bylNaServeru: false,
-           hospoda: null, prichod: {}, prichodCas: {}, skopek: {}, ukoly: {}, zlodej: {} };
+           hospoda: null, prichod: {}, prichodCas: {}, skopek: {}, ukoly: {}, zlodej: {},
+           kniha: K.prazdnaKniha(), neodeslano: vlastni };
 }
 
-/** Označí tým za používaný a orazítkuje změnu.
- *  Razítko rozhoduje při slučování se serverem, čí verze je novější. */
+/** Jméno tohohle telefonu v knize zápisů. Náhodné a uložené, ať se počty
+ *  úkolů z různých telefonů nepletou dohromady. */
+const KLIC_ZARIZENI = "tourdepub-zarizeni";
+function zarizeni(): string {
+  try {
+    const z = localStorage.getItem(KLIC_ZARIZENI);
+    if (z) return z;
+    const nove = noveId();
+    localStorage.setItem(KLIC_ZARIZENI, nove);
+    return nove;
+  } catch {
+    return noveId(); // bez úložiště jen na tohle spuštění; nic se nesečte dvakrát
+  }
+}
+const JA = zarizeni();
+
+/** Přepočítá pole týmu z knihy. */
+function prepocti(t: Tym, hospody: Hospoda[] = stav.hospody) {
+  Object.assign(t, K.vyloz(t.kniha));
+  if (!t.hospoda || !hospody.some((h) => h.id === t.hospoda)) t.hospoda = hospody[0]?.id || null;
+}
+
+/** Kniha z řádku ze serveru. Řádek zapsaný starší verzí appky knihu nemá,
+ *  pak se složí z polí s razítkem řádku. */
+export function knihaRadku(r: RadekTymu): K.Kniha {
+  return K.jeKniha(r.stav?.kniha) ? r.stav.kniha : K.zeStarehoTvaru(r.stav, casZmeny(r.upraveno));
+}
+
+/** Označí tým za používaný a orazítkuje změnu. */
 function dotknuto(t: Tym | undefined) {
   if (!t) return;
   t.vlastni = true;
+  t.neodeslano = true;
   t.upraveno = new Date().toISOString();
 }
 
@@ -184,6 +226,7 @@ function nacti(): Stav {
     // dřív se štace držela jako číslo, teď jako id hospody
     const h = VYCHOZI_HOSPODY[(ulozeno.hospoda || 1) - 1];
     t.hospoda = h ? h.id : null;
+    t.kniha = K.zeStarehoTvaru(t, Date.now());
     // Prázdný zápis ze staré verze žádnou partu nenese. Převádět ho na
     // „Naši partu“ by znamenalo založit tým za někoho, kdo si ho nezaložil.
     const maCo = !!ulozeno.parta?.nazev
@@ -205,6 +248,13 @@ function nacti(): Stav {
   for (const t of z.tymy) {
     // starší uložený stav časy příchodů nemá; karta si pak nemá co ukázat a je to v pořádku
     if (!t.prichodCas) t.prichodCas = {};
+    // Stav z doby před knihou zápisů: kniha se složí z polí a tým se pošle,
+    // ať se sloučí se serverem. Sloučení je bezpečné i opakovaně.
+    if (!K.jeKniha(t.kniha)) {
+      t.kniha = K.zeStarehoTvaru(t, casZmeny(t.upraveno));
+      t.neodeslano = !!t.vlastni;
+    }
+    if (t.neodeslano === undefined) t.neodeslano = false;
     if (t.vlastni === undefined) {
       t.vlastni = t.nazev !== "Naše parta"
         || Object.keys(t.prichod).length > 0
@@ -216,6 +266,7 @@ function nacti(): Stav {
   // nedotkl, se zahodí. Nic se tím neztratí: vlastni:false znamená bez jména
   // i bez jediné čárky. Pojmenovaná nebo rozehraná parta má vlastni:true.
   z.tymy = z.tymy.filter((t) => t.vlastni !== false);
+  for (const t of z.tymy) prepocti(t, z.hospody);
   if (!z.tymy.some((t) => t.id === z.tymId)) z.tymId = z.tymy[0]?.id || "";
   srovnejStace(z);
   return z;
@@ -267,7 +318,8 @@ export const tym = (): Tym | undefined => stav.tymy.find((t) => t.id === stav.ty
 
 export function pridejTym(nazev: string): Tym {
   const t = novyTym(nazev);
-  t.hospoda = stav.hospody[0]?.id || null;
+  K.nastavHospodu(t.kniha, stav.hospody[0]?.id || null, JA);
+  prepocti(t);
   t.upraveno = new Date().toISOString();
   stav.tymy.push(t);
   uloz();
@@ -277,7 +329,10 @@ export function pridejTym(nazev: string): Tym {
 export function upravTym(id: string, zmeny: Partial<Pick<Tym, "nazev">>) {
   const t = stav.tymy.find((x) => x.id === id);
   if (!t) return;
-  if (zmeny.nazev !== undefined) t.nazev = zmeny.nazev;
+  if (zmeny.nazev !== undefined && zmeny.nazev !== t.nazev) {
+    t.nazev = zmeny.nazev;
+    t.prejmenovano = true;
+  }
   dotknuto(t); // pojmenovaný tým už patří ostatním na oči
   uloz();
 }
@@ -310,7 +365,8 @@ export function nastavHospodu(id: string) {
   const t = tym();
   if (!t || t.hospoda === id) return;
   dotknuto(t);
-  t.hospoda = id;
+  K.nastavHospodu(t.kniha, id, JA);
+  prepocti(t);
   uloz();
 }
 
@@ -492,13 +548,10 @@ export function prepniZaklad(druh: Zaklad, kde?: string): boolean {
   const h = kde || t?.hospoda;
   if (!t || !h) return false;
   dotknuto(t);
-  if (t[druh][h]) delete t[druh][h];
-  else t[druh][h] = true;
-  // čas příchodu drží jen kvůli „jste tady dvacet minut“; odepsaný příchod ho bere s sebou
-  if (druh === "prichod") {
-    if (t.prichod[h]) t.prichodCas[h] = Date.now();
-    else delete t.prichodCas[h];
-  }
+  // Čas příchodu (kvůli „jste tady dvacet minut“) je čas zápisu v knize;
+  // odepsaný příchod ho bere s sebou.
+  K.nastavPrepinac(t.kniha, druh, h, !t[druh][h], JA);
+  prepocti(t);
   uloz();
   return !!t[druh][h];
 }
@@ -507,8 +560,9 @@ export function pridejUkol(u: Ukol): boolean {
   const t = tym();
   if (!t || !jdePridat(u, t)) return false;
   dotknuto(t);
-  t.ukoly[u.id] = kolikrat(u.id, t) + 1;
-  if (u.jednouZaHospodu && t.hospoda) t.zlodej[t.hospoda] = true;
+  K.pricti(t.kniha, u.id, 1, JA);
+  if (u.jednouZaHospodu && t.hospoda) K.nastavPrepinac(t.kniha, "zlodej", t.hospoda, true, JA);
+  prepocti(t);
   uloz();
   return true;
 }
@@ -518,9 +572,9 @@ export function uberUkol(u: Ukol): boolean {
   const ted = kolikrat(u.id, t);
   if (!t || ted <= 0) return false;
   dotknuto(t);
-  t.ukoly[u.id] = ted - 1;
-  if (t.ukoly[u.id] === 0) delete t.ukoly[u.id];
-  if (u.jednouZaHospodu && t.hospoda && t.zlodej[t.hospoda]) delete t.zlodej[t.hospoda];
+  K.pricti(t.kniha, u.id, -1, JA);
+  if (u.jednouZaHospodu && t.hospoda && t.zlodej[t.hospoda]) K.nastavPrepinac(t.kniha, "zlodej", t.hospoda, false, JA);
+  prepocti(t);
   uloz();
   return true;
 }
@@ -528,29 +582,46 @@ export function uberUkol(u: Ukol): boolean {
 export function vynulujTym(id = stav.tymId) {
   const t = stav.tymy.find((x) => x.id === id);
   if (!t) return;
-  // prichodCas taky: bez něj by po vynulování zůstávaly časy příchodů
-  // k hospodám, kde parta podle stavu nikdy nebyla
-  Object.assign(t, { prichod: {}, prichodCas: {}, skopek: {}, ukoly: {}, zlodej: {},
-    hospoda: stav.hospody[0]?.id || null });
+  // Vynuluje se v knize, ne smazáním polí: smazané by druhý telefon při
+  // sloučení vrátil. Co mezitím přidá jiný telefon, zůstane (viz vynuluj).
   dotknuto(t);
+  K.vynuluj(t.kniha, stav.hospody[0]?.id || null, JA);
+  prepocti(t);
   uloz();
 }
 
 /* ---------- slučování se serverem ---------- */
 
-/** Co se o týmu posílá ostatním. Posílá se celý stav, ne jen výsledek —
- *  jinak by tým šlo upravovat jenom na telefonu, kde vznikl. */
-export function kOdeslani(t: Tym): RadekTymu {
+/** Co se o týmu posílá ostatním: kniha zápisů a z ní spočítaný výklad
+ *  (body, štace) pro pořadí. `kniha` je sloučená kniha, která se zapisuje,
+ *  když se liší od té v telefonu. */
+export function kOdeslani(t: Tym, kniha: K.Kniha = t.kniha): RadekTymu {
+  const v: Tym = { ...t, kniha };
+  prepocti(v);
   return {
     id: t.id,
     nazev: t.nazev || "Bezejmenná parta",
-    hospoda: indexHospody(t) + 1,
-    body: body(t),
-    rozpad: rozpad(t),
-    stav: { hospoda: t.hospoda, prichod: t.prichod, prichodCas: t.prichodCas,
-            skopek: t.skopek, ukoly: t.ukoly, zlodej: t.zlodej },
-    upraveno: t.upraveno || new Date().toISOString(),
+    hospoda: indexHospody(v) + 1,
+    body: body(v),
+    rozpad: rozpad(v),
+    stav: { hospoda: v.hospoda, prichod: v.prichod, prichodCas: v.prichodCas,
+            skopek: v.skopek, ukoly: v.ukoly, zlodej: v.zlodej, kniha },
+    upraveno: new Date().toISOString(),
   };
+}
+
+/** Telefon zapsal na server sloučenou knihu `odeslana`. Kniha v telefonu se
+ *  mezitím mohla změnit (ťuknutí během čekání na server), proto se slučuje,
+ *  ne přepisuje, a tým zůstane k odeslání, pokud v něm je něco navíc. */
+export function poOdeslani(id: string, odeslana: K.Kniha, nazev: string) {
+  const t = stav.tymy.find((x) => x.id === id);
+  if (!t) return;
+  t.kniha = K.sluc(t.kniha, odeslana);
+  t.neodeslano = !K.stejne(t.kniha, odeslana);
+  if (t.nazev === nazev) t.prejmenovano = false;
+  t.bylNaServeru = true;
+  prepocti(t);
+  uloz();
 }
 
 /** Razítko změny jako číslo. Porovnávat ho jako text nejde: telefon píše
@@ -564,19 +635,24 @@ export function slucZeServeru(radky: RadekTymu[]) {
   const naServeru = new Set(radky.map((r) => r.id));
 
   for (const r of radky) {
-    const zeServeru = {
-      nazev: r.nazev, vlastni: true, upraveno: r.upraveno,
-      bylNaServeru: true,
-      hospoda: r.stav?.hospoda ?? stav.hospody[0]?.id ?? null,
-      prichod: r.stav?.prichod || {}, prichodCas: r.stav?.prichodCas || {},
-      skopek: r.stav?.skopek || {},
-      ukoly: r.stav?.ukoly || {}, zlodej: r.stav?.zlodej || {},
-    };
+    const k = knihaRadku(r);
     const mistni = stav.tymy.find((t) => t.id === r.id);
-    if (!mistni) stav.tymy.push({ id: r.id, ...zeServeru });
-    else if (casZmeny(r.upraveno) > casZmeny(mistni.upraveno))
-      Object.assign(mistni, zeServeru);
-    else mistni.bylNaServeru = true;
+    if (!mistni) {
+      const t: Tym = { ...novyTym(r.nazev, true), id: r.id, upraveno: r.upraveno,
+        bylNaServeru: true, kniha: k, neodeslano: false };
+      prepocti(t);
+      stav.tymy.push(t);
+      continue;
+    }
+    // Sloučit, ne vybrat novější: v knize ze serveru může být zápis
+    // z jiného telefonu a v té místní zápis, který ještě neodešel.
+    const m = K.sluc(mistni.kniha, k);
+    mistni.kniha = m;
+    if (!mistni.prejmenovano) mistni.nazev = r.nazev;
+    mistni.neodeslano = !K.stejne(m, k) || (!!mistni.prejmenovano && mistni.nazev !== r.nazev);
+    if (casZmeny(r.upraveno) > casZmeny(mistni.upraveno)) mistni.upraveno = r.upraveno;
+    mistni.bylNaServeru = true;
+    prepocti(mistni);
   }
 
   // tým smazaný na jiném telefonu musí zmizet i tady

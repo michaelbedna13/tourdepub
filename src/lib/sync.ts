@@ -6,7 +6,8 @@ import { useSyncExternalStore } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_KEY, TABULKA, HRA } from "./nastaveni";
 import { aktualniUcet, dejKlienta } from "./prihlaseni";
-import { stav, naZmenu, kOdeslani, slucZeServeru, casZmeny, type RadekTymu } from "./stav";
+import { stav, naZmenu, kOdeslani, knihaRadku, poOdeslani, slucZeServeru, type RadekTymu } from "./stav";
+import * as K from "./kniha";
 
 /** ukazka = jen tenhle telefon · pripojuji · zivo · chyba = nepodařilo se */
 export type Rezim = "ukazka" | "pripojuji" | "zivo" | "chyba";
@@ -133,49 +134,20 @@ function posliOpatrne() {
   setTimeout(() => { cekaZapis = false; posli(); }, 700);
 }
 
+/** Běží zrovna odesílání? Dvě naráz by si přetahovaly stejné verze. */
+let odesila = false;
+let znova = false;
+
 async function posli(): Promise<boolean> {
   if (!klient) return false;
+  if (odesila) { znova = true; return true; }
+  odesila = true;
   try {
-    // Posílají se jen týmy, se kterými někdo opravdu pracuje. Tým, co si appka
-    // založila sama a nikdo se ho nedotkl, zůstane jen v telefonu.
-    //
-    // A jen ty, které jsou tady novější než to, co naposledy přišlo ze
-    // serveru. Dřív šly nahoru všechny týmy v telefonu, i cizí, které sem
-    // jen přitekly: kdo ťukl čárku, poslal s ní i svou kopii ostatních part.
-    // Když byla ta kopie o chlup starší (druhá parta zrovna zapsala), upsert
-    // jí na serveru přepsal novější zápis. A smazaný tým z jiného telefonu
-    // vracel zpátky, dokud se o smazání nedozvěděl.
-    const k = stav.tymy.filter((t) => t.vlastni && jeNovejsi(t, naposledy.find((r) => r.id === t.id)));
-    if (!k.length) return true;
-    // hra se přidává až tady: kOdeslani() popisuje tým, do které hry patří
-    // je věc připojení. Bez něj zápis spadne — sloupec je not null a appka
-    // by se k serveru hlásila, aniž by do něj kdy něco dostala.
-    //
-    // barva je pozůstatek. Party ji měly, než se z týmu stalo jenom jméno
-    // (viz „Tým je jméno, ne barva"), jenže sloupec v tabulce zůstal povinný.
-    // Posílá se prázdná, ať nemusí nikdo sahat do databáze; nová tabulka
-    // z supabase/party.sql už ji povinnou nemá a časem může zmizet.
-    const radky = k.map((t) => ({ ...kOdeslani(t), hra: HRA, barva: "" }));
-
-    // Zakládat a přejmenovávat týmy smí jen správce, a hlídá to server:
-    // hráčův insert odmítne pravidlo, přejmenování spoušť. Upsert je pro
-    // Postgres insert i u řádku, který už existuje, takže hráč posílá
-    // update jen do týmů, které na serveru jsou, a bez jména. Tým, který
-    // na serveru není (třeba založený ve starší verzi), zůstane hráči jen
-    // v telefonu, ať appka neplive chybu při každé čárce.
-    if (aktualniUcet() !== "spravce") {
-      const naServeru = new Set(naposledy.map((r) => r.id));
-      const vysledky = await Promise.all(radky
-        .filter((r) => naServeru.has(r.id))
-        .map(({ id, nazev: _jmeno, ...zbytek }) =>
-          klient!.from(TABULKA).update(zbytek).eq("id", id)));
-      const chybny = vysledky.find((v) => v.error);
-      if (chybny?.error) throw chybny.error;
-      return true;
-    }
-
-    const { error } = await klient.from(TABULKA).upsert(radky);
-    if (error) throw error;
+    // Posílají se jen týmy, se kterými někdo opravdu pracuje (vlastni), a jen
+    // ty, které mají v telefonu něco, co na serveru ještě není (neodeslano).
+    // Cizí týmy, které sem jen přitekly, se neposílají: tenhle telefon k nim
+    // nic nepřidal.
+    for (const t of stav.tymy.filter((x) => x.vlastni && x.neodeslano)) await posliTym(t.id);
     return true;
   } catch (e) {
     // Rozdíl mezi „není signál" a „zápis neprojde nikdy" se musí poznat.
@@ -189,14 +161,80 @@ async function posli(): Promise<boolean> {
       zmena();
     }
     return false;
+  } finally {
+    odesila = false;
+    if (znova) { znova = false; posliOpatrne(); }
   }
 }
 
-/** Je tým v telefonu novější než jeho řádek na serveru? Tým, který na
- *  serveru ještě není, je novější vždycky. */
-function jeNovejsi(t: { upraveno: string | null }, naServeru?: RadekTymu): boolean {
-  if (!naServeru) return true;
-  return casZmeny(t.upraveno) > casZmeny(naServeru.upraveno);
+/** Kolikrát to telefon zkusí, když mu někdo pořád zapisuje pod rukama. */
+const POKUSU = 6;
+
+/** Zapíše jeden tým tak, aby nepřepsal cizí zápis.
+ *
+ *  Dřív šel nahoru celý tým a vyhrál, kdo zapsal poslední: když za jeden tým
+ *  ťukaly dva telefony naráz, čárka z jednoho se ztratila. Teď:
+ *   1. vezme řádek, jak ho naposledy viděl na serveru (i s číslem verze),
+ *   2. sloučí jeho knihu se svou (lib/kniha.ts, po položkách),
+ *   3. zapíše jen „pokud je na serveru pořád ta verze“ a zvedne ji o jednu,
+ *   4. když mezitím zapsal někdo jiný (nic se nezapsalo), stáhne řádek
+ *      znova a jde od jedničky.
+ *  Nikdy tedy nezapíše knihu, ve které by chybělo něco, co na serveru je. */
+async function posliTym(id: string) {
+  const k = klient!;
+  const spravce = aktualniUcet() === "spravce";
+  let r = naposledy.find((x) => x.id === id);
+
+  for (let pokus = 0; pokus < POKUSU; pokus++) {
+    const t = stav.tymy.find((x) => x.id === id);
+    if (!t) return;
+
+    // Tým, který na serveru ještě není. Zakládat smí jen správce (hlídá to
+    // server); hráči zůstane jen v telefonu, ať appka neplive chybu při
+    // každé čárce.
+    if (!r) {
+      if (!spravce) return;
+      // hra se přidává až tady: do které hry tým patří, je věc připojení.
+      // barva je pozůstatek povinného sloupce, posílá se prázdná.
+      const radek = { ...kOdeslani(t), hra: HRA, barva: "", verze: 1 };
+      const { data, error } = await k.from(TABULKA).insert(radek).select();
+      if (!error && data?.length) { zapsano(data[0] as RadekTymu, radek.stav.kniha!, radek.nazev); return; }
+      // Mezitím ho založil jiný telefon správce: stáhnout a sloučit.
+      if (error && error.code !== "23505") throw error;
+      r = await stahni(id);
+      continue;
+    }
+
+    const kniha = K.sluc(t.kniha, knihaRadku(r));
+    const radek = kOdeslani(t, kniha);
+    const verze = r.verze ?? 0;
+    // Hráč jméno neposílá: přejmenovat smí jen správce a server by zápis
+    // s cizím jménem odmítl.
+    const { nazev, ...bezJmena } = radek;
+    const zmena = { ...(spravce ? radek : bezJmena), verze: verze + 1 };
+    const { data, error } = await k.from(TABULKA).update(zmena)
+      .eq("id", id).eq("verze", verze).select();
+    if (error) throw error;
+    if (data?.length) { zapsano(data[0] as RadekTymu, kniha, nazev); return; }
+    // Nic se nezapsalo: na serveru je jiná verze, nebo tým mezitím zmizel.
+    r = await stahni(id);
+    if (!r) return; // smazal ho správce; při dalším čtení zmizí i tady
+  }
+  // Pořád někdo zapisuje pod rukama. Tým zůstane k odeslání a zkusí se
+  // to s dalším ťuknutím nebo s dalším čtením.
+}
+
+/** Řádek týmu přímo ze serveru, ne z posledního čtení. */
+async function stahni(id: string): Promise<RadekTymu | undefined> {
+  const { data, error } = await klient!.from(TABULKA).select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return (data as RadekTymu | null) ?? undefined;
+}
+
+/** Zápis prošel: zapamatovat si nový řádek (i s verzí) a dát vědět stavu. */
+function zapsano(r: RadekTymu, kniha: K.Kniha, nazev: string) {
+  naposledy = [...naposledy.filter((x) => x.id !== r.id), r].sort((a, b) => (a.id < b.id ? -1 : 1));
+  poOdeslani(r.id, kniha, nazev);
 }
 
 async function nacti(): Promise<boolean> {
