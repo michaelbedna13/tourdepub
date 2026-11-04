@@ -1286,14 +1286,21 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 }
 .uvod-nadpis{
   flex:none;margin:var(--uvod-nad-nadpisem) 0 0;
-  /* Tučnější než čtyřstovka. Kit má jen 400 a 700, a v sedmistovce se
-     široké verzálky Hagridu slévají; obtah přidá, co by byla pětistovka až
-     šestistovka. Bylo 0,6 px, Mišák chtěl ještě o něco tučněji. */
-  font-weight:400;-webkit-text-stroke:1.2px currentColor;font-size:clamp(34px,11vw,46px);line-height:1.02;letter-spacing:-.01em;
+  /* Tloušťka: obtah 0,6 a pak 1,2 px na čtyřstovce byl Mišákovi pořád
+     málo, tak je tu skutečná sedmistovka (A). Varianty B a C jsou dočasně
+     na vyzkoušení přes ?nadpis=b / ?nadpis=c, viz VARIANTA_NADPISU.
+     Řádkování 1,02 bylo na verzálky s diakritikou málo: háček v Ň druhého
+     řádku narážel do prvního (Mišákův screenshot, „Od špeluňky ke špeluňce“).
+     Písmo o chlup menší (10,5 vw místo 11), ať se tučnější „Od špeluňky“
+     vejde: v 400 s obtahem měl řádek na telefonu 296 z 337 bodů. */
+  font-weight:700;font-size:clamp(32px,10.5vw,44px);line-height:1.14;letter-spacing:0;
 }
-/* Dva řádky natvrdo (pribeh.ts): každý řádek je blok a nezalomí se, ať
-   jsou všechny nadpisy na dva řádky, ne jednou na jeden a jednou na tři. */
-.uvod-nadpis span{display:block;white-space:nowrap}
+.uvod[data-nadpis="b"] .uvod-nadpis{font-weight:400;-webkit-text-stroke:2px currentColor;letter-spacing:.01em}
+.uvod[data-nadpis="c"] .uvod-nadpis{font-family:"hagrid-black",var(--nadpisy);font-weight:900;font-size:clamp(30px,9.4vw,40px)}
+/* Dva řádky natvrdo (pribeh.ts): každý řádek je blok, ať jsou všechny
+   nadpisy na dva řádky. Zalomit se uvnitř smí: kdyby se tučný řez na úzkém
+   telefonu nevešel, je lepší třetí řádek než useknuté písmeno. */
+.uvod-nadpis span{display:block}
 /* Jeden odstavec v plné krémové. Byl šedý (66 %) a v patnácti bodech, vedle
    velkého nadpisu se ztrácel; pak dvacítka, a ta vedle nadpisu přes dva
    řádky křičela stejně jako on. Sedmnáctka v plné krémové se dá přečíst
@@ -1355,7 +1362,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
    zmenší i písmo a panák. */
 @media (max-height:640px){
   .uvod{--uvod-text:16px;--uvod-kresba:min(150px,22vh)}
-  .uvod-nadpis{font-size:clamp(30px,9.5vw,38px)}
+  .uvod-nadpis{font-size:clamp(28px,9vw,36px)}
 }
 
 @keyframes uvod-prichod{
