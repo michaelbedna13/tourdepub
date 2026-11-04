@@ -794,7 +794,7 @@ html.rozmazat .obrazovka{filter:blur(5px)}
     linear-gradient(to right,
       rgba(12,12,9,.55), rgba(12,12,9,0) 16%,
       rgba(12,12,9,0) 84%, rgba(12,12,9,.55)),
-    rgba(22,22,18,.52);
+    linear-gradient(rgba(22,22,18,.52),rgba(22,22,18,.52));
   animation:zjevit .18s var(--krok);
 }
 /* Výška je daná, ne odvozená z délky popisu: karta s dvěma větami a karta
@@ -1089,13 +1089,19 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .fab.otevreno .fab-znak-menu{opacity:0;rotate:-30deg}
 .fab.otevreno .fab-znak-krizek{opacity:1;rotate:45deg}
 
+/* Ztmavení u všech tří vrstev (menu, detail úkolu, okno) je přechod
+   z barvy do té samé barvy, ne plná barva pozadí. Safari na iOS 26 si
+   u vrstvy přes celou obrazovku vezme její barvu pozadí a natře jí pruh
+   pod lištou s adresou a nahoře u stavového řádku: po otevření menu tam
+   naskočil tmavý plný blok. Přechod vypadá stejně, ale plnou barvu
+   pozadí nemá, takže Safari nemá co přebrat. */
 .fab-plachta{
   position:fixed;inset:0;z-index:40;touch-action:none;
   background:
     linear-gradient(to right,
       rgba(12,12,9,.5), rgba(12,12,9,0) 16%,
       rgba(12,12,9,0) 84%, rgba(12,12,9,.5)),
-    rgba(22,22,18,.52);
+    linear-gradient(rgba(22,22,18,.52),rgba(22,22,18,.52));
   animation:zjevit .22s var(--krok);
 }
 /* Plachta hasne stejně dlouho, jako trvá odchod poslední položky, ať
@@ -1148,7 +1154,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
     linear-gradient(to right,
       rgba(12,12,9,.5), rgba(12,12,9,0) 16%,
       rgba(12,12,9,0) 84%, rgba(12,12,9,.5)),
-    rgba(3,7,5,.62);
+    linear-gradient(rgba(3,7,5,.62),rgba(3,7,5,.62));
   animation:zjevit .18s var(--krok)}
 .okno-telo{width:100%;max-width:var(--sirka);background:var(--vrstva);
   border-radius:28px 28px 0 0;padding:26px 22px calc(24px + env(safe-area-inset-bottom));
