@@ -239,7 +239,13 @@ input,textarea,select{caret-color:var(--text)}
    do boku (svih.ts ho zapisuje rovnou do stylu), takže se nedal plynule
    přepínat: při zavírání skočil z 1,06 na 1 v jediném snímku. Okraje řeší
    viněta na plachtě, ta žádnou hranu nepotřebuje. */
-html.rozmazat .obrazovka{filter:blur(5px)}
+html.rozmazat .obrazovka{filter:blur(5px) brightness(.55)}
+/* Ztmavení je filtr na obsahu, ne vrstva přes obrazovku (proč, viz
+   .fab-plachta). Podklad appky ztmavne o stejný kus, jinak by u krajů,
+   kam rozostření obsahu nedosáhne, zůstal světlejší pruh. Dřív ho
+   schovávala viněta na plachtě. */
+.app{transition:background-color .24s var(--krok)}
+html.rozmazat .app{background-color:color-mix(in srgb,var(--podklad) 55%,#000)}
 /* ---------- horní hrana v appce z plochy ---------- */
 /* iOS 26 kreslí v appce přidané na plochu přes horní okraj webového pohledu
    systémové rozostření („scroll edge effect", liquid glass), aby stavová
@@ -775,26 +781,8 @@ html.rozmazat .obrazovka{filter:blur(5px)}
      a scrolluje stránkou pod otevřeným detailem. */
   touch-action:none;
   padding:calc(var(--vrch) + 8px) var(--okraj) calc(env(safe-area-inset-bottom) + 24px);
-  /* Ztmavení a po stranách vinětace. Rozostření dělá .obrazovka pod vrstvou,
-     viz lib/vrstvy.ts.
-
-     Viněta je tu kvůli okrajům. Karty galerie stojí dvacet bodů od kraje
-     obrazovky a rozostření jim tu hranu rozmázne na obě strany — doleva
-     dosáhne asi čtrnáct bodů, takže posledních šest bodů u kraje zůstane
-     holý podklad. Dokud je obraz ostrý, čte se ten pruh jako okraj stránky;
-     jakmile se rozmaže, je z něj pruh, co „není rozmazaný". Není to chyba
-     prohlížeče ani vzorkování — rozostřit se tam prostě nemá co. Měřeno na
-     telefonu: od kraje k šestému bodu plochá barva, pak hladký náběh přes
-     třicet bodů, přesně jak má gaussovské rozostření vypadat.
-
-     Spravit se to dá jedině tím, že ten okraj přestane být náhodný. Viněta
-     z něj udělá kraj obrazu: nejtmavší u hrany, do šestnácti procent šířky
-     se ztratí. Náběh karet do ní zapadne a žádný pruh tam není. */
-  background:
-    linear-gradient(to right,
-      rgba(12,12,9,.55), rgba(12,12,9,0) 16%,
-      rgba(12,12,9,0) 84%, rgba(12,12,9,.55)),
-    linear-gradient(rgba(22,22,18,.52),rgba(22,22,18,.52));
+  /* Bez pozadí: ztmavení i rozostření dělá obsah pod vrstvou
+     (html.rozmazat .obrazovka), viz poznámku u .fab-plachta. */
   animation:zjevit .18s var(--krok);
 }
 /* Výška je daná, ne odvozená z délky popisu: karta s dvěma větami a karta
@@ -1089,19 +1077,19 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .fab.otevreno .fab-znak-menu{opacity:0;rotate:-30deg}
 .fab.otevreno .fab-znak-krizek{opacity:1;rotate:45deg}
 
-/* Ztmavení u všech tří vrstev (menu, detail úkolu, okno) je přechod
-   z barvy do té samé barvy, ne plná barva pozadí. Safari na iOS 26 si
-   u vrstvy přes celou obrazovku vezme její barvu pozadí a natře jí pruh
-   pod lištou s adresou a nahoře u stavového řádku: po otevření menu tam
-   naskočil tmavý plný blok. Přechod vypadá stejně, ale plnou barvu
-   pozadí nemá, takže Safari nemá co přebrat. */
 .fab-plachta{
   position:fixed;inset:0;z-index:40;touch-action:none;
-  background:
-    linear-gradient(to right,
-      rgba(12,12,9,.5), rgba(12,12,9,0) 16%,
-      rgba(12,12,9,0) 84%, rgba(12,12,9,.5)),
-    linear-gradient(rgba(22,22,18,.52),rgba(22,22,18,.52));
+  /* Plachta je průhledná a jen chytá ťuknutí. Ztmavení i rozostření dělá
+     obsah pod ní (html.rozmazat .obrazovka) a podklad appky.
+
+     Dřív tu bylo ztmavení přes celou obrazovku. Safari na iOS 26 si
+     u vrstvy přes celou obrazovku vezme její barvu a natře jí pruh pod
+     plovoucí lištou s adresou a nahoře u stavového řádku: po otevření
+     menu tam naskočil plný tmavý blok. Napřed se zkoušelo udělat z plné
+     barvy přechod (stejný vzhled, background-color průhledná) a Safari
+     blok kreslilo dál, takže nejde o background-color, ale o vrstvu
+     samotnou. Bez barvy na vrstvě ukazuje Safari pod lištou to, co tam
+     je: ztmavený obsah. Platí to i pro .detail a .okno. */
   animation:zjevit .22s var(--krok);
 }
 /* Plachta hasne stejně dlouho, jako trvá odchod poslední položky, ať
@@ -1147,14 +1135,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 
 /* ---------- okno ---------- */
 .okno{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;
-  /* Ztmavení a po stranách viněta, ze stejného důvodu jako u detailu úkolu:
-     rozostřený obsah nedosáhne až ke kraji obrazovky a holý pruh by se četl
-     jako nerozmazaný. Rozostření dělá .obrazovka pod vrstvou (lib/vrstvy.ts). */
-  background:
-    linear-gradient(to right,
-      rgba(12,12,9,.5), rgba(12,12,9,0) 16%,
-      rgba(12,12,9,0) 84%, rgba(12,12,9,.5)),
-    linear-gradient(rgba(3,7,5,.62),rgba(3,7,5,.62));
+  /* Bez pozadí, ztmavení dělá obsah pod vrstvou (viz .fab-plachta). */
   animation:zjevit .18s var(--krok)}
 .okno-telo{width:100%;max-width:var(--sirka);background:var(--vrstva);
   border-radius:28px 28px 0 0;padding:26px 22px calc(24px + env(safe-area-inset-bottom));
