@@ -1169,7 +1169,6 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .rezim .ikona{color:var(--text-3);margin-top:2px}
 .rezim.chybny{background:rgba(255,109,84,.1);color:#FFAD9B}
 .rezim.chybny .ikona{color:var(--spatne)}
-.rezim.zivy .ikona{color:var(--text)}
 .rezim .drobne{opacity:.9}
 
 /* ---------- pravidla ---------- */

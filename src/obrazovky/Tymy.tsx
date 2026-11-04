@@ -23,7 +23,7 @@ export function Tymy() {
     <>
       <Hlava nadpis="Týmy" />
       <p className="podnadpis">{vazat("Ťukni na tým, za který chceš zapisovat.")}</p>
-      <PruhSyncu podrobne />
+      <PruhSyncu />
 
       <Uctenka
         poradi={poradi}

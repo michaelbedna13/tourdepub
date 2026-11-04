@@ -2,16 +2,11 @@ import { vazat } from "../lib/format";
 import { useSync, zkusZnovu } from "../lib/sync";
 import { Ikona } from "./Ikona";
 
-interface Props {
-  /** Na Týmech se hlásí i to, že živé pořadí běží. Jinde by to bylo kafrání. */
-  podrobne?: boolean;
-}
-
-const sklonujParty = (n: number) => (n === 1 ? "partu" : n < 5 ? "party" : "part");
-
-/** Pruh o tom, jestli se skóre sdílí. Rozlišuje tři stavy, protože „tváříme se
- *  připojeně, ale nic se neposílá“ je ten nejhorší, co může nastat. */
-export function PruhSyncu({ podrobne = false }: Props) {
+/** Pruh o tom, že se skóre NEsdílí: bez serveru, offline nebo chyba.
+ *  Když všechno běží, mlčí. Na Týmech dřív hlásil „Živé pořadí běží,
+ *  vidíš 2 party z jinejch telefonů“; Mišákovi to překáželo, a navíc to
+ *  počítalo všechny týmy na serveru, i ten vlastní. */
+export function PruhSyncu() {
   const s = useSync();
 
   if (s.rezim === "ukazka")
@@ -33,14 +28,6 @@ export function PruhSyncu({ podrobne = false }: Props) {
           {s.chyba && <><br /><span className="drobne">{vazat(s.chyba)}</span></>}
           <br /><button className="tl maly" style={{ marginTop: 9 }} onClick={() => zkusZnovu()}>Zkusit znovu</button>
         </span></div>
-    );
-
-  if (s.rezim === "zivo" && podrobne)
-    return (
-      <div className="rezim zivy"><Ikona jmeno="check" px={16} />
-        <span>{vazat(`Živé pořadí běží${s.pocet
-          ? `, vidíš ${s.pocet} ${sklonujParty(s.pocet)} z jinejch telefonů`
-          : " – zatím nikdo jinej nepřipojenej"}.`)}</span></div>
     );
 
   return null;
