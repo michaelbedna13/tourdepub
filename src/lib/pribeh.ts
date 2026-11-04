@@ -22,7 +22,7 @@ export interface Kapitola {
 export const PRIBEH: Kapitola[] = [
   {
     nadpis: ["Sraz", "ve štatlu"],
-    text: "Šest večer, zoncna zalezla a ve štatlu se schází parta ogarů a holek. Každej hodí kilo do kotla, parta se rozdělí na dvě až tři partyje a první škopek se ťukne na zdar.",
+    text: "Šest večer, zoncna zalezla a ve štatlu se schází parta ogarů a holek. Každej hodí kilo do kotla, parta se rozdělí na dvě partyje a první škopek se ťukne na zdar.",
   },
   {
     nadpis: ["Od špeluňky", "ke špeluňce"],

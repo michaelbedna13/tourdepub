@@ -32,7 +32,7 @@ export const CAJK: Bod = {
   stitek: "Časovej cajk",
   text: "Valí se to od šesti večer do dvou do rána. Co se zvrtne potom, už se do čárek nepočítá.",
 };
-export const PARTYJE: Bod = { stitek: "Partyje", text: "Jede se ve dvou až třech partách." };
+export const PARTYJE: Bod = { stitek: "Partyje", text: "Jede se ve dvou partách." };
 export const COURANI: Bod = {
   stitek: "Žádný courání",
   text: "Na každou štaci je zhruba 45 minut. Jak se nějaká parta bude fest loudat a ty druhý na ně budou muset čumět, tak v té špeluňce nebudou mít za ty srandy ani čárku.",

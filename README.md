@@ -184,7 +184,7 @@ tým a zapisuješ za někoho jiného.
 Supabase má na free plánu strop **dva běžící projekty**, ale **tabulek může mít jeden
 projekt kolik chce.** Takže pusť `supabase/party.sql` v projektu, který už používáš
 (u nás `osobni-aplikace`). Tabulka se jmenuje `tourdepub_tymy`, takže se ti tam nic
-nepomíchá, a za jeden večer se tří part nedotkne ani okraje půlgigového limitu.
+nepomíchá, a za jeden večer se dvou part nedotkne ani okraje půlgigového limitu.
 
 1. Otevři projekt, co už máš — v Supabase se jmenuje **`osobni-aplikace`** —
    a vlevo dej **SQL Editor** → **New query**.
@@ -217,7 +217,7 @@ Bez signálu se zapisuje dál do telefonu a pošle se to, až bude signál.
 Jde to přes Google Apps Script a Google tabulku — stejně jako přihláška na kemp
 ve florbalkurim. Je to zadarmo, bez stropu na projekty a data vidíš rovnou v tabulce.
 Není tam ale živé posílání změn, takže by se muselo jednou za pár vteřin ptát samo.
-Pro dvě tři party na jeden večer by to stačilo; kdybys to chtěl, dopíšu to.
+Pro dvě party na jeden večer by to stačilo; kdybys to chtěl, dopíšu to.
 
 ## Appka na ploše
 
