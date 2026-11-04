@@ -1230,7 +1230,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
      titulek plakátu, ne řádek pod logem. */
   --uvod-nad-nadpisem:clamp(8px,6vh,72px);
   --uvod-text:20px;
-  --uvod-kresba:min(196px,25vh);
+  --uvod-kresba:min(196px,28vh);
   --uvod-pod-panakem:clamp(16px,8vh,90px);
 
   position:fixed;inset:0;z-index:120;
@@ -1338,15 +1338,19 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .uvod-zpet.nikam{visibility:hidden}
 .uvod-sipka{width:18px;height:8px;flex:none}
 
-/* Na krátkém displeji se stáhne všechno naráz: menší nadpis, menší text,
-   menší panák. Pořád to dýchá, jen míň.
-   Hranice byla 760 bodů, nastavená ještě pro text ve 22 bodech. Safari
-   s lištou dole má na 852bodovém iPhonu okno kolem 750, takže tam úvod
-   spadl do malé verze (panák 128 místo 175) a vypadal jinak než appka
-   z plochy. S textem ve 20 bodech se velký panák vejde od 740: při zátěži
-   s šířkou Hagridu na 745 mezera text → panák nejmíň 27, panák všude 169;
-   na 720 už se u nejdelšího plakátu smršťuje (158 vs 163). */
-@media (max-height:730px){
+/* Nižší okno: ubírá se vzduch, ne písmo a panák.
+   Safari na iPhonu s 852 body nemá okno 852 ani 750, ale asi 705:
+   stránka začíná pod stavovým řádkem a končí nad lištou (ze screenshotu:
+   logo 81 bodů od horního okraje = 59 + 22). Dokud se pod 760 bodů
+   zmenšoval text na 18 a panák na 150, vypadal úvod v Safari o poznání
+   menší než z plochy. Teď se tam jen stáhne mezera nad nadpisem a pod
+   panákem a všechno ostatní zůstává jako z plochy. */
+@media (max-height:780px){
+  .uvod{--uvod-nad-nadpisem:clamp(4px,2.5vh,24px);--uvod-pod-panakem:clamp(8px,2.5vh,24px)}
+}
+/* Opravdu malý displej (iPhone SE v Safari má okno kolem 550): tam už se
+   zmenší i písmo a panák. */
+@media (max-height:640px){
   .uvod{--uvod-text:18px;--uvod-kresba:min(150px,22vh)}
   .uvod-nadpis{font-size:clamp(30px,9.5vw,38px)}
 }
