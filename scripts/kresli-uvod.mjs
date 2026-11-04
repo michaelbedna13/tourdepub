@@ -226,6 +226,65 @@ const KRESBY = {
     ...skopekVRuce(33, 36, 14, 1),
   ],
 
+  // Od špeluňky ke špeluňce: panák se opírá o zeď hospody se škopkem
+  // v ruce, nohy zakřížené. Dřív se opíral o lucernu (viz lucerna výš),
+  // Mišák chtěl hospodu. Póza je stejná, ruka teď sahá na zeď. Hospoda se
+  // musí číst jako předmět i ve sto bodech: dveře, okno a škopek na štítu.
+  hospoda: () => {
+    const V = process.env.VARIANTA || "a";
+    const ZED = { amp: .6, step: 4, tension: .42 };
+    const panakUZdi = [
+      ...panak({
+        trup: [[50, 37], [47, 50], [44, 63]],
+        ruce: [[[51, 43], [62, 40], [74, 41], [84, 44]], [[49, 45], [40, 44], [33, 36]]],
+        nohy: [[[44, 62], [49, 76], [54, 90]], [[44, 62], [44, 77], [37, 91]]],
+        chodidla: [[55, 91, -5], [37, 92, 185]], hlava: 6,
+      }),
+      ...skopekVRuce(33, 36, 14, 1),
+    ];
+    if (V === "b") return [
+      // rovná fasáda, římsa, markýza s pruhy, cedule se škopkem, výloha
+      I(cut(rect(84, 14, 120, 98, 1), ZED)),
+      I(cut(rect(81, 11, 123, 16, 1), PRST)),
+      C(cut(rect(90, 21, 114, 34, 1.5), PRST)),
+      ...skopek(100, 27.5, 0, 1, .6),
+      I(cut([[80, 40], [124, 40], [127, 51], [77, 51]], PRST)),
+      ...[88, 96, 104, 112].map((x) => C(cut(tah([[x, 42], [x + .6, 49]], 2.8), PRST))),
+      C(cut(rect(88, 56, 104, 76, 1.5), PRST)),
+      ...skopek(94.5, 66, 0, 1, .75),
+      C(cut(rect(107, 58, 117, 98, 3.5), PRST)),
+      ...panakUZdi,
+    ];
+    if (V === "c") return [
+      // domek s otevřenými dveřmi a cedulí nade dveřmi
+      I(cut(rect(84, 30, 118, 98, 1), ZED)),
+      I(cut([[79, 32], [101, 10], [123, 32]], ZED)),
+      I(cut(rect(108, 13, 114, 25, 1), PRST)),
+      C(cut(rect(91, 39, 113, 52, 1.5), PRST)),
+      ...skopek(100, 45.5, 0, 1, .6),
+      C(cut(rect(95, 60, 110, 98, 2), PRST)),
+      I(cut([[110, 60], [119, 55], [119, 99], [110, 98]], PRST)),
+      ...panakUZdi,
+    ];
+    return [
+      // domek se sedlovou střechou, okno s křížem, dveře, štít se škopkem
+      I(cut(rect(84, 26, 118, 98, 1), ZED)),
+      I(cut([[79, 28], [101, 6], [123, 28]], ZED)),
+      I(cut(rect(108, 9, 114, 21, 1), PRST)),
+      C(cut(rect(88, 38, 103, 55, 1.5), PRST)),
+      I(cut(tah([[95.5, 38], [95.5, 55]], 1.8), PRST)),
+      I(cut(tah([[88, 46.5], [103, 46.5]], 1.8), PRST)),
+      C(cut(rect(97, 66, 112, 98, 5), PRST)),
+      I(cut(ell(109, 83, 1.3, 1.3, 8), JEMNE)),
+      I(cut(tah([[118, 33], [131, 33]], 2.4), PRST)),
+      I(cut(tah([[120, 33], [120, 38]], 1.1), PRST)),
+      I(cut(tah([[129, 33], [129, 38]], 1.1), PRST)),
+      I(cut(rect(116, 37, 133, 53, 1.5), PRST)),
+      ...skopek(122.5, 45.5, 0, 1, .62).map(([d, x]) => [d === "i" ? "c" : "i", x]),
+      ...panakUZdi,
+    ];
+  },
+
   // Žádný courání: panák běží, předklon, škopek před sebou, pěna
   // odlétá. Čárky za ním říkají, že to valí.
   beh: () => [
@@ -411,7 +470,7 @@ const KRESBY = {
 };
 
 /** Co se opravdu zapisuje do src/lib/uvod-kresby.ts. */
-const POUZITE = ["sraz", "lucerna", "beh", "zed", "vitez"];
+const POUZITE = ["sraz", "hospoda", "beh", "zed", "vitez"];
 
 /** Obálka kresby: nejmenší rámeček, do kterého se vejde inkoust.
  *

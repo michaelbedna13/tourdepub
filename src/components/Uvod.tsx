@@ -33,10 +33,10 @@ const PISMA_NEJVIC = 2500;
 const ZAVRENI = 300;
 
 /** Pět plakátů, pět kapitol jednoho večera (lib/pribeh.ts). Ke každé
- *  patří panák, co ji hraje: ťuká si škopkem, visí na lucerně, běží
+ *  patří panák, co ji hraje: ťuká si škopkem, opírá se o hospodu, běží
  *  s pivem, píše čárky na tabuli, skáče s pohárem. Kresby jdou ve stejném
  *  pořadí jako kapitoly. */
-const KRESBY_KAPITOL = ["sraz", "lucerna", "beh", "zed", "vitez"] as const;
+const KRESBY_KAPITOL = ["sraz", "hospoda", "beh", "zed", "vitez"] as const;
 const PLAKATY = PRIBEH.map((k, i) => ({ ...k, id: KRESBY_KAPITOL[i] }));
 
 /** DOČASNÉ: varianta tloušťky nadpisu na vyzkoušení na telefonu
@@ -274,17 +274,20 @@ function Cmaranice({ id }: { id: keyof typeof UVOD_KRESBY }) {
   const maska = `uk${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const kresba = UVOD_KRESBY[id];
   if (!kresba) return null;
+  const [bx, by, bw, bh] = kresba.box.split(" ").map(Number);
   // viewBox je obálka inkoustu, ne celý čtverec, ve kterém se kreslilo: jinak
   // by měla každá kresba jinak velkou mezeru pod sebou podle toho, kolik
   // z čtverce zabrala (viz obalka() v scripts/kresli-uvod.mjs).
   return (
     <svg className="uvod-cmaranice" viewBox={kresba.box} aria-hidden="true">
-      <mask id={maska} maskUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="140">
+      {/* Maska i plocha podle obálky kresby, ne pevně -20…120: hospoda se
+          štítem sahá za 120 a pevná maska ji usekla. */}
+      <mask id={maska} maskUnits="userSpaceOnUse" x={bx - 5} y={by - 5} width={bw + 10} height={bh + 10}>
         {kresba.vrstvy.map(([druh, d], i) => (
           <path key={i} d={d} fill={druh === "i" ? "#FFFFFF" : "#000000"} />
         ))}
       </mask>
-      <rect x="-20" y="-20" width="140" height="140" fill="currentColor" mask={`url(#${maska})`} />
+      <rect x={bx - 5} y={by - 5} width={bw + 10} height={bh + 10} fill="currentColor" mask={`url(#${maska})`} />
     </svg>
   );
 }
