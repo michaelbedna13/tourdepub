@@ -227,6 +227,28 @@ function panakJde(x, nahoru = false) {
   return vrstvy;
 }
 
+/** Výstřižek z plného tvaru: obrátí papír a díru (škopek vystřižený ze
+ *  štítu nebo ze šipky). */
+const naruby = (vrstvy) => vrstvy.map(([d, p]) => [d === "i" ? "c" : "i", p]);
+
+/** Obrys oblouku: rovné boky a půlkruh nahoře (portál, klenba). */
+function oblouk(x1, y1, x2, y2) {
+  const r = (x2 - x1) / 2, cx = x1 + r, cy = y1 + r;
+  const vrch = [...Array(13)].map((_, i) => { const a = Math.PI + (i * Math.PI) / 12;
+    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; });
+  return [[x1, y2], ...vrch, [x2, y2]];
+}
+
+/** Obrys sudu: boky vypouklé, dno a víko rovné. */
+function sud(x1, y1, x2, y2) {
+  const v = (x2 - x1) * .1, n = 8, L = [], R = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, y = y1 + (y2 - y1) * t, o = Math.sin(t * Math.PI) * v;
+    L.push([x1 + v - o, y]); R.push([x2 - v + o, y]);
+  }
+  return [...L, ...R.reverse()];
+}
+
 // Z těchhle se do appky dostane jen to, co je v POUZITE. Zbytek zůstává
 // tady jako zdroj: kreslilo se to pro starou průpravu přes čtyři plakáty
 // a může se to hodit, ale vozit čtyři nepoužité kresby v balíku je zbytečné.
@@ -277,29 +299,57 @@ const KRESBY = {
     ...skopekVRuce(33, 36, 14, 1),
   ],
 
-  // Od špeluňky ke špeluňce: panák jde po štatlu se škopkem v ruce od
-  // hospody k hospodě. Dřív visel na lucerně; Mišák chtěl hospodu, a pak
-  // ať se o ni neopírá. Hospoda je přízemní budova, ne vysoký domek: štít
-  // se škopkem na rameni, dveře, okno. Ve sto bodech se čtou předměty,
-  // takže hospodu dělá štít se škopkem, ne tvar domu.
+  // Od špeluňky ke špeluňce: panák jde se škopkem ke sklepní hospodě.
+  // Dřív visel na lucerně. Mišák chtěl hospodu, pak ať se o ni neopírá,
+  // a domky se střechou a komínem (hospodaTvar) byly „hnusný“: četly se
+  // jako dětská kresba domu. Hospoda je proto předmět, ne dům, stejně
+  // jako tabule u čárek: velký plochý tvar s ostře vystřiženým detailem.
+  // Výchozí B: masivní zeď s klenutým vchodem, kameny kolem klenby
+  // a vývěsní štít se škopkem. A (rozcestník se dvěma šipkami a škopky)
+  // a C (pivní sud s pípou) přes VARIANTA=a / c.
   hospoda: () => {
-    // Výchozí je B: od jedný hospody k druhý, jak říká nadpis kapitoly.
-    // A (jde k hospodě) a C (vychází a připíjí) přes VARIANTA=a / c.
     const V = process.env.VARIANTA || "b";
-    // Všechno stojí na jedné zemi (y 92, kde má panák chodidla); hospoda
-    // se staví od země nahoru, ať nevisí ve vzduchu.
+    const PLOCHA = { amp: .6, step: 4, tension: .42 };
     if (V === "b") return [
-      ...hospodaTvar(-2, ZEM, .8, -1),
-      ...panakJde(72),
-      ...hospodaTvar(124, ZEM, 1.1, 1),
+      // klenutý vchod do sklepní hospody: masivní zeď, v ní vystřižená
+      // klenba s kameny kolem, nad vchodem štít se škopkem
+      ...panakJde(18),
+      I(cut(rect(62, 10, 112, 92, 1.5), PLOCHA)),
+      C(cut(oblouk(73, 30, 101, 92), PRST)),
+      ...[[-150, -122], [-115, -88], [-80, -52], [-45, -18], [-10, 18]].map(([a, b]) => {
+        const r1 = 16.5, r2 = 22, c = [87, 44];
+        const bod = (r, st) => [c[0] + Math.cos((st * Math.PI) / 180) * r, c[1] + Math.sin((st * Math.PI) / 180) * r];
+        const kamen = [bod(r1, a + 4), bod(r2, a + 4), bod(r2, b - 4), bod(r1, b - 4)];
+        return C(cut(kamen, PRST));
+      }),
+      I(cut(rect(58, 89, 116, 95, 1), PRST)),
+      I(cut(tah([[112, 22], [130, 22]], 2.6), PRST)),
+      I(cut(tah([[115, 22], [115, 27]], 1.2), PRST)),
+      I(cut(tah([[127, 22], [127, 27]], 1.2), PRST)),
+      I(cut(rect(111, 26, 133, 46, 1.8), PRST)),
+      ...naruby(skopek(120, 36, 0, 1, .75)),
     ];
     if (V === "c") return [
-      ...hospodaTvar(0, ZEM, 1.15, -1),
-      ...panakJde(98, true),
+      // pivní sud s obručemi, dole pípa, z ní kápne
+      ...panakJde(18),
+      I(cut(sud(66, 30, 114, 92), PLOCHA)),
+      C(cut(tah([[67, 44], [113, 44]], 3), PRST)),
+      C(cut(tah([[67, 78], [113, 78]], 3), PRST)),
+      C(cut(ell(90, 61, 4.5, 4.5, 12), JEMNE)),
+      I(cut(tah([[67, 70], [58, 70], [58, 76]], [3.4, 3.4, 2.8]), PRST)),
+      I(cut(rect(55, 64, 61, 67, .8), PRST)),
+      I(cut(ell(58, 82, 1.6, 2.4, 10), JEMNE)),
     ];
+    // rozcestník: vysoký sloup, šipka doprava nahoře, doleva níž, v obou
+    // vystřižený škopek
     return [
-      ...panakJde(28),
-      ...hospodaTvar(80, ZEM, 1.15, 1),
+      ...panakJde(14),
+      I(cut(tah([[92, 4], [92, 92]], [4.4, 4.8]), PRST)),
+      I(cut(rect(85, 89, 99, 95, 1.2), PRST)),
+      I(cut([[88, 8], [122, 8], [133, 20], [122, 32], [88, 32]], PLOCHA)),
+      ...naruby(skopek(105, 20, 0, 1, .85)),
+      I(cut([[96, 40], [96, 64], [64, 64], [53, 52], [64, 40]], PLOCHA)),
+      ...naruby(skopek(76, 52, 0, -1, .85)),
     ];
   },
 
