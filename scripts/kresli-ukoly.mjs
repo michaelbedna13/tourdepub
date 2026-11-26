@@ -318,6 +318,17 @@ const KRESBY = {
     I(cut(stroke(50, 58, 66, 66, 5), { ...R, amp: .7 })),
     I(cut(ell(50, 58, 5, 5, 14), JEMNE)),
   ],
+  // Bratrská hubana: rty. Ve sto bodech se čtou předměty, ne postavičky
+  // (dva panáci v pusinkování by byli flíček); rty s rýhou mezi sebou
+  // a srdíčko nad nimi jsou pusa i bez čtení.
+  hubana: () => [
+    I(cut([[6, 56], [16, 44], [28, 35], [40, 32], [50, 39], [60, 32], [72, 35], [84, 44], [94, 56],
+           [84, 68], [70, 78], [50, 82], [30, 78], [16, 68]], { ...H, tension: .5 })),
+    C(cut([[12, 56], [26, 53], [40, 55], [50, 59], [60, 55], [74, 53], [88, 56],
+           [74, 59], [60, 61], [50, 64], [40, 61], [26, 59]], { ...R, amp: .5 })),
+    I(cut([[78, 26], [70, 18], [67, 11], [70, 6], [75, 6], [78, 10],
+           [81, 6], [86, 6], [89, 11], [86, 18]], { ...JEMNE, tension: .5 })),
+  ],
   // Tácková galerie: jeden tácek s hvězdou. Dva přes sebe se slily v jeden
   // pomačkaný papír.
   tacky: () => [
