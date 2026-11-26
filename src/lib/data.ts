@@ -163,8 +163,7 @@ export const VYCHOZI_UKOLY: Ukol[] = [
     popis: "Jeden si vybere druhýho a minutu do něj hustí motivační proslov, jak kdyby ten druhej šel na olympijský finále.",
     pozn: "Disciplína může bejt klidně zavazování tkaniček." },
   { id: "hubana", kat: "zranice", piva: 2, body: 2, max: 1, nazev: "Homo huban",
-    popis: "Dva z partyje stejnýho pohlaví, dva ogaři nebo dvě holky, si daj před celým lokálem pořádnou hubanu jak Brežněv s Honeckerem.",
-    pozn: "Nikoho se nenutí. Kdo nechce, nemusí, partyja si najde jinou dvojku." },
+    popis: "Dva z partyje stejnýho pohlaví, dva ogaři nebo dvě holky, si daj před celým lokálem pořádnýho hubana jak Brežněv s Honeckerem." },
 ];
 
 export const OBTIZNOST: { piva: 1 | 2 | 3; nazev: string }[] = [
