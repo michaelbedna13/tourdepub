@@ -299,6 +299,50 @@ const KRESBY = {
     I(cut(stroke(50, 58, 66, 66, 5), { ...R, amp: .7 })),
     I(cut(ell(50, 58, 5, 5, 14), JEMNE)),
   ],
+  // Lidská pyramida: tři hlavy s rameny dole, jedna nahoře. Panáci celí
+  // by byli ve sto bodech flíček; hlavy na ramenou v trojúhelníku jsou
+  // pyramida i bez nohou.
+  pyramida: () => {
+    const clovek = (x, y) => [
+      I(cut(ell(x, y, 8.5, 8.5, 18), { ...R, amp: .6 })),
+      I(cut([[x - 13, y + 21], [x - 10, y + 11], [x + 10, y + 11], [x + 13, y + 21]], { ...R, amp: .6 })),
+    ];
+    return [
+      ...clovek(22, 66), ...clovek(50, 66), ...clovek(78, 66),
+      ...clovek(36, 34), ...clovek(64, 34),
+      ...clovek(50, 2 + 8.5),
+      I(cut(rect(6, 87, 94, 93, 2), { ...R, amp: .7 })),
+    ];
+  },
+  // Točenej mašinfíra: flaška a kolem ní oblouk se šipkou, jak se točí.
+  tocenej: () => [
+    I(cut([[42, 14], [58, 14], [58, 34], [66, 46], [66, 88], [34, 88], [34, 46], [42, 34]], H)),
+    C(cut(rect(38, 56, 62, 72, 2), { ...R, amp: .6 })),
+    I(cut(srpek(50, 58, 44, 6, 200, 330, 14), { ...R, amp: .8, step: 5 })),
+    I(cut([[86, 26], [99, 34], [86, 44]], { ...R, amp: .5 })),
+  ],
+  // Páka s cizákem: napnutá ruka s bicepsem. Dva lokty na stole se
+  // sevřenýma rukama se ve sto bodech slily do trojúhelníku; zatnutý
+  // biceps je síla na první pohled.
+  paka: () => [
+    I(cut([[8, 70], [16, 58], [26, 46], [38, 40], [50, 44], [56, 54], [57, 46], [53, 36], [53, 24],
+           [60, 14], [72, 12], [83, 18], [85, 30], [80, 42], [77, 54], [80, 66],
+           [76, 80], [64, 89], [44, 91], [24, 89], [8, 88]], { ...H, tension: .45 })),
+    C(cut(stroke(60, 25, 76, 22, 2.6), JEMNE)),
+    C(cut(stroke(61, 33, 77, 30, 2.6), JEMNE)),
+    C(cut(srpek(40, 68, 12, 2.6, 200, 300), JEMNE)),
+  ],
+  // Tácek na palici: hlava a na ní tácek z boku, nad ním čárky, jak se klepe.
+  palice: () => [
+    I(cut(ell(50, 66, 22, 24, 24), H)),
+    C(cut(ell(42, 64, 3.5, 3.5, 12), JEMNE)),
+    C(cut(ell(58, 64, 3.5, 3.5, 12), JEMNE)),
+    C(cut(srpek(50, 70, 9, 2.6, 30, 150), JEMNE)),
+    I(cut(rot(rect(22, 34, 78, 41, 2), -6, 50, 37), { ...R, amp: .7 })),
+    I(cut(stroke(30, 22, 26, 14, 3.2), JEMNE)),
+    I(cut(stroke(50, 20, 50, 11, 3.2), JEMNE)),
+    I(cut(stroke(70, 22, 74, 14, 3.2), JEMNE)),
+  ],
   // Homo huban: rty. Ve sto bodech se čtou předměty, ne postavičky
   // (dva panáci v pusinkování by byli flíček); rty s rýhou mezi sebou
   // a srdíčko nad nimi jsou pusa i bez čtení.
