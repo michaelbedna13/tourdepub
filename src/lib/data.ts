@@ -162,8 +162,8 @@ export const VYCHOZI_UKOLY: Ukol[] = [
   { id: "trener", kat: "zranice", piva: 1, body: 1, max: 1, nazev: "Trenér roku",
     popis: "Jeden si vybere druhýho a minutu do něj hustí motivační proslov, jak kdyby ten druhej šel na olympijský finále.",
     pozn: "Disciplína může bejt klidně zavazování tkaniček." },
-  { id: "hubana", kat: "zranice", piva: 2, body: 2, max: 1, nazev: "Bratrská hubana",
-    popis: "Dva z partyje stejnýho pohlaví, dva ogaři nebo dvě holky, si daj před celým lokálem pořádnou hubanu jak Brežněv s Honeckerem. Žádný cmuknutí do vzduchu, pusa na pusu.",
+  { id: "hubana", kat: "zranice", piva: 2, body: 2, max: 1, nazev: "Homo huban",
+    popis: "Dva z partyje stejnýho pohlaví, dva ogaři nebo dvě holky, si daj před celým lokálem pořádnou hubanu jak Brežněv s Honeckerem.",
     pozn: "Nikoho se nenutí. Kdo nechce, nemusí, partyja si najde jinou dvojku." },
 ];
 

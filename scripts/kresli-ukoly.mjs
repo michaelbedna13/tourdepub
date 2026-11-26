@@ -318,7 +318,7 @@ const KRESBY = {
     I(cut(stroke(50, 58, 66, 66, 5), { ...R, amp: .7 })),
     I(cut(ell(50, 58, 5, 5, 14), JEMNE)),
   ],
-  // Bratrská hubana: rty. Ve sto bodech se čtou předměty, ne postavičky
+  // Homo huban: rty. Ve sto bodech se čtou předměty, ne postavičky
   // (dva panáci v pusinkování by byli flíček); rty s rýhou mezi sebou
   // a srdíčko nad nimi jsou pusa i bez čtení.
   hubana: () => [
