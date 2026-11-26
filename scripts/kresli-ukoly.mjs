@@ -347,9 +347,10 @@ const KRESBY = {
   // ze seznamu nápadů; před ní pěst, rukavice, blesk, VS a pěsti proti
   // sobě (ty zůstávají přes VARIANTA_PAKY=a/b/c/d). Z tří provedení býka
   // nejlíp fungovaly velké rohy, oči a kroužek v nose dohromady: bez
-  // rohů je to kráva, bez kroužku taky.
+  // rohů je to kráva. Mišák pak vybral C: jen velké rohy, bez očí
+  // a bez kroužku (spojení s očima a kroužkem zůstává jako VARIANTA_PAKY=byk).
   paka: () => {
-    const V = process.env.VARIANTA_PAKY || "byk";
+    const V = process.env.VARIANTA_PAKY || "byk-c";
     if (V.startsWith("byk")) {
       const silne = V === "byk" || V === "byk-c";
       const roh = (smer) => {
