@@ -173,7 +173,7 @@ const KRESBY = {
           ? [C(cut(ell(43, 46, 4.2, 5, 14), JEMNE)), C(cut(ell(57, 46, 4.2, 5, 14), JEMNE)),
              C(cut(tah([[31, 39], [40, 35], [50, 38], [60, 35], [69, 39]], 3), JEMNE)),
              ...(V === "opice-d" ? [C(cut(ell(45, 64, 2.6, 2, 10), JEMNE)), C(cut(ell(55, 64, 2.6, 2, 10), JEMNE))] : []),
-             C(cut(stroke(42, 74, 58, 74, 2.6), JEMNE))]
+             C(cut(stroke(42, 69, 58, 69, 2.6), JEMNE))]
           : [C(cut(ell(40, 42, 5, 6, 14), JEMNE)), C(cut(ell(60, 42, 5, 6, 14), JEMNE)),
              ...(V !== "opice-a" ? [C(cut(ell(46, 64, 2.4, 2, 10), JEMNE)), C(cut(ell(54, 64, 2.4, 2, 10), JEMNE))] : []),
              ...(V === "opice-a" ? [C(cut(srpek(50, 68, 10, 3, 25, 155, 10), JEMNE))] : []),
