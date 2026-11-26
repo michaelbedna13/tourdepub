@@ -145,13 +145,33 @@ const KRESBY = {
     ...[41.5, 48.5, 55.5].map((x) => C(cut(rect(x, 25, x + 3.5, 28.5, .5), JEMNE))),
     ...[45, 52, 59].map((x) => C(cut(rect(x, 28.5, x + 3.5, 32, .5), JEMNE))),
   ],
-  // Vopičí lajna: opičí hlava s kudrlinkou. Velké uši, hladký obrys,
-  // obličej do tvaru buráku s lemem kolem, oči a čumák. Původní hlava měla
-  // zubatý chochol jako korunku a obličej přes celou hlavu; zkoušely se
-  // i banán, otisky dlaní a opice po čtyřech (VARIANTA_LAJNY=a/b/c), ale
-  // Mišák chtěl hlavu, jen líp.
+  // Vopičí lajna: opičí hlava jako jedna plná silueta (hlava, velké uši,
+  // vystouplý čumák, kudrlinka) a vystřižené jen oči, nozdry a úsměv.
+  // Dřív byl vystřižený celý obličej do tvaru buráku a v něm zase oči
+  // a pusa: Mišákovi to připadalo jako obličej v obličeji. Zkoušely se
+  // i banán, otisky dlaní, opice po čtyřech a hlava s vystřiženým
+  // obličejem (VARIANTA_LAJNY=a/b/c/hlava-kudrna).
   lajna: () => {
-    const V = process.env.VARIANTA_LAJNY || "hlava-kudrna";
+    const V = process.env.VARIANTA_LAJNY || "silueta";
+    if (V === "silueta" || V === "silueta-linka") {
+      // plná silueta: hlava, velké uši, vystouplý čumák dole; vystřižené
+      // jen oči, nozdry a pusa, žádná vnitřní plocha obličeje
+      return [
+        I(cut(ell(16, 50, 13, 13, 22), { ...R, amp: .35 })),
+        I(cut(ell(84, 50, 13, 13, 22), { ...R, amp: .35 })),
+        C(cut(ell(16, 51, 6, 6, 16), JEMNE)),
+        C(cut(ell(84, 51, 6, 6, 16), JEMNE)),
+        I(cut(ell(50, 44, 29, 28, 32), { ...R, amp: .35, step: 5 })),
+        I(cut(ell(50, 68, 21, 16, 28), { ...R, amp: .35, step: 5 })),
+        C(cut(ell(40, 42, 5, 6, 14), JEMNE)),
+        C(cut(ell(60, 42, 5, 6, 14), JEMNE)),
+        C(cut(ell(46, 64, 2.4, 2, 10), JEMNE)),
+        C(cut(ell(54, 64, 2.4, 2, 10), JEMNE)),
+        C(cut(srpek(50, 68, 10, 3, 25, 155, 10), JEMNE)),
+        ...(V === "silueta-linka" ? [C(cut(srpek(50, 40, 19, 2.4, 200, 340, 16), JEMNE))] : []),
+        I(cut(tah([[46, 17], [44, 10], [48, 4], [55, 5], [56, 11], [51, 12]], [5, 4.6, 4.2, 3.8, 3.4, 3]), JEMNE)),
+      ];
+    }
     if (V === "hlava" || V === "hlava-kudrna") {
       // opičí hlava: velké uši, obličej do tvaru buráku, oči a čumák
       return [
