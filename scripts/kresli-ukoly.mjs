@@ -165,14 +165,15 @@ const KRESBY = {
     I(cut(ell(55, 61, 2.2, 1.8, 10), JEMNE)),
     I(cut(srpek(50, 63, 12, 3.4, 30, 150), JEMNE)),
   ],
-  // Řev jak z JZD: megafon a vlny řevu. Kravská hlava se pletla s býkem
-  // u Páky s cizákem ve stejné kategorii.
+  // Řev jak z JZD: kravská hlava. Megafon ani hlava z profilu se nečetly,
+  // a tohle navíc sedí na jméno úkolu.
   rev: () => [
-    I(cut([[16, 42], [28, 42], [68, 20], [76, 20], [76, 80], [68, 80], [28, 58], [16, 58]], { ...H, tension: .2 })),
-    I(cut(rect(6, 43, 18, 57, 2), { ...R, amp: .5 })),
-    I(cut(stroke(40, 58, 45, 76, 7), JEMNE)),
-    I(cut(srpek(78, 50, 14, 4, -42, 42, 10), JEMNE)),
-    I(cut(srpek(78, 50, 24, 4, -38, 38, 12), JEMNE)),
+    I(cut([[22, 32], [78, 32], [82, 60], [68, 84], [32, 84], [18, 60]], H)),
+    I(cut(stroke(26, 36, 10, 20, 10), { ...R, amp: .8 })),
+    I(cut(stroke(74, 36, 90, 20, 10), { ...R, amp: .8 })),
+    C(cut(ell(37, 50, 6, 6, 14), JEMNE)),
+    C(cut(ell(63, 50, 6, 6, 14), JEMNE)),
+    C(cut(ell(50, 71, 15, 9, 18), { ...R, amp: .8 })),
   ],
   // Bullseye: terč a šipka zapíchnutá do středu. Šipka měla napřed hrot
   // jako vlaječku a potom velký trojúhelník venku na konci dříku, takže
