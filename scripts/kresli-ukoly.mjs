@@ -151,8 +151,35 @@ const KRESBY = {
   // a pusa: Mišákovi to připadalo jako obličej v obličeji. Zkoušely se
   // i banán, otisky dlaní, opice po čtyřech a hlava s vystřiženým
   // obličejem (VARIANTA_LAJNY=a/b/c/hlava-kudrna).
+  // Pak to Mišákovi připomínalo smajlíka: dvě oči a úsměv jsou smajlík.
+  // Opici z toho dělá výrazné obočí, oči blízko u sebe a velký čumák
+  // s rovnou pusou (opice-d); bez nozder, bez pusy nebo jen s rovnou
+  // pusou to byl smajlík nebo lebka (opice-a/b/c, silueta).
   lajna: () => {
-    const V = process.env.VARIANTA_LAJNY || "silueta";
+    const V = process.env.VARIANTA_LAJNY || "opice-d";
+    if (V.startsWith("opice-")) {
+      // opičí silueta bez smajlíka: varianty bez nozder / bez úsměvu /
+      // bez pusy / s obočím a velkým čumákem
+      const obocim = V === "opice-d";
+      return [
+        I(cut(ell(16, 50, 13, 13, 22), { ...R, amp: .35 })),
+        I(cut(ell(84, 50, 13, 13, 22), { ...R, amp: .35 })),
+        C(cut(ell(16, 51, 6, 6, 16), JEMNE)),
+        C(cut(ell(84, 51, 6, 6, 16), JEMNE)),
+        I(cut(ell(50, 44, 29, 28, 32), { ...R, amp: .35, step: 5 })),
+        I(cut(ell(50, obocim ? 69 : 68, obocim ? 24 : 21, obocim ? 18 : 16, 28), { ...R, amp: .35, step: 5 })),
+        ...(obocim
+          ? [C(cut(ell(43, 46, 4.2, 5, 14), JEMNE)), C(cut(ell(57, 46, 4.2, 5, 14), JEMNE)),
+             C(cut(tah([[31, 39], [40, 35], [50, 38], [60, 35], [69, 39]], 3), JEMNE)),
+             C(cut(ell(45, 64, 2.6, 2, 10), JEMNE)), C(cut(ell(55, 64, 2.6, 2, 10), JEMNE)),
+             C(cut(stroke(42, 74, 58, 74, 2.6), JEMNE))]
+          : [C(cut(ell(40, 42, 5, 6, 14), JEMNE)), C(cut(ell(60, 42, 5, 6, 14), JEMNE)),
+             ...(V !== "opice-a" ? [C(cut(ell(46, 64, 2.4, 2, 10), JEMNE)), C(cut(ell(54, 64, 2.4, 2, 10), JEMNE))] : []),
+             ...(V === "opice-a" ? [C(cut(srpek(50, 68, 10, 3, 25, 155, 10), JEMNE))] : []),
+             ...(V === "opice-b" ? [C(cut(stroke(43, 73, 57, 73, 2.6), JEMNE))] : [])]),
+        I(cut(tah([[46, 17], [44, 10], [48, 4], [55, 5], [56, 11], [51, 12]], [5, 4.6, 4.2, 3.8, 3.4, 3]), JEMNE)),
+      ];
+    }
     if (V === "silueta" || V === "silueta-linka") {
       // plná silueta: hlava, velké uši, vystouplý čumák dole; vystřižené
       // jen oči, nozdry a pusa, žádná vnitřní plocha obličeje
