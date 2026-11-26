@@ -343,11 +343,32 @@ const KRESBY = {
       I(cut(star(16, 18, 6, 2.4), JEMNE)),
     ];
   },
-  // Páka s cizákem: „VS“ v kruhu, souboj s cizákem. Pěst se Mišákovi
-  // nelíbila; ze čtyř variant (A rukavice, B blesk, C VS, D pěsti proti
-  // sobě) se nejlíp četly blesk a VS. Ostatní přes VARIANTA_PAKY=a/b/d.
+  // Páka s cizákem: býčí hlava, síla a tvrdá palice. Mišák si ji vybral
+  // ze seznamu nápadů; před ní pěst, rukavice, blesk, VS a pěsti proti
+  // sobě (ty zůstávají přes VARIANTA_PAKY=a/b/c/d). Z tří provedení býka
+  // nejlíp fungovaly velké rohy, oči a kroužek v nose dohromady: bez
+  // rohů je to kráva, bez kroužku taky.
   paka: () => {
-    const V = process.env.VARIANTA_PAKY || "c";
+    const V = process.env.VARIANTA_PAKY || "byk";
+    if (V.startsWith("byk")) {
+      const silne = V === "byk" || V === "byk-c";
+      const roh = (smer) => {
+        const z = (pts) => pts.map(([x, y]) => [50 + (x - 50) * smer, y]);
+        const body = silne ? [[34, 36], [20, 34], [9, 24], [6, 8]] : [[34, 36], [22, 33], [13, 25], [10, 13]];
+        return I(cut(tah(z(body), silne ? [12, 10, 7, 3] : [9, 8, 6, 3]), { ...R, amp: .5, step: 4 }));
+      };
+      const ucho = (smer) => I(cut(rot(ell(50 + 27 * smer, 45, 10, 5, 16), -18 * smer, 50 + 27 * smer, 45), { ...R, amp: .5 }));
+      return [
+        roh(1), roh(-1), ucho(1), ucho(-1),
+        I(cut([[30, 30], [70, 30], [75, 46], [67, 68], [62, 84], [38, 84], [33, 68], [25, 46]], { ...H, tension: .5 })),
+        I(cut(ell(50, 80, 17, 11, 20), { ...R, amp: .6 })),
+        C(cut(ell(43, 81, 3.2, 4.2, 12), JEMNE)),
+        C(cut(ell(57, 81, 3.2, 4.2, 12), JEMNE)),
+        ...(V === "byk-a" || V === "byk" ? [C(cut(ell(39, 52, 3.8, 3.2, 12), JEMNE)), C(cut(ell(61, 52, 3.8, 3.2, 12), JEMNE))] : []),
+        ...(V === "byk" ? [I(cut(srpek(50, 86, 10, 3.6, 10, 170, 14), JEMNE))] : []),
+        ...(V === "byk-a" || V === "byk-b" ? [I(cut(srpek(50, 89, 8, 2.8, 15, 165, 12), JEMNE))] : []),
+      ];
+    }
     if (V === "b") return [
       // blesk
       I(cut([[58, 6], [24, 54], [46, 54], [36, 94], [78, 40], [55, 40], [68, 6]], { ...H, tension: .15 })),
