@@ -154,13 +154,14 @@ const KRESBY = {
   // Pak to Mišákovi připomínalo smajlíka: dvě oči a úsměv jsou smajlík.
   // Opici z toho dělá výrazné obočí, oči blízko u sebe a velký čumák
   // s rovnou pusou (opice-d); bez nozder, bez pusy nebo jen s rovnou
-  // pusou to byl smajlík nebo lebka (opice-a/b/c, silueta).
+  // pusou to byl smajlík nebo lebka (opice-a/b/c, silueta). Nasazená je
+  // D bez nozder (opice-e), nozdry Mišákovi vadily; s nozdrami opice-d.
   lajna: () => {
-    const V = process.env.VARIANTA_LAJNY || "opice-d";
+    const V = process.env.VARIANTA_LAJNY || "opice-e";
     if (V.startsWith("opice-")) {
       // opičí silueta bez smajlíka: varianty bez nozder / bez úsměvu /
       // bez pusy / s obočím a velkým čumákem
-      const obocim = V === "opice-d";
+      const obocim = V === "opice-d" || V === "opice-e";
       return [
         I(cut(ell(16, 50, 13, 13, 22), { ...R, amp: .35 })),
         I(cut(ell(84, 50, 13, 13, 22), { ...R, amp: .35 })),
@@ -171,7 +172,7 @@ const KRESBY = {
         ...(obocim
           ? [C(cut(ell(43, 46, 4.2, 5, 14), JEMNE)), C(cut(ell(57, 46, 4.2, 5, 14), JEMNE)),
              C(cut(tah([[31, 39], [40, 35], [50, 38], [60, 35], [69, 39]], 3), JEMNE)),
-             C(cut(ell(45, 64, 2.6, 2, 10), JEMNE)), C(cut(ell(55, 64, 2.6, 2, 10), JEMNE)),
+             ...(V === "opice-d" ? [C(cut(ell(45, 64, 2.6, 2, 10), JEMNE)), C(cut(ell(55, 64, 2.6, 2, 10), JEMNE))] : []),
              C(cut(stroke(42, 74, 58, 74, 2.6), JEMNE))]
           : [C(cut(ell(40, 42, 5, 6, 14), JEMNE)), C(cut(ell(60, 42, 5, 6, 14), JEMNE)),
              ...(V !== "opice-a" ? [C(cut(ell(46, 64, 2.4, 2, 10), JEMNE)), C(cut(ell(54, 64, 2.4, 2, 10), JEMNE))] : []),
