@@ -1224,7 +1224,7 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
      okna; Safari má dole lištu a plakát je tam o ~150 bodů nižší. */
   --uvod-mezera-text:clamp(16px,2.6vh,24px);
   --uvod-mezera-blok:clamp(20px,3.6vh,36px);
-  --uvod-pod-textem:clamp(28px,7vh,64px);
+  --uvod-pod-textem:9vh;
   --uvod-text:18px;
   position:fixed;inset:0;z-index:120;
   background:var(--podklad);color:var(--text);
@@ -1263,13 +1263,13 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   font-size:13px;color:var(--text-3);touch-action:manipulation}
 .uvod-preskocit:active{color:var(--text)}
 
-/* Plakát: nadpis a odstavec, nic víc. Blok stojí dole nad lištou, kde
-   leží palec a kam se oko po ťuknutí vrací; nahoře zůstává vzduch. Všech
-   pět plakátů stojí na stejné spodní hraně, takže při listování neposkakují
-   ani tehdy, když je text jinak dlouhý: delší text roste nahoru. */
+/* Plakát: nadpis a odstavec, nic víc, uprostřed volné plochy (Mišák
+   vybral ze tří rozložení: dole nad lištou, uprostřed, nahoře). Střed je
+   optický, ne geometrický: blok je o kus výš, protože pod ním je ještě
+   lišta a oko bere střed obrazovky výš než skutečný. */
 .uvod-list{
   flex:1;min-height:0;width:100%;max-width:var(--uvod-sirka);
-  display:flex;flex-direction:column;justify-content:flex-end;
+  display:flex;flex-direction:column;justify-content:center;
   padding-bottom:var(--uvod-pod-textem);
   animation:uvod-prichod .3s var(--krok) both;
 }
