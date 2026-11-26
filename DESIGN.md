@@ -691,6 +691,10 @@ tmavá. Vypadá to přesně jako bliknutí staré tmavě modré palety, i když 
 appka nikde nemá. Proto ten poslední odkaz: použije se jen tehdy, když nic
 jiného nesedlo.
 
+> **Úvod je vypnutý** (`S_UVODEM = false` v `src/App.tsx`): „stejně všichni
+> víme, o co jde“ (Mišák). Kód i texty zůstávají. Pořadí při spuštění je
+> značka → heslo (jen poprvé) → appka; značku bez úvodu odklízí `App`.
+>
 > **Stav k 26. 11. 2026:** plakáty úvodu jsou **jen text, bez kreseb**
 > (Mišák: „čistě ten text, hezčí spacing, jak to umí Apple“). Nadpis na dva
 > řádky (Hagrid 400, obtah 2 px, 11 vw), pod ním odstavec 18 px v sloupci

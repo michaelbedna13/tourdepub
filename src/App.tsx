@@ -4,7 +4,7 @@ import { PotvrzeniHost } from "./components/Potvrzeni";
 import { Ramy } from "./components/Ramy";
 import { FabMenu } from "./components/FabMenu";
 import { Natoc } from "./components/Natoc";
-import { Uvod } from "./components/Uvod";
+import { Uvod, odklidZnacku, pockejNaZnacku, postrcStranku } from "./components/Uvod";
 import { Brana } from "./components/Brana";
 import { KATEGORIE } from "./lib/data";
 import { useSvih } from "./lib/svih";
@@ -16,6 +16,12 @@ import { Kategorie } from "./obrazovky/Kategorie";
 import { Pravidla } from "./obrazovky/Pravidla";
 import { Tymy } from "./obrazovky/Tymy";
 import { Ukoly } from "./obrazovky/Ukoly";
+
+/** Úvod (pět plakátů s příběhem večera) je vypnutý: „stejně všichni víme,
+ *  o co jde“ (Mišák). Kód i texty (components/Uvod.tsx, lib/pribeh.ts)
+ *  zůstávají; zapne se tady. Bez úvodu odklidí značku z index.html appka
+ *  sama, viz níž. */
+const S_UVODEM = false;
 
 // jako v nativní appce: prohlížeč si pozici posunu nepamatuje, každá obrazovka začíná nahoře
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
@@ -36,10 +42,27 @@ export function App() {
     else zastavSync();
   }, [ucet]);
 
+  // Bez úvodu: značka se dokreslí a odejde, appka se odkryje (html.uvodni ji
+  // do té doby schovává). Odhlášenému značku odklidí brána s heslem a appka
+  // se odkryje hned po přihlášení, ne až po další vteřině čekání.
+  useEffect(() => {
+    if (S_UVODEM || venku) return;
+    let platne = true;
+    const odkryj = () => {
+      if (!platne) return;
+      odklidZnacku();
+      document.documentElement.classList.remove("uvodni");
+      postrcStranku();
+    };
+    if (document.getElementById("uvod")) pockejNaZnacku().then(odkryj);
+    else odkryj();
+    return () => { platne = false; };
+  }, [venku]);
+
   return (
     <HashRouter>
       <Natoc />
-      {uvod && !venku && <Uvod hotovo={() => setUvod(false)} />}
+      {S_UVODEM && uvod && !venku && <Uvod hotovo={() => setUvod(false)} />}
       <PotvrzeniHost />
       {venku ? <Brana /> : <Routes>
         <Route element={<Kostra />}>

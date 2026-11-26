@@ -237,7 +237,7 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
  *  a to samé udělá posunutí o bod tam a zpátky. Je to chyba WebKitu
  *  v režimu z plochy, v prohlížeči se to neděje a v Chromiu se nedá
  *  napodobit, takže ověřit to jde jen na telefonu. */
-function postrcStranku() {
+export function postrcStranku() {
   requestAnimationFrame(() => {
     window.scrollTo(0, 1);
     window.scrollTo(0, 0);
