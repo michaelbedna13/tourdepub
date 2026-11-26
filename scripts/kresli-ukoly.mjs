@@ -18,6 +18,22 @@ const R = { amp: 1.3, step: 7, tension: 0.42 };
 const H = { amp: 1.7, step: 6, tension: 0.4, nicks: 1 };
 const JEMNE = { amp: .6, step: 3, tension: 0.42 };
 
+/** Tlustý tah po lomené čáře (spirála, oblouky): obrys kolem bodů,
+ *  v ohybech se normály zprůměrují, ať se zatáčka nerozpadne. */
+function tah(pts, w) {
+  const L = [], P = [];
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+    let dx = b[0] - a[0], dy = b[1] - a[1];
+    const d = Math.hypot(dx, dy) || 1;
+    dx /= d; dy /= d;
+    const h = (Array.isArray(w) ? w[i] : w) / 2;
+    L.push([pts[i][0] - dy * h, pts[i][1] + dx * h]);
+    P.push([pts[i][0] + dy * h, pts[i][1] - dx * h]);
+  }
+  return [...L, ...P.reverse()];
+}
+
 /** Postavička: hlava a trup. Vrací díly, ať se dá doplnit rukama a nohama. */
 const hlava = (x, y, r) => I(cut(ell(x, y, r, r, 20), { ...R, amp: .9 }));
 
@@ -299,50 +315,63 @@ const KRESBY = {
     I(cut(stroke(50, 58, 66, 66, 5), { ...R, amp: .7 })),
     I(cut(ell(50, 58, 5, 5, 14), JEMNE)),
   ],
-  // Lidská pyramida: tři hlavy s rameny dole, jedna nahoře. Panáci celí
-  // by byli ve sto bodech flíček; hlavy na ramenou v trojúhelníku jsou
-  // pyramida i bez nohou.
+  // Kresby pro Tělo v luftě jsou symboly, ne scény (Mišák: „nemusí to
+  // být konkrétně ono, ať je to čitelný“). Napřed to byly doslovné scény:
+  // hlavy s rameny v pyramidě, hlava s táckem a obličejem, biceps; v kartě
+  // se četly jako emoji nebo jako nic.
+
+  // Lidská pyramida: egyptská pyramida z kvádrů.
   pyramida: () => {
-    const clovek = (x, y) => [
-      I(cut(ell(x, y, 8.5, 8.5, 18), { ...R, amp: .6 })),
-      I(cut([[x - 13, y + 21], [x - 10, y + 11], [x + 10, y + 11], [x + 13, y + 21]], { ...R, amp: .6 })),
-    ];
+    const radky = [[38, 33, 67], [56, 22, 78], [74, 12, 88]];
     return [
-      ...clovek(22, 66), ...clovek(50, 66), ...clovek(78, 66),
-      ...clovek(36, 34), ...clovek(64, 34),
-      ...clovek(50, 2 + 8.5),
-      I(cut(rect(6, 87, 94, 93, 2), { ...R, amp: .7 })),
+      I(cut([[6, 88], [50, 12], [94, 88]], { ...H, tension: .2 })),
+      ...radky.map(([y, x1, x2]) => C(cut(stroke(x1, y, x2, y, 3), JEMNE))),
+      ...[[50, 47], [38, 65], [62, 65], [28, 81], [50, 81], [72, 81]]
+        .map(([x, y]) => C(cut(stroke(x, y - 6, x, y + 4, 3), JEMNE))),
     ];
   },
-  // Točenej mašinfíra: flaška a kolem ní oblouk se šipkou, jak se točí.
-  tocenej: () => [
-    I(cut([[42, 14], [58, 14], [58, 34], [66, 46], [66, 88], [34, 88], [34, 46], [42, 34]], H)),
-    C(cut(rect(38, 56, 62, 72, 2), { ...R, amp: .6 })),
-    I(cut(srpek(50, 58, 44, 6, 200, 330, 14), { ...R, amp: .8, step: 5 })),
-    I(cut([[86, 26], [99, 34], [86, 44]], { ...R, amp: .5 })),
-  ],
-  // Páka s cizákem: napnutá ruka s bicepsem. Dva lokty na stole se
-  // sevřenýma rukama se ve sto bodech slily do trojúhelníku; zatnutý
-  // biceps je síla na první pohled.
+  // Točenej mašinfíra: spirála, jak se točí hlava, a dvě hvězdičky.
+  tocenej: () => {
+    const body = [];
+    for (let t = 0; t <= 3.1 * Math.PI; t += .18) {
+      const r = 6 + t * 3.55;
+      body.push([47 + Math.cos(t) * r, 54 + Math.sin(t) * r]);
+    }
+    return [
+      I(cut(tah(body, body.map((_, i) => 6 + i * .06)), { ...R, amp: .5, step: 4 })),
+      I(cut(star(84, 16, 9, 3.6), JEMNE)),
+      I(cut(star(16, 18, 6, 2.4), JEMNE)),
+    ];
+  },
+  // Páka s cizákem: zaťatá pěst. Síla a souboj na první pohled.
   paka: () => [
-    I(cut([[8, 70], [16, 58], [26, 46], [38, 40], [50, 44], [56, 54], [57, 46], [53, 36], [53, 24],
-           [60, 14], [72, 12], [83, 18], [85, 30], [80, 42], [77, 54], [80, 66],
-           [76, 80], [64, 89], [44, 91], [24, 89], [8, 88]], { ...H, tension: .45 })),
-    C(cut(stroke(60, 25, 76, 22, 2.6), JEMNE)),
-    C(cut(stroke(61, 33, 77, 30, 2.6), JEMNE)),
-    C(cut(srpek(40, 68, 12, 2.6, 200, 300), JEMNE)),
+    I(cut([[22, 46], [78, 46], [82, 72], [66, 90], [34, 90], [20, 72]], H)),
+    ...[30, 43.5, 57, 70].map((x) => I(cut(ell(x, 38, 8.2, 9, 18), { ...R, amp: .6 }))),
+    ...[36.7, 50.2, 63.6].map((x) => C(cut(stroke(x, 30, x, 54, 2.6), JEMNE))),
+    C(cut(stroke(18, 60, 64, 54, 3), JEMNE)),
+    I(cut(tah([[20, 68], [36, 62], [56, 60], [66, 63]], [12, 12, 10, 8]), { ...R, amp: .6 })),
+    I(cut(rect(34, 88, 66, 100, 3), { ...R, amp: .7 })),
   ],
-  // Tácek na palici: hlava a na ní tácek z boku, nad ním čárky, jak se klepe.
-  palice: () => [
-    I(cut(ell(50, 66, 22, 24, 24), H)),
-    C(cut(ell(42, 64, 3.5, 3.5, 12), JEMNE)),
-    C(cut(ell(58, 64, 3.5, 3.5, 12), JEMNE)),
-    C(cut(srpek(50, 70, 9, 2.6, 30, 150), JEMNE)),
-    I(cut(rot(rect(22, 34, 78, 41, 2), -6, 50, 37), { ...R, amp: .7 })),
-    I(cut(stroke(30, 22, 26, 14, 3.2), JEMNE)),
-    I(cut(stroke(50, 20, 50, 11, 3.2), JEMNE)),
-    I(cut(stroke(70, 22, 74, 14, 3.2), JEMNE)),
-  ],
+  // Tácek na palici: kulatý pivní tácek se zubatým okrajem a vystřiženým
+  // škopkem, nakloněný, a kolem čárky, jak se kýve. Tácková galerie má
+  // tácek hranatý s hvězdou, takže se nepletou.
+  palice: () => {
+    const okraj = [];
+    for (let i = 0; i < 64; i++) {
+      const a = (i / 64) * Math.PI * 2, r = 33 + Math.cos(a * 16) * 2.2;
+      okraj.push([50 + Math.cos(a) * r, 52 + Math.sin(a) * r]);
+    }
+    const sklon = (pts) => rot(pts, -12, 50, 52);
+    return [
+      I(cut(sklon(okraj), { ...R, amp: .4, step: 3 })),
+      C(cut(sklon(rect(37, 42, 55, 68, 3)), { ...R, amp: .5 })),
+      C(cut(sklon(ell(46, 41, 11, 4.5, 16)), JEMNE)),
+      C(cut(sklon(ell(61, 55, 7.5, 7.5, 16)), JEMNE)),
+      I(cut(sklon(ell(61, 55, 3.6, 3.6, 12)), JEMNE)),
+      I(cut(srpek(50, 52, 46, 3.6, 150, 185, 8), JEMNE)),
+      I(cut(srpek(50, 52, 46, 3.6, -5, 30, 8), JEMNE)),
+    ];
+  },
   // Homo huban: rty. Ve sto bodech se čtou předměty, ne postavičky
   // (dva panáci v pusinkování by byli flíček); rty s rýhou mezi sebou
   // a srdíčko nad nimi jsou pusa i bez čtení.
