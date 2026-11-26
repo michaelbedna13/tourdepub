@@ -145,13 +145,32 @@ const KRESBY = {
     ...[41.5, 48.5, 55.5].map((x) => C(cut(rect(x, 25, x + 3.5, 28.5, .5), JEMNE))),
     ...[45, 52, 59].map((x) => C(cut(rect(x, 28.5, x + 3.5, 32, .5), JEMNE))),
   ],
-  // Vopičí lajna: opice po čtyřech s ocasem do spirály, jak parta leze
-  // z lokálu. Opičí hlava se četla, ale Mišák chtěl jinou; ze tří variant
-  // (A banán, B otisky dlaní, C opice po čtyřech) nejvíc sedí C: je vidět
-  // opice i to, že leze. Banán se četl jako úsměv, otisky jako medvěd.
-  // Ostatní přes VARIANTA_LAJNY=a/b.
+  // Vopičí lajna: opičí hlava s kudrlinkou. Velké uši, hladký obrys,
+  // obličej do tvaru buráku s lemem kolem, oči a čumák. Původní hlava měla
+  // zubatý chochol jako korunku a obličej přes celou hlavu; zkoušely se
+  // i banán, otisky dlaní a opice po čtyřech (VARIANTA_LAJNY=a/b/c), ale
+  // Mišák chtěl hlavu, jen líp.
   lajna: () => {
-    const V = process.env.VARIANTA_LAJNY || "c";
+    const V = process.env.VARIANTA_LAJNY || "hlava-kudrna";
+    if (V === "hlava" || V === "hlava-kudrna") {
+      // opičí hlava: velké uši, obličej do tvaru buráku, oči a čumák
+      return [
+        I(cut(ell(18, 53, 12, 12, 22), { ...R, amp: .35 })),
+        I(cut(ell(82, 53, 12, 12, 22), { ...R, amp: .35 })),
+        C(cut(ell(18, 54, 6, 6, 16), JEMNE)),
+        C(cut(ell(82, 54, 6, 6, 16), JEMNE)),
+        I(cut(ell(50, 50, 30, 32, 32), { ...R, amp: .35, step: 5 })),
+        C(cut(ell(41, 46, 9.5, 10.5, 20), JEMNE)),
+        C(cut(ell(59, 46, 9.5, 10.5, 20), JEMNE)),
+        C(cut(ell(50, 63, 16, 11.5, 22), JEMNE)),
+        I(cut(ell(41.5, 47, 3.6, 4.6, 12), JEMNE)),
+        I(cut(ell(58.5, 47, 3.6, 4.6, 12), JEMNE)),
+        I(cut(ell(46.5, 59, 1.8, 1.5, 10), JEMNE)),
+        I(cut(ell(53.5, 59, 1.8, 1.5, 10), JEMNE)),
+        I(cut(srpek(50, 62, 8, 2.6, 25, 155, 10), JEMNE)),
+        ...(V === "hlava-kudrna" ? [I(cut(tah([[46, 19], [44, 12], [48, 6], [55, 7], [56, 13], [51, 14]], [5, 4.6, 4.2, 3.8, 3.4, 3]), JEMNE))] : []),
+      ];
+    }
     if (V === "a") {
       // banán: oblouk, uprostřed nejširší, na konci stopka
       const body = [];
