@@ -144,7 +144,7 @@ export const VYCHOZI_UKOLY: Ukol[] = [
   { id: "maturita", kat: "zranice", piva: 1, body: 1, max: 1, nazev: "Chlastací maturita",
     popis: "V jedný špeluňce musíte celá partyja hodit do sebe jednoho z těhlech zabijáků: flusanec, mozek, semafor, čert, krámy yettiho mamy, plameňák, vítr z hor, vodníkovo sperma nebo magické oko." },
   { id: "versovany", kat: "zranice", piva: 2, body: 2, max: 1, nazev: "Veršovanej lokál",
-    popis: "Objednávku u obsluhy hoďte celou v rýmech. Kdo se zasekne, začíná se znova." },
+    popis: "Jeden z vás hodí u obsluhy celou objednávku v rýmech. Když se zasekne, začíná znova." },
   { id: "anglan", kat: "zranice", piva: 2, body: 2, max: 1, nazev: "Falešnej Anglán",
     popis: "Nahoďte pokec s cizím stolem anglicky, jak když bičem mrská. Po chvilce na ně vybalte česky a vypadněte." },
   { id: "narodni", kat: "zranice", piva: 3, body: 3, max: 1, nazev: "Hospodský Národní", ikona: "zamek",

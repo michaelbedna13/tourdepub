@@ -145,26 +145,55 @@ const KRESBY = {
     ...[41.5, 48.5, 55.5].map((x) => C(cut(rect(x, 25, x + 3.5, 28.5, .5), JEMNE))),
     ...[45, 52, 59].map((x) => C(cut(rect(x, 28.5, x + 3.5, 32, .5), JEMNE))),
   ],
-  // Vopičí lajna: opičí hlava. Otisk dlaně se za opici nevydával, bylo
-  // to prostě „ruka". Hlava s velkýma ušima po stranách a vystřiženým
-  // obličejem do tvaru buráku je opice na první pohled; oči a nozdry
-  // jsou v obličeji zase papír.
-  lajna: () => [
-    I(cut(ell(15, 52, 13, 14, 18), { ...R, amp: .9 })),
-    I(cut(ell(85, 52, 13, 14, 18), { ...R, amp: .9 })),
-    C(cut(ell(15, 53, 6, 7, 14), JEMNE)),
-    C(cut(ell(85, 53, 6, 7, 14), JEMNE)),
-    I(cut(ell(50, 50, 32, 36, 26), H)),
-    I(cut([[38, 16], [44, 6], [50, 14], [56, 5], [62, 16]], { ...R, amp: .7, tension: .3 })),
-    C(cut(ell(39, 45, 11, 12, 18), JEMNE)),
-    C(cut(ell(61, 45, 11, 12, 18), JEMNE)),
-    C(cut(ell(50, 66, 21, 15, 22), JEMNE)),
-    I(cut(ell(40, 46, 4, 4.6, 12), JEMNE)),
-    I(cut(ell(60, 46, 4, 4.6, 12), JEMNE)),
-    I(cut(ell(45, 61, 2.2, 1.8, 10), JEMNE)),
-    I(cut(ell(55, 61, 2.2, 1.8, 10), JEMNE)),
-    I(cut(srpek(50, 63, 12, 3.4, 30, 150), JEMNE)),
-  ],
+  // Vopičí lajna: opice po čtyřech s ocasem do spirály, jak parta leze
+  // z lokálu. Opičí hlava se četla, ale Mišák chtěl jinou; ze tří variant
+  // (A banán, B otisky dlaní, C opice po čtyřech) nejvíc sedí C: je vidět
+  // opice i to, že leze. Banán se četl jako úsměv, otisky jako medvěd.
+  // Ostatní přes VARIANTA_LAJNY=a/b.
+  lajna: () => {
+    const V = process.env.VARIANTA_LAJNY || "c";
+    if (V === "a") {
+      // banán: oblouk, uprostřed nejširší, na konci stopka
+      const body = [];
+      for (let i = 0; i <= 12; i++) {
+        const u = Math.PI * (0.78 - i * 0.047);
+        body.push([50 + Math.cos(u) * 52, 10 + Math.sin(u) * 62]);
+      }
+      const sirky = body.map((_, i) => 5 + Math.sin((i / 12) * Math.PI) * 17);
+      return [
+        I(cut(tah(body, sirky), { ...R, amp: .5, step: 4 })),
+        C(cut(tah(body.slice(3, 10).map(([x, y]) => [x, y - 4]), 2.4), JEMNE)),
+        I(cut(tah([body[0], [body[0][0] - 6, body[0][1] - 10]], [6, 5]), JEMNE)),
+      ];
+    }
+    if (V === "b") {
+      // otisky dlaní po čtyřech: dvě ruce šikmo za sebou
+      const dlan = (x, y, uhel, m) => {
+        const u = (pts) => rot(pts.map(([q, w]) => [x + q * m, y + w * m]), uhel, x, y);
+        return [
+          I(cut(u(ell(0, 6, 11, 12, 20)), { ...R, amp: .5 })),
+          ...[-9, -3, 3, 9].map((fx, i) => I(cut(u(ell(fx, -12 + Math.abs(i - 1.5) * 2, 3.2, 6.5, 12)), JEMNE))),
+          I(cut(u(ell(-15, 4, 3.2, 6.5, 12)), JEMNE)),
+        ];
+      };
+      return [...dlan(30, 66, -20, 1.15), ...dlan(68, 32, -20, 1.15)];
+    }
+    // opice po čtyřech s ocasem do spirály
+    const ocas = [];
+    for (let t = 0; t <= 2.6 * Math.PI; t += .25) {
+      const r = 14 - t * 1.6;
+      ocas.push([76 + Math.cos(t + Math.PI) * r, 30 + Math.sin(t + Math.PI) * r]);
+    }
+    return [
+      I(cut(ell(50, 50, 22, 12, 22), H)),
+      I(cut(ell(22, 40, 11, 10, 20), { ...R, amp: .6 })),
+      I(cut(ell(12, 34, 4, 4, 12), JEMNE)),
+      C(cut(ell(19, 42, 6, 5, 14), JEMNE)),
+      ...[[34, 58, 30, 84], [44, 60, 42, 86], [60, 58, 64, 84], [68, 56, 74, 82]]
+        .map(([q, w, e, r]) => I(cut(tah([[q, w], [e, r]], [7, 5]), JEMNE))),
+      I(cut(tah([[70, 46], [62, 30], ...ocas], 4.4), JEMNE)),
+    ];
+  },
   // Řev jak z JZD: kravská hlava. Megafon ani hlava z profilu se nečetly,
   // a tohle navíc sedí na jméno úkolu.
   rev: () => [
