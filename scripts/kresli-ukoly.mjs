@@ -90,20 +90,38 @@ const KRESBY = {
     I(cut(ell(80, 68, 7, 7, 18), JEMNE)),
   ],
 
-  // Srostlý budny: dvě nohy, jeden pásek. Boty a druhý pásek dole z toho
-  // dělaly dva roboty.
-  budny: () => [
-    I(cut(rect(24, 8, 44, 90, 7), H)),
-    I(cut(rect(56, 8, 76, 90, 7), H)),
-    I(cut(rect(12, 44, 88, 62, 6), H)),
-    C(cut(rect(12, 50, 88, 56, 1), JEMNE)),
-  ],
-  // Hajzlovej úlet: cedule s panáčkem v sukni. Dveře s malou cedulkou měly
-  // to hlavní velké pár bodů; teď je cedule celá kresba.
+  // Srostlý budny: dvě boty svázané tkaničkou s mašlí. Tvar jako „H“ (a pak
+  // dvě svázané nohy) se četl jako písmeno nebo žebřík.
+  budny: () => {
+    const bota = (dx, dy) => [[10, 88], [9, 68], [18, 60], [30, 64], [42, 67], [58, 71], [70, 77], [72, 86], [66, 90], [14, 90]]
+      .map(([x, y]) => [x + dx, y + dy]);
+    return [
+      I(cut(bota(22, -18), { ...R, amp: .5, tension: .5 })),
+      C(cut(bota(0, 0).map(([x, y]) => [x + (x < 40 ? -3 : 3), y + (y < 75 ? -3 : 3)]), JEMNE)),
+      I(cut(bota(0, 0), { ...R, amp: .5, tension: .5 })),
+      C(cut(stroke(12, 84, 68, 84, 2.4), JEMNE)),
+      C(cut(stroke(34, 66, 37, 72, 2.2), JEMNE)),
+      C(cut(stroke(42, 68, 45, 74, 2.2), JEMNE)),
+      I(cut(tah([[18, 60], [26, 50], [34, 46], [40, 42]], 3.4), JEMNE)),
+      I(cut(rot(ell(26, 36, 9, 5, 16), -35, 26, 36), JEMNE)),
+      C(cut(rot(ell(26, 36, 4.5, 1.8, 12), -35, 26, 36), JEMNE)),
+      I(cut(rot(ell(42, 34, 9, 5, 16), 30, 42, 34), JEMNE)),
+      C(cut(rot(ell(42, 34, 4.5, 1.8, 12), 30, 42, 34), JEMNE)),
+      I(cut(ell(34, 40, 4, 4, 12), JEMNE)),
+    ];
+  },
+  // Hajzlovej úlet: cedule WC, panáček a panenka. Dveře s klíčovou dírkou
+  // se jako záchod nečetly.
   hajzl: () => [
-    I(cut(rect(16, 8, 84, 92, 8), H)),
-    C(cut(ell(50, 30, 11, 11, 18), { ...R, amp: .8 })),
-    C(cut([[33, 78], [42, 44], [58, 44], [67, 78]], { ...R, amp: .9, tension: .3 })),
+    I(cut(ell(28, 18, 8, 8, 18), { ...R, amp: .5 })),
+    I(cut(rect(18, 30, 38, 62, 3), { ...R, amp: .6 })),
+    I(cut(stroke(23, 60, 23, 90, 7), JEMNE)),
+    I(cut(stroke(33, 60, 33, 90, 7), JEMNE)),
+    I(cut(rect(48, 8, 52, 92, 1), JEMNE)),
+    I(cut(ell(72, 18, 8, 8, 18), { ...R, amp: .5 })),
+    I(cut([[66, 30], [78, 30], [90, 70], [54, 70]], { ...R, amp: .6 })),
+    I(cut(stroke(67, 68, 67, 90, 6), JEMNE)),
+    I(cut(stroke(77, 68, 77, 90, 6), JEMNE)),
   ],
   // Pouliční pumpa: klik. Hlava musí mít kolem sebe mezeru, jinak se slije
   // s trupem a z kliku je sedmička.
@@ -113,15 +131,19 @@ const KRESBY = {
     I(cut(stroke(64, 56, 68, 88, 11), { ...R, amp: .8 })),
     I(cut(stroke(18, 72, 10, 88, 11), { ...R, amp: .8 })),
   ],
-  // Živej taxál: taxikářská cedule na střeše. Bota nad zemí nebo dvě
-  // postavičky nad sebou se nepovedly ani jednou; tohle je předmět
-  // a jméno úkolu říká to samé.
+  // Živej taxál: auto z boku s taxi cedulí na střeše. Samotná cedule se
+  // nedala poznat.
   taxal: () => [
-    I(cut(rect(14, 34, 86, 64, 8), H)),
-    C(cut(rect(22, 42, 35, 56, 1), JEMNE)),
-    C(cut(rect(44, 42, 57, 56, 1), JEMNE)),
-    C(cut(rect(66, 42, 79, 56, 1), JEMNE)),
-    I(cut(rect(28, 64, 72, 74, 3), { ...R, amp: .8 })),
+    I(cut([[4, 68], [8, 56], [26, 51], [36, 36], [66, 36], [78, 51], [94, 55], [96, 68]], H)),
+    C(cut([[39, 41], [49, 41], [49, 51], [32, 51]], { ...R, amp: .4 })),
+    C(cut([[53, 41], [64, 41], [72, 51], [53, 51]], { ...R, amp: .4 })),
+    I(cut(ell(26, 70, 11, 11, 20), { ...R, amp: .6 })),
+    C(cut(ell(26, 70, 4.5, 4.5, 12), JEMNE)),
+    I(cut(ell(74, 70, 11, 11, 20), { ...R, amp: .6 })),
+    C(cut(ell(74, 70, 4.5, 4.5, 12), JEMNE)),
+    I(cut(rect(38, 22, 64, 34, 2), { ...R, amp: .5 })),
+    ...[41.5, 48.5, 55.5].map((x) => C(cut(rect(x, 25, x + 3.5, 28.5, .5), JEMNE))),
+    ...[45, 52, 59].map((x) => C(cut(rect(x, 28.5, x + 3.5, 32, .5), JEMNE))),
   ],
   // Vopičí lajna: opičí hlava. Otisk dlaně se za opici nevydával, bylo
   // to prostě „ruka". Hlava s velkýma ušima po stranách a vystřiženým
@@ -143,15 +165,14 @@ const KRESBY = {
     I(cut(ell(55, 61, 2.2, 1.8, 10), JEMNE)),
     I(cut(srpek(50, 63, 12, 3.4, 30, 150), JEMNE)),
   ],
-  // Řev jak z JZD: kravská hlava. Megafon ani hlava z profilu se nečetly,
-  // a tohle navíc sedí na jméno úkolu.
+  // Řev jak z JZD: megafon a vlny řevu. Kravská hlava se pletla s býkem
+  // u Páky s cizákem ve stejné kategorii.
   rev: () => [
-    I(cut([[22, 32], [78, 32], [82, 60], [68, 84], [32, 84], [18, 60]], H)),
-    I(cut(stroke(26, 36, 10, 20, 10), { ...R, amp: .8 })),
-    I(cut(stroke(74, 36, 90, 20, 10), { ...R, amp: .8 })),
-    C(cut(ell(37, 50, 6, 6, 14), JEMNE)),
-    C(cut(ell(63, 50, 6, 6, 14), JEMNE)),
-    C(cut(ell(50, 71, 15, 9, 18), { ...R, amp: .8 })),
+    I(cut([[16, 42], [28, 42], [68, 20], [76, 20], [76, 80], [68, 80], [28, 58], [16, 58]], { ...H, tension: .2 })),
+    I(cut(rect(6, 43, 18, 57, 2), { ...R, amp: .5 })),
+    I(cut(stroke(40, 58, 45, 76, 7), JEMNE)),
+    I(cut(srpek(78, 50, 14, 4, -42, 42, 10), JEMNE)),
+    I(cut(srpek(78, 50, 24, 4, -38, 38, 12), JEMNE)),
   ],
   // Bullseye: terč a šipka zapíchnutá do středu. Šipka měla napřed hrot
   // jako vlaječku a potom velký trojúhelník venku na konci dříku, takže
@@ -253,11 +274,14 @@ const KRESBY = {
     C(cut(srpek(50, 50, 15, 5), { ...R, amp: .8, step: 5 })),
     I(cut(rect(45, 78, 55, 96, 2), { ...R, amp: .8 })),
   ],
-  // Brněnskej zloděj: lžička. Výstřižek v misce z ní dělal zrcátko,
-  // tak je miska plná a krček úzký.
+  // Brněnskej zloděj: lupičská maska přes oči. Lžička se četla jako kyj.
   zlodej: () => [
-    I(cut(ell(50, 24, 19, 23, 22), H)),
-    I(cut(rect(44, 44, 56, 94, 6), H)),
+    I(cut([[6, 46], [18, 34], [36, 33], [50, 40], [64, 33], [82, 34], [94, 46], [88, 62],
+           [68, 67], [56, 60], [44, 60], [32, 67], [12, 62]], { ...H, tension: .45 })),
+    C(cut(ell(31, 49, 9, 6.5, 18), { ...R, amp: .5 })),
+    C(cut(ell(69, 49, 9, 6.5, 18), { ...R, amp: .5 })),
+    I(cut(tah([[92, 50], [97, 60], [99, 72]], [5, 4, 3]), JEMNE)),
+    I(cut(tah([[90, 54], [92, 66], [91, 78]], [5, 4, 3]), JEMNE)),
   ],
   // Fotka na hovno: foťák
   fotka: () => [
@@ -267,40 +291,31 @@ const KRESBY = {
     I(cut(ell(48, 56, 10, 10, 18), { ...R, amp: .8 })),
     C(cut(ell(78, 40, 6, 6, 16), JEMNE)),
   ],
-  // Živý sochy: busta. Panáček na desce vypadal jako panáček na desce;
-  // hlava s rameny na podstavci je socha i bez vysvětlování.
+  // Živý sochy: socha na podstavci, ruka nahoru s pochodní. Busta se
+  // četla jako sedící postava.
   sochy: () => [
-    I(cut(ell(50, 26, 17, 19, 22), H)),
-    I(cut([[28, 46], [72, 46], [78, 76], [22, 76]], H)),
-    I(cut(rect(30, 76, 70, 86, 3), { ...R, amp: .9 })),
-    I(cut(rect(20, 86, 80, 96, 3), H)),
+    I(cut(ell(46, 16, 7, 7, 16), { ...R, amp: .5 })),
+    I(cut([[38, 26], [54, 26], [57, 46], [55, 68], [37, 68], [35, 46]], { ...R, amp: .6 })),
+    I(cut(tah([[52, 29], [60, 18], [64, 8]], [6, 5.5, 5]), JEMNE)),
+    I(cut(tah([[40, 30], [32, 44], [34, 56]], [6, 5.5, 5]), JEMNE)),
+    I(cut(ell(65, 4, 3.4, 4.6, 12), JEMNE)),
+    I(cut(rect(26, 68, 66, 74, 1.5), { ...R, amp: .5 })),
+    I(cut(rect(30, 74, 62, 90, 2), H)),
+    I(cut(rect(24, 90, 68, 96, 1.5), { ...R, amp: .5 })),
   ],
-  // Kapela na placku: čtyři chlapi na přechodu, jak na tom slavném obalu.
-  //
-  // Postavy i pruhy jsou ta samá barva, takže by se slily v jednu plochu.
-  // Každá postava proto dostane nejdřív obrys o pár bodů větší jako
-  // výstřižek a teprve do něj se nakreslí — kolem ní je tím pádem mezera
-  // a na přechodu je vidět. Vystřihnout rovnou postavy z pruhů nešlo:
-  // mezery mezi pruhy je rozsekaly a byla z toho mříž.
+  // Kapela na placku: deska vyjíždí z obalu. Čtyři chlapi na přechodu se
+  // v kartě slili do změti čar a samotná deska se pletla s terčem.
   kapela: () => {
-    // Přechod leží jen v dolní třetině. Když vyplňoval celý čtverec, obrysy
-    // postav ho rozkrájely na drobky a vypadalo to, že stojí za mřížemi.
-    const pruhy = [60, 77, 94]
-      .map((y) => I(cut(rect(0, y, 100, y + 13, 2), { ...R, amp: .9 })));
-    const dily = [16, 38, 60, 82].flatMap((x, i) => {
-      const d = (i % 2) * 4;
-      return [
-        [ell(x, 13, 7, 7, 16), ell(x, 13, 10, 10, 16)],
-        [[[x - 8, 21], [x + 8, 21], [x + 6, 56], [x - 6, 56]],
-         [[x - 10, 19], [x + 10, 19], [x + 8, 59], [x - 8, 59]]],
-        [stroke(x - 2, 54, x - 5 - d, 90, 6), stroke(x - 2, 54, x - 5 - d, 93, 11)],
-        [stroke(x + 2, 54, x + 5 + d, 90, 6), stroke(x + 2, 54, x + 5 + d, 93, 11)],
-      ];
-    });
+    const kruh = (r, w) => [C(cut(ell(62, 50, r, r, 40), JEMNE)), I(cut(ell(62, 50, r - w, r - w, 40), JEMNE))];
     return [
-      ...pruhy,
-      ...dily.map(([, obal]) => C(cut(obal, { ...R, amp: .8 }))),
-      ...dily.map(([plny]) => I(cut(plny, { ...R, amp: .8 }))),
+      I(cut(rect(4, 14, 66, 86, 2.5), H)),
+      C(cut(ell(62, 50, 39, 39, 44), JEMNE)),
+      I(cut(ell(62, 50, 35, 35, 44), { ...R, amp: .6 })),
+      ...kruh(29, 1.8), ...kruh(23, 1.8),
+      C(cut(ell(62, 50, 13, 13, 28), JEMNE)),
+      I(cut(ell(62, 50, 11, 11, 24), JEMNE)),
+      C(cut(ell(62, 50, 2.6, 2.6, 12), JEMNE)),
+      C(cut(star(22, 30, 7, 3), JEMNE)),
     ];
   },
   // Trenér roku: stopky. Píšťalka se zkoušela dvakrát a pokaždé z ní byl
