@@ -343,15 +343,46 @@ const KRESBY = {
       I(cut(star(16, 18, 6, 2.4), JEMNE)),
     ];
   },
-  // Páka s cizákem: zaťatá pěst. Síla a souboj na první pohled.
-  paka: () => [
-    I(cut([[22, 46], [78, 46], [82, 72], [66, 90], [34, 90], [20, 72]], H)),
-    ...[30, 43.5, 57, 70].map((x) => I(cut(ell(x, 38, 8.2, 9, 18), { ...R, amp: .6 }))),
-    ...[36.7, 50.2, 63.6].map((x) => C(cut(stroke(x, 30, x, 54, 2.6), JEMNE))),
-    C(cut(stroke(18, 60, 64, 54, 3), JEMNE)),
-    I(cut(tah([[20, 68], [36, 62], [56, 60], [66, 63]], [12, 12, 10, 8]), { ...R, amp: .6 })),
-    I(cut(rect(34, 88, 66, 100, 3), { ...R, amp: .7 })),
-  ],
+  // Páka s cizákem: „VS“ v kruhu, souboj s cizákem. Pěst se Mišákovi
+  // nelíbila; ze čtyř variant (A rukavice, B blesk, C VS, D pěsti proti
+  // sobě) se nejlíp četly blesk a VS. Ostatní přes VARIANTA_PAKY=a/b/d.
+  paka: () => {
+    const V = process.env.VARIANTA_PAKY || "c";
+    if (V === "b") return [
+      // blesk
+      I(cut([[58, 6], [24, 54], [46, 54], [36, 94], [78, 40], [55, 40], [68, 6]], { ...H, tension: .15 })),
+    ];
+    if (V === "c") return [
+      // VS v kruhu
+      I(cut(ell(50, 50, 42, 42, 32), H)),
+      C(cut([[16, 32], [24, 32], [32, 58], [40, 32], [48, 32], [36, 70], [28, 70]], { ...R, amp: .4, tension: .2 })),
+      C(cut(tah([[80, 36], [74, 31], [62, 33], [60, 42], [70, 48], [80, 54], [79, 64], [67, 68], [58, 63]], 6.4), { ...R, amp: .4 })),
+    ];
+    if (V === "d") {
+      // dvě pěsti proti sobě
+      const pest = (x, smer) => {
+        const z = (pts) => pts.map(([a, b]) => [x + a * smer, b]);
+        return [
+          I(cut(z([[0, 34], [26, 34], [30, 66], [0, 66]]), H)),
+          ...[39, 48, 57].map((y) => I(cut(z(ell(30, y, 7, 5.2, 14)), { ...R, amp: .5 }))),
+          I(cut(z(ell(28, 30, 7, 5.6, 14)), { ...R, amp: .5 })),
+          ...[43.5, 52.5].map((y) => C(cut(z(stroke(22, y, 37, y, 2.2)), JEMNE))),
+          I(cut(z(rect(-18, 40, 2, 60, 2)), { ...R, amp: .6 })),
+        ];
+      };
+      return [...pest(14, 1), ...pest(86, -1),
+        ...[-120, -90, -60].map((st) => { const a = (st * Math.PI) / 180;
+          return I(cut(stroke(50 + Math.cos(a) * 18, 30 + Math.sin(a) * 6, 50 + Math.cos(a) * 26, 30 + Math.sin(a) * 18, 3.2), JEMNE)); })];
+    }
+    // boxovací rukavice
+    return [
+      I(cut([[24, 44], [26, 24], [40, 12], [62, 12], [78, 24], [82, 44], [78, 62], [68, 70], [40, 70], [26, 62]], { ...H, tension: .5 })),
+      I(cut([[14, 34], [22, 30], [30, 38], [30, 54], [22, 58], [14, 52]], { ...R, amp: .6, tension: .5 })),
+      C(cut(tah([[30, 40], [30, 56]], 2.6), JEMNE)),
+      I(cut(rect(36, 72, 72, 92, 3), H)),
+      C(cut(stroke(38, 79, 70, 79, 3), JEMNE)),
+    ];
+  },
   // Tácek na palici: kulatý pivní tácek se zubatým okrajem a vystřiženým
   // škopkem, nakloněný, a kolem čárky, jak se kýve. Tácková galerie má
   // tácek hranatý s hvězdou, takže se nepletou.
