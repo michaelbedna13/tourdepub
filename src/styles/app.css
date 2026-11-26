@@ -1216,22 +1216,16 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
    inkoust na všechno (čmáranice, nadpis, text i lišta dole) a jedna velká
    čmáranice. Rozdíl mezi plakáty nedělá barva, ale rozmístění na mřížce. */
 .uvod{
-  /* Svislý rytmus je násobek osmi: jedna mezera mezi nadpisem a větou,
-     větší mezi kresbou a nadpisem, ať je poznat, co k čemu patří. */
   --uvod-okraj:28px;
   --uvod-sirka:430px;
-  /* Mezery se smrskávají s výškou displeje. Napevno to bylo 24 a 56 a na
-     krátkém okně (Safari má dole plovoucí lištu, takže plakát má o osmdesát
-     bodů míň, než se zdá) se delší text nevešel a podlezl ceduli „Dál". */
-  --uvod-mezera-text:clamp(14px,2.4vh,22px);
+  /* Jen text, bez kreseb (Mišák: „čistě ten text, hezčí spacing, jak to
+     umí Apple“). Hierarchie dělá všechno: velký nadpis, pod ním odstavec
+     v úzkém sloupci a kolem hodně vzduchu. Mezery se smrskávají s výškou
+     okna; Safari má dole lištu a plakát je tam o ~150 bodů nižší. */
+  --uvod-mezera-text:clamp(16px,2.6vh,24px);
   --uvod-mezera-blok:clamp(20px,3.6vh,36px);
-  /* Nadpis nezačíná hned pod značkou: trocha vzduchu nad ním z něj dělá
-     titulek plakátu, ne řádek pod logem. */
-  --uvod-nad-nadpisem:clamp(8px,6vh,72px);
-  --uvod-text:17px;
-  --uvod-kresba:min(196px,28vh);
-  --uvod-pod-panakem:clamp(16px,8vh,90px);
-
+  --uvod-pod-textem:clamp(28px,7vh,64px);
+  --uvod-text:18px;
   position:fixed;inset:0;z-index:120;
   background:var(--podklad);color:var(--text);
   /* Pod úvodem je appka a nemá se pod ním posouvat. */
@@ -1269,61 +1263,36 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
   font-size:13px;color:var(--text-3);touch-action:manipulation}
 .uvod-preskocit:active{color:var(--text)}
 
-/* Plakát: nadpis a souvislý odstavec nahoře, panák pod nimi.
-   Podle plakátů Wosetu, které Mišák poslal: velký text zarovnaný vlevo,
-   kresba malá a stranou, hodně vzduchu. Dřív byla kresba nahoře uprostřed,
-   pod ní nadpis a drobný šedý text rozsekaný na štítky. Četlo se to jako
-   formulář a pod textem zůstávalo přes dvě stě bodů prázdna, kdežto takhle
-   prázdno leží mezi textem a panákem, kde dělá rámeček.
-
-   Všech pět stojí stejně. Pět různých skladeb se tu už zkoušelo a odklikává
-   se to po vteřinách, takže každá stránka skočila jinam. */
+/* Plakát: nadpis a odstavec, nic víc. Blok stojí dole nad lištou, kde
+   leží palec a kam se oko po ťuknutí vrací; nahoře zůstává vzduch. Všech
+   pět plakátů stojí na stejné spodní hraně, takže při listování neposkakují
+   ani tehdy, když je text jinak dlouhý: delší text roste nahoru. */
 .uvod-list{
   flex:1;min-height:0;width:100%;max-width:var(--uvod-sirka);
-  display:flex;flex-direction:column;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding-bottom:var(--uvod-pod-textem);
   animation:uvod-prichod .3s var(--krok) both;
 }
 .uvod-nadpis{
-  flex:none;margin:var(--uvod-nad-nadpisem) 0 0;
-  /* Tloušťka: čtyřstovka s obtahem 2 px. Obtah 0,6 a pak 1,2 px byl
-     Mišákovi málo; ze tří variant na telefonu (sedmistovka, čtyřstovka
-     s obtahem 2 px, Black) vybral tuhle.
-     Řádkování 1,02 bylo na verzálky s diakritikou málo: háček v Ň druhého
-     řádku narážel do prvního (Mišákův screenshot, „Od špeluňky ke špeluňce“).
-     Písmo o chlup menší (10,5 vw místo 11), ať se tučnější „Od špeluňky“
-     vejde: v 400 s obtahem měl řádek na telefonu 296 z 337 bodů. */
-  font-weight:400;-webkit-text-stroke:2px currentColor;font-size:clamp(32px,10.5vw,44px);line-height:1.14;letter-spacing:.01em;
+  flex:none;margin:0;
+  /* Hagrid 400 s obtahem 2 px (Mišák vybral ze tří variant). Bez kresby
+     snese o kus víc: 11 vw, 43 px na 393 bodech; nejširší řádek
+     „Od špeluňky“ vychází kolem 300 z 337 bodů. Řádkování 1,1: háček v Ň
+     druhého řádku nesmí narazit do prvního. */
+  font-weight:400;-webkit-text-stroke:2px currentColor;font-size:clamp(34px,11vw,48px);line-height:1.1;letter-spacing:.01em;
 }
 /* Dva řádky natvrdo (pribeh.ts): každý řádek je blok, ať jsou všechny
-   nadpisy na dva řádky. Zalomit se uvnitř smí: kdyby se tučný řez na úzkém
-   telefonu nevešel, je lepší třetí řádek než useknuté písmeno. */
+   nadpisy na dva řádky. Zalomit se uvnitř smí: kdyby se na úzkém telefonu
+   nevešel, je lepší třetí řádek než useknuté písmeno. */
 .uvod-nadpis span{display:block}
-/* Jeden odstavec v plné krémové. Byl šedý (66 %) a v patnácti bodech, vedle
-   velkého nadpisu se ztrácel; pak dvacítka, a ta vedle nadpisu přes dva
-   řádky křičela stejně jako on. Sedmnáctka v plné krémové se dá přečíst
-   a nadpis zůstane nadpisem. */
+/* Odstavec v plné krémové (v hospodě se musí přečíst), osmnáctka s volným
+   řádkováním a sloupec kolem 34 znaků: řádky jsou stejně dlouhé a pravý
+   okraj se netrhá. */
 .uvod-telo{
-  flex:none;margin:var(--uvod-mezera-text) 0 0;
-  font-family:var(--pismo);font-size:var(--uvod-text);line-height:1.45;
+  flex:none;margin:var(--uvod-mezera-text) 0 0;max-width:34ch;
+  font-family:var(--pismo);font-size:var(--uvod-text);line-height:1.5;
   color:var(--text);text-wrap:pretty;
 }
-/* Panák stojí uprostřed volného místa pod textem. Vlevo dole na liště
-   dělal se spodkem roh, který plakát zavíral; uprostřed kolem sebe má
-   vzduch ze všech stran. Výšku má pevnou, ať je na všech plakátech stejně
-   velký, ale smí se stáhnout, když delší text potřebuje místo: na krátkém
-   okně je to lepší než text podlezlý pod ceduli. */
-.uvod-kresba{
-  /* Ukotvený odspodu na pevnou vzdálenost, ne na střed volného místa:
-     na střed se posouval podle délky textu (510 vs 524 bodů na 852)
-     a při listování poskakoval. */
-  flex:0 1 var(--uvod-kresba);min-height:96px;margin:auto 0 var(--uvod-pod-panakem);
-  padding-top:var(--uvod-mezera-text);
-  display:flex;align-items:center;justify-content:center;color:var(--cervena);
-}
-/* Výška plní rámeček, šířka se dopočítá: panák je pokaždé stejně vysoký,
-   ať drží cokoli vedle sebe. */
-.uvod-cmaranice{height:100%;width:auto;max-width:100%;display:block}
-
 /* Spodek: zpátky vlevo, kolikátý plakát uprostřed, dál vpravo. Všechno
    drobné a ztlumené. Plné krémové čárky a „Dál" v patnácti bodech dělaly
    ze spodku druhou hlavičku a plakát nedýchal. */
@@ -1345,23 +1314,10 @@ html.rozmazat .fab:not(.otevreno){opacity:0;transform:translateY(12px);pointer-e
 .uvod-zpet.nikam{visibility:hidden}
 .uvod-sipka{width:18px;height:8px;flex:none}
 
-/* Nižší okno: ubírá se vzduch, ne písmo a panák.
-   Safari na iPhonu s 852 body nemá okno 852 ani 750, ale asi 705:
-   stránka začíná pod stavovým řádkem a končí nad lištou (ze screenshotu:
-   logo 81 bodů od horního okraje = 59 + 22). Dokud se pod 760 bodů
-   zmenšoval text na 18 a panák na 150, vypadal úvod v Safari o poznání
-   menší než z plochy. Teď se tam jen stáhne mezera nad nadpisem a pod
-   panákem a všechno ostatní zůstává jako z plochy. */
-@media (max-height:780px){
-  /* Mezera nad nadpisem jen 2,5 vh (18 b. v Safari) posadila text těsně pod
-     značku a mezi textem a panákem zůstal prázdný pás 121 bodů (Mišákův
-     screenshot). 7 vh dá v Safari 49 b., skoro jako z plochy (51). */
-  .uvod{--uvod-nad-nadpisem:clamp(8px,7vh,56px);--uvod-pod-panakem:clamp(8px,2.5vh,24px)}
-}
-/* Opravdu malý displej (iPhone SE v Safari má okno kolem 550): tam už se
-   zmenší i písmo a panák. */
+/* Opravdu malý displej (iPhone SE v Safari má okno kolem 550): tam se
+   zmenší i písmo. */
 @media (max-height:640px){
-  .uvod{--uvod-text:16px;--uvod-kresba:min(150px,22vh)}
+  .uvod{--uvod-text:16px;--uvod-pod-textem:20px}
   .uvod-nadpis{font-size:clamp(28px,9vw,36px)}
 }
 

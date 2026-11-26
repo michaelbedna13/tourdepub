@@ -14,10 +14,9 @@
 // přihlásil, animace by buď naskočila v půlce, nebo by písmena zmizela
 // a začala znova. Tahle vrstva je proto do příchodu plakátů průhledná
 // a značka pod ní prosvítá — teprve s prvním se #uvod odklidí.
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { vazat } from "../lib/format";
 import { PRIBEH } from "../lib/pribeh";
-import { UVOD_KRESBY } from "../lib/uvod-kresby";
 import { Logo } from "./Logo";
 
 /** Nejmíň takhle dlouho zůstane značka od načtení stránky. */
@@ -32,12 +31,10 @@ const PISMA_NEJVIC = 2500;
 /** Jak dlouho se úvod vytrácí, než se odklidí. */
 const ZAVRENI = 300;
 
-/** Pět plakátů, pět kapitol jednoho večera (lib/pribeh.ts). Ke každé
- *  patří panák, co ji hraje: ťuká si škopkem, opírá se o hospodu, běží
- *  s pivem, píše čárky na tabuli, skáče s pohárem. Kresby jdou ve stejném
- *  pořadí jako kapitoly. */
-const KRESBY_KAPITOL = ["sraz", "hospoda", "beh", "zed", "vitez"] as const;
-const PLAKATY = PRIBEH.map((k, i) => ({ ...k, id: KRESBY_KAPITOL[i] }));
+/** Pět plakátů, pět kapitol jednoho večera (lib/pribeh.ts). Jen text:
+ *  kresby panáka (ťukal si škopkem, šel k sudu, běžel, ukazoval na tabuli,
+ *  skákal s pohárem) šly pryč, Mišák chtěl čistý text s lepším vzduchem. */
+const PLAKATY = PRIBEH;
 
 /** Jak dlouho se značka z index.html vytrácí, než se odklidí. Odchází
  *  nadvakrát (nejdřív logo, pak podklad), tohle je obojí dohromady.
@@ -198,16 +195,13 @@ export function Uvod({ hotovo }: { hotovo: () => void }) {
               onClick={(e) => { e.stopPropagation(); zavri(); }}>Přeskočit</button>
           </div>
 
-          {/* key: každý plakát přijede jako nový, ne že se přepíše text.
-              Nadpis a text nahoře, panák dole nad lištou: čte se shora
-              a kresba je tečka na konci, ne překážka před textem. */}
+          {/* key: každý plakát přijede jako nový, ne že se přepíše text. */}
           <div className="uvod-list" key={kde}>
             <h1 className="uvod-nadpis">
               <span>{vazat(p.nadpis[0])}</span>
               <span>{vazat(p.nadpis[1])}</span>
             </h1>
             <p className="uvod-telo">{vazat(p.text)}</p>
-            <div className="uvod-kresba"><Cmaranice id={p.id} /></div>
           </div>
 
           <div className="uvod-spodek">
@@ -257,32 +251,6 @@ function Sipka({ zpet = false }: { zpet?: boolean }) {
       stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
       aria-hidden="true">
       <path d="M1 5h21M17 1l5 4-5 4" />
-    </svg>
-  );
-}
-
-/** Kresba plakátu: ta samá ruka jako ikony, jen velká. Plocha je v barvě
- *  textu, výstřižky jsou průhledné a prosvítá jimi podklad — proto maska,
- *  ne dvě barvy (viz Ikona). */
-function Cmaranice({ id }: { id: keyof typeof UVOD_KRESBY }) {
-  // useId vrací dvojtečky, které v url(#…) nefungují všude
-  const maska = `uk${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
-  const kresba = UVOD_KRESBY[id];
-  if (!kresba) return null;
-  const [bx, by, bw, bh] = kresba.box.split(" ").map(Number);
-  // viewBox je obálka inkoustu, ne celý čtverec, ve kterém se kreslilo: jinak
-  // by měla každá kresba jinak velkou mezeru pod sebou podle toho, kolik
-  // z čtverce zabrala (viz obalka() v scripts/kresli-uvod.mjs).
-  return (
-    <svg className="uvod-cmaranice" viewBox={kresba.box} aria-hidden="true">
-      {/* Maska i plocha podle obálky kresby, ne pevně -20…120: hospoda se
-          štítem sahá za 120 a pevná maska ji usekla. */}
-      <mask id={maska} maskUnits="userSpaceOnUse" x={bx - 5} y={by - 5} width={bw + 10} height={bh + 10}>
-        {kresba.vrstvy.map(([druh, d], i) => (
-          <path key={i} d={d} fill={druh === "i" ? "#FFFFFF" : "#000000"} />
-        ))}
-      </mask>
-      <rect x={bx - 5} y={by - 5} width={bw + 10} height={bh + 10} fill="currentColor" mask={`url(#${maska})`} />
     </svg>
   );
 }

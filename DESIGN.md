@@ -691,6 +691,14 @@ tmavá. Vypadá to přesně jako bliknutí staré tmavě modré palety, i když 
 appka nikde nemá. Proto ten poslední odkaz: použije se jen tehdy, když nic
 jiného nesedlo.
 
+> **Stav k 26. 11. 2026:** plakáty úvodu jsou **jen text, bez kreseb**
+> (Mišák: „čistě ten text, hezčí spacing, jak to umí Apple“). Nadpis na dva
+> řádky (Hagrid 400, obtah 2 px, 11 vw), pod ním odstavec 18 px v sloupci
+> 34 znaků, a celý blok stojí **dole nad lištou**: všech pět plakátů má
+> stejnou spodní hranu a delší text roste nahoru. Generátor čmáranic
+> (`scripts/kresli-uvod.mjs`, `src/lib/uvod-kresby.ts`) šel pryč, zůstal
+> v historii gitu. Co je níž o kresbách na plakátech, platí pro starší verzi.
+
 **2. Průprava.** Pět plakátů a na nich **pravidla, ne jejich převyprávění**:
 texty se berou z `src/lib/pravidla.ts`, odkud je čte i obrazovka Pravidla, tak
 se nemůžou rozejít. Jeden plakát = jedna kapitola a jedna kresba, co říká to

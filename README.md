@@ -256,9 +256,7 @@ Kresbu má **každý úkol**. Berou se ze dvou zdrojů, v tomhle pořadí:
 Když přibude obtažená kresba, kreslená se sama přestane používat a nic se
 kolem toho nepřerovná.
 
-Stránky průpravy v úvodu mají vlastní **čmáranice**. Ty se nekreslí z obrázku,
-ale generují se stejně jako ikony (`scripts/kresli-uvod.mjs` →
-`src/lib/uvod-kresby.ts`) — ta samá ruka, jen velká.
+Plakáty úvodu jsou jen text, bez kreseb (`src/lib/pribeh.ts`).
 
 Kresba se dodává jako **obrázek**: tmavá kresba (fixa, pero, cokoli) na světlém
 podkladu, bez pozadí a bez stínů. Soubor se jmenuje podle toho, kam patří:
