@@ -229,16 +229,6 @@ const KRESBY = {
     I(cut(rect(30, 76, 62, 86, 3), { ...R, amp: .9 })),
     I(cut(srpek(46, 30, 30, 6, -46, 46), { ...R, amp: .8, step: 5 })),
   ],
-  // Královská delegace: koruna. Hroty musí zůstat ostré, proto nižší
-  // tension — vyhlazená koruna vypadala jako vlna.
-  delegace: () => [
-    I(cut([[14, 76], [19, 30], [34, 52], [50, 22], [66, 52], [81, 30], [86, 76]],
-          { ...H, tension: .25 })),
-    I(cut(rect(14, 72, 86, 90, 3), { ...R, amp: 1 })),
-    C(cut(ell(30, 64, 5, 5, 14), JEMNE)),
-    C(cut(ell(50, 60, 5, 5, 14), JEMNE)),
-    C(cut(ell(70, 64, 5, 5, 14), JEMNE)),
-  ],
   // Hospodský Národní: divadelní maska na tyčce
   narodni: () => [
     I(cut([[26, 14], [74, 14], [78, 44], [68, 68], [50, 80], [32, 68], [22, 44]], H)),
@@ -297,15 +287,6 @@ const KRESBY = {
       ...dily.map(([plny]) => I(cut(plny, { ...R, amp: .8 }))),
     ];
   },
-  // Dabing naživo: filmová klapka. Bublina by se pletla s Tichou špeluňkou
-  // i Veršovaným lokálem, ty už obě bublinu mají.
-  dabing: () => [
-    I(cut(rect(10, 40, 90, 88, 4), H)),
-    I(cut(rot(rect(8, 14, 92, 34, 2), -9, 50, 24), { ...R, amp: 1 })),
-    C(cut(rot(rect(26, 14, 34, 34, 1), -9, 50, 24), { ...R, amp: .7 })),
-    C(cut(rot(rect(50, 14, 58, 34, 1), -9, 50, 24), { ...R, amp: .7 })),
-    C(cut(rot(rect(74, 14, 82, 34, 1), -9, 50, 24), { ...R, amp: .7 })),
-  ],
   // Trenér roku: stopky. Píšťalka se zkoušela dvakrát a pokaždé z ní byl
   // v téhle velikosti šnek nebo flaška: tělo s náustkem splyne do jednoho
   // kužele. Stopky mají korunku nahoře a ručičky uvnitř, takže se nedají

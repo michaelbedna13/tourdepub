@@ -107,9 +107,6 @@ export const VYCHOZI_UKOLY: Ukol[] = [
   { id: "hadka", kat: "kecy", piva: 3, body: 3, max: 1, nazev: "Hádka o čárku",
     popis: "Dělejte u vrchního borčus, že to pivo je pod čáru nebo to není správnej šnyt. Furt jim to vracejte a chtějte nový, dokud nepřiznaj barvu.",
     pozn: "Ale s citem, ať vás nevyhodijó!" },
-  { id: "delegace", kat: "kecy", piva: 2, body: 2, max: 1, nazev: "Královská delegace",
-    popis: "Hoďte objednávku jak královská delegace. Jeden je král, druhý rádce a třetí překladatel.",
-    pozn: "Role musíte udržet až do konce objednávky." },
   { id: "prenos", kat: "kecy", piva: 2, body: 2, max: 1, nazev: "Přímej přenos",
     popis: "Jeden z vás dvě minuty naživo komentuje, co zrovna dělá kamarád: jak objednává, obléká bundu nebo cáluje. A to tak, jak kdyby to bylo finále mistrovství světa." },
 
@@ -157,8 +154,6 @@ export const VYCHOZI_UKOLY: Ukol[] = [
   { id: "kapela", kat: "zranice", piva: 2, body: 2, max: 1, nazev: "Kapela na placku",
     popis: "Postavte se jak kapela na obal placky. Musíte mít název, žánr a pózu, co tomu žánru sedí.",
     pozn: "Betelnější je, když vás cvakne cizák." },
-  { id: "dabing", kat: "zranice", piva: 2, body: 2, max: 1, nazev: "Dabing naživo",
-    popis: "Dva z vás rozbalí němou scénku a třetí jim k tomu improvizuje dialog. Scénka musí mít začátek, zádrhel a konec." },
   { id: "trener", kat: "zranice", piva: 1, body: 1, max: 1, nazev: "Trenér roku",
     popis: "Jeden si vybere druhýho a minutu do něj hustí motivační proslov, jak kdyby ten druhej šel na olympijský finále.",
     pozn: "Disciplína může bejt klidně zavazování tkaniček." },
